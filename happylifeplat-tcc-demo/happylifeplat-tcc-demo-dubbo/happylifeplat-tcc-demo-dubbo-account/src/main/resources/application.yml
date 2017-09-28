@@ -1,0 +1,29 @@
+server:
+  port: 8085
+  contextPath: /
+  address: 0.0.0.0
+
+spring:
+    datasource:
+        driver-class-name:  com.mysql.jdbc.Driver
+        url: jdbc:mysql://192.168.1.68:3306/account?useUnicode=true&characterEncoding=utf8
+        username: xiaoyu
+        password: Wgj@555888
+
+
+mybatis:
+  type-aliases-package: com.happylifeplat.tcc.demo.dubbo.account.api.entity
+  config-location: classpath:mybatis/mybatis-config.xml
+
+logging:
+    level:
+        root: error
+        org.springframework.web: info
+        org.apache.ibatis: info
+        com.happylifeplat.bonuspoint: info
+        com.happylifeplat.lottery: debug
+        com.happylifeplat: debug
+        io.netty: info
+
+    path: "./logs"
+
