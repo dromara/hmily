@@ -23,13 +23,11 @@ happylifeplat-tcc
 
 
 # TCC原理介绍
-
-
+  ####  [原理介绍](https://github.com/yu199195/happylifeplat-tcc/wiki/TCC%E5%8E%9F%E7%90%86%E4%BB%8B%E7%B4%B9)
 
 #   Configuration
 
   ####  [配置详解](https://github.com/yu199195/happylifeplat-tcc/wiki/%E9%85%8D%E7%BD%AE%E8%AF%A6%E8%A7%A3)
-
 
 # Usage
 
