@@ -1,7 +1,7 @@
 happylifeplat-tcc
 ================
 
-碧桂园旺生活平台解决分布式事务方案之tcc开源框架。基于java语言来开发（JDK1.8），支持dubbo，springcloud等rpc框架进行分布式事务.
+碧桂园旺生活平台解决分布式事务方案之tcc开源框架。基于java语言来开发（JDK1.8），支持dubbo，springcloud等rpc框架进行分布式事务。
 #####   因为文件名太长，大家在拉取代码的时候执git命令：git config core.longpaths true
 
  # Features
@@ -31,9 +31,9 @@ happylifeplat-tcc
 
 # Usage
 
-   ### [快速体检(dubbo)](https://github.com/yu199195/happylifeplat-tcc/wiki/%E5%BF%AB%E9%80%9F%E4%BD%93%E9%AA%8C%EF%BC%88dubbo%EF%BC%89)
+   ### [快速体验(dubbo)](https://github.com/yu199195/happylifeplat-tcc/wiki/%E5%BF%AB%E9%80%9F%E4%BD%93%E9%AA%8C%EF%BC%88dubbo%EF%BC%89)
 
-   ### [快速体检(springcloud)](https://github.com/yu199195/happylifeplat-tcc/wiki/%E5%BF%AB%E9%80%9F%E4%BD%93%E9%AA%8C%EF%BC%88springcloud%EF%BC%89)
+   ### [快速体验(springcloud)](https://github.com/yu199195/happylifeplat-tcc/wiki/%E5%BF%AB%E9%80%9F%E4%BD%93%E9%AA%8C%EF%BC%88springcloud%EF%BC%89)
 
 
  # Support
