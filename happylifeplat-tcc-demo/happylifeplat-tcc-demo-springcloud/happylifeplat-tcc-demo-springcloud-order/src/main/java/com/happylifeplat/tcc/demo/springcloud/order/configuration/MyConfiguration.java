@@ -33,7 +33,9 @@ public class MyConfiguration {
     @Bean
     @Scope("prototype")
     public Feign.Builder feignBuilder() {
-        return Feign.builder().requestInterceptor(new TccRestTemplateInterceptor()).invocationHandlerFactory(invocationHandlerFactory());
+        return Feign.builder()
+                .requestInterceptor(new TccRestTemplateInterceptor())
+                .invocationHandlerFactory(invocationHandlerFactory());
     }
 
     @Bean
