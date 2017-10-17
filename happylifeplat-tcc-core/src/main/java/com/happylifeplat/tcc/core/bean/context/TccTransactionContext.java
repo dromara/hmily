@@ -20,6 +20,9 @@ package com.happylifeplat.tcc.core.bean.context;
 import java.io.Serializable;
 
 
+/**
+ * @author xiaoyu
+ */
 public class TccTransactionContext implements Serializable {
 
     private static final long serialVersionUID = -5289080166922118073L;

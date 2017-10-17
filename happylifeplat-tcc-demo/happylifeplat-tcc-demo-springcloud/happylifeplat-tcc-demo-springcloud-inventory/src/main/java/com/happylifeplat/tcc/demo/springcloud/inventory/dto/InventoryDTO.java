@@ -20,6 +20,9 @@ package com.happylifeplat.tcc.demo.springcloud.inventory.dto;
 
 import java.io.Serializable;
 
+/**
+ * @author xiaoyu
+ */
 public class InventoryDTO implements Serializable {
 
     private static final long serialVersionUID = 8229355519336565493L;
@@ -32,7 +35,7 @@ public class InventoryDTO implements Serializable {
     /**
      * 数量
      */
-    private int count;
+    private Integer count;
 
     public Integer getProductId() {
         return productId;
@@ -42,11 +45,19 @@ public class InventoryDTO implements Serializable {
         this.productId = productId;
     }
 
-    public int getCount() {
+    public Integer getCount() {
         return count;
     }
 
-    public void setCount(int count) {
+    public void setCount(Integer count) {
         this.count = count;
+    }
+
+    @Override
+    public String toString() {
+        return "InventoryDTO{" +
+                "productId=" + productId +
+                ", count=" + count +
+                '}';
     }
 }

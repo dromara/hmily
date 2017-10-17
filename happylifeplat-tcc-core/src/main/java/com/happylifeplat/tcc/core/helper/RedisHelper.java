@@ -25,6 +25,9 @@ import java.util.List;
 import java.util.Map;
 
 
+/**
+ * @author xiaoyu
+ */
 public class RedisHelper {
 
     public static byte[] getRedisKey(String keyPrefix, String id) {
@@ -41,8 +44,9 @@ public class RedisHelper {
                     Map<byte[], byte[]> fieldValueMap = jedis.hgetAll(key);
                     List<Map.Entry<byte[], byte[]>> entries = new ArrayList<>(fieldValueMap.entrySet());
                     entries.sort((entry1, entry2) -> (int) (ByteUtils.bytesToLong(entry1.getKey()) - ByteUtils.bytesToLong(entry2.getKey())));
-                    if (entries.isEmpty())
+                    if (entries.isEmpty()) {
                         return null;
+                    }
                     return entries.get(entries.size() - 1).getValue();
                 }
         );
@@ -52,8 +56,9 @@ public class RedisHelper {
         Map<byte[], byte[]> fieldValueMap = jedis.hgetAll(key);
         List<Map.Entry<byte[], byte[]>> entries = new ArrayList<Map.Entry<byte[], byte[]>>(fieldValueMap.entrySet());
         entries.sort((entry1, entry2) -> (int) (ByteUtils.bytesToLong(entry1.getKey()) - ByteUtils.bytesToLong(entry2.getKey())));
-        if (entries.isEmpty())
+        if (entries.isEmpty()) {
             return null;
+        }
         return entries.get(entries.size() - 1).getValue();
     }
 

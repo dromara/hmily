@@ -25,11 +25,20 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+/**
+ * @author xiaoyu
+ */
 @FeignClient(value = "account-service", configuration = MyConfiguration.class)
 public interface AccountClient {
 
+    /**
+     * 用户账户付款
+     *
+     * @param accountDO 实体类
+     * @return true 成功
+     */
     @PostMapping("/account-service/account/payment")
-    @Tcc(confirmMethod = "payment", cancelMethod = "payment")
+    @Tcc
     Boolean payment(@RequestBody AccountDTO accountDO);
 
 }

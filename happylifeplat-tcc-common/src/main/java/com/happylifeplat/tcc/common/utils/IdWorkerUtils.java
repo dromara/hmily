@@ -20,6 +20,9 @@ package com.happylifeplat.tcc.common.utils;
 import java.util.UUID;
 
 
+/**
+ * @author xiaoyu
+ */
 public final class IdWorkerUtils {
 
     private final long twepoch = 1288834974657L;
@@ -38,10 +41,10 @@ public final class IdWorkerUtils {
     private long sequence = 0L;
     private long lastTimestamp = -1L;
 
-    private static final IdWorkerUtils idWorker = new IdWorkerUtils();
+    private static final IdWorkerUtils ID_WORKER_UTILS = new IdWorkerUtils();
 
     public static IdWorkerUtils getInstance() {
-        return idWorker;
+        return ID_WORKER_UTILS;
     }
 
     private IdWorkerUtils() {
@@ -91,11 +94,11 @@ public final class IdWorkerUtils {
     }
 
     public String buildPartNumber() {
-        return "P" + idWorker.nextId();
+        return "P" + ID_WORKER_UTILS.nextId();
     }
 
     public String buildSkuCode() {
-        return "S" + idWorker.nextId();
+        return "S" + ID_WORKER_UTILS.nextId();
     }
 
     public String createTaskKey() {
@@ -113,7 +116,7 @@ public final class IdWorkerUtils {
     }
 
     public long randomUUID() {
-        return idWorker.nextId();
+        return ID_WORKER_UTILS.nextId();
     }
 
 

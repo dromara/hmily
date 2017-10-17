@@ -30,6 +30,9 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 
+/**
+ * @author xiaoyu
+ */
 public class JavaSerializer implements ObjectSerializer {
     @Override
     public byte[] serialize(Object obj) throws TccException {
@@ -52,9 +55,7 @@ public class JavaSerializer implements ObjectSerializer {
         try {
             ObjectInput input = new ObjectInputStream(arrayInputStream);
             return (T) input.readObject();
-        } catch (IOException e) {
-            throw new TccException("JAVA deSerialize error " + e.getMessage());
-        } catch (ClassNotFoundException e) {
+        } catch (IOException | ClassNotFoundException e) {
             throw new TccException("JAVA deSerialize error " + e.getMessage());
         }
     }

@@ -18,6 +18,7 @@
 package com.happylifeplat.tcc.core.spi.repository;
 
 import com.alibaba.druid.pool.DruidDataSource;
+import com.google.common.collect.Maps;
 import com.happylifeplat.tcc.common.config.TccConfig;
 import com.happylifeplat.tcc.common.config.TccDbConfig;
 import com.happylifeplat.tcc.core.bean.entity.Participant;
@@ -46,6 +47,9 @@ import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
+/**
+ * @author xiaoyu
+ */
 @SuppressWarnings("unchecked")
 public class JdbcCoordinatorRepository implements CoordinatorRepository {
 
@@ -278,7 +282,6 @@ public class JdbcCoordinatorRepository implements CoordinatorRepository {
             }
             return ps.executeUpdate();
         } catch (SQLException e) {
-            //e.printStackTrace();
             logger.error("executeUpdate-> " + e.getMessage());
         } finally {
             close(connection, ps, null);
@@ -304,7 +307,7 @@ public class JdbcCoordinatorRepository implements CoordinatorRepository {
             int columnCount = md.getColumnCount();
             list = new ArrayList<>();
             while (rs.next()) {
-                Map<String, Object> rowData = new HashMap<>();
+                Map<String, Object> rowData = Maps.newConcurrentMap();
                 for (int i = 1; i <= columnCount; i++) {
                     rowData.put(md.getColumnName(i), rs.getObject(i));
                 }

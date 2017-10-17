@@ -21,6 +21,9 @@ package com.happylifeplat.tcc.demo.dubbo.account.api.dto;
 import java.io.Serializable;
 import java.math.BigDecimal;
 
+/**
+ * @author xiaoyu
+ */
 public class AccountDTO implements Serializable {
 
     private static final long serialVersionUID = 7223470850578998427L;

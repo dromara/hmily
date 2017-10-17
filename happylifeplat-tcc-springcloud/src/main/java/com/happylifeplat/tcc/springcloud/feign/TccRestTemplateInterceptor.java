@@ -27,9 +27,11 @@ import feign.RequestTemplate;
 import org.springframework.context.annotation.Configuration;
 
 
+/**
+ * @author xiaoyu
+ */
 @Configuration
 public class TccRestTemplateInterceptor implements RequestInterceptor {
-
 
 
     @Override

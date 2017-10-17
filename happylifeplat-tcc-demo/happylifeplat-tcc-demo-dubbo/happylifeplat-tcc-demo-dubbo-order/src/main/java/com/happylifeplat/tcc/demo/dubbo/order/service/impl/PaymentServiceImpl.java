@@ -34,6 +34,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+/**
+ * @author xiaoyu
+ */
 @Service
 public class PaymentServiceImpl implements PaymentService {
 
@@ -58,6 +61,7 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
 
+    @Override
     @Tcc(confirmMethod = "confirmOrderStatus", cancelMethod = "cancelOrderStatus")
     public void makePayment(Order order) {
         order.setStatus(OrderStatusEnum.PAYING.getCode());

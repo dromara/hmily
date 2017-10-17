@@ -36,14 +36,17 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * @author xiaoyu
+ */
 @Component
 @SuppressWarnings("unchecked")
-public class AsyncRollbackService implements RollbackService {
+public class AsyncRollbackServiceImpl implements RollbackService {
 
     /**
      * logger
      */
-    private static final Logger LOGGER = LoggerFactory.getLogger(AsyncRollbackService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AsyncRollbackServiceImpl.class);
 
     /**
      * 执行协调回滚方法
@@ -69,7 +72,7 @@ public class AsyncRollbackService implements RollbackService {
                                         LogUtil.error(LOGGER, "执行cancel方法异常：{}", e::getMessage);
                                         e.printStackTrace();
                                     }
-                                }).whenComplete((v,e)-> TransactionContextLocal.getInstance().remove()))
+                                }).whenComplete((v, e) -> TransactionContextLocal.getInstance().remove()))
                         .toArray(CompletableFuture[]::new);
                 CompletableFuture.allOf(cfs).join();
             }

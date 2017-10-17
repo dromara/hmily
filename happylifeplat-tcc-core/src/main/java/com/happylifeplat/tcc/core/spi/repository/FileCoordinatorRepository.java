@@ -38,6 +38,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 
+/**
+ * @author xiaoyu
+ */
 @SuppressWarnings("unchecked")
 public class FileCoordinatorRepository implements CoordinatorRepository {
 
@@ -113,7 +116,7 @@ public class FileCoordinatorRepository implements CoordinatorRepository {
 
         String fullFileName = getFullFileName(id);
         File file = new File(fullFileName);
-        return  readTransaction(file);
+        return readTransaction(file);
     }
 
     /**
@@ -162,7 +165,7 @@ public class FileCoordinatorRepository implements CoordinatorRepository {
 
     private String buildFilePath(String modelName, TccFileConfig tccFileConfig) {
 
-        String fileName = String.join("_", "TX", tccFileConfig.getPrefix(), modelName.replaceAll("-", "_"));
+        String fileName = String.join("_", "tcc", tccFileConfig.getPrefix(), modelName.replaceAll("-", "_"));
 
         return String.join("/", tccFileConfig.getPath(), fileName);
 

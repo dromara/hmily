@@ -22,6 +22,9 @@ import com.happylifeplat.tcc.core.bean.entity.Participant;
 
 import java.util.List;
 
+/**
+ * @author xiaoyu
+ */
 public interface RollbackService {
 
 

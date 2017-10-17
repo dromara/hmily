@@ -23,6 +23,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ImportResource;
 
 
+/**
+ * @author xiaoyu
+ */
 @SpringBootApplication
 @ImportResource({"classpath:applicationContext.xml"})
 @MapperScan("com.happylifeplat.tcc.demo.dubbo.inventory.mapper")
@@ -30,7 +33,6 @@ public class InventoryApplication {
     public static void main(String[] args) {
         SpringApplication.run(InventoryApplication.class, args);
     }
-
 
 
 }

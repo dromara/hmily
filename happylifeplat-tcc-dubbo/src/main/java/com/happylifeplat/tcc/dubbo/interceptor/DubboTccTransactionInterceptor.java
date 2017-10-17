@@ -29,6 +29,9 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+/**
+ * @author xiaoyu
+ */
 @Component
 public class DubboTccTransactionInterceptor implements TccTransactionInterceptor {
 

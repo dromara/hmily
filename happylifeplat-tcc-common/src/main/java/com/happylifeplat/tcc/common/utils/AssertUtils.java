@@ -21,6 +21,9 @@ package com.happylifeplat.tcc.common.utils;
 import com.happylifeplat.tcc.common.exception.TccRuntimeException;
 
 
+/**
+ * @author xiaoyu
+ */
 public class AssertUtils {
 
     private AssertUtils() {

@@ -20,6 +20,9 @@ package com.happylifeplat.tcc.core.service;
 
 import com.happylifeplat.tcc.core.bean.context.TccTransactionContext;
 
+/**
+ * @author xiaoyu
+ */
 @FunctionalInterface
 public interface TccTransactionFactoryService<T> {
 

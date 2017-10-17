@@ -37,6 +37,9 @@ import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.Objects;
 
+/**
+ * @author xiaoyu
+ */
 public class TccFeignHandler implements InvocationHandler {
     /**
      * logger
@@ -46,6 +49,7 @@ public class TccFeignHandler implements InvocationHandler {
     private Target<?> target;
     private Map<Method, MethodHandler> handlers;
 
+    @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         if (Object.class.equals(method.getDeclaringClass())) {
             return method.invoke(this, args);

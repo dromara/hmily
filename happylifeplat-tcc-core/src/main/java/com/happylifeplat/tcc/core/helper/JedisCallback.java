@@ -20,8 +20,17 @@ package com.happylifeplat.tcc.core.helper;
 import redis.clients.jedis.Jedis;
 
 
+/**
+ * @author xiaoyu
+ */
 @FunctionalInterface
 public interface JedisCallback<T> {
 
+    /**
+     * redis操作
+     *
+     * @param jedis jedis客户端
+     * @return T 泛型
+     */
     T doInJedis(Jedis jedis);
 }

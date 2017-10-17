@@ -19,6 +19,9 @@ package com.happylifeplat.tcc.core.bean;
 
 import com.happylifeplat.tcc.core.bean.context.TccTransactionContext;
 
+/**
+ * @author xiaoyu
+ */
 public class TccTransactionInfo {
 
     private String compensationId;

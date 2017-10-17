@@ -31,7 +31,8 @@
 
     <dubbo:protocol accesslog="true" name="dubbo" port="20884"/>
 
-    <dubbo:service interface="com.happylifeplat.tcc.demo.dubbo.account.api.service.AccountService" ref="accountService"  />
+    <dubbo:service interface="com.happylifeplat.tcc.demo.dubbo.account.api.service.AccountService"
+                   ref="accountService"/>
 
 
 </beans>

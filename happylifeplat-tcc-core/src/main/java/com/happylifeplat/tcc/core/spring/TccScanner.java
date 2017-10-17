@@ -24,6 +24,9 @@ import org.springframework.context.annotation.ClassPathBeanDefinitionScanner;
 import java.util.Set;
 
 
+/**
+ * @author xiaoyu
+ */
 public class TccScanner extends ClassPathBeanDefinitionScanner {
     public TccScanner(BeanDefinitionRegistry registry) {
         super(registry);

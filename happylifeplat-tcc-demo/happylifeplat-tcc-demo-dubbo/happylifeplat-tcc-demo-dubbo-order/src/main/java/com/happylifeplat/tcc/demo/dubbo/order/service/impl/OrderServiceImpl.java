@@ -32,6 +32,9 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 
+/**
+ * @author xiaoyu
+ */
 @Service("orderService")
 public class OrderServiceImpl implements OrderService {
 
@@ -156,11 +159,13 @@ public class OrderServiceImpl implements OrderService {
         Order order = new Order();
         order.setCreateTime(new Date());
         order.setNumber(IdWorkerUtils.getInstance().buildPartNumber());
-        order.setProductId(1);//demo中的表里只有商品id为1的数据
+        //demo中的表里只有商品id为1的数据
+        order.setProductId(1);
         order.setStatus(OrderStatusEnum.NOT_PAY.getCode());
         order.setTotalAmount(amount);
         order.setCount(count);
-        order.setUserId(10000);//demo中 表里面存的用户id为10000
+        //demo中 表里面存的用户id为10000
+        order.setUserId(10000);
         return order;
     }
 }

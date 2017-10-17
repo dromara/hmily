@@ -20,6 +20,9 @@ package com.happylifeplat.tcc.core.bean.entity;
 import java.io.Serializable;
 
 
+/**
+ * @author xiaoyu
+ */
 public class Participant implements Serializable {
 
     private static final long serialVersionUID = -2590970715288987627L;
@@ -29,7 +32,7 @@ public class Participant implements Serializable {
 
     private TccInvocation cancelTccInvocation;
 
-    public Participant(){
+    public Participant() {
 
     }
 

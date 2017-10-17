@@ -22,6 +22,9 @@ import java.util.Objects;
 import java.util.Optional;
 
 
+/**
+ * @author xiaoyu
+ */
 public enum RepositorySupportEnum {
 
     /**

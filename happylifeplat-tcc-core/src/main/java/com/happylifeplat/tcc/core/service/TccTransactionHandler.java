@@ -20,6 +20,9 @@ package com.happylifeplat.tcc.core.service;
 import com.happylifeplat.tcc.core.bean.context.TccTransactionContext;
 import org.aspectj.lang.ProceedingJoinPoint;
 
+/**
+ * @author xiaoyu
+ */
 @FunctionalInterface
 public interface TccTransactionHandler {
 

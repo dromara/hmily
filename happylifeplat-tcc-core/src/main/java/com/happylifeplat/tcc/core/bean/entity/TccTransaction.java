@@ -26,6 +26,9 @@ import java.util.Date;
 import java.util.List;
 
 
+/**
+ * @author xiaoyu
+ */
 public class TccTransaction implements Serializable {
 
 

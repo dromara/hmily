@@ -19,6 +19,9 @@ package com.happylifeplat.tcc.common.config;
 
 import com.happylifeplat.tcc.common.enums.SerializeEnum;
 
+/**
+ * @author xiaoyu
+ */
 public class TccConfig {
 
     /**

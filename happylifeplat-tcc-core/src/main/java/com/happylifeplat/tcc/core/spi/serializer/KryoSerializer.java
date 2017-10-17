@@ -29,6 +29,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 
+/**
+ * @author xiaoyu
+ */
 public class KryoSerializer implements ObjectSerializer {
     /**
      * 序列化

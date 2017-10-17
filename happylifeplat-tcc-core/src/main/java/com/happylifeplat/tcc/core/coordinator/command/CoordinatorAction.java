@@ -23,6 +23,9 @@ import com.happylifeplat.tcc.core.bean.entity.TccTransaction;
 
 import java.io.Serializable;
 
+/**
+ * @author xiaoyu
+ */
 public class CoordinatorAction implements Serializable {
 
 

@@ -20,10 +20,13 @@ package com.happylifeplat.tcc.core.concurrent.threadlocal;
 
 import com.happylifeplat.tcc.core.bean.context.TccTransactionContext;
 
+/**
+ * @author xiaoyu
+ */
 public class TransactionContextLocal {
 
 
-    private static final ThreadLocal<TccTransactionContext> currentLocal = new ThreadLocal<>();
+    private static final ThreadLocal<TccTransactionContext> CURRENT_LOCAL = new ThreadLocal<>();
 
     private static final TransactionContextLocal TRANSACTION_CONTEXT_LOCAL = new TransactionContextLocal();
 
@@ -37,14 +40,14 @@ public class TransactionContextLocal {
 
 
     public void set(TccTransactionContext context) {
-        currentLocal.set(context);
+        CURRENT_LOCAL.set(context);
     }
 
     public TccTransactionContext get() {
-        return currentLocal.get();
+        return CURRENT_LOCAL.get();
     }
 
     public void remove() {
-        currentLocal.remove();
+        CURRENT_LOCAL.remove();
     }
 }

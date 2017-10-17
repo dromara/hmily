@@ -22,6 +22,10 @@ import java.util.Objects;
 import java.util.Optional;
 
 
+/**
+ * @author xiaoyu
+ */
+
 public enum TccActionEnum {
 
 
@@ -41,8 +45,6 @@ public enum TccActionEnum {
      * Canceling tcc action enum.
      */
     CANCELING(3, "cancel阶段");
-
-
 
 
     private int code;

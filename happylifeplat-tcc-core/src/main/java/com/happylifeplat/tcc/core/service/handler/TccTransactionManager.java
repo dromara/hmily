@@ -34,7 +34,7 @@ import com.happylifeplat.tcc.core.coordinator.CoordinatorService;
 import com.happylifeplat.tcc.core.coordinator.command.CoordinatorAction;
 import com.happylifeplat.tcc.core.coordinator.command.CoordinatorCommand;
 import com.happylifeplat.tcc.core.helper.SpringBeanUtils;
-import com.happylifeplat.tcc.core.service.rollback.AsyncRollbackService;
+import com.happylifeplat.tcc.core.service.rollback.AsyncRollbackServiceImpl;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.reflect.MethodUtils;
 import org.slf4j.Logger;
@@ -47,6 +47,9 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 
+/**
+ * @author xiaoyu
+ */
 @Component
 @SuppressWarnings("unchecked")
 public class TccTransactionManager {
@@ -67,10 +70,10 @@ public class TccTransactionManager {
 
     private final CoordinatorCommand coordinatorCommand;
 
-    private final AsyncRollbackService asyncRollbackService;
+    private final AsyncRollbackServiceImpl asyncRollbackService;
 
     @Autowired
-    public TccTransactionManager(CoordinatorCommand coordinatorCommand, CoordinatorService coordinatorService, AsyncRollbackService asyncRollbackService) {
+    public TccTransactionManager(CoordinatorCommand coordinatorCommand, CoordinatorService coordinatorService, AsyncRollbackServiceImpl asyncRollbackService) {
         this.coordinatorCommand = coordinatorCommand;
         this.coordinatorService = coordinatorService;
         this.asyncRollbackService = asyncRollbackService;
@@ -96,8 +99,10 @@ public class TccTransactionManager {
 
         //设置tcc事务上下文，这个类会传递给远端
         TccTransactionContext context = new TccTransactionContext();
-        context.setAction(TccActionEnum.TRYING.getCode());//设置执行动作为try
-        context.setTransId(tccTransaction.getTransId());//设置事务id
+        //设置执行动作为try
+        context.setAction(TccActionEnum.TRYING.getCode());
+        //设置事务id
+        context.setTransId(tccTransaction.getTransId());
         TransactionContextLocal.getInstance().set(context);
 
     }
@@ -105,11 +110,11 @@ public class TccTransactionManager {
     TccTransaction providerBegin(TccTransactionContext context) {
         LogUtil.debug(LOGGER, "参与方开始执行tcc事务！start：{}", context::toString);
         TccTransaction transaction = new TccTransaction(context.getTransId());
-        transaction.setRole(TccRoleEnum.PROVIDER.getCode());//设置角色为提供者
+        //设置角色为提供者
+        transaction.setRole(TccRoleEnum.PROVIDER.getCode());
         transaction.setStatus(context.getAction());
         //保存当前事务信息
         coordinatorService.save(transaction);
-        // coordinatorCommand.execute(new CoordinatorAction(CoordinatorActionEnum.SAVE, transaction));
         //传入当前threadLocal
         CURRENT.set(transaction);
         return transaction;
@@ -117,7 +122,6 @@ public class TccTransactionManager {
 
     TccTransaction acquire(TccTransactionContext context) {
         final TccTransaction tccTransaction = coordinatorService.findByTransId(context.getTransId());
-        // tccTransaction.setStatus(context.getAction());
         CURRENT.set(tccTransaction);
         return tccTransaction;
     }
@@ -151,7 +155,6 @@ public class TccTransactionManager {
         Participant fail = null;
         List<Participant> participantList = Lists.newArrayListWithCapacity(participants.size());
         if (CollectionUtils.isNotEmpty(participants)) {
-            //asyncRollbackService.execute(participants);
             for (Participant participant : participants) {
                 try {
                     TccTransactionContext context = new TccTransactionContext();
@@ -165,7 +168,6 @@ public class TccTransactionManager {
                     success = false;
                     fail = participant;
                     break;
-                    //throw new TccRuntimeException(e);
                 }
             }
 
@@ -174,8 +176,6 @@ public class TccTransactionManager {
 
 
     }
-
-
 
 
     /**
