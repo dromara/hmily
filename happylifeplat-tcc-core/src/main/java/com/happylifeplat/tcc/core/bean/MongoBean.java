@@ -24,6 +24,9 @@ import java.io.Serializable;
 import java.util.Date;
 
 
+/**
+ * @author xiaoyu
+ */
 public class MongoBean implements Serializable {
 
     private static final long serialVersionUID = 7920817865031921102L;

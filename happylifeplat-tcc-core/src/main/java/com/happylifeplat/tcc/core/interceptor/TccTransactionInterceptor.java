@@ -20,8 +20,19 @@ package com.happylifeplat.tcc.core.interceptor;
 import org.aspectj.lang.ProceedingJoinPoint;
 
 
+/**
+ * @author xiaoyu
+ */
 @FunctionalInterface
 public interface TccTransactionInterceptor {
 
+
+    /**
+     * tcc分布式事务拦截方法
+     *
+     * @param pjp tcc切入点
+     * @return Object
+     * @throws Throwable 异常
+     */
     Object interceptor(ProceedingJoinPoint pjp) throws Throwable;
 }

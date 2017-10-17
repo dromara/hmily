@@ -20,7 +20,10 @@ package com.happylifeplat.tcc.demo.springcloud.inventory.entity;
 
 import java.io.Serializable;
 
-public class Inventory implements Serializable{
+/**
+ * @author xiaoyu
+ */
+public class Inventory implements Serializable {
 
     private static final long serialVersionUID = 6957734749389133832L;
     private Integer id;

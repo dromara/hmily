@@ -56,8 +56,12 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * @author xiaoyu
+ */
 @Service("coordinatorService")
 public class CoordinatorServiceImpl implements CoordinatorService {
 
@@ -81,9 +85,9 @@ public class CoordinatorServiceImpl implements CoordinatorService {
     @Autowired
     public CoordinatorServiceImpl(ApplicationService applicationService) {
         this.applicationService = applicationService;
-
-        this.scheduledExecutorService = Executors.newSingleThreadScheduledExecutor(
+        this.scheduledExecutorService = new ScheduledThreadPoolExecutor(1,
                 TccTransactionThreadFactory.create("tccRollBackService", true));
+
     }
 
 
@@ -102,7 +106,6 @@ public class CoordinatorServiceImpl implements CoordinatorService {
         coordinatorRepository.init(appName, tccConfig);
         //初始化 协调资源线程池
         initCoordinatorPool();
-
         //定时执行补偿
         scheduledRollBack();
 
@@ -318,7 +321,6 @@ public class CoordinatorServiceImpl implements CoordinatorService {
             final Object[] args = tccInvocation.getArgs();
             final Class[] parameterTypes = tccInvocation.getParameterTypes();
             final Object bean = SpringBeanUtils.getInstance().getBean(clazz);
-            //CoordinatorLocal.getInstance().set(Constant.COORDINATOR_LOCAL);
             MethodUtils.invokeMethod(bean, method, args, parameterTypes);
             LogUtil.debug(LOGGER, "执行本地协调事务:{}", () -> tccInvocation.getTargetClass()
                     + ":" + tccInvocation.getMethodName());

@@ -20,20 +20,51 @@ package com.happylifeplat.tcc.demo.dubbo.order.service;
 
 import com.happylifeplat.tcc.demo.dubbo.order.entity.Order;
 
+/**
+ * @author xiaoyu
+ */
 public interface PaymentService {
 
+    /**
+     * 订单支付
+     *
+     * @param order 订单实体
+     */
     void makePayment(Order order);
 
-
+    /**
+     * mock订单支付的时候库存异常
+     *
+     * @param order 订单实体
+     * @return String
+     */
     String mockPaymentInventoryWithTryException(Order order);
 
 
+    /**
+     * mock订单支付的时候库存超时
+     *
+     * @param order 订单实体
+     * @return String
+     */
     String mockPaymentInventoryWithTryTimeout(Order order);
 
 
+    /**
+     * mock订单支付的时候库存确认异常
+     *
+     * @param order 订单实体
+     * @return String
+     */
     String mockPaymentInventoryWithConfirmException(Order order);
 
 
+    /**
+     * mock订单支付的时候库存确认超时
+     *
+     * @param order 订单实体
+     * @return String
+     */
     String mockPaymentInventoryWithConfirmTimeout(Order order);
 
 }

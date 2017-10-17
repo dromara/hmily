@@ -16,23 +16,30 @@
  *
  */
 
-package com.happylifeplat.tcc.demo.springcloud.account.service;
+package com.happylifeplat.tcc.core.service.handler;
 
-import com.happylifeplat.tcc.annotation.Tcc;
-import com.happylifeplat.tcc.demo.springcloud.account.dto.AccountDTO;
+import com.happylifeplat.tcc.core.bean.context.TccTransactionContext;
+import com.happylifeplat.tcc.core.service.TccTransactionHandler;
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.springframework.stereotype.Component;
 
 /**
  * @author xiaoyu
  */
-public interface AccountService {
+@Component
+public class ConsumeTccTransactionHandler implements TccTransactionHandler {
 
 
     /**
-     * 扣款支付
+     * 分布式事务处理接口
      *
-     * @param accountDTO 参数dto
-     * @return true
+     * @param point   point 切点
+     * @param context 信息
+     * @return Object
+     * @throws Throwable 异常
      */
-    @Tcc
-    boolean payment(AccountDTO accountDTO);
+    @Override
+    public Object handler(ProceedingJoinPoint point, TccTransactionContext context) throws Throwable {
+        return point.proceed();
+    }
 }

@@ -20,6 +20,9 @@ package com.happylifeplat.tcc.core.service;
 
 import com.happylifeplat.tcc.common.config.TccConfig;
 
+/**
+ * @author xiaoyu
+ */
 @FunctionalInterface
 public interface TccInitService {
 

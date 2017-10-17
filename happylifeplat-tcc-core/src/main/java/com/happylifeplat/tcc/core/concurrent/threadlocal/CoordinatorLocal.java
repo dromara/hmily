@@ -17,6 +17,9 @@
  */
 package com.happylifeplat.tcc.core.concurrent.threadlocal;
 
+/**
+ * @author xiaoyu
+ */
 public class CoordinatorLocal {
 
     private static final CoordinatorLocal COMPENSATION_LOCAL = new CoordinatorLocal();
@@ -30,19 +33,19 @@ public class CoordinatorLocal {
     }
 
 
-    private static final ThreadLocal<String> currentLocal = new ThreadLocal<>();
+    private static final ThreadLocal<String> CURRENT_LOCAL = new ThreadLocal<>();
 
 
     public void set(String coordinatorId) {
-        currentLocal.set(coordinatorId);
+        CURRENT_LOCAL.set(coordinatorId);
     }
 
     public String get() {
-        return currentLocal.get();
+        return CURRENT_LOCAL.get();
     }
 
     public void remove() {
-        currentLocal.remove();
+        CURRENT_LOCAL.remove();
     }
 
 }

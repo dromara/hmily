@@ -22,6 +22,9 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
+/**
+ * @author xiaoyu
+ */
 public class AccountDO implements Serializable {
 
     private static final long serialVersionUID = -81849676368907419L;

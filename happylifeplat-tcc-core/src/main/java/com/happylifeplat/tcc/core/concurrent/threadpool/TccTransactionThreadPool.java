@@ -35,14 +35,17 @@ import javax.annotation.PostConstruct;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * @author xiaoyu
+ */
 @Component
 public class TccTransactionThreadPool {
 
@@ -51,8 +54,8 @@ public class TccTransactionThreadPool {
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(TccTransactionThreadPool.class);
 
-    private static final String ThreadFactoryName = "tccTransaction";
-    private static final int Max_Array_Queue = 1000;
+    private static final String THREAD_FACTORY_NAME = "tccTransaction";
+    private static final int MAX_ARRAY_QUEUE = 1000;
 
     private TccConfig tccConfig;
 
@@ -60,18 +63,19 @@ public class TccTransactionThreadPool {
 
     private ExecutorService fixExecutorService;
 
-    private static final ScheduledExecutorService singleThreadScheduledExecutor =
-            Executors.newSingleThreadScheduledExecutor(TccTransactionThreadFactory.create(ThreadFactoryName, false));
+    private static final ScheduledExecutorService SCHEDULED_THREAD_POOL_EXECUTOR =
+            new ScheduledThreadPoolExecutor(1,
+                    TccTransactionThreadFactory.create(THREAD_FACTORY_NAME, true));
 
 
     @PostConstruct
     public void init() {
-        scheduledExecutorService = Executors.newScheduledThreadPool(tccConfig.getScheduledThreadMax(),
-                TccTransactionThreadFactory.create(ThreadFactoryName, true));
+        scheduledExecutorService = new ScheduledThreadPoolExecutor(1,
+                TccTransactionThreadFactory.create(THREAD_FACTORY_NAME, true));
 
         fixExecutorService = new ThreadPoolExecutor(tccConfig.getCoordinatorThreadMax(), tccConfig.getCoordinatorThreadMax(), 0, TimeUnit.MILLISECONDS,
                 createBlockingQueue(),
-                TccTransactionThreadFactory.create(ThreadFactoryName, false), createPolicy());
+                TccTransactionThreadFactory.create(THREAD_FACTORY_NAME, false), createPolicy());
 
     }
 
@@ -107,7 +111,7 @@ public class TccTransactionThreadPool {
             case LINKED_BLOCKING_QUEUE:
                 return new LinkedBlockingQueue<>();
             case ARRAY_BLOCKING_QUEUE:
-                return new ArrayBlockingQueue<>(Max_Array_Queue);
+                return new ArrayBlockingQueue<>(MAX_ARRAY_QUEUE);
             case SYNCHRONOUS_QUEUE:
                 return new SynchronousQueue<>();
             default:
@@ -119,7 +123,7 @@ public class TccTransactionThreadPool {
     public ExecutorService newCustomFixedThreadPool(int threads) {
         return new ThreadPoolExecutor(threads, threads, 0, TimeUnit.MILLISECONDS,
                 createBlockingQueue(),
-                TccTransactionThreadFactory.create(ThreadFactoryName, false), createPolicy());
+                TccTransactionThreadFactory.create(THREAD_FACTORY_NAME, false), createPolicy());
     }
 
     public ExecutorService newFixedThreadPool() {
@@ -129,11 +133,11 @@ public class TccTransactionThreadPool {
     public ExecutorService newSingleThreadExecutor() {
         return new ThreadPoolExecutor(1, 1, 0, TimeUnit.MILLISECONDS,
                 createBlockingQueue(),
-                TccTransactionThreadFactory.create(ThreadFactoryName, false), createPolicy());
+                TccTransactionThreadFactory.create(THREAD_FACTORY_NAME, false), createPolicy());
     }
 
     public ScheduledExecutorService newSingleThreadScheduledExecutor() {
-        return singleThreadScheduledExecutor;
+        return SCHEDULED_THREAD_POOL_EXECUTOR;
     }
 
     public ScheduledExecutorService newScheduledThreadPool() {

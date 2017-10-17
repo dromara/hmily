@@ -18,7 +18,15 @@
 
 package com.happylifeplat.tcc.core.service;
 
+/**
+ * @author xiaoyu
+ */
 public interface ApplicationService {
 
+    /**
+     * 获取applicationName
+     *
+     * @return applicationName
+     */
     String acquireName();
 }

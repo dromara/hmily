@@ -18,17 +18,22 @@
 package com.happylifeplat.tcc.core.helper;
 
 
+import com.happylifeplat.tcc.common.constant.Constant;
+
+/**
+ * @author xiaoyu
+ */
 public class SqlHelper {
 
 
     public static String buildCreateTableSql(String driverClassName, String tableName) {
         String createTableSql;
         String dbType = "mysql";
-        if (driverClassName.contains("mysql")) {
+        if (driverClassName.contains(Constant.DB_MYSQL)) {
             dbType = "mysql";
-        } else if (driverClassName.contains("sqlserver")) {
+        } else if (driverClassName.contains(Constant.DB_SQLSERVER)) {
             dbType = "sqlserver";
-        } else if (driverClassName.contains("oracle")) {
+        } else if (driverClassName.contains(Constant.DB_ORACLE)) {
             dbType = "oracle";
         }
         switch (dbType) {

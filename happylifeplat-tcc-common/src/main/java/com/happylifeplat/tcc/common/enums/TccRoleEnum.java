@@ -24,6 +24,8 @@ import java.util.Optional;
 
 /**
  * The enum Tcc role enum.
+ *
+ * @author xiaoyu
  */
 public enum TccRoleEnum {
 
@@ -44,7 +46,6 @@ public enum TccRoleEnum {
      * Provider tcc role enum.
      */
     PROVIDER(3, "提供者");
-
 
 
     private int code;

@@ -27,6 +27,9 @@ import org.springframework.core.Ordered;
 import org.springframework.stereotype.Component;
 
 
+/**
+ * @author xiaoyu
+ */
 @Aspect
 @Component
 public class TccCoordinatorMethodAspect implements Ordered {

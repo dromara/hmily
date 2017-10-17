@@ -21,6 +21,9 @@ import java.io.Serializable;
 import java.util.Arrays;
 
 
+/**
+ * @author xiaoyu
+ */
 public class TccInvocation implements Serializable {
 
     private static final long serialVersionUID = -5108578223428529356L;

@@ -23,6 +23,9 @@ import com.happylifeplat.tcc.common.config.TccConfig;
 import com.happylifeplat.tcc.core.bean.entity.TccTransaction;
 import com.happylifeplat.tcc.core.coordinator.command.CoordinatorAction;
 
+/**
+ * @author xiaoyu
+ */
 public interface CoordinatorService {
 
     /**
@@ -41,6 +44,12 @@ public interface CoordinatorService {
      */
     String save(TccTransaction tccTransaction);
 
+    /**
+     * 根据事务id获取TccTransaction
+     *
+     * @param transId 事务id
+     * @return TccTransaction
+     */
     TccTransaction findByTransId(String transId);
 
 
@@ -64,6 +73,7 @@ public interface CoordinatorService {
      * 提交补偿操作
      *
      * @param coordinatorAction 执行动作
+     * @return true 成功
      */
     Boolean submit(CoordinatorAction coordinatorAction);
 }

@@ -50,6 +50,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * @author xiaoyu
+ */
 public class MongoCoordinatorRepository implements CoordinatorRepository {
 
     /**
@@ -61,7 +64,7 @@ public class MongoCoordinatorRepository implements CoordinatorRepository {
 
     private MongoTemplate template;
 
-    private String COLLECTION_NAME;
+    private String collectionName;
 
 
     /**
@@ -83,7 +86,7 @@ public class MongoCoordinatorRepository implements CoordinatorRepository {
             mongoBean.setPattern(tccTransaction.getPattern());
             final byte[] cache = objectSerializer.serialize(tccTransaction.getParticipants());
             mongoBean.setContents(cache);
-            template.save(mongoBean, COLLECTION_NAME);
+            template.save(mongoBean, collectionName);
         } catch (TccException e) {
             e.printStackTrace();
         }
@@ -101,7 +104,7 @@ public class MongoCoordinatorRepository implements CoordinatorRepository {
         AssertUtils.notNull(id);
         Query query = new Query();
         query.addCriteria(new Criteria("transId").is(id));
-        template.remove(query, COLLECTION_NAME);
+        template.remove(query, collectionName);
         return 1;
     }
 
@@ -119,7 +122,7 @@ public class MongoCoordinatorRepository implements CoordinatorRepository {
         update.set("lastTime", new Date());
         update.set("retriedCount", tccTransaction.getRetriedCount() + 1);
         update.set("version", tccTransaction.getVersion() + 1);
-        final WriteResult writeResult = template.updateFirst(query, update, MongoBean.class, COLLECTION_NAME);
+        final WriteResult writeResult = template.updateFirst(query, update, MongoBean.class, collectionName);
         if (writeResult.getN() <= 0) {
             throw new TccRuntimeException("更新数据异常!");
         }
@@ -137,7 +140,7 @@ public class MongoCoordinatorRepository implements CoordinatorRepository {
     public TccTransaction findById(String id) {
         Query query = new Query();
         query.addCriteria(new Criteria("transId").is(id));
-        MongoBean cache = template.findOne(query, MongoBean.class, COLLECTION_NAME);
+        MongoBean cache = template.findOne(query, MongoBean.class, collectionName);
         return buildByCache(cache);
 
     }
@@ -169,7 +172,7 @@ public class MongoCoordinatorRepository implements CoordinatorRepository {
      */
     @Override
     public List<TccTransaction> listAll() {
-        final List<MongoBean> resultList = template.findAll(MongoBean.class, COLLECTION_NAME);
+        final List<MongoBean> resultList = template.findAll(MongoBean.class, collectionName);
         if (CollectionUtils.isNotEmpty(resultList)) {
             return resultList.stream().map(this::buildByCache).collect(Collectors.toList());
         }
@@ -188,7 +191,7 @@ public class MongoCoordinatorRepository implements CoordinatorRepository {
         Query query = new Query();
         query.addCriteria(Criteria.where("lastTime").lt(date));
         final List<MongoBean> mongoBeans =
-                template.find(query, MongoBean.class, COLLECTION_NAME);
+                template.find(query, MongoBean.class, collectionName);
         if (CollectionUtils.isNotEmpty(mongoBeans)) {
             return mongoBeans.stream().map(this::buildByCache).collect(Collectors.toList());
         }
@@ -203,7 +206,7 @@ public class MongoCoordinatorRepository implements CoordinatorRepository {
      */
     @Override
     public void init(String modelName, TccConfig tccConfig) {
-        COLLECTION_NAME = modelName;
+        collectionName = modelName;
         final TccMongoConfig tccMongoConfig = tccConfig.getTccMongoConfig();
         MongoClientFactoryBean clientFactoryBean = buildMongoClientFactoryBean(tccMongoConfig);
         try {

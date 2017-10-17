@@ -18,13 +18,16 @@
 package com.happylifeplat.tcc.common.config;
 
 
+/**
+ * @author xiaoyu
+ */
 public class TccZookeeperConfig {
 
     private String host;
 
     private int sessionTimeOut = 1000;
 
-    private String rootPath = "/tx";
+    private String rootPath = "/tcc";
 
     public String getHost() {
         return host;

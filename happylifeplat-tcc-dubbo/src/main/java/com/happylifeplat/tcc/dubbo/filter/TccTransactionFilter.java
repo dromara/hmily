@@ -43,6 +43,9 @@ import org.apache.commons.lang3.StringUtils;
 import java.lang.reflect.Method;
 import java.util.Objects;
 
+/**
+ * @author xiaoyu
+ */
 @Activate(group = {Constants.SERVER_KEY, Constants.CONSUMER})
 public class TccTransactionFilter implements Filter {
 
@@ -80,7 +83,7 @@ public class TccTransactionFilter implements Filter {
                                     GsonUtils.getInstance().toJson(tccTransactionContext));
                 }
                 if (Objects.nonNull(tccTransactionContext)) {
-                    if(TccActionEnum.TRYING.getCode()==tccTransactionContext.getAction()){
+                    if (TccActionEnum.TRYING.getCode() == tccTransactionContext.getAction()) {
                         //获取协调方法
                         String confirmMethodName = tcc.confirmMethod();
 
@@ -118,7 +121,6 @@ public class TccTransactionFilter implements Filter {
                     }
 
                 }
-
 
 
             }

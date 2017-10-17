@@ -20,28 +20,30 @@ package com.happylifeplat.tcc.annotation;
 
 /**
  * The enum Tcc pattern enum.
- *
+ * <p>
  * 当模式为tcc时候，在try异常中，会执行cancel方法，cc模式不会执行
+ *
+ * @author xiaoyu
  */
 public enum TccPatternEnum {
 
     /**
      * Tcc tcc pattern enum.
      */
-    TCC(1,"try,confirm,cancel模式"),
+    TCC(1, "try,confirm,cancel模式"),
 
     /**
      * Cc tcc pattern enum.
      */
-    CC(2,"confirm,cancel模式");
+    CC(2, "confirm,cancel模式");
 
     private Integer code;
 
     private String desc;
 
-    TccPatternEnum(Integer code ,String desc){
-        this.code=code;
-        this.desc=desc;
+    TccPatternEnum(Integer code, String desc) {
+        this.code = code;
+        this.desc = desc;
     }
 
     /**

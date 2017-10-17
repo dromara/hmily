@@ -41,6 +41,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * @author xiaoyu
+ */
 public class RedisCoordinatorRepository implements CoordinatorRepository {
 
     /**
@@ -252,7 +255,7 @@ public class RedisCoordinatorRepository implements CoordinatorRepository {
         //对象空闲多久后逐出, 当空闲时间>该值 ，且 空闲连接>最大空闲数 时直接逐出,不再根据MinEvictableIdleTimeMillis判断  (默认逐出策略)，默认30m
         config.setSoftMinEvictableIdleTimeMillis(tccRedisConfig.getSoftMinEvictableIdleTimeMillis());
         //逐出扫描的时间间隔(毫秒) 如果为负数,则不运行逐出线程, 默认-1
-        config.setTimeBetweenEvictionRunsMillis(tccRedisConfig.getTimeBetweenEvictionRunsMillis()); //1m
+        config.setTimeBetweenEvictionRunsMillis(tccRedisConfig.getTimeBetweenEvictionRunsMillis());
         //每次逐出检查时 逐出的最大数目 如果为负数就是 : 1/abs(n), 默认3
         config.setNumTestsPerEvictionRun(tccRedisConfig.getNumTestsPerEvictionRun());
         if (StringUtils.isNoneBlank(tccRedisConfig.getPassword())) {

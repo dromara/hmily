@@ -37,6 +37,9 @@ import java.time.LocalDate;
 
 import static com.google.common.collect.Lists.newArrayList;
 
+/**
+ * @author xiaoyu
+ */
 @Configuration
 @EnableSwagger2
 public class SwaggerConfig {

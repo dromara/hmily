@@ -18,6 +18,9 @@
 
 package com.happylifeplat.tcc.core.bean;
 
+/**
+ * @author xiaoyu
+ */
 public interface Constant {
 
     String TCC_TRANSACTION_CONTEXT = "TCC_TRANSACTION_CONTEXT";

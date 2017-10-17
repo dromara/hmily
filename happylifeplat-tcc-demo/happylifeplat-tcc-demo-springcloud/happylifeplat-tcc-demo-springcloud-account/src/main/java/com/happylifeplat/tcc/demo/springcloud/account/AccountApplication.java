@@ -27,16 +27,19 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.context.annotation.ImportResource;
 
-@SpringBootApplication(exclude = {MongoAutoConfiguration.class,MongoDataAutoConfiguration.class})
+/**
+ * @author xiaoyu
+ */
+@SpringBootApplication(exclude = {MongoAutoConfiguration.class, MongoDataAutoConfiguration.class})
 @EnableDiscoveryClient
 @EnableFeignClients
 @ImportResource({"classpath:applicationContext.xml"})
 @MapperScan("com.happylifeplat.tcc.demo.springcloud.account.mapper")
 public class AccountApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(AccountApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(AccountApplication.class, args);
+    }
 
 
 }

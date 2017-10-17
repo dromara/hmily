@@ -18,6 +18,9 @@
 package com.happylifeplat.tcc.common.config;
 
 
+/**
+ * @author xiaoyu
+ */
 public class TccMongoConfig {
 
     /**

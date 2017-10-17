@@ -27,6 +27,9 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
+/**
+ * @author xiaoyu
+ */
 public class TccTransactionThreadFactory implements ThreadFactory {
 
     private static final Logger log = LoggerFactory.getLogger(TccTransactionThreadFactory.class);
@@ -37,10 +40,10 @@ public class TccTransactionThreadFactory implements ThreadFactory {
 
     private static volatile boolean daemon;
 
-    private static final ThreadGroup threadGroup = new ThreadGroup("tccTransaction");
+    private static final ThreadGroup THREAD_GROUP = new ThreadGroup("tccTransaction");
 
     public static ThreadGroup getThreadGroup() {
-        return threadGroup;
+        return THREAD_GROUP;
     }
 
     public static ThreadFactory create(String namePrefix, boolean daemon) {
@@ -74,7 +77,13 @@ public class TccTransactionThreadFactory implements ThreadFactory {
         return false;
     }
 
-    private static interface ClassifyStandard<T> {
+    private interface ClassifyStandard<T> {
+        /**
+         * 没啥用
+         *
+         * @param thread 线程
+         * @return boolean
+         */
         boolean satisfy(T thread);
     }
 
@@ -91,14 +100,14 @@ public class TccTransactionThreadFactory implements ThreadFactory {
 
     private TccTransactionThreadFactory(String namePrefix, boolean daemon) {
         this.namePrefix = namePrefix;
-        this.daemon = daemon;
+        TccTransactionThreadFactory.daemon = daemon;
     }
 
 
     @Override
     public Thread newThread(Runnable runnable) {
-        Thread thread = new Thread(threadGroup, runnable,//
-                threadGroup.getName() + "-" + namePrefix + "-" + threadNumber.getAndIncrement());
+        Thread thread = new Thread(THREAD_GROUP, runnable,
+                THREAD_GROUP.getName() + "-" + namePrefix + "-" + threadNumber.getAndIncrement());
         thread.setDaemon(daemon);
         if (thread.getPriority() != Thread.NORM_PRIORITY) {
             thread.setPriority(Thread.NORM_PRIORITY);

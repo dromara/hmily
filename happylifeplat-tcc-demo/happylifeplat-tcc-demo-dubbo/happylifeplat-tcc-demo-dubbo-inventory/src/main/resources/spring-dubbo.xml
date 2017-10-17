@@ -31,7 +31,8 @@
 
     <dubbo:protocol accesslog="true" name="dubbo" port="20885"/>
 
-    <dubbo:service interface="com.happylifeplat.tcc.demo.dubbo.inventory.api.service.InventoryService" ref="inventoryService"  />
+    <dubbo:service interface="com.happylifeplat.tcc.demo.dubbo.inventory.api.service.InventoryService"
+                   ref="inventoryService"/>
 
 
 </beans>

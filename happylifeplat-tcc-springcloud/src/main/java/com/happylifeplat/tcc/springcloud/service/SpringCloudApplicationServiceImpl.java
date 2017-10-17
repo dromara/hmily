@@ -16,27 +16,23 @@
  *
  */
 
-package com.happylifeplat.tcc.core.service.handler;
+package com.happylifeplat.tcc.springcloud.service;
 
-import com.happylifeplat.tcc.core.bean.context.TccTransactionContext;
-import com.happylifeplat.tcc.core.service.TccTransactionHandler;
-import org.aspectj.lang.ProceedingJoinPoint;
-import org.springframework.stereotype.Component;
+import com.happylifeplat.tcc.core.service.ApplicationService;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
-@Component
-public class ConsumeTccTransactionIHandler implements TccTransactionHandler {
+/**
+ * @author xiaoyu
+ */
+@Service("applicationService")
+public class SpringCloudApplicationServiceImpl implements ApplicationService {
 
+    @Value("${spring.application.name}")
+    private String appName;
 
-    /**
-     * 分布式事务处理接口
-     *
-     * @param point   point 切点
-     * @param context 信息
-     * @return Object
-     * @throws Throwable 异常
-     */
     @Override
-    public Object handler(ProceedingJoinPoint point, TccTransactionContext context) throws Throwable {
-        return point.proceed();
+    public String acquireName() {
+        return appName;
     }
 }

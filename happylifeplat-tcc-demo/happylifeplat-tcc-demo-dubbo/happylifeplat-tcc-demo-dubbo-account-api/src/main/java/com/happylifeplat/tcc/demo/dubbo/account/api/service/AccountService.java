@@ -21,6 +21,9 @@ package com.happylifeplat.tcc.demo.dubbo.account.api.service;
 import com.happylifeplat.tcc.annotation.Tcc;
 import com.happylifeplat.tcc.demo.dubbo.account.api.dto.AccountDTO;
 
+/**
+ * @author xiaoyu
+ */
 public interface AccountService {
 
 

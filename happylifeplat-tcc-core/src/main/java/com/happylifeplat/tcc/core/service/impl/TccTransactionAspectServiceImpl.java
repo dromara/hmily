@@ -28,12 +28,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 
+/**
+ * @author xiaoyu
+ */
 @Service("tccTransactionAspectService")
 @SuppressWarnings("unchecked")
 public class TccTransactionAspectServiceImpl implements TccTransactionAspectService {
 
+    private final TccTransactionFactoryService tccTransactionFactoryService;
+
     @Autowired
-    private TccTransactionFactoryService tccTransactionFactoryService;
+    public TccTransactionAspectServiceImpl(TccTransactionFactoryService tccTransactionFactoryService) {
+        this.tccTransactionFactoryService = tccTransactionFactoryService;
+    }
 
     /**
      * tcc 事务切面服务

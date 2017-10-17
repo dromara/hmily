@@ -20,7 +20,7 @@ package com.happylifeplat.tcc.core.service.impl;
 
 import com.happylifeplat.tcc.core.bean.context.TccTransactionContext;
 import com.happylifeplat.tcc.core.service.TccTransactionFactoryService;
-import com.happylifeplat.tcc.core.service.handler.ConsumeTccTransactionIHandler;
+import com.happylifeplat.tcc.core.service.handler.ConsumeTccTransactionHandler;
 import com.happylifeplat.tcc.core.service.handler.ProviderTccTransactionHandler;
 import com.happylifeplat.tcc.core.service.handler.StartTccTransactionHandler;
 import com.happylifeplat.tcc.core.service.handler.TccTransactionManager;
@@ -30,12 +30,19 @@ import org.springframework.stereotype.Service;
 import java.util.Objects;
 
 
+/**
+ * @author xiaoyu
+ */
 @Service("tccTransactionFactoryService")
 public class TccTransactionFactoryServiceImpl implements TccTransactionFactoryService {
 
 
+    private final TccTransactionManager tccTransactionManager;
+
     @Autowired
-    private TccTransactionManager tccTransactionManager;
+    public TccTransactionFactoryServiceImpl(TccTransactionManager tccTransactionManager) {
+        this.tccTransactionManager = tccTransactionManager;
+    }
 
 
     /**
@@ -52,10 +59,10 @@ public class TccTransactionFactoryServiceImpl implements TccTransactionFactorySe
         if (!tccTransactionManager.isBegin() && Objects.isNull(context)) {
             return StartTccTransactionHandler.class;
         } else if (tccTransactionManager.isBegin() && Objects.isNull(context)) {
-            return ConsumeTccTransactionIHandler.class;
+            return ConsumeTccTransactionHandler.class;
         } else if (Objects.nonNull(context)) {
             return ProviderTccTransactionHandler.class;
         }
-        return ConsumeTccTransactionIHandler.class;
+        return ConsumeTccTransactionHandler.class;
     }
 }

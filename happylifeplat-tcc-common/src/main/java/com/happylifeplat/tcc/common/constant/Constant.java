@@ -15,21 +15,19 @@
  * along with this distribution; if not, see <http://www.gnu.org/licenses/>.
  *
  */
+package com.happylifeplat.tcc.common.constant;
 
-package com.happylifeplat.tcc.springcloud.service;
+/**
+ * @author xiaoyu
+ */
+public interface Constant {
 
-import com.happylifeplat.tcc.core.service.ApplicationService;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
 
-@Service("applicationService")
-public class SpringCloudApplicationService implements ApplicationService {
+    String DB_MYSQL = "mysql";
 
-    @Value("${spring.application.name}")
-    private String appName;
+    String DB_SQLSERVER = "sqlserver";
 
-    @Override
-    public String acquireName() {
-        return appName;
-    }
+    String DB_ORACLE = "oracle";
+
+
 }

@@ -22,12 +22,16 @@ import com.happylifeplat.tcc.annotation.Tcc;
 import com.happylifeplat.tcc.demo.dubbo.inventory.api.dto.InventoryDTO;
 import com.happylifeplat.tcc.demo.dubbo.inventory.api.entity.Inventory;
 
+/**
+ * @author xiaoyu
+ */
 public interface InventoryService {
 
 
     /**
      * 扣减库存操作
      * 这一个tcc接口
+     *
      * @param inventoryDTO 库存DTO对象
      * @return true
      */
@@ -35,19 +39,42 @@ public interface InventoryService {
     Boolean decrease(InventoryDTO inventoryDTO);
 
 
-
+    /**
+     * mock扣减库存异常
+     *
+     * @param inventoryDTO dto对象
+     * @return String
+     */
     @Tcc
     String mockWithTryException(InventoryDTO inventoryDTO);
 
 
+    /**
+     * mock扣减库存超时
+     *
+     * @param inventoryDTO dto对象
+     * @return String
+     */
     @Tcc
     Boolean mockWithTryTimeout(InventoryDTO inventoryDTO);
 
 
+    /**
+     * mock 扣减库存confirm异常
+     *
+     * @param inventoryDTO dto对象
+     * @return String
+     */
     @Tcc
     String mockWithConfirmException(InventoryDTO inventoryDTO);
 
 
+    /**
+     * mock 扣减库存confirm超时
+     *
+     * @param inventoryDTO dto对象
+     * @return True
+     */
     @Tcc
     Boolean mockWithConfirmTimeout(InventoryDTO inventoryDTO);
 

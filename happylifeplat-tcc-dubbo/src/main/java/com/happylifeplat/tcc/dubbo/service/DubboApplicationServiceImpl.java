@@ -23,6 +23,9 @@ import com.happylifeplat.tcc.core.service.ApplicationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+/**
+ * @author xiaoyu
+ */
 @Service("applicationService")
 public class DubboApplicationServiceImpl implements ApplicationService {
 

@@ -28,6 +28,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 
+/**
+ * @author xiaoyu
+ */
 public class HessianSerializer implements ObjectSerializer {
     @Override
     public byte[] serialize(Object obj) throws TccException {

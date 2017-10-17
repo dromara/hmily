@@ -30,6 +30,9 @@ import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
 
+/**
+ * @author xiaoyu
+ */
 @Component
 public class ProviderTccTransactionHandler implements TccTransactionHandler {
 
@@ -43,7 +46,7 @@ public class ProviderTccTransactionHandler implements TccTransactionHandler {
 
 
     /**
-     * 分布式事务处理接口
+     * 分布式事务提供者处理接口
      * 根据tcc事务上下文的状态来执行相对应的方法
      *
      * @param point   point 切点

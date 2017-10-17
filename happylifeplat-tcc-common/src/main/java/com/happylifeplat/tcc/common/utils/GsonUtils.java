@@ -20,21 +20,24 @@ package com.happylifeplat.tcc.common.utils;
 
 import com.google.gson.Gson;
 
+/**
+ * @author xiaoyu
+ */
 public class GsonUtils {
 
-    public static final GsonUtils GSON_UTILS = new GsonUtils();
+    private static final GsonUtils GSON_UTILS = new GsonUtils();
 
-    private static final Gson gson = new Gson();
+    private static final Gson GSON = new Gson();
 
     public static GsonUtils getInstance() {
         return GSON_UTILS;
     }
 
     public String toJson(Object object) {
-        return gson.toJson(object);
+        return GSON.toJson(object);
     }
 
     public <T> T fromJson(String json, Class<T> tClass) {
-        return gson.fromJson(json, tClass);
+        return GSON.fromJson(json, tClass);
     }
 }

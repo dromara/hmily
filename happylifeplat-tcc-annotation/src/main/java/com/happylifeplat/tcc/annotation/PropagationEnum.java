@@ -18,6 +18,10 @@
 package com.happylifeplat.tcc.annotation;
 
 
+/**
+ * @author xiaoyu
+ */
+
 public enum PropagationEnum {
 
     /**
@@ -70,10 +74,6 @@ public enum PropagationEnum {
     public int getValue() {
         return this.value;
     }
-
-
-
-
 
 
 }

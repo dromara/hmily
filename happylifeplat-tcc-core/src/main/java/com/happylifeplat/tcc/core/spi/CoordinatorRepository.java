@@ -26,6 +26,9 @@ import java.util.Date;
 import java.util.List;
 
 
+/**
+ * @author xiaoyu
+ */
 public interface CoordinatorRepository {
 
     /**
@@ -83,6 +86,7 @@ public interface CoordinatorRepository {
      *
      * @param modelName 模块名称
      * @param tccConfig 配置信息
+     * @throws TccRuntimeException 自定义异常
      */
     void init(String modelName, TccConfig tccConfig) throws TccRuntimeException;
 

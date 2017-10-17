@@ -24,8 +24,11 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 
 
+/**
+ * @author xiaoyu
+ */
 @Aspect
-public abstract class TccTransactionAspect {
+public abstract class AbstractTccTransactionAspect {
 
     private TccTransactionInterceptor tccTransactionInterceptor;
 
@@ -43,5 +46,10 @@ public abstract class TccTransactionAspect {
         return tccTransactionInterceptor.interceptor(proceedingJoinPoint);
     }
 
+    /**
+     * spring Order 接口，该值的返回直接会影响springBean的加载顺序
+     *
+     * @return int 类型
+     */
     public abstract int getOrder();
 }

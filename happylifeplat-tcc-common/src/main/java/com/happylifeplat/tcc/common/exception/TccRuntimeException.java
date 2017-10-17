@@ -18,6 +18,9 @@
 package com.happylifeplat.tcc.common.exception;
 
 
+/**
+ * @author xiaoyu
+ */
 public class TccRuntimeException extends RuntimeException {
     private static final long serialVersionUID = -1949770547060521702L;
 

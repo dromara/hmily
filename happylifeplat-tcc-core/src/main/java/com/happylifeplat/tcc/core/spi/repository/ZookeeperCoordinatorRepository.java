@@ -45,6 +45,9 @@ import java.util.concurrent.CountDownLatch;
 import java.util.stream.Collectors;
 
 
+/**
+ * @author xiaoyu
+ */
 public class ZookeeperCoordinatorRepository implements CoordinatorRepository {
 
     /**
@@ -60,7 +63,7 @@ public class ZookeeperCoordinatorRepository implements CoordinatorRepository {
 
     private static volatile ZooKeeper zooKeeper;
 
-    private static final CountDownLatch countDownLatch = new CountDownLatch(1);
+    private static final CountDownLatch LATCH = new CountDownLatch(1);
 
 
     public void setRootPath(String rootPath) {
@@ -215,10 +218,10 @@ public class ZookeeperCoordinatorRepository implements CoordinatorRepository {
             zooKeeper = new ZooKeeper(config.getHost(), config.getSessionTimeOut(), watchedEvent -> {
                 if (watchedEvent.getState() == Watcher.Event.KeeperState.SyncConnected) {
                     // 放开闸门, wait在connect方法上的线程将被唤醒
-                    countDownLatch.countDown();
+                    LATCH.countDown();
                 }
             });
-            countDownLatch.await();
+            LATCH.await();
             Stat stat = zooKeeper.exists(rootPath, false);
             if (stat == null) {
                 zooKeeper.create(rootPath, rootPath.getBytes(), ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
@@ -250,9 +253,6 @@ public class ZookeeperCoordinatorRepository implements CoordinatorRepository {
         this.objectSerializer = objectSerializer;
     }
 
-    private String getParentPath() {
-        return String.join("/", rootPath, modelName);
-    }
 
     private String getRootPath(String id) {
         return String.join("/", rootPath, id);

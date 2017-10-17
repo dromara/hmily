@@ -25,6 +25,8 @@ import java.util.Optional;
 
 /**
  * The enum Blocking queue type enum.
+ *
+ * @author xiaoyu
  */
 public enum BlockingQueueTypeEnum {
 
@@ -70,6 +72,7 @@ public enum BlockingQueueTypeEnum {
         return blockingQueueTypeEnum.orElse(BlockingQueueTypeEnum.LINKED_BLOCKING_QUEUE);
     }
 
+    @Override
     public String toString() {
         return value;
     }

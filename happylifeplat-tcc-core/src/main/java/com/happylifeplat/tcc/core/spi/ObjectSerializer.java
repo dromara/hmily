@@ -20,6 +20,9 @@ package com.happylifeplat.tcc.core.spi;
 import com.happylifeplat.tcc.common.exception.TccException;
 
 
+/**
+ * @author xiaoyu
+ */
 public interface ObjectSerializer {
     /**
      * 序列化对象
@@ -30,10 +33,13 @@ public interface ObjectSerializer {
      */
     byte[] serialize(Object obj) throws TccException;
 
+
     /**
      * 反序列化对象
      *
      * @param param 需要反序列化的byte []
+     * @param clazz java对象
+     * @param <T>   泛型支持
      * @return 对象
      * @throws TccException 异常信息
      */

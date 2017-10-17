@@ -24,6 +24,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
 
+/**
+ * @author xiaoyu
+ */
 @Configuration
 public class TccRestTemplateConfiguration {
 

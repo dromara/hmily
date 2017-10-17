@@ -30,12 +30,15 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 
 
+/**
+ * @author xiaoyu
+ */
 public class ProtostuffSerializer implements ObjectSerializer {
-    private static final SchemaCache cachedSchema = SchemaCache.getInstance();
-    private static final Objenesis objenesis = new ObjenesisStd(true);
+    private static final SchemaCache CACHED_SCHEMA = SchemaCache.getInstance();
+    private static final Objenesis OBJENESIS_STD = new ObjenesisStd(true);
 
     private static <T> Schema<T> getSchema(Class<T> cls) {
-        return (Schema<T>) cachedSchema.get(cls);
+        return (Schema<T>) CACHED_SCHEMA.get(cls);
     }
 
 
@@ -76,7 +79,7 @@ public class ProtostuffSerializer implements ObjectSerializer {
         try {
             ByteArrayInputStream inputStream = new ByteArrayInputStream(param);
             Class cls = clazz;
-            object = objenesis.newInstance((Class<T>) cls);
+            object = OBJENESIS_STD.newInstance((Class<T>) cls);
             Schema schema = getSchema(cls);
             ProtostuffIOUtil.mergeFrom(inputStream, object, schema);
             return object;

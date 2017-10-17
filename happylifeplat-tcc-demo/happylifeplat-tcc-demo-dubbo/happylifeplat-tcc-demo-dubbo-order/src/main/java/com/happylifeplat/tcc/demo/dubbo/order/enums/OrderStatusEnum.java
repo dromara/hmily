@@ -20,6 +20,8 @@ package com.happylifeplat.tcc.demo.dubbo.order.enums;
 
 /**
  * The enum Order status enum.
+ *
+ * @author xiaoyu
  */
 public enum OrderStatusEnum {
 
