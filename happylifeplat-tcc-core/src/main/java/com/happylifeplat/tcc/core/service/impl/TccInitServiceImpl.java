@@ -63,8 +63,10 @@ public class TccInitServiceImpl implements TccInitService {
      */
     @Override
     public void initialization(TccConfig tccConfig) {
+    	//在jvm中增加一个关闭的钩子，当jvm关闭的时候，会执行系统中已经设置的所有通过方法addShutdownHook添加的钩子，当系统执行完这些钩子后，jvm才会关闭。所以这些钩子可以在jvm关闭的时候进行内存清理、对象销毁等操作
         Runtime.getRuntime().addShutdownHook(new Thread(() -> LOGGER.error("系统关闭")));
         try {
+        	//加载spi服务类
             LoadSpiSupport(tccConfig);
             coordinatorService.start(tccConfig);
         } catch (Exception ex) {
@@ -100,7 +102,7 @@ public class TccInitServiceImpl implements TccInitService {
                 .filter(recoverRepository ->
                         Objects.equals(recoverRepository.getScheme(), repositorySupportEnum.getSupport())).findFirst();
 
-        //将CoordinatorRepository实现注入到spring容器
+        //将CoordinatorRepository实现注入到spring容器 ,同时将repositoryOptional的ObjectSerializer设置为serializer
         repositoryOptional.ifPresent(repository -> {
             serializer.ifPresent(repository::setSerializer);
             SpringBeanUtils.getInstance().registerBean(CoordinatorRepository.class.getName(), repository);

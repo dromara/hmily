@@ -42,14 +42,15 @@
         <property name="blockingQueueType" value="Linked"/>
         <property name="scheduledDelay" value="120" />
         <property name="scheduledThreadMax" value="4"/>
+        <!-- 补偿机制  -->
         <property name="repositorySupport" value="db" />
         <property name="tccDbConfig">
             <bean class="com.happylifeplat.tcc.common.config.TccDbConfig">
                 <property name="url"
-                          value="jdbc:mysql://192.168.1.68:3306/account?useUnicode=true&amp;characterEncoding=utf8"/>
+                          value="jdbc:mysql://localhost:3306/account?useUnicode=true&amp;characterEncoding=utf8"/>
                 <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
-                <property name="password" value="Wgj@555888"/>
-                <property name="username" value="xiaoyu"/>
+                <property name="password" value="123456"/>
+                <property name="username" value="mqzhao"/>
             </bean>
         </property>
 
@@ -57,8 +58,8 @@
     </bean>
 
 
-
-    <!--
+<!--
+    
        <property name="repositorySupport" value="db" />
         <property name="tccDbConfig">
             <bean class="com.happylifeplat.tcc.common.config.TccDbConfig">
