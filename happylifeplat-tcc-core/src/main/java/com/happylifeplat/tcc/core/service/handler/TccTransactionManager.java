@@ -91,7 +91,7 @@ public class TccTransactionManager {
         }
         //保存当前事务信息
         coordinatorCommand.execute(new CoordinatorAction(CoordinatorActionEnum.SAVE, tccTransaction));
-
+        //这一行应该移到Objects的判断中
         CURRENT.set(tccTransaction);
 
         //设置tcc事务上下文，这个类会传递给远端

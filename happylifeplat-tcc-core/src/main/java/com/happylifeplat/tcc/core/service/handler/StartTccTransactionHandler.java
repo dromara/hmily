@@ -48,9 +48,10 @@ public class StartTccTransactionHandler implements TccTransactionHandler {
     public Object handler(ProceedingJoinPoint point, TccTransactionContext context) throws Throwable {
         Object returnValue;
         try {
+        	//开启分布式事务
             tccTransactionManager.begin();
             try {
-                //发起调用 执行try方法
+                //发起调用 执行try方法，进入TccCoordinatorMethodInterceptor切面
                 returnValue = point.proceed();
 
             } catch (Throwable throwable) {

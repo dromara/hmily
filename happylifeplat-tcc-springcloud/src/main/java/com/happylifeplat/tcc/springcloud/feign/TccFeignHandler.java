@@ -37,6 +37,11 @@ import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.Objects;
 
+/**
+ * 动态代理类都必须要实现InvocationHandler这个接口
+ * @author mqzhao
+ *
+ */
 public class TccFeignHandler implements InvocationHandler {
     /**
      * logger

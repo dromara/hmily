@@ -74,6 +74,7 @@ public class PaymentServiceImpl implements PaymentService {
         InventoryDTO inventoryDTO = new InventoryDTO();
         inventoryDTO.setCount(order.getCount());
         inventoryDTO.setProductId(order.getProductId());
+        LOGGER.debug("===========执行springcloud扣减库存接口==========");
         inventoryClient.decrease(inventoryDTO);
     }
 

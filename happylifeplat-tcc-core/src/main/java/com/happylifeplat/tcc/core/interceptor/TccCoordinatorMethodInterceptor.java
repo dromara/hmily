@@ -79,7 +79,7 @@ public class TccCoordinatorMethodInterceptor {
 
         final Tcc tcc = method.getAnnotation(Tcc.class);
 
-        //获取协调方法
+        //获取协调方法  获取tcc注解中描述的方法
         String confirmMethodName = tcc.confirmMethod();
 
        /* if (StringUtils.isBlank(confirmMethodName)) {
