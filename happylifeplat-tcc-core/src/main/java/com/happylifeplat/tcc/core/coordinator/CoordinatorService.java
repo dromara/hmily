@@ -20,7 +20,7 @@ package com.happylifeplat.tcc.core.coordinator;
 
 
 import com.happylifeplat.tcc.common.config.TccConfig;
-import com.happylifeplat.tcc.core.bean.entity.TccTransaction;
+import com.happylifeplat.tcc.common.bean.entity.TccTransaction;
 import com.happylifeplat.tcc.core.coordinator.command.CoordinatorAction;
 
 /**
@@ -68,6 +68,14 @@ public interface CoordinatorService {
      * @param tccTransaction 实体对象
      */
     void update(TccTransaction tccTransaction);
+
+
+    /**
+     * 更新 List<Participant>  只更新这一个字段数据
+     * @param tccTransaction  实体对象
+     * @return rows
+     */
+    int updateParticipant(TccTransaction tccTransaction);
 
     /**
      * 提交补偿操作

@@ -18,7 +18,7 @@
 
 package com.happylifeplat.tcc.core.service.impl;
 
-import com.happylifeplat.tcc.core.bean.context.TccTransactionContext;
+import com.happylifeplat.tcc.common.bean.context.TccTransactionContext;
 import com.happylifeplat.tcc.core.helper.SpringBeanUtils;
 import com.happylifeplat.tcc.core.service.TccTransactionAspectService;
 import com.happylifeplat.tcc.core.service.TccTransactionFactoryService;

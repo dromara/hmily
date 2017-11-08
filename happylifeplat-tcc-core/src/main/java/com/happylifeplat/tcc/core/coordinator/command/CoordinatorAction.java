@@ -19,7 +19,7 @@
 package com.happylifeplat.tcc.core.coordinator.command;
 
 import com.happylifeplat.tcc.common.enums.CoordinatorActionEnum;
-import com.happylifeplat.tcc.core.bean.entity.TccTransaction;
+import com.happylifeplat.tcc.common.bean.entity.TccTransaction;
 
 import java.io.Serializable;
 

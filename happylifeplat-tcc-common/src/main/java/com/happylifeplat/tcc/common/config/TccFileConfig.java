@@ -18,9 +18,12 @@
 package com.happylifeplat.tcc.common.config;
 
 
+import lombok.Data;
+
 /**
  * @author xiaoyu
  */
+@Data
 public class TccFileConfig {
 
     /**
@@ -34,19 +37,4 @@ public class TccFileConfig {
     private String prefix;
 
 
-    public String getPath() {
-        return path;
-    }
-
-    public void setPath(String path) {
-        this.path = path;
-    }
-
-    public String getPrefix() {
-        return prefix;
-    }
-
-    public void setPrefix(String prefix) {
-        this.prefix = prefix;
-    }
 }

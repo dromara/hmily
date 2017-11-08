@@ -2,6 +2,8 @@ package com.happylifeplat.tcc.core.spi;
 
 
 import com.happylifeplat.tcc.common.enums.SerializeEnum;
+import com.happylifeplat.tcc.common.serializer.ObjectSerializer;
+import com.happylifeplat.tcc.common.utils.ServiceBootstrap;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

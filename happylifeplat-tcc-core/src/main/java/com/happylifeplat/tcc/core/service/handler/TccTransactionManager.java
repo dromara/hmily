@@ -25,10 +25,10 @@ import com.happylifeplat.tcc.common.enums.TccActionEnum;
 import com.happylifeplat.tcc.common.enums.TccRoleEnum;
 import com.happylifeplat.tcc.common.exception.TccRuntimeException;
 import com.happylifeplat.tcc.common.utils.LogUtil;
-import com.happylifeplat.tcc.core.bean.context.TccTransactionContext;
-import com.happylifeplat.tcc.core.bean.entity.Participant;
-import com.happylifeplat.tcc.core.bean.entity.TccInvocation;
-import com.happylifeplat.tcc.core.bean.entity.TccTransaction;
+import com.happylifeplat.tcc.common.bean.context.TccTransactionContext;
+import com.happylifeplat.tcc.common.bean.entity.Participant;
+import com.happylifeplat.tcc.common.bean.entity.TccInvocation;
+import com.happylifeplat.tcc.common.bean.entity.TccTransaction;
 import com.happylifeplat.tcc.core.concurrent.threadlocal.TransactionContextLocal;
 import com.happylifeplat.tcc.core.coordinator.CoordinatorService;
 import com.happylifeplat.tcc.core.coordinator.command.CoordinatorAction;
@@ -37,11 +37,14 @@ import com.happylifeplat.tcc.core.helper.SpringBeanUtils;
 import com.happylifeplat.tcc.core.service.rollback.AsyncRollbackServiceImpl;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.reflect.MethodUtils;
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -84,13 +87,21 @@ public class TccTransactionManager {
      * 该方法为发起方第一次调用
      * 也是tcc事务的入口
      */
-    void begin() {
+    void begin(ProceedingJoinPoint point) {
         LogUtil.debug(LOGGER, () -> "开始执行tcc事务！start");
         TccTransaction tccTransaction = CURRENT.get();
         if (Objects.isNull(tccTransaction)) {
+
+            MethodSignature signature = (MethodSignature) point.getSignature();
+            Method method = signature.getMethod();
+
+            Class<?> clazz = point.getTarget().getClass();
+
             tccTransaction = new TccTransaction();
             tccTransaction.setStatus(TccActionEnum.TRYING.getCode());
             tccTransaction.setRole(TccRoleEnum.START.getCode());
+            tccTransaction.setTargetClass(clazz.getName());
+            tccTransaction.setTargetMethod(method.getName());
         }
         //保存当前事务信息
         coordinatorCommand.execute(new CoordinatorAction(CoordinatorActionEnum.SAVE, tccTransaction));
@@ -107,12 +118,20 @@ public class TccTransactionManager {
 
     }
 
-    TccTransaction providerBegin(TccTransactionContext context) {
+    TccTransaction providerBegin(TccTransactionContext context, ProceedingJoinPoint point) {
         LogUtil.debug(LOGGER, "参与方开始执行tcc事务！start：{}", context::toString);
+
+        MethodSignature signature = (MethodSignature) point.getSignature();
+        Method method = signature.getMethod();
+
+        Class<?> clazz = point.getTarget().getClass();
         TccTransaction transaction = new TccTransaction(context.getTransId());
         //设置角色为提供者
         transaction.setRole(TccRoleEnum.PROVIDER.getCode());
         transaction.setStatus(context.getAction());
+
+        transaction.setTargetClass(clazz.getName());
+        transaction.setTargetMethod(method.getName());
         //保存当前事务信息
         coordinatorService.save(transaction);
         //传入当前threadLocal
@@ -152,8 +171,7 @@ public class TccTransactionManager {
         //先异步更新数据
         coordinatorCommand.execute(new CoordinatorAction(CoordinatorActionEnum.UPDATE, currentTransaction));
         boolean success = true;
-        Participant fail = null;
-        List<Participant> participantList = Lists.newArrayListWithCapacity(participants.size());
+        List<Participant> failList = Lists.newArrayListWithCapacity(participants.size());
         if (CollectionUtils.isNotEmpty(participants)) {
             for (Participant participant : participants) {
                 try {
@@ -162,16 +180,15 @@ public class TccTransactionManager {
                     context.setTransId(participant.getTransId());
                     TransactionContextLocal.getInstance().set(context);
                     executeParticipantMethod(participant.getCancelTccInvocation());
-                    participantList.add(participant);
+
                 } catch (Exception e) {
                     LogUtil.error(LOGGER, "执行cancel方法异常:{}", () -> e);
                     success = false;
-                    fail = participant;
-                    break;
+                    failList.add(participant);
                 }
             }
 
-            executeHandler(success, currentTransaction, fail, participantList, participants);
+            executeHandler(success, currentTransaction, failList);
         }
 
 
@@ -199,9 +216,8 @@ public class TccTransactionManager {
         final List<Participant> participants = currentTransaction.getParticipants();
 
 
-        List<Participant> participantList = Lists.newArrayListWithCapacity(participants.size());
+        List<Participant> failList = Lists.newArrayListWithCapacity(participants.size());
         boolean success = true;
-        Participant fail = null;
         if (CollectionUtils.isNotEmpty(participants)) {
             for (Participant participant : participants) {
                 try {
@@ -210,34 +226,29 @@ public class TccTransactionManager {
                     context.setTransId(participant.getTransId());
                     TransactionContextLocal.getInstance().set(context);
                     executeParticipantMethod(participant.getConfirmTccInvocation());
-                    participantList.add(participant);
                 } catch (Exception e) {
                     LogUtil.error(LOGGER, "执行confirm方法异常:{}", () -> e);
                     success = false;
-                    fail = participant;
-                    break;
+                    failList.add(participant);
                 }
             }
         }
-        executeHandler(success, currentTransaction, fail, participantList, participants);
+        executeHandler(success, currentTransaction, failList);
 
 
     }
 
 
-    private void executeHandler(boolean success, final TccTransaction currentTransaction, Participant fail,
-                                List<Participant> participantList, final List<Participant> participants) {
+    private void executeHandler(boolean success, final TccTransaction currentTransaction,
+                                List<Participant> failList) {
         if (success) {
             TransactionContextLocal.getInstance().remove();
             coordinatorCommand.execute(new CoordinatorAction(CoordinatorActionEnum.DELETE, currentTransaction));
         } else {
             //获取还没执行的，或者执行失败的
-            final List<Participant> updateList =
-                    participants.stream().skip(participantList.size()).collect(Collectors.toList());
-            currentTransaction.setParticipants(updateList);
-            coordinatorCommand.execute(new CoordinatorAction(CoordinatorActionEnum.UPDATE, currentTransaction));
-            assert fail != null;
-            throw new TccRuntimeException(fail.getConfirmTccInvocation().toString());
+            currentTransaction.setParticipants(failList);
+            coordinatorService.updateParticipant(currentTransaction);
+            throw new TccRuntimeException(failList.toString());
         }
     }
 
@@ -290,8 +301,8 @@ public class TccTransactionManager {
     public void enlistParticipant(Participant participant) {
         final TccTransaction transaction = this.getCurrentTransaction();
         transaction.registerParticipant(participant);
+        coordinatorService.updateParticipant(transaction);
 
-        coordinatorCommand.execute(new CoordinatorAction(CoordinatorActionEnum.UPDATE, transaction));
 
     }
 }
