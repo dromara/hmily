@@ -19,18 +19,18 @@
 package com.happylifeplat.tcc.core.coordinator.impl;
 
 
+import com.google.common.collect.Lists;
 import com.happylifeplat.tcc.annotation.TccPatternEnum;
 import com.happylifeplat.tcc.common.config.TccConfig;
 import com.happylifeplat.tcc.common.enums.CoordinatorActionEnum;
 import com.happylifeplat.tcc.common.enums.TccActionEnum;
 import com.happylifeplat.tcc.common.enums.TccRoleEnum;
+import com.happylifeplat.tcc.common.exception.TccRuntimeException;
 import com.happylifeplat.tcc.common.utils.LogUtil;
-import com.happylifeplat.tcc.core.bean.Constant;
-import com.happylifeplat.tcc.core.bean.context.TccTransactionContext;
-import com.happylifeplat.tcc.core.bean.entity.Participant;
-import com.happylifeplat.tcc.core.bean.entity.TccInvocation;
-import com.happylifeplat.tcc.core.bean.entity.TccTransaction;
-import com.happylifeplat.tcc.core.concurrent.threadlocal.CoordinatorLocal;
+import com.happylifeplat.tcc.common.bean.context.TccTransactionContext;
+import com.happylifeplat.tcc.common.bean.entity.Participant;
+import com.happylifeplat.tcc.common.bean.entity.TccInvocation;
+import com.happylifeplat.tcc.common.bean.entity.TccTransaction;
 import com.happylifeplat.tcc.core.concurrent.threadlocal.TransactionContextLocal;
 import com.happylifeplat.tcc.core.concurrent.threadpool.TccTransactionThreadFactory;
 import com.happylifeplat.tcc.core.concurrent.threadpool.TccTransactionThreadPool;
@@ -53,11 +53,11 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * @author xiaoyu
@@ -154,6 +154,16 @@ public class CoordinatorServiceImpl implements CoordinatorService {
     }
 
     /**
+     * 更新 List<Participant>  只更新这一个字段数据
+     *
+     * @param tccTransaction 实体对象
+     */
+    @Override
+    public int updateParticipant(TccTransaction tccTransaction) {
+        return  coordinatorRepository.updateParticipant(tccTransaction);
+    }
+
+    /**
      * 提交补偿操作
      *
      * @param coordinatorAction 执行动作
@@ -240,11 +250,9 @@ public class CoordinatorServiceImpl implements CoordinatorService {
                                     continue;
                                 }
 
-                                //如果事务角色是提供者的话，并且在重试的次数范围类是不能执行的，只能由发起者执行
-                                if (tccTransaction.getRole() == TccRoleEnum.PROVIDER.getCode()
-                                        && (tccTransaction.getCreateTime().getTime() +
-                                        tccConfig.getRetryMax() * tccConfig.getRecoverDelayTime() * 1000
-                                        > System.currentTimeMillis())) {
+                                //如果事务角色是提供者的话，只能由发起者执行
+                                if (tccTransaction.getRole() == TccRoleEnum.PROVIDER.getCode()) {
+
                                     continue;
                                 }
 
@@ -264,7 +272,6 @@ public class CoordinatorServiceImpl implements CoordinatorService {
                                         }
                                     }
 
-
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                     LogUtil.error(LOGGER, "执行事务补偿异常:{}", e::getMessage);
@@ -279,39 +286,62 @@ public class CoordinatorServiceImpl implements CoordinatorService {
     }
 
     private void cancel(TccTransaction tccTransaction) {
-        tccTransaction.getParticipants().stream()
-                .map(Participant::getCancelTccInvocation)
-                .forEach(tccInvocation -> {
-                    try {
-                        TccTransactionContext context = new TccTransactionContext();
-                        context.setAction(TccActionEnum.CANCELING.getCode());
-                        context.setTransId(tccTransaction.getTransId());
-                        TransactionContextLocal.getInstance().set(context);
-                        executeCoordinator(tccInvocation);
-                        coordinatorRepository.remove(tccTransaction.getTransId());
-                    } catch (Exception e) {
-                        LogUtil.error(LOGGER, "执行cancel事务补偿异常:{}", e::getMessage);
-                    }
-                });
+        final List<Participant> participants = tccTransaction.getParticipants();
+        List<Participant> failList = Lists.newArrayListWithCapacity(participants.size());
+        boolean success = true;
+        if (CollectionUtils.isNotEmpty(participants)) {
+            for (Participant participant : participants) {
+                try {
+                    TccTransactionContext context = new TccTransactionContext();
+                    context.setAction(TccActionEnum.CANCELING.getCode());
+                    context.setTransId(tccTransaction.getTransId());
+                    TransactionContextLocal.getInstance().set(context);
+                    executeCoordinator(participant.getConfirmTccInvocation());
+                } catch (Exception e) {
+                    LogUtil.error(LOGGER, "执行cancel方法异常:{}", () -> e);
+                    success = false;
+                    failList.add(participant);
+                }
+            }
+        }
+        executeHandler(success, tccTransaction, failList);
     }
 
     private void confirm(TccTransaction tccTransaction) {
-        tccTransaction.getParticipants().stream()
-                .map(Participant::getConfirmTccInvocation)
-                .forEach(tccInvocation -> {
-                    try {
-                        TccTransactionContext context = new TccTransactionContext();
-                        context.setAction(TccActionEnum.CONFIRMING.getCode());
-                        context.setTransId(tccTransaction.getTransId());
-                        TransactionContextLocal.getInstance().set(context);
-                        executeCoordinator(tccInvocation);
-                        coordinatorRepository.remove(tccTransaction.getTransId());
-                    } catch (Exception e) {
-                        LogUtil.error(LOGGER, "执行confirm事务补偿异常:{}", e::getMessage);
-                    }
 
-                });
+        final List<Participant> participants = tccTransaction.getParticipants();
+
+        List<Participant> failList = Lists.newArrayListWithCapacity(participants.size());
+        boolean success = true;
+        if (CollectionUtils.isNotEmpty(participants)) {
+            for (Participant participant : participants) {
+                try {
+                    TccTransactionContext context = new TccTransactionContext();
+                    context.setAction(TccActionEnum.CONFIRMING.getCode());
+                    context.setTransId(tccTransaction.getTransId());
+                    TransactionContextLocal.getInstance().set(context);
+                    executeCoordinator(participant.getConfirmTccInvocation());
+                } catch (Exception e) {
+                    LogUtil.error(LOGGER, "执行confirm方法异常:{}", () -> e);
+                    success = false;
+                    failList.add(participant);
+                }
+            }
+        }
+        executeHandler(success, tccTransaction, failList);
     }
+
+
+    private void executeHandler(boolean success, final TccTransaction currentTransaction,
+                                List<Participant> failList ) {
+        if (success) {
+            coordinatorRepository.remove(currentTransaction.getTransId());
+        } else {
+            currentTransaction.setParticipants(failList);
+            coordinatorRepository.updateParticipant(currentTransaction);
+        }
+    }
+
 
     @SuppressWarnings("unchecked")
     private void executeCoordinator(TccInvocation tccInvocation) throws Exception {

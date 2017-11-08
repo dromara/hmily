@@ -16,6 +16,7 @@
         <module>happylifeplat-tcc-dubbo</module>
         <module>happylifeplat-tcc-springcloud</module>
         <module>happylifeplat-tcc-annotation</module>
+        <module>happylifeplat-tcc-admin</module>
     </modules>
 
     <licenses>
@@ -69,11 +70,17 @@
         <gson.verions>2.6.2</gson.verions>
         <druid.version>1.0.29</druid.version>
         <springfox.version>2.6.1</springfox.version>
+        <lombok.version>1.16.14</lombok.version>
     </properties>
 
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>com.happylifeplat.tcc</groupId>
+                <artifactId>happylifeplat-tcc-admin</artifactId>
+                <version>${project.version}</version>
+            </dependency>
             <dependency>
                 <groupId>com.happylifeplat.tcc</groupId>
                 <artifactId>happylifeplat-tcc-common</artifactId>
@@ -101,6 +108,11 @@
                 <version>${project.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>${lombok.version}</version>
+            </dependency>
 
             <dependency>
                 <groupId>com.alibaba</groupId>

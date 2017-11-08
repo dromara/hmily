@@ -18,23 +18,28 @@
 package com.happylifeplat.tcc.core.spi.repository;
 
 import com.google.common.collect.Lists;
+import com.happylifeplat.tcc.common.bean.adapter.CoordinatorRepositoryAdapter;
+import com.happylifeplat.tcc.common.bean.entity.TccTransaction;
 import com.happylifeplat.tcc.common.config.TccConfig;
 import com.happylifeplat.tcc.common.config.TccFileConfig;
-import com.happylifeplat.tcc.core.bean.entity.TccTransaction;
 import com.happylifeplat.tcc.common.enums.RepositorySupportEnum;
+import com.happylifeplat.tcc.common.exception.TccException;
 import com.happylifeplat.tcc.common.exception.TccRuntimeException;
+import com.happylifeplat.tcc.common.serializer.ObjectSerializer;
+import com.happylifeplat.tcc.common.utils.FileUtils;
+import com.happylifeplat.tcc.common.utils.RepositoryConvertUtils;
+import com.happylifeplat.tcc.common.utils.RepositoryPathUtils;
 import com.happylifeplat.tcc.core.spi.CoordinatorRepository;
-import com.happylifeplat.tcc.core.spi.ObjectSerializer;
-
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 
@@ -77,7 +82,7 @@ public class FileCoordinatorRepository implements CoordinatorRepository {
      */
     @Override
     public int remove(String id) {
-        String fullFileName = getFullFileName(id);
+        String fullFileName = RepositoryPathUtils.getFullFileName(filePath, id);
         File file = new File(fullFileName);
         if (file.exists()) {
             file.delete();
@@ -104,6 +109,29 @@ public class FileCoordinatorRepository implements CoordinatorRepository {
         return 1;
     }
 
+    /**
+     * 更新 List<Participant>  只更新这一个字段数据
+     *
+     * @param tccTransaction 实体对象
+     */
+    @Override
+    public int updateParticipant(TccTransaction tccTransaction) {
+        try {
+
+            final String fullFileName = RepositoryPathUtils.getFullFileName(filePath,tccTransaction.getTransId());
+            final File file = new File(fullFileName);
+            final CoordinatorRepositoryAdapter adapter = readAdapter(file);
+            if(Objects.nonNull(adapter)){
+                adapter.setContents(serializer.serialize(tccTransaction.getParticipants()));
+            }
+            FileUtils.writeFile(fullFileName,serializer.serialize(adapter));
+
+        } catch (Exception e) {
+            throw new TccRuntimeException("更新数据异常！");
+        }
+        return 1;
+    }
+
 
     /**
      * 根据id获取对象
@@ -113,10 +141,15 @@ public class FileCoordinatorRepository implements CoordinatorRepository {
      */
     @Override
     public TccTransaction findById(String id) {
-
-        String fullFileName = getFullFileName(id);
+        String fullFileName = RepositoryPathUtils.getFullFileName(filePath, id);
         File file = new File(fullFileName);
-        return readTransaction(file);
+        try {
+            return readTransaction(file);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+
     }
 
     /**
@@ -131,8 +164,14 @@ public class FileCoordinatorRepository implements CoordinatorRepository {
         File[] files = path.listFiles();
         if (files != null && files.length > 0) {
             for (File file : files) {
-                TccTransaction transaction = readTransaction(file);
-                transactionRecoverList.add(transaction);
+                try {
+                    TccTransaction  transaction = readTransaction(file);
+                    transactionRecoverList.add(transaction);
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
             }
         }
         return transactionRecoverList;
@@ -155,21 +194,20 @@ public class FileCoordinatorRepository implements CoordinatorRepository {
 
     @Override
     public void init(String modelName, TccConfig tccConfig) {
-        filePath = buildFilePath(modelName, tccConfig.getTccFileConfig());
+        final TccFileConfig tccFileConfig =
+                tccConfig.getTccFileConfig();
+        if(StringUtils.isNoneBlank(tccFileConfig.getPrefix())){
+            filePath = RepositoryPathUtils.buildFilePath(
+                    String.join("/", tccFileConfig.getPath(), modelName));
+        }else{
+            filePath = RepositoryPathUtils.buildFilePath(modelName);
+        }
+
         File file = new File(filePath);
         if (!file.exists()) {
             file.getParentFile().mkdirs();
             file.mkdirs();
         }
-    }
-
-    private String buildFilePath(String modelName, TccFileConfig tccFileConfig) {
-
-        String fileName = String.join("_", "tcc", tccFileConfig.getPrefix(), modelName.replaceAll("-", "_"));
-
-        return String.join("/", tccFileConfig.getPath(), fileName);
-
-
     }
 
     /**
@@ -185,61 +223,33 @@ public class FileCoordinatorRepository implements CoordinatorRepository {
     private void writeFile(TccTransaction tccTransaction) {
         makeDirIfNecessory();
 
-        String file = getFullFileName(tccTransaction.getTransId());
+        String fileName = RepositoryPathUtils.getFullFileName(filePath, tccTransaction.getTransId());
 
-        FileChannel channel = null;
-        RandomAccessFile raf;
         try {
-            byte[] content = serialize(tccTransaction);
-            raf = new RandomAccessFile(file, "rw");
-            channel = raf.getChannel();
-            ByteBuffer buffer = ByteBuffer.allocate(content.length);
-            buffer.put(content);
-            buffer.flip();
-            while (buffer.hasRemaining()) {
-                channel.write(buffer);
-            }
-
-            channel.force(true);
-        } catch (Exception e) {
-            throw new TccRuntimeException(e);
-        } finally {
-            if (channel != null && channel.isOpen()) {
-                try {
-                    channel.close();
-                } catch (IOException e) {
-                    throw new TccRuntimeException(e);
-                }
-            }
+            FileUtils.writeFile(fileName, RepositoryConvertUtils.convert(tccTransaction, serializer));
+        } catch (TccException e) {
+            e.printStackTrace();
         }
+
     }
 
-    private String getFullFileName(String id) {
-        return String.format("%s/%s", filePath, id);
-    }
 
-    private TccTransaction readTransaction(File file) {
-
-        FileInputStream fis = null;
-        try {
-            fis = new FileInputStream(file);
-
+    private TccTransaction readTransaction(File file) throws Exception {
+        try (FileInputStream fis = new FileInputStream(file)) {
             byte[] content = new byte[(int) file.length()];
-
             fis.read(content);
-
-            return deserialize(content);
-        } catch (Exception e) {
-            throw new TccRuntimeException(e);
-        } finally {
-            if (fis != null) {
-                try {
-                    fis.close();
-                } catch (IOException e) {
-                    // throw new TransactionRuntimeException(e);
-                }
-            }
+            return RepositoryConvertUtils.transformBean(content, serializer);
         }
+
+    }
+
+    private CoordinatorRepositoryAdapter readAdapter(File file) throws Exception {
+        try (FileInputStream fis = new FileInputStream(file)) {
+            byte[] content = new byte[(int) file.length()];
+            fis.read(content);
+            return serializer.deSerialize(content, CoordinatorRepositoryAdapter.class);
+        }
+
     }
 
     private void makeDirIfNecessory() {
@@ -262,14 +272,5 @@ public class FileCoordinatorRepository implements CoordinatorRepository {
                 }
             }
         }
-    }
-
-    private byte[] serialize(TccTransaction tccTransaction) throws Exception {
-        return serializer.serialize(tccTransaction);
-
-    }
-
-    private TccTransaction deserialize(byte[] value) throws Exception {
-        return serializer.deSerialize(value, TccTransaction.class);
     }
 }

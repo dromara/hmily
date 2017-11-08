@@ -17,22 +17,32 @@
  */
 package com.happylifeplat.tcc.core.spi.repository;
 
+import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
+import com.happylifeplat.tcc.common.bean.adapter.CoordinatorRepositoryAdapter;
 import com.happylifeplat.tcc.common.config.TccConfig;
 import com.happylifeplat.tcc.common.config.TccRedisConfig;
-import com.happylifeplat.tcc.core.bean.entity.TccTransaction;
+import com.happylifeplat.tcc.common.bean.entity.TccTransaction;
 import com.happylifeplat.tcc.common.enums.RepositorySupportEnum;
 import com.happylifeplat.tcc.common.exception.TccException;
 import com.happylifeplat.tcc.common.exception.TccRuntimeException;
+import com.happylifeplat.tcc.common.jedis.JedisClient;
+import com.happylifeplat.tcc.common.jedis.JedisClientCluster;
+import com.happylifeplat.tcc.common.jedis.JedisClientSingle;
+import com.happylifeplat.tcc.common.utils.DateUtils;
 import com.happylifeplat.tcc.common.utils.LogUtil;
+import com.happylifeplat.tcc.common.utils.RepositoryConvertUtils;
+import com.happylifeplat.tcc.common.utils.RepositoryPathUtils;
 import com.happylifeplat.tcc.core.helper.ByteUtils;
 import com.happylifeplat.tcc.core.helper.RedisHelper;
-import com.happylifeplat.tcc.core.spi.ObjectSerializer;
+import com.happylifeplat.tcc.common.serializer.ObjectSerializer;
 import com.happylifeplat.tcc.core.spi.CoordinatorRepository;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import redis.clients.jedis.HostAndPort;
+import redis.clients.jedis.JedisCluster;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
@@ -55,9 +65,9 @@ public class RedisCoordinatorRepository implements CoordinatorRepository {
     private ObjectSerializer objectSerializer;
 
 
-    private JedisPool jedisPool;
+    private JedisClient jedisClient;
 
-    private String keyName;
+    private String keyPrefix;
 
     /**
      * 创建本地事务对象
@@ -68,20 +78,9 @@ public class RedisCoordinatorRepository implements CoordinatorRepository {
     @Override
     public int create(TccTransaction tccTransaction) {
         try {
-            final byte[] key = RedisHelper.getRedisKey(keyName, tccTransaction.getTransId());
-            Long statusCode = RedisHelper.execute(jedisPool,
-                    jedis -> {
-                        try {
-                            return jedis.hsetnx(key,
-                                    ByteUtils.longToBytes(tccTransaction.getVersion()),
-                                    objectSerializer.serialize(tccTransaction));
-                        } catch (TccException e) {
-                            e.printStackTrace();
-                            return 0L;
-                        }
-                    });
-
-            return statusCode.intValue();
+            final String redisKey = RepositoryPathUtils.buildRedisKey(keyPrefix, tccTransaction.getTransId());
+            jedisClient.set(redisKey, RepositoryConvertUtils.convert(tccTransaction, objectSerializer));
+            return 1;
         } catch (Exception e) {
             throw new TccRuntimeException(e);
         }
@@ -96,9 +95,8 @@ public class RedisCoordinatorRepository implements CoordinatorRepository {
     @Override
     public int remove(String id) {
         try {
-            final byte[] key = RedisHelper.getRedisKey(keyName, id);
-            Long result = RedisHelper.execute(jedisPool, jedis -> jedis.del(key));
-            return result.intValue();
+            final String redisKey = RepositoryPathUtils.buildRedisKey(keyPrefix, id);
+            return jedisClient.del(redisKey).intValue();
         } catch (Exception e) {
             throw new TccRuntimeException(e);
         }
@@ -113,30 +111,39 @@ public class RedisCoordinatorRepository implements CoordinatorRepository {
     @Override
     public int update(TccTransaction tccTransaction) throws TccRuntimeException {
         try {
-            final byte[] key = RedisHelper.getRedisKey(keyName, tccTransaction.getTransId());
-            Long statusCode = RedisHelper.execute(jedisPool, jedis -> {
-                tccTransaction.setVersion(tccTransaction.getVersion() + 1);
-                tccTransaction.setLastTime(new Date());
-                tccTransaction.setRetriedCount(tccTransaction.getRetriedCount() + 1);
-                try {
-                    return jedis.hsetnx(key,
-                            ByteUtils.longToBytes(tccTransaction.getVersion()),
-                            objectSerializer.serialize(tccTransaction));
-                } catch (TccException e) {
-                    e.printStackTrace();
-                    return 0L;
-                }
-
-            });
-
-            final int intValue = statusCode.intValue();
-            if (intValue <= 0) {
-                throw new TccRuntimeException("数据已经被更新！");
-            }
-            return intValue;
+            final String redisKey = RepositoryPathUtils.buildRedisKey(keyPrefix, tccTransaction.getTransId());
+            tccTransaction.setVersion(tccTransaction.getVersion() + 1);
+            tccTransaction.setLastTime(new Date());
+            tccTransaction.setRetriedCount(tccTransaction.getRetriedCount() + 1);
+            final String result = jedisClient.set(redisKey, RepositoryConvertUtils.convert(tccTransaction, objectSerializer));
+            return 1;
         } catch (Exception e) {
             throw new TccRuntimeException(e);
         }
+    }
+
+    /**
+     * 更新 List<Participant>  只更新这一个字段数据
+     *
+     * @param tccTransaction 实体对象
+     */
+    @Override
+    public int updateParticipant(TccTransaction tccTransaction) {
+        final String redisKey =
+                RepositoryPathUtils.buildRedisKey(keyPrefix, tccTransaction.getTransId());
+
+        byte[] contents = jedisClient.get(redisKey.getBytes());
+        try {
+            CoordinatorRepositoryAdapter adapter = objectSerializer.deSerialize(contents, CoordinatorRepositoryAdapter.class);
+            adapter.setContents(objectSerializer.serialize(tccTransaction.getParticipants()));
+            jedisClient.set(redisKey, objectSerializer.serialize(adapter));
+        } catch (TccException e) {
+            e.printStackTrace();
+            return 0;
+        }
+
+        return 1;
+
     }
 
 
@@ -150,12 +157,10 @@ public class RedisCoordinatorRepository implements CoordinatorRepository {
     public TccTransaction findById(String id) {
         try {
 
-            final byte[] key = RedisHelper.getRedisKey(keyName, id);
-            byte[] content = RedisHelper.getKeyValue(jedisPool, key);
-            if (content != null) {
-                return objectSerializer.deSerialize(content, TccTransaction.class);
-            }
-            return null;
+            final String redisKey = RepositoryPathUtils.buildRedisKey(keyPrefix, id);
+            byte[] contents = jedisClient.get(redisKey.getBytes());
+
+            return RepositoryConvertUtils.transformBean(contents, objectSerializer);
         } catch (Exception e) {
             throw new TccRuntimeException(e);
         }
@@ -170,12 +175,11 @@ public class RedisCoordinatorRepository implements CoordinatorRepository {
     public List<TccTransaction> listAll() {
         try {
             List<TccTransaction> transactions = Lists.newArrayList();
-            Set<byte[]> keys = RedisHelper.execute(jedisPool,
-                    jedis -> jedis.keys((keyName + "*").getBytes()));
+            Set<byte[]> keys = jedisClient.keys((keyPrefix + "*").getBytes());
             for (final byte[] key : keys) {
-                byte[] content = RedisHelper.getKeyValue(jedisPool, key);
-                if (content != null) {
-                    transactions.add(objectSerializer.deSerialize(content, TccTransaction.class));
+                byte[] contents = jedisClient.get(key);
+                if (contents != null) {
+                    transactions.add(RepositoryConvertUtils.transformBean(contents, objectSerializer));
                 }
             }
             return transactions;
@@ -204,7 +208,7 @@ public class RedisCoordinatorRepository implements CoordinatorRepository {
      */
     @Override
     public void init(String modelName, TccConfig tccConfig) {
-        keyName = modelName;
+        keyPrefix = RepositoryPathUtils.buildRedisKeyPrefix(modelName);
         final TccRedisConfig tccRedisConfig = tccConfig.getTccRedisConfig();
         try {
             buildJedisPool(tccRedisConfig);
@@ -258,10 +262,24 @@ public class RedisCoordinatorRepository implements CoordinatorRepository {
         config.setTimeBetweenEvictionRunsMillis(tccRedisConfig.getTimeBetweenEvictionRunsMillis());
         //每次逐出检查时 逐出的最大数目 如果为负数就是 : 1/abs(n), 默认3
         config.setNumTestsPerEvictionRun(tccRedisConfig.getNumTestsPerEvictionRun());
-        if (StringUtils.isNoneBlank(tccRedisConfig.getPassword())) {
-            jedisPool = new JedisPool(config, tccRedisConfig.getHostName(), tccRedisConfig.getPort(), tccRedisConfig.getTimeOut(), tccRedisConfig.getPassword());
+
+        JedisPool jedisPool;
+        //如果是集群模式
+        if (tccRedisConfig.getCluster()) {
+            LogUtil.info(LOGGER, () -> "构造redis集群模式");
+            final String clusterUrl = tccRedisConfig.getClusterUrl();
+            final Set<HostAndPort> hostAndPorts = Splitter.on(clusterUrl)
+                    .splitToList(";").stream()
+                    .map(HostAndPort::parseString).collect(Collectors.toSet());
+            JedisCluster jedisCluster = new JedisCluster(hostAndPorts, config);
+            jedisClient = new JedisClientCluster(jedisCluster);
         } else {
-            jedisPool = new JedisPool(config, tccRedisConfig.getHostName(), tccRedisConfig.getPort(), tccRedisConfig.getTimeOut());
+            if (StringUtils.isNoneBlank(tccRedisConfig.getPassword())) {
+                jedisPool = new JedisPool(config, tccRedisConfig.getHostName(), tccRedisConfig.getPort(), tccRedisConfig.getTimeOut(), tccRedisConfig.getPassword());
+            } else {
+                jedisPool = new JedisPool(config, tccRedisConfig.getHostName(), tccRedisConfig.getPort(), tccRedisConfig.getTimeOut());
+            }
+            jedisClient = new JedisClientSingle(jedisPool);
         }
 
     }

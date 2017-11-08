@@ -18,7 +18,7 @@
 
 package com.happylifeplat.tcc.core.service.handler;
 
-import com.happylifeplat.tcc.core.bean.context.TccTransactionContext;
+import com.happylifeplat.tcc.common.bean.context.TccTransactionContext;
 import com.happylifeplat.tcc.core.service.TccTransactionHandler;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,7 +51,7 @@ public class StartTccTransactionHandler implements TccTransactionHandler {
     public Object handler(ProceedingJoinPoint point, TccTransactionContext context) throws Throwable {
         Object returnValue;
         try {
-            tccTransactionManager.begin();
+            tccTransactionManager.begin(point);
             try {
                 //发起调用 执行try方法
                 returnValue = point.proceed();

@@ -18,7 +18,7 @@
 
 package com.happylifeplat.tcc.core.service.handler;
 
-import com.happylifeplat.tcc.core.bean.context.TccTransactionContext;
+import com.happylifeplat.tcc.common.bean.context.TccTransactionContext;
 import com.happylifeplat.tcc.core.service.TccTransactionHandler;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.springframework.stereotype.Component;

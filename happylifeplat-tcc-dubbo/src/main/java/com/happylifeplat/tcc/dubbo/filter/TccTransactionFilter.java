@@ -29,13 +29,13 @@ import com.alibaba.dubbo.rpc.RpcContext;
 import com.alibaba.dubbo.rpc.RpcException;
 import com.happylifeplat.tcc.annotation.Tcc;
 import com.happylifeplat.tcc.annotation.TccPatternEnum;
+import com.happylifeplat.tcc.common.constant.CommonConstant;
 import com.happylifeplat.tcc.common.enums.TccActionEnum;
 import com.happylifeplat.tcc.common.exception.TccRuntimeException;
 import com.happylifeplat.tcc.common.utils.GsonUtils;
-import com.happylifeplat.tcc.core.bean.Constant;
-import com.happylifeplat.tcc.core.bean.context.TccTransactionContext;
-import com.happylifeplat.tcc.core.bean.entity.Participant;
-import com.happylifeplat.tcc.core.bean.entity.TccInvocation;
+import com.happylifeplat.tcc.common.bean.context.TccTransactionContext;
+import com.happylifeplat.tcc.common.bean.entity.Participant;
+import com.happylifeplat.tcc.common.bean.entity.TccInvocation;
 import com.happylifeplat.tcc.core.concurrent.threadlocal.TransactionContextLocal;
 import com.happylifeplat.tcc.core.service.handler.TccTransactionManager;
 import org.apache.commons.lang3.StringUtils;
@@ -79,7 +79,7 @@ public class TccTransactionFilter implements Filter {
                         TransactionContextLocal.getInstance().get();
                 if (Objects.nonNull(tccTransactionContext)) {
                     RpcContext.getContext()
-                            .setAttachment(Constant.TCC_TRANSACTION_CONTEXT,
+                            .setAttachment(CommonConstant.TCC_TRANSACTION_CONTEXT,
                                     GsonUtils.getInstance().toJson(tccTransactionContext));
                 }
                 if (Objects.nonNull(tccTransactionContext)) {

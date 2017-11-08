@@ -18,7 +18,7 @@
 package com.happylifeplat.tcc.core.service;
 
 
-import com.happylifeplat.tcc.core.bean.context.TccTransactionContext;
+import com.happylifeplat.tcc.common.bean.context.TccTransactionContext;
 
 /**
  * @author xiaoyu

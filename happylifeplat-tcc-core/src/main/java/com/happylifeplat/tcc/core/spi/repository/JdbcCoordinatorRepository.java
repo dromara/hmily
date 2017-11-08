@@ -21,13 +21,13 @@ import com.alibaba.druid.pool.DruidDataSource;
 import com.google.common.collect.Maps;
 import com.happylifeplat.tcc.common.config.TccConfig;
 import com.happylifeplat.tcc.common.config.TccDbConfig;
-import com.happylifeplat.tcc.core.bean.entity.Participant;
-import com.happylifeplat.tcc.core.bean.entity.TccTransaction;
+import com.happylifeplat.tcc.common.bean.entity.Participant;
+import com.happylifeplat.tcc.common.bean.entity.TccTransaction;
 import com.happylifeplat.tcc.common.enums.RepositorySupportEnum;
 import com.happylifeplat.tcc.common.exception.TccException;
-import com.happylifeplat.tcc.common.exception.TccRuntimeException;
+import com.happylifeplat.tcc.common.utils.RepositoryPathUtils;
 import com.happylifeplat.tcc.core.helper.SqlHelper;
-import com.happylifeplat.tcc.core.spi.ObjectSerializer;
+import com.happylifeplat.tcc.common.serializer.ObjectSerializer;
 import com.happylifeplat.tcc.core.spi.CoordinatorRepository;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
@@ -40,7 +40,6 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -70,11 +69,13 @@ public class JdbcCoordinatorRepository implements CoordinatorRepository {
 
     @Override
     public int create(TccTransaction tccTransaction) {
-        String sql = "insert into " + tableName + "(trans_id,retried_count,create_time,last_time,version,status,invocation,role,pattern)" +
-                " values(?,?,?,?,?,?,?,?,?)";
+        String sql = "insert into " + tableName + "(trans_id,target_class,target_method,retried_count,create_time,last_time,version,status,invocation,role,pattern)" +
+                " values(?,?,?,?,?,?,?,?,?,?,?)";
         try {
+
             final byte[] serialize = serializer.serialize(tccTransaction.getParticipants());
-            return executeUpdate(sql, tccTransaction.getTransId(), tccTransaction.getRetriedCount(), tccTransaction.getCreateTime(), tccTransaction.getLastTime(),
+            return executeUpdate(sql, tccTransaction.getTransId(), tccTransaction.getTargetClass(), tccTransaction.getTargetMethod(),
+                    tccTransaction.getRetriedCount(), tccTransaction.getCreateTime(), tccTransaction.getLastTime(),
                     tccTransaction.getVersion(), tccTransaction.getStatus(), serialize, tccTransaction.getRole(), tccTransaction.getPattern());
 
         } catch (TccException e) {
@@ -103,14 +104,47 @@ public class JdbcCoordinatorRepository implements CoordinatorRepository {
         tccTransaction.setVersion(tccTransaction.getVersion() + 1);
 
         String sql = "update " + tableName +
-                " set last_time = ?,version =?,retried_count =?,invocation=?,status=? , pattern=? where trans_id = ? and version=? ";
+                " set last_time = ?,version =?,retried_count =?,invocation=?,status=? ,confirm_method=?,cancel_method=? ,pattern=? where trans_id = ? and version=? ";
+        String confirmMethod = "";
+        String cancelMethod = "";
+        try {
+            final byte[] serialize = serializer.serialize(tccTransaction.getParticipants());
+
+            if (CollectionUtils.isNotEmpty(tccTransaction.getParticipants())) {
+                final Participant participant = tccTransaction.getParticipants().get(0);
+                confirmMethod = participant.getConfirmTccInvocation().getMethodName();
+                cancelMethod = participant.getCancelTccInvocation().getMethodName();
+            }
+
+            return executeUpdate(sql, tccTransaction.getLastTime(),
+                    tccTransaction.getVersion(), tccTransaction.getRetriedCount(), serialize,
+                    tccTransaction.getStatus(), confirmMethod, cancelMethod, tccTransaction.getPattern(),
+                    tccTransaction.getTransId(), currentVersion);
+
+        } catch (TccException e) {
+            e.printStackTrace();
+            return 0;
+        }
+
+
+    }
+
+    /**
+     * 更新 List<Participant>  只更新这一个字段数据
+     *
+     * @param tccTransaction 实体对象
+     */
+    @Override
+    public int updateParticipant(TccTransaction tccTransaction) {
+
+        String sql = "update " + tableName +
+                " set invocation=?  where trans_id = ?  ";
 
         try {
             final byte[] serialize = serializer.serialize(tccTransaction.getParticipants());
-            return executeUpdate(sql, tccTransaction.getLastTime(),
-                    tccTransaction.getVersion(), tccTransaction.getRetriedCount(), serialize,
-                    tccTransaction.getStatus(), tccTransaction.getPattern(),
-                    tccTransaction.getTransId(), currentVersion);
+
+            return executeUpdate(sql, serialize,
+                    tccTransaction.getTransId());
 
         } catch (TccException e) {
             e.printStackTrace();
@@ -131,24 +165,9 @@ public class JdbcCoordinatorRepository implements CoordinatorRepository {
     public TccTransaction findById(String id) {
         String selectSql = "select * from " + tableName + " where trans_id=?";
         List<Map<String, Object>> list = executeQuery(selectSql, id);
-        for (Map<String, Object> map : list) {
-            TccTransaction tccTransaction = new TccTransaction();
-            tccTransaction.setTransId((String) map.get("trans_id"));
-            tccTransaction.setRetriedCount((Integer) map.get("retried_count"));
-            tccTransaction.setCreateTime((Date) map.get("create_time"));
-            tccTransaction.setLastTime((Date) map.get("last_time"));
-            tccTransaction.setVersion((Integer) map.get("version"));
-            tccTransaction.setRole((Integer) map.get("role"));
-            tccTransaction.setPattern((Integer) map.get("pattern"));
-            tccTransaction.setStatus((Integer) map.get("status"));
-            byte[] bytes = (byte[]) map.get("invocation");
-            try {
-                final List<Participant> participants = serializer.deSerialize(bytes, CopyOnWriteArrayList.class);
-                tccTransaction.setParticipants(participants);
-            } catch (TccException e) {
-                e.printStackTrace();
-            }
-            return tccTransaction;
+        if (CollectionUtils.isNotEmpty(list)) {
+            return list.stream().filter(Objects::nonNull)
+                    .map(this::buildByResultMap).collect(Collectors.toList()).get(0);
         }
         return null;
     }
@@ -163,31 +182,11 @@ public class JdbcCoordinatorRepository implements CoordinatorRepository {
     public List<TccTransaction> listAll() {
         String selectSql = "select * from " + tableName;
         List<Map<String, Object>> list = executeQuery(selectSql);
-        List<TccTransaction> tccTransactions = new ArrayList<>();
-
-
-        for (Map<String, Object> map : list) {
-            TccTransaction tccTransaction = new TccTransaction();
-
-            tccTransaction.setTransId((String) map.get("trans_id"));
-            tccTransaction.setRetriedCount((Integer) map.get("retried_count"));
-            tccTransaction.setCreateTime((Date) map.get("create_time"));
-            tccTransaction.setLastTime((Date) map.get("last_time"));
-            tccTransaction.setVersion((Integer) map.get("version"));
-            tccTransaction.setRole((Integer) map.get("role"));
-            tccTransaction.setPattern((Integer) map.get("pattern"));
-            tccTransaction.setStatus((Integer) map.get("status"));
-
-            byte[] bytes = (byte[]) map.get("invocation");
-            try {
-                final List<Participant> participants = serializer.deSerialize(bytes, CopyOnWriteArrayList.class);
-                tccTransaction.setParticipants(participants);
-            } catch (TccException e) {
-                e.printStackTrace();
-            }
-            tccTransactions.add(tccTransaction);
+        if (CollectionUtils.isNotEmpty(list)) {
+            return list.stream().filter(Objects::nonNull)
+                    .map(this::buildByResultMap).collect(Collectors.toList());
         }
-        return tccTransactions;
+        return null;
     }
 
     /**
@@ -207,29 +206,31 @@ public class JdbcCoordinatorRepository implements CoordinatorRepository {
 
         if (CollectionUtils.isNotEmpty(list)) {
             return list.stream().filter(Objects::nonNull)
-                    .map(map -> {
-                        TccTransaction tccTransaction = new TccTransaction();
-                        tccTransaction.setTransId((String) map.get("trans_id"));
-                        tccTransaction.setRetriedCount((Integer) map.get("retried_count"));
-                        tccTransaction.setCreateTime((Date) map.get("create_time"));
-                        tccTransaction.setLastTime((Date) map.get("last_time"));
-                        tccTransaction.setVersion((Integer) map.get("version"));
-                        tccTransaction.setStatus((Integer) map.get("status"));
-                        tccTransaction.setRole((Integer) map.get("role"));
-                        tccTransaction.setPattern((Integer) map.get("pattern"));
-                        byte[] bytes = (byte[]) map.get("invocation");
-                        try {
-                            final List<Participant> participants = serializer.deSerialize(bytes, CopyOnWriteArrayList.class);
-                            tccTransaction.setParticipants(participants);
-                        } catch (TccException e) {
-                            e.printStackTrace();
-                        }
-                        return tccTransaction;
-                    }).collect(Collectors.toList());
-
+                    .map(this::buildByResultMap).collect(Collectors.toList());
         }
 
         return null;
+    }
+
+
+    private TccTransaction buildByResultMap(Map<String, Object> map) {
+        TccTransaction tccTransaction = new TccTransaction();
+        tccTransaction.setTransId((String) map.get("trans_id"));
+        tccTransaction.setRetriedCount((Integer) map.get("retried_count"));
+        tccTransaction.setCreateTime((Date) map.get("create_time"));
+        tccTransaction.setLastTime((Date) map.get("last_time"));
+        tccTransaction.setVersion((Integer) map.get("version"));
+        tccTransaction.setStatus((Integer) map.get("status"));
+        tccTransaction.setRole((Integer) map.get("role"));
+        tccTransaction.setPattern((Integer) map.get("pattern"));
+        byte[] bytes = (byte[]) map.get("invocation");
+        try {
+            final List<Participant> participants = serializer.deSerialize(bytes, CopyOnWriteArrayList.class);
+            tccTransaction.setParticipants(participants);
+        } catch (TccException e) {
+            e.printStackTrace();
+        }
+        return tccTransaction;
     }
 
     /**
@@ -254,7 +255,7 @@ public class JdbcCoordinatorRepository implements CoordinatorRepository {
         dataSource.setTestOnBorrow(false);
         dataSource.setTestWhileIdle(true);
         dataSource.setPoolPreparedStatements(false);
-        this.tableName = "tcc_transaction_" + modelName.replaceAll("-", "_");
+        this.tableName = RepositoryPathUtils.buildDbTableName(modelName);
         executeUpdate(SqlHelper.buildCreateTableSql(txDbConfig.getDriverClassName(), tableName));
     }
 
@@ -282,6 +283,7 @@ public class JdbcCoordinatorRepository implements CoordinatorRepository {
             }
             return ps.executeUpdate();
         } catch (SQLException e) {
+            e.printStackTrace();
             logger.error("executeUpdate-> " + e.getMessage());
         } finally {
             close(connection, ps, null);

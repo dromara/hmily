@@ -1,4 +1,0 @@
-com.happylifeplat.tcc.core.spi.serializer.KryoSerializer
-com.happylifeplat.tcc.core.spi.serializer.ProtostuffSerializer
-com.happylifeplat.tcc.core.spi.serializer.HessianSerializer
-com.happylifeplat.tcc.core.spi.serializer.JavaSerializer
