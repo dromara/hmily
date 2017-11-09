@@ -27,7 +27,7 @@ import lombok.Data;
 public class TccRedisConfig {
 
 
-    private  Boolean cluster;
+    private Boolean cluster = false;
 
     /**
      * 集群url   ip:port;ip:port

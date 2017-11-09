@@ -242,21 +242,23 @@ public class JdbcCoordinatorRepository implements CoordinatorRepository {
     @Override
     public void init(String modelName, TccConfig txConfig) {
         dataSource = new DruidDataSource();
-        final TccDbConfig txDbConfig = txConfig.getTccDbConfig();
-        dataSource.setUrl(txDbConfig.getUrl());
-        dataSource.setDriverClassName(txDbConfig.getDriverClassName());
-        dataSource.setUsername(txDbConfig.getUsername());
-        dataSource.setPassword(txDbConfig.getPassword());
-        dataSource.setInitialSize(2);
-        dataSource.setMaxActive(20);
-        dataSource.setMinIdle(0);
-        dataSource.setMaxWait(60000);
-        dataSource.setValidationQuery("SELECT 1");
-        dataSource.setTestOnBorrow(false);
-        dataSource.setTestWhileIdle(true);
-        dataSource.setPoolPreparedStatements(false);
+        final TccDbConfig tccDbConfig = txConfig.getTccDbConfig();
+        dataSource.setUrl(tccDbConfig.getUrl());
+        dataSource.setDriverClassName(tccDbConfig.getDriverClassName());
+        dataSource.setUsername(tccDbConfig.getUsername());
+        dataSource.setPassword(tccDbConfig.getPassword());
+        dataSource.setInitialSize(tccDbConfig.getInitialSize());
+        dataSource.setMaxActive(tccDbConfig.getMaxActive());
+        dataSource.setMinIdle(tccDbConfig.getMinIdle());
+        dataSource.setMaxWait(tccDbConfig.getMaxWait());
+        dataSource.setValidationQuery(tccDbConfig.getValidationQuery());
+        dataSource.setTestOnBorrow(tccDbConfig.getTestOnBorrow());
+        dataSource.setTestOnReturn(tccDbConfig.getTestOnReturn());
+        dataSource.setTestWhileIdle(tccDbConfig.getTestWhileIdle());
+        dataSource.setPoolPreparedStatements(tccDbConfig.getPoolPreparedStatements());
+        dataSource.setMaxPoolPreparedStatementPerConnectionSize(tccDbConfig.getMaxPoolPreparedStatementPerConnectionSize());
         this.tableName = RepositoryPathUtils.buildDbTableName(modelName);
-        executeUpdate(SqlHelper.buildCreateTableSql(txDbConfig.getDriverClassName(), tableName));
+        executeUpdate(SqlHelper.buildCreateTableSql(tccDbConfig.getDriverClassName(), tableName));
     }
 
 

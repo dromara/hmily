@@ -31,7 +31,6 @@ import java.util.Arrays;
  */
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
 public class TccInvocation implements Serializable {
 
     private static final long serialVersionUID = -5108578223428529356L;
@@ -48,6 +47,11 @@ public class TccInvocation implements Serializable {
 
     @Getter
     private Object[] args;
+
+
+    public TccInvocation(){
+
+    }
 
 
 

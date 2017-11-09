@@ -21,11 +21,11 @@ package com.happylifeplat.tcc.admin.spi;
 import com.alibaba.druid.pool.DruidDataSource;
 import com.google.common.base.Splitter;
 import com.happylifeplat.tcc.admin.service.CompensationService;
-import com.happylifeplat.tcc.admin.service.recover.FileCompensationServiceImpl;
-import com.happylifeplat.tcc.admin.service.recover.JdbcCompensationServiceImpl;
-import com.happylifeplat.tcc.admin.service.recover.MongoCompensationServiceImpl;
-import com.happylifeplat.tcc.admin.service.recover.RedisCompensationServiceImpl;
-import com.happylifeplat.tcc.admin.service.recover.ZookeeperCompensationServiceImpl;
+import com.happylifeplat.tcc.admin.service.compensate.FileCompensationServiceImpl;
+import com.happylifeplat.tcc.admin.service.compensate.JdbcCompensationServiceImpl;
+import com.happylifeplat.tcc.admin.service.compensate.MongoCompensationServiceImpl;
+import com.happylifeplat.tcc.admin.service.compensate.RedisCompensationServiceImpl;
+import com.happylifeplat.tcc.admin.service.compensate.ZookeeperCompensationServiceImpl;
 import com.happylifeplat.tcc.common.jedis.JedisClient;
 import com.happylifeplat.tcc.common.jedis.JedisClientCluster;
 import com.happylifeplat.tcc.common.jedis.JedisClientSingle;
@@ -127,7 +127,7 @@ public class CompensationConfiguration {
             JedisClient jedisClient;
             final Boolean cluster = env.getProperty("compensation.redis.cluster", Boolean.class);
             if (cluster) {
-                final String clusterUrl = env.getProperty("compensation.redis.clusterUrl");
+                final String clusterUrl = env.getProperty("compensate.redis.clusterUrl");
                 final Set<HostAndPort> hostAndPorts = Splitter.on(clusterUrl)
                         .splitToList(";").stream()
                         .map(HostAndPort::parseString).collect(Collectors.toSet());

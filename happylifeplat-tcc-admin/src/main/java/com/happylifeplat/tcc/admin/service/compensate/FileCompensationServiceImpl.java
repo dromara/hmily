@@ -16,7 +16,7 @@
  *
  */
 
-package com.happylifeplat.tcc.admin.service.recover;
+package com.happylifeplat.tcc.admin.service.compensate;
 
 import com.happylifeplat.tcc.admin.helper.PageHelper;
 import com.happylifeplat.tcc.admin.service.CompensationService;
@@ -37,10 +37,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.RandomAccessFile;
-import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
-import java.text.ParseException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -70,6 +66,7 @@ public class FileCompensationServiceImpl implements CompensationService {
      */
     @Override
     public CommonPager<TccCompensationVO> listByPage(CompensationQuery query) {
+
         final String filePath = RepositoryPathUtils.buildFilePath(query.getApplicationName());
         final PageParameter pageParameter = query.getPageParameter();
         final int currentPage = pageParameter.getCurrentPage();

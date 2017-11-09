@@ -194,14 +194,7 @@ public class FileCoordinatorRepository implements CoordinatorRepository {
 
     @Override
     public void init(String modelName, TccConfig tccConfig) {
-        final TccFileConfig tccFileConfig =
-                tccConfig.getTccFileConfig();
-        if(StringUtils.isNoneBlank(tccFileConfig.getPrefix())){
-            filePath = RepositoryPathUtils.buildFilePath(
-                    String.join("/", tccFileConfig.getPath(), modelName));
-        }else{
-            filePath = RepositoryPathUtils.buildFilePath(modelName);
-        }
+        filePath = RepositoryPathUtils.buildFilePath(modelName);
 
         File file = new File(filePath);
         if (!file.exists()) {

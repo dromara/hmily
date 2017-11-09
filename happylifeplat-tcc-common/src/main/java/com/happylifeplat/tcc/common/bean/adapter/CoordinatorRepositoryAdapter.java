@@ -19,6 +19,7 @@
 package com.happylifeplat.tcc.common.bean.adapter;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Date;
 
@@ -31,6 +32,7 @@ import java.util.Date;
  * @since JDK 1.8
  */
 @Data
+@NoArgsConstructor
 public class CoordinatorRepositoryAdapter {
 
 

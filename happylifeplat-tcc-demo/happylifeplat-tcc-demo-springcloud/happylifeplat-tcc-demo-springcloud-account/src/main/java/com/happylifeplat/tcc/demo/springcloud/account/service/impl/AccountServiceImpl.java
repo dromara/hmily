@@ -79,7 +79,10 @@ public class AccountServiceImpl implements AccountService {
         final AccountDO accountDO = accountMapper.findByUserId(accountDTO.getUserId());
         accountDO.setFreezeAmount(accountDO.getFreezeAmount().subtract(accountDTO.getAmount()));
         accountDO.setUpdateTime(new Date());
-        accountMapper.update(accountDO);
+        final int rows = accountMapper.confirm(accountDO);
+        if(rows!=1){
+            throw  new TccRuntimeException("确认扣减账户异常！");
+        }
         return Boolean.TRUE;
     }
 
@@ -91,7 +94,10 @@ public class AccountServiceImpl implements AccountService {
         accountDO.setBalance(accountDO.getBalance().add(accountDTO.getAmount()));
         accountDO.setFreezeAmount(accountDO.getFreezeAmount().subtract(accountDTO.getAmount()));
         accountDO.setUpdateTime(new Date());
-        accountMapper.update(accountDO);
+        final int rows = accountMapper.cancel(accountDO);
+        if(rows!=1){
+            throw  new TccRuntimeException("取消扣减账户异常！");
+        }
         return Boolean.TRUE;
     }
 }

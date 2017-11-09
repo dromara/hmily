@@ -16,12 +16,12 @@
  *
  */
 
-package com.happylifeplat.tcc.admin.service.recover;
+package com.happylifeplat.tcc.admin.service.compensate;
 
 import com.happylifeplat.tcc.admin.page.CommonPager;
 import com.happylifeplat.tcc.admin.page.PageParameter;
-import com.happylifeplat.tcc.admin.service.CompensationService;
 import com.happylifeplat.tcc.admin.query.CompensationQuery;
+import com.happylifeplat.tcc.admin.service.CompensationService;
 import com.happylifeplat.tcc.admin.vo.TccCompensationVO;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -39,24 +39,25 @@ import org.springframework.test.context.junit4.SpringRunner;
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class MongoCompensationServiceImplTest {
-
+public class RedisCompensationServiceImplTest {
 
     @Autowired
     private CompensationService compensationService;
 
-
     @Test
     public void listByPage() throws Exception {
-
 
         CompensationQuery query = new CompensationQuery();
 
         query.setApplicationName("alipay-service");
 
-        PageParameter pageParameter = new PageParameter(1,5);
+        PageParameter pageParameter = new PageParameter(1,1);
 
         query.setPageParameter(pageParameter);
+
+        query.setRetry(2);
+
+        query.setTransId("2075304338");
 
         final CommonPager<TccCompensationVO> voCommonPager = compensationService.listByPage(query);
 

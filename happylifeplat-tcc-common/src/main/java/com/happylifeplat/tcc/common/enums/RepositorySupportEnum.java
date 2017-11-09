@@ -28,27 +28,27 @@ import java.util.Optional;
 public enum RepositorySupportEnum {
 
     /**
-     * Db compensation cache type enum.
+     * Db compensate cache type enum.
      */
     DB("db"),
 
     /**
-     * File compensation cache type enum.
+     * File compensate cache type enum.
      */
     FILE("file"),
 
     /**
-     * Redis compensation cache type enum.
+     * Redis compensate cache type enum.
      */
     REDIS("redis"),
 
     /**
-     * Mongodb compensation cache type enum.
+     * Mongodb compensate cache type enum.
      */
     MONGODB("mongodb"),
 
     /**
-     * Zookeeper compensation cache type enum.
+     * Zookeeper compensate cache type enum.
      */
     ZOOKEEPER("zookeeper");
 
@@ -59,10 +59,10 @@ public enum RepositorySupportEnum {
     }
 
     /**
-     * Acquire compensation cache type compensation cache type enum.
+     * Acquire compensate cache type compensate cache type enum.
      *
-     * @param support the compensation cache type
-     * @return the compensation cache type enum
+     * @param support the compensate cache type
+     * @return the compensate cache type enum
      */
     public static RepositorySupportEnum acquire(String support) {
         Optional<RepositorySupportEnum> repositorySupportEnum =

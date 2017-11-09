@@ -301,7 +301,7 @@ public class TccTransactionManager {
     public void enlistParticipant(Participant participant) {
         final TccTransaction transaction = this.getCurrentTransaction();
         transaction.registerParticipant(participant);
-        coordinatorService.updateParticipant(transaction);
+        coordinatorService.update(transaction);
 
 
     }

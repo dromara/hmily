@@ -145,7 +145,6 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
 
-    @Transactional(rollbackFor = Exception.class)
     public Boolean confirmMethod(InventoryDTO inventoryDTO) {
 
         LOGGER.info("==========Springcloud调用扣减库存确认方法===========");
@@ -155,12 +154,17 @@ public class InventoryServiceImpl implements InventoryService {
 
         entity.setLockInventory(entity.getLockInventory() - inventoryDTO.getCount());
 
-        inventoryMapper.decrease(entity);
+        final int rows = inventoryMapper.confirm(entity);
+
+
+        if (rows != 1) {
+            throw new TccRuntimeException("确认库存操作失败！");
+        }
+
         return true;
 
     }
 
-    @Transactional(rollbackFor = Exception.class)
     public Boolean cancelMethod(InventoryDTO inventoryDTO) {
 
         LOGGER.info("==========Springcloud调用扣减库存取消方法===========");
@@ -171,7 +175,12 @@ public class InventoryServiceImpl implements InventoryService {
 
         entity.setLockInventory(entity.getLockInventory() - inventoryDTO.getCount());
 
-        inventoryMapper.decrease(entity);
+       int rows= inventoryMapper.cancel(entity);
+
+
+        if (rows != 1) {
+            throw new TccRuntimeException("取消库存操作失败！");
+        }
 
         return true;
 

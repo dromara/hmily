@@ -44,9 +44,12 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 
 import java.net.InetSocketAddress;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 /**
@@ -85,6 +88,8 @@ public class MongoCoordinatorRepository implements CoordinatorRepository {
             mongoBean.setPattern(tccTransaction.getPattern());
             mongoBean.setTargetClass(tccTransaction.getTargetClass());
             mongoBean.setTargetMethod(tccTransaction.getTargetMethod());
+            mongoBean.setConfirmMethod("");
+            mongoBean.setCancelMethod("");
             final byte[] cache = objectSerializer.serialize(tccTransaction.getParticipants());
             mongoBean.setContents(cache);
             template.save(mongoBean, collectionName);
@@ -124,15 +129,22 @@ public class MongoCoordinatorRepository implements CoordinatorRepository {
         update.set("retriedCount", tccTransaction.getRetriedCount() + 1);
         update.set("version", tccTransaction.getVersion() + 1);
 
-        if (CollectionUtils.isNotEmpty(tccTransaction.getParticipants())) {
-            final Participant participant = tccTransaction.getParticipants().get(0);
-            update.set("confirmMethod", participant.getConfirmTccInvocation().getMethodName());
-            update.set("cancelMethod", participant.getCancelTccInvocation().getMethodName());
+        try {
+            if (CollectionUtils.isNotEmpty(tccTransaction.getParticipants())) {
+                final Participant participant = tccTransaction.getParticipants().get(0);
+                if (Objects.nonNull(participant)) {
+                    update.set("confirmMethod", participant.getConfirmTccInvocation().getMethodName());
+                    update.set("cancelMethod", participant.getCancelTccInvocation().getMethodName());
+                }
+                update.set("contents", objectSerializer.serialize(tccTransaction.getParticipants()));
+            }
+        } catch (TccException e) {
+            e.printStackTrace();
         }
 
         final WriteResult writeResult = template.updateFirst(query, update, MongoAdapter.class, collectionName);
         if (writeResult.getN() <= 0) {
-            throw new TccRuntimeException("更新数据异常!");
+            //throw new TccRuntimeException("更新数据异常!");
         }
         return 1;
     }
@@ -148,7 +160,7 @@ public class MongoCoordinatorRepository implements CoordinatorRepository {
         query.addCriteria(new Criteria("transId").is(tccTransaction.getTransId()));
         Update update = new Update();
         try {
-            update.set("contents",  objectSerializer.serialize(tccTransaction.getParticipants()));
+            update.set("contents", objectSerializer.serialize(tccTransaction.getParticipants()));
         } catch (TccException e) {
             e.printStackTrace();
         }
@@ -189,7 +201,7 @@ public class MongoCoordinatorRepository implements CoordinatorRepository {
         tccTransaction.setTargetClass(cache.getTargetClass());
         tccTransaction.setTargetMethod(cache.getTargetMethod());
         try {
-            List<Participant> participants = objectSerializer.deSerialize(cache.getContents(), List.class);
+            List<Participant> participants = (List<Participant>) objectSerializer.deSerialize(cache.getContents(), CopyOnWriteArrayList.class);
             tccTransaction.setParticipants(participants);
         } catch (TccException e) {
             LogUtil.error(LOGGER, "mongodb 反序列化异常:{}", e::getLocalizedMessage);

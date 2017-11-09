@@ -24,6 +24,9 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
 
 /**
  * @author xiaoyu
@@ -33,6 +36,9 @@ public class StartTccTransactionHandler implements TccTransactionHandler {
 
 
     private final TccTransactionManager tccTransactionManager;
+
+
+    private static final  Lock LOCK = new ReentrantLock();
 
     @Autowired
     public StartTccTransactionHandler(TccTransactionManager tccTransactionManager) {
@@ -51,6 +57,7 @@ public class StartTccTransactionHandler implements TccTransactionHandler {
     public Object handler(ProceedingJoinPoint point, TccTransactionContext context) throws Throwable {
         Object returnValue;
         try {
+            LOCK.lock();
             tccTransactionManager.begin(point);
             try {
                 //发起调用 执行try方法
@@ -67,6 +74,7 @@ public class StartTccTransactionHandler implements TccTransactionHandler {
             tccTransactionManager.confirm();
         } finally {
             tccTransactionManager.remove();
+            LOCK.unlock();
         }
         return returnValue;
     }

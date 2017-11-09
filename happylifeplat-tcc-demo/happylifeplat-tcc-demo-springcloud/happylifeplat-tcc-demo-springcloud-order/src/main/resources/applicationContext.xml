@@ -35,7 +35,7 @@
     <bean id="tccTransactionBootstrap" class="com.happylifeplat.tcc.core.bootstrap.TccTransactionBootstrap">
         <property name="serializer" value="kryo"/>
         <property name="coordinatorQueueMax" value="5000"/>
-        <property name="coordinatorThreadMax" value="4"/>
+        <property name="coordinatorThreadMax" value="16"/>
         <property name="recoverDelayTime" value="120"/>
         <property name="retryMax" value="30"/>
         <property name="rejectPolicy" value="Abort"/>
