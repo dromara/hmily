@@ -45,7 +45,7 @@ import java.util.List;
  * @since JDK 1.8
  */
 @RestController
-@RequestMapping("/compensation")
+@RequestMapping("/compensate")
 public class CompensationController {
 
 
