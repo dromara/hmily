@@ -182,7 +182,14 @@ public class InventoryServiceImpl implements InventoryService {
 
         entity.setLockInventory(entity.getLockInventory() - inventoryDTO.getCount());
 
-        inventoryMapper.decrease(entity);
+
+        final int rows = inventoryMapper.confirm(entity);
+
+
+        if (rows != 1) {
+            throw new TccRuntimeException("确认库存操作失败！");
+        }
+
         return true;
 
     }
@@ -198,7 +205,12 @@ public class InventoryServiceImpl implements InventoryService {
 
         entity.setLockInventory(entity.getLockInventory() - inventoryDTO.getCount());
 
-        inventoryMapper.decrease(entity);
+        int rows= inventoryMapper.cancel(entity);
+
+
+        if (rows != 1) {
+            throw new TccRuntimeException("取消库存操作失败！");
+        }
 
         return true;
 

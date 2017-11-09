@@ -7,7 +7,7 @@
     <groupId>com.happylifeplat.tcc</groupId>
     <artifactId>happylifeplat-tcc</artifactId>
     <packaging>pom</packaging>
-    <version>1.0.0-RELEASE</version>
+    <version>1.1.0-RELEASE</version>
     <name>happylifeplat-tcc</name>
     <modules>
         <module>happylifeplat-tcc-common</module>
