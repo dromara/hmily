@@ -25,6 +25,7 @@ import com.happylifeplat.tcc.common.exception.TccException;
 import com.happylifeplat.tcc.common.serializer.ObjectSerializer;
 import org.apache.commons.collections.CollectionUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -75,7 +76,7 @@ public class RepositoryConvertUtils {
                 objectSerializer.deSerialize(contents, CoordinatorRepositoryAdapter.class);
 
         List<Participant> participants =
-                objectSerializer.deSerialize(adapter.getContents(), List.class);
+                objectSerializer.deSerialize(adapter.getContents(), ArrayList.class);
 
         tccTransaction.setLastTime(adapter.getLastTime());
         tccTransaction.setRetriedCount(adapter.getRetriedCount());

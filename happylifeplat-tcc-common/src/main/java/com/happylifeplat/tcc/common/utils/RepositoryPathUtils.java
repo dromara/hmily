@@ -62,7 +62,7 @@ public class RepositoryPathUtils {
     }
 
     public static String buildZookeeperPathPrefix(String applicationName) {
-        return String.join("_", CommonConstant.PATH_SUFFIX, applicationName);
+        return String.join("-", CommonConstant.PATH_SUFFIX, applicationName);
     }
 
 

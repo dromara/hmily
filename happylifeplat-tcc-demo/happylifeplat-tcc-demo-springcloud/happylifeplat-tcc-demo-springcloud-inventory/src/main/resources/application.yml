@@ -3,13 +3,28 @@ server:
   contextPath: /inventory-service
   address: 0.0.0.0
 
-
 spring:
     datasource:
         driver-class-name:  com.mysql.jdbc.Driver
         url: jdbc:mysql://192.168.1.68:3306/stock?useUnicode=true&characterEncoding=utf8
         username: xiaoyu
         password: Wgj@555888
+        platform: mysql
+        type: com.alibaba.druid.pool.DruidDataSource
+        initialSize: 20
+        minIdle: 20
+        maxActive: 100
+        maxWait: 60000
+        timeBetweenEvictionRunsMillis: 60000
+        minEvictableIdleTimeMillis: 30000
+        validationQuery: select 'x'
+        testWhileIdle: true
+        testOnBorrow: false
+        testOnReturn: false
+        poolPreparedStatements: true
+        maxPoolPreparedStatementPerConnectionSize: 20
+        filters: stat,wall,slf4j
+        connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
     application:
       name: inventory-service
 

@@ -29,7 +29,6 @@ import java.io.Serializable;
  */
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
 public class Participant implements Serializable {
 
     private static final long serialVersionUID = -2590970715288987627L;
@@ -40,6 +39,12 @@ public class Participant implements Serializable {
     private TccInvocation confirmTccInvocation;
 
     private TccInvocation cancelTccInvocation;
+
+    public Participant(){
+
+    }
+
+
 
 
 }

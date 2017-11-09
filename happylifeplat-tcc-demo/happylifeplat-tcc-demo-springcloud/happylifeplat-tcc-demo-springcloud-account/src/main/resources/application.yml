@@ -10,6 +10,20 @@ spring:
         url: jdbc:mysql://192.168.1.68:3306/account?useUnicode=true&characterEncoding=utf8
         username: xiaoyu
         password: Wgj@555888
+        initialSize: 20
+        minIdle: 20
+        maxActive: 100
+        maxWait: 60000
+        timeBetweenEvictionRunsMillis: 60000
+        minEvictableIdleTimeMillis: 30000
+        validationQuery: select 'x'
+        testWhileIdle: true
+        testOnBorrow: false
+        testOnReturn: false
+        poolPreparedStatements: true
+        maxPoolPreparedStatementPerConnectionSize: 20
+        filters: stat,wall,slf4j
+        connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
     application:
       name: account-service
 

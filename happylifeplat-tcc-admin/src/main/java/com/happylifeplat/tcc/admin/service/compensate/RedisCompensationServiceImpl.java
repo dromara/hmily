@@ -16,7 +16,7 @@
  *
  */
 
-package com.happylifeplat.tcc.admin.service.recover;
+package com.happylifeplat.tcc.admin.service.compensate;
 
 import com.google.common.collect.Sets;
 import com.happylifeplat.tcc.admin.helper.ConvertHelper;
@@ -89,7 +89,7 @@ public class RedisCompensationServiceImpl implements CompensationService {
         int start = (currentPage - 1) * pageSize;
 
 
-        //transaction:recover:alipay-service:
+        //transaction:compensate:alipay-service:
         //获取所有的key
         Set<byte[]> keys;
 

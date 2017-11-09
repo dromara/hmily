@@ -175,7 +175,7 @@
             headTop,
         },
         created() {
-            this.$http.post(this.baseUrl + '/compensation/listAppName', {}).then(
+            this.$http.post(this.baseUrl + '/compensate/listAppName', {}).then(
                 response => {
                     if (response.body.code == 200 && response.body.data != null) {
                         this.options = response.body.data;
@@ -203,7 +203,7 @@
             },
             updateRetryCount: function () {
                 let tData = this.tableData;
-                this.$http.post(this.baseUrl + '/compensation/update', {
+                this.$http.post(this.baseUrl + '/compensate/update', {
                     "applicationName": this.selected,
                     "retry": this.form.newRetryCount,
                     "id": this.currentRow.transId
@@ -238,7 +238,7 @@
                 )
             },
             query: function () {
-                this.$http.post(this.baseUrl + '/compensation/listPage', {
+                this.$http.post(this.baseUrl + '/compensate/listPage', {
                     "pageParameter": {
                         "pageSize": this.paging.limit,
                     },
@@ -278,7 +278,7 @@
                 //delete row and update tableData but don't send post request to update all data
                 var oldTableData = this.tableData;
                 var tlen = oldTableData.length;
-                this.$http.post(this.baseUrl + '/compensation/batchRemove', {
+                this.$http.post(this.baseUrl + '/compensate/batchRemove', {
                     "applicationName": this.selected,
                     "ids": groupIds
                 }).then(
@@ -326,7 +326,7 @@
         watch: {
             paging: {
                 handler: function () {
-                    this.$http.post(this.baseUrl + '/compensation/listPage', {
+                    this.$http.post(this.baseUrl + '/compensate/listPage', {
                         "pageParameter": {
                             "currentPage": this.paging.currentPage,
                             "pageSize": this.paging.limit,

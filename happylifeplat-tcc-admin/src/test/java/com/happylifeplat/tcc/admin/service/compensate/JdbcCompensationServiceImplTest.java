@@ -16,18 +16,22 @@
  *
  */
 
-package com.happylifeplat.tcc.admin.service.recover;
+package com.happylifeplat.tcc.admin.service.compensate;
 
 import com.happylifeplat.tcc.admin.page.CommonPager;
 import com.happylifeplat.tcc.admin.page.PageParameter;
-import com.happylifeplat.tcc.admin.query.CompensationQuery;
 import com.happylifeplat.tcc.admin.service.CompensationService;
+import com.happylifeplat.tcc.admin.query.CompensationQuery;
 import com.happylifeplat.tcc.admin.vo.TccCompensationVO;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
+
 
 /**
  * <p>Description:</p>
@@ -39,27 +43,27 @@ import org.springframework.test.context.junit4.SpringRunner;
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class RedisCompensationServiceImplTest {
+public class JdbcCompensationServiceImplTest {
+
+    /** logger */
+    private static final Logger LOGGER = LoggerFactory.getLogger(JdbcCompensationServiceImplTest.class);
+
 
     @Autowired
     private CompensationService compensationService;
 
     @Test
     public void listByPage() throws Exception {
-
         CompensationQuery query = new CompensationQuery();
 
-        query.setApplicationName("alipay-service");
-
-        PageParameter pageParameter = new PageParameter(1,1);
+        PageParameter pageParameter = new PageParameter(1,10);
 
         query.setPageParameter(pageParameter);
+        query.setApplicationName("account-service");
 
-        query.setRetry(2);
+        final CommonPager<TccCompensationVO> pager = compensationService.listByPage(query);
 
-        query.setTransId("2075304338");
-
-        final CommonPager<TccCompensationVO> voCommonPager = compensationService.listByPage(query);
+        Assert.assertNotNull(pager.getDataList());
 
 
     }

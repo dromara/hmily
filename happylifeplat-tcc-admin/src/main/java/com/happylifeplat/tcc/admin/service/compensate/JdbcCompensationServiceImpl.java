@@ -16,7 +16,7 @@
  *
  */
 
-package com.happylifeplat.tcc.admin.service.recover;
+package com.happylifeplat.tcc.admin.service.compensate;
 
 import com.happylifeplat.tcc.admin.helper.PageHelper;
 import com.happylifeplat.tcc.admin.page.CommonPager;
