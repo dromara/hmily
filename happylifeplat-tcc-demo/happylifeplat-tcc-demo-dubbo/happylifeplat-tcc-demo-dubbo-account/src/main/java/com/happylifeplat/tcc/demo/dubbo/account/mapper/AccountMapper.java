@@ -35,8 +35,33 @@ public interface AccountMapper {
      */
     @Update("update account set balance =#{balance}," +
             " freeze_amount= #{freezeAmount} ,update_time = #{updateTime}" +
-            " where user_id =#{userId}  and  balance > 0")
+            " where user_id =#{userId}  and  balance > 0 and freeze_amount  = 0 ")
     int update(AccountDO accountDO);
+
+
+    /**
+     * 确认扣减账户余额
+     *
+     * @param accountDO 实体类
+     * @return rows
+     */
+    @Update("update account set " +
+            " freeze_amount= #{freezeAmount} ,update_time = #{updateTime}" +
+            " where user_id =#{userId}  and freeze_amount >0 ")
+    int confirm(AccountDO accountDO);
+
+
+    /**
+     * 取消扣减账户余额
+     *
+     * @param accountDO 实体类
+     * @return rows
+     */
+    @Update("update account set balance =#{balance}," +
+            " freeze_amount= #{freezeAmount} ,update_time = #{updateTime}" +
+            " where user_id =#{userId}  and freeze_amount >0")
+    int cancel(AccountDO accountDO);
+
 
     /**
      * 根据userId获取用户账户信息

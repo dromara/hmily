@@ -28,6 +28,7 @@ import org.apache.ibatis.annotations.Update;
 public interface InventoryMapper {
 
 
+
     /**
      * 库存扣减
      *
@@ -36,8 +37,32 @@ public interface InventoryMapper {
      */
     @Update("update inventory set total_inventory =#{totalInventory}," +
             " lock_inventory= #{lockInventory} " +
-            " where product_id =#{productId}  and  total_inventory >0 and lock_inventory >=0 ")
+            " where product_id =#{productId}  and  total_inventory >0 and lock_inventory =0  ")
     int decrease(Inventory inventory);
+
+
+    /**
+     * 库存扣减confirm
+     *
+     * @param inventory 实体对象
+     * @return rows
+     */
+    @Update("update inventory set " +
+            " lock_inventory= #{lockInventory} " +
+            " where product_id =#{productId}  and lock_inventory >0 ")
+    int confirm(Inventory inventory);
+
+
+    /**
+     * 库存扣减 cancel
+     *
+     * @param inventory 实体对象
+     * @return rows
+     */
+    @Update("update inventory set total_inventory =#{totalInventory}," +
+            " lock_inventory= #{lockInventory} " +
+            " where product_id =#{productId}  and lock_inventory >0 ")
+    int cancel(Inventory inventory);
 
     /**
      * 根据商品id找到库存信息
