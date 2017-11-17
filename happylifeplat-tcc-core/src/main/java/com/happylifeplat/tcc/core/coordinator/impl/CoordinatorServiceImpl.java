@@ -250,9 +250,11 @@ public class CoordinatorServiceImpl implements CoordinatorService {
                                     continue;
                                 }
 
-                                //如果事务角色是提供者的话，只能由发起者执行
-                                if (tccTransaction.getRole() == TccRoleEnum.PROVIDER.getCode()) {
-
+                                //如果事务角色是提供者的话，并且在重试的次数范围类是不能执行的，只能由发起者执行
+                                if (tccTransaction.getRole() == TccRoleEnum.PROVIDER.getCode()
+                                        && (tccTransaction.getCreateTime().getTime() +
+                                        tccConfig.getRetryMax() * tccConfig.getRecoverDelayTime() * 1000
+                                        > System.currentTimeMillis())) {
                                     continue;
                                 }
 
