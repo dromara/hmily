@@ -231,7 +231,7 @@ public class CoordinatorServiceImpl implements CoordinatorService {
 
     private void scheduledRollBack() {
         scheduledExecutorService
-                .scheduleAtFixedRate(() -> {
+                .scheduleWithFixedDelay(() -> {
                     LogUtil.debug(LOGGER, "rollback execute delayTime:{}", () -> tccConfig.getScheduledDelay());
                     try {
                         final List<TccTransaction> tccTransactions =
