@@ -298,7 +298,7 @@ public class CoordinatorServiceImpl implements CoordinatorService {
                     context.setAction(TccActionEnum.CANCELING.getCode());
                     context.setTransId(tccTransaction.getTransId());
                     TransactionContextLocal.getInstance().set(context);
-                    executeCoordinator(participant.getConfirmTccInvocation());
+                    executeCoordinator(participant.getCancelTccInvocation());
                 } catch (Exception e) {
                     LogUtil.error(LOGGER, "执行cancel方法异常:{}", () -> e);
                     success = false;
