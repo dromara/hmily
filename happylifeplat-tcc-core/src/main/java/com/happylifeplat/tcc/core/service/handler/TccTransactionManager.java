@@ -259,7 +259,7 @@ public class TccTransactionManager {
             if (currentTransaction.getStatus() == TccActionEnum.TRYING.getCode()
                     && currentTransaction.getRole() == TccRoleEnum.START.getCode()) {
                 return participants.stream()
-                        .limit(participants.size() - 1)
+                        .limit(participants.size())
                         .filter(Objects::nonNull).collect(Collectors.toList());
             }
 
@@ -302,7 +302,6 @@ public class TccTransactionManager {
         final TccTransaction transaction = this.getCurrentTransaction();
         transaction.registerParticipant(participant);
         coordinatorService.update(transaction);
-
 
     }
 }
