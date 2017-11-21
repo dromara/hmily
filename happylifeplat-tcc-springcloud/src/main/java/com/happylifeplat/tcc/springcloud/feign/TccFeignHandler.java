@@ -59,55 +59,72 @@ public class TccFeignHandler implements InvocationHandler {
             if (Objects.isNull(tcc)) {
                 return this.handlers.get(method).invoke(args);
             }
-
-            final TccTransactionContext tccTransactionContext =
-                    TransactionContextLocal.getInstance().get();
-            if (Objects.nonNull(tccTransactionContext)) {
+            try {
                 final TccTransactionManager tccTransactionManager =
                         SpringBeanUtils.getInstance().getBean(TccTransactionManager.class);
-                if (TccActionEnum.TRYING.getCode() == tccTransactionContext.getAction()) {
-                    //获取协调方法
-                    String confirmMethodName = tcc.confirmMethod();
-
-                    if (StringUtils.isBlank(confirmMethodName)) {
-                        confirmMethodName = method.getName();
-                    }
-
-                    String cancelMethodName = tcc.cancelMethod();
-
-                    if (StringUtils.isBlank(cancelMethodName)) {
-                        cancelMethodName = method.getName();
-                    }
-
-                    //设置模式
-                    final TccPatternEnum pattern = tcc.pattern();
-
-                    tccTransactionManager.getCurrentTransaction().setPattern(pattern.getCode());
-
-                    final Class<?> declaringClass = method.getDeclaringClass();
-
-                    TccInvocation confirmInvocation = new TccInvocation(declaringClass,
-                            confirmMethodName,
-                            method.getParameterTypes(), args);
-
-                    TccInvocation cancelInvocation = new TccInvocation(declaringClass,
-                            cancelMethodName,
-                            method.getParameterTypes(), args);
-
-                    //封装调用点
-                    final Participant participant = new Participant(
-                            tccTransactionContext.getTransId(),
-                            confirmInvocation,
-                            cancelInvocation);
-
+                final Object invoke = this.handlers.get(method).invoke(args);
+                final Participant participant = buildParticipant(tcc, method, args, tccTransactionManager);
+                if (Objects.nonNull(participant)) {
                     tccTransactionManager.enlistParticipant(participant);
                 }
-
+                return invoke;
+            } catch (Throwable throwable) {
+                throwable.printStackTrace();
+                throw throwable;
             }
 
 
-            return this.handlers.get(method).invoke(args);
         }
+    }
+
+
+    private Participant buildParticipant(Tcc tcc, Method method, Object[] args,
+                                         TccTransactionManager tccTransactionManager) {
+
+        final TccTransactionContext tccTransactionContext =
+                TransactionContextLocal.getInstance().get();
+        Participant participant=null;
+        if (Objects.nonNull(tccTransactionContext)) {
+
+            if (TccActionEnum.TRYING.getCode() == tccTransactionContext.getAction()) {
+                //获取协调方法
+                String confirmMethodName = tcc.confirmMethod();
+
+                if (StringUtils.isBlank(confirmMethodName)) {
+                    confirmMethodName = method.getName();
+                }
+
+                String cancelMethodName = tcc.cancelMethod();
+
+                if (StringUtils.isBlank(cancelMethodName)) {
+                    cancelMethodName = method.getName();
+                }
+
+                //设置模式
+                final TccPatternEnum pattern = tcc.pattern();
+
+                tccTransactionManager.getCurrentTransaction().setPattern(pattern.getCode());
+
+                final Class<?> declaringClass = method.getDeclaringClass();
+
+                TccInvocation confirmInvocation = new TccInvocation(declaringClass,
+                        confirmMethodName,
+                        method.getParameterTypes(), args);
+
+                TccInvocation cancelInvocation = new TccInvocation(declaringClass,
+                        cancelMethodName,
+                        method.getParameterTypes(), args);
+
+                //封装调用点
+                participant = new Participant(
+                        tccTransactionContext.getTransId(),
+                        confirmInvocation,
+                        cancelInvocation);
+
+                return participant;
+            }
+        }
+        return participant;
     }
 
 

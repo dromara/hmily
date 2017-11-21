@@ -57,76 +57,92 @@ public class TccTransactionFilter implements Filter {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {
 
         String methodName = invocation.getMethodName();
-        Class aClass = invoker.getInterface();
+        Class clazz = invoker.getInterface();
         Class[] args = invocation.getParameterTypes();
         final Object[] arguments = invocation.getArguments();
 
-        registerParticipant(aClass, methodName, arguments, args);
+        Method method = null;
+        Tcc tcc = null;
+        try {
+            method = clazz.getDeclaredMethod(methodName, args);
+            tcc = method.getAnnotation(Tcc.class);
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
 
-        return invoker.invoke(invocation);
+        if (Objects.nonNull(tcc)) {
+            try {
+                final Result result = invoker.invoke(invocation);
+                final Participant participant = buildParticipant(tcc, method, clazz, arguments, args);
+                if (Objects.nonNull(participant)) {
+                    tccTransactionManager.enlistParticipant(participant);
+                }
+
+                return result;
+            } catch (RpcException e) {
+                e.printStackTrace();
+                throw e;
+            }
+        } else {
+            return invoker.invoke(invocation);
+        }
+
     }
 
     @SuppressWarnings("unchecked")
-    private void registerParticipant(Class clazz, String methodName, Object[] arguments, Class... args) throws TccRuntimeException {
-        try {
-            Method method = clazz.getDeclaredMethod(methodName, args);
-            Tcc tcc = method.getAnnotation(Tcc.class);
-            if (Objects.nonNull(tcc)) {
-                final TccTransactionContext tccTransactionContext =
-                        TransactionContextLocal.getInstance().get();
-                if (Objects.nonNull(tccTransactionContext)) {
-                    RpcContext.getContext()
-                            .setAttachment(CommonConstant.TCC_TRANSACTION_CONTEXT,
-                                    GsonUtils.getInstance().toJson(tccTransactionContext));
-                }
-                if (Objects.nonNull(tccTransactionContext)) {
-                    if (TccActionEnum.TRYING.getCode() == tccTransactionContext.getAction()) {
-                        //获取协调方法
-                        String confirmMethodName = tcc.confirmMethod();
+    private Participant buildParticipant(Tcc tcc, Method method, Class clazz, Object[] arguments, Class... args) throws TccRuntimeException {
 
-                        if (StringUtils.isBlank(confirmMethodName)) {
-                            confirmMethodName = method.getName();
-                        }
-
-                        String cancelMethodName = tcc.cancelMethod();
-
-                        if (StringUtils.isBlank(cancelMethodName)) {
-                            cancelMethodName = method.getName();
-                        }
-
-                        //设置模式
-                        final TccPatternEnum pattern = tcc.pattern();
-
-                        tccTransactionManager.getCurrentTransaction().setPattern(pattern.getCode());
-
-
-                        TccInvocation confirmInvocation = new TccInvocation(clazz,
-                                confirmMethodName,
-                                args, arguments);
-
-                        TccInvocation cancelInvocation = new TccInvocation(clazz,
-                                cancelMethodName,
-                                args, arguments);
-
-                        //封装调用点
-                        final Participant participant = new Participant(
-                                tccTransactionContext.getTransId(),
-                                confirmInvocation,
-                                cancelInvocation);
-
-                        tccTransactionManager.enlistParticipant(participant);
-                    }
-
-                }
-
-
-            }
-        } catch (NoSuchMethodException e) {
-            throw new TccRuntimeException("not fount method " + e.getMessage());
+        final TccTransactionContext tccTransactionContext =
+                TransactionContextLocal.getInstance().get();
+        if (Objects.nonNull(tccTransactionContext)) {
+            RpcContext.getContext()
+                    .setAttachment(CommonConstant.TCC_TRANSACTION_CONTEXT,
+                            GsonUtils.getInstance().toJson(tccTransactionContext));
         }
+        if (Objects.nonNull(tccTransactionContext)) {
+            if (TccActionEnum.TRYING.getCode() == tccTransactionContext.getAction()) {
+                //获取协调方法
+                String confirmMethodName = tcc.confirmMethod();
+
+                if (StringUtils.isBlank(confirmMethodName)) {
+                    confirmMethodName = method.getName();
+                }
+
+                String cancelMethodName = tcc.cancelMethod();
+
+                if (StringUtils.isBlank(cancelMethodName)) {
+                    cancelMethodName = method.getName();
+                }
+
+                //设置模式
+                final TccPatternEnum pattern = tcc.pattern();
+
+                tccTransactionManager.getCurrentTransaction().setPattern(pattern.getCode());
+
+
+                TccInvocation confirmInvocation = new TccInvocation(clazz,
+                        confirmMethodName,
+                        args, arguments);
+
+                TccInvocation cancelInvocation = new TccInvocation(clazz,
+                        cancelMethodName,
+                        args, arguments);
+
+                //封装调用点
+                return new Participant(
+                        tccTransactionContext.getTransId(),
+                        confirmInvocation,
+                        cancelInvocation);
+            }
+
+        }
+
+        return null;
+
 
     }
 }

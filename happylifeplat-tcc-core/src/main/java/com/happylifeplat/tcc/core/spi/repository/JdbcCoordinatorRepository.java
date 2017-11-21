@@ -311,7 +311,7 @@ public class JdbcCoordinatorRepository implements CoordinatorRepository {
             int columnCount = md.getColumnCount();
             list = new ArrayList<>();
             while (rs.next()) {
-                Map<String, Object> rowData = Maps.newConcurrentMap();
+                Map<String, Object> rowData = Maps.newHashMap();
                 for (int i = 1; i <= columnCount; i++) {
                     rowData.put(md.getColumnName(i), rs.getObject(i));
                 }
