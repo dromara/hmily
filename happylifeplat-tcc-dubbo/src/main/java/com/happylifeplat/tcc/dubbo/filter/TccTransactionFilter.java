@@ -76,8 +76,17 @@ public class TccTransactionFilter implements Filter {
 
         if (Objects.nonNull(tcc)) {
             try {
+
+                final TccTransactionContext tccTransactionContext =
+                        TransactionContextLocal.getInstance().get();
+                if (Objects.nonNull(tccTransactionContext)) {
+                    RpcContext.getContext()
+                            .setAttachment(CommonConstant.TCC_TRANSACTION_CONTEXT,
+                                    GsonUtils.getInstance().toJson(tccTransactionContext));
+                }
+
                 final Result result = invoker.invoke(invocation);
-                final Participant participant = buildParticipant(tcc, method, clazz, arguments, args);
+                final Participant participant = buildParticipant(tccTransactionContext,tcc, method, clazz, arguments, args);
                 if (Objects.nonNull(participant)) {
                     tccTransactionManager.enlistParticipant(participant);
                 }
@@ -94,15 +103,8 @@ public class TccTransactionFilter implements Filter {
     }
 
     @SuppressWarnings("unchecked")
-    private Participant buildParticipant(Tcc tcc, Method method, Class clazz, Object[] arguments, Class... args) throws TccRuntimeException {
+    private Participant buildParticipant(TccTransactionContext tccTransactionContext,Tcc tcc, Method method, Class clazz, Object[] arguments, Class... args) throws TccRuntimeException {
 
-        final TccTransactionContext tccTransactionContext =
-                TransactionContextLocal.getInstance().get();
-        if (Objects.nonNull(tccTransactionContext)) {
-            RpcContext.getContext()
-                    .setAttachment(CommonConstant.TCC_TRANSACTION_CONTEXT,
-                            GsonUtils.getInstance().toJson(tccTransactionContext));
-        }
         if (Objects.nonNull(tccTransactionContext)) {
             if (TccActionEnum.TRYING.getCode() == tccTransactionContext.getAction()) {
                 //获取协调方法

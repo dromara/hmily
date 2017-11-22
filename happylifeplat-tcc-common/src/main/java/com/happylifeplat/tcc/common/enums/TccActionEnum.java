@@ -29,10 +29,13 @@ import java.util.Optional;
 public enum TccActionEnum {
 
 
+    PRE_TRY(0,"开始执行try"),
+
+
     /**
      * Trying tcc action enum.
      */
-    TRYING(1, "try阶段"),
+    TRYING(1, "try阶段完成"),
 
 
     /**
