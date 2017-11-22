@@ -57,8 +57,10 @@ public class TccCoordinatorMethodInterceptor {
         if (Objects.nonNull(currentTransaction)) {
             final TccActionEnum action = TccActionEnum.acquireByCode(currentTransaction.getStatus());
             switch (action) {
-                case TRYING:
+                case PRE_TRY:
                     registerParticipant(pjp, currentTransaction.getTransId());
+                    break;
+                case TRYING:
                     break;
                 case CONFIRMING:
                     break;

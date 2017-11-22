@@ -152,6 +152,33 @@ public class ZookeeperCoordinatorRepository implements CoordinatorRepository {
     }
 
     /**
+     * 更新补偿数据状态
+     *
+     * @param id     事务id
+     * @param status 状态
+     * @return rows 1 成功 0 失败
+     */
+    @Override
+    public int updateStatus(String id, Integer status) {
+        final String path = RepositoryPathUtils.buildZookeeperRootPath(rootPathPrefix,id);
+        try {
+            byte[] content = zooKeeper.getData(path,
+                    false, new Stat());
+            final CoordinatorRepositoryAdapter adapter = objectSerializer.deSerialize(content, CoordinatorRepositoryAdapter.class);
+
+            adapter.setStatus(status);
+            zooKeeper.create(path,
+                    objectSerializer.serialize(adapter),
+                    ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
+            return 1;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
+
+    }
+
+    /**
      * 根据id获取对象
      *
      * @param id 主键id
