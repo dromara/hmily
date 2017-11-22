@@ -35,7 +35,7 @@
     <bean id="tccTransactionBootstrap" class="com.happylifeplat.tcc.core.bootstrap.TccTransactionBootstrap">
         <property name="serializer" value="kryo"/>
         <property name="coordinatorQueueMax" value="5000"/>
-        <property name="coordinatorThreadMax" value="4"/>
+        <property name="coordinatorThreadMax" value="8"/>
         <property name="recoverDelayTime" value="120"/>
         <property name="retryMax" value="30"/>
         <property name="rejectPolicy" value="Abort"/>
@@ -46,7 +46,7 @@
         <property name="tccDbConfig">
             <bean class="com.happylifeplat.tcc.common.config.TccDbConfig">
                 <property name="url"
-                          value="jdbc:mysql://192.168.1.68:3306/order?useUnicode=true&amp;characterEncoding=utf8"/>
+                          value="jdbc:mysql://192.168.1.68:3306/tcc?useUnicode=true&amp;characterEncoding=utf8"/>
                 <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
                 <property name="password" value="Wgj@555888"/>
                 <property name="username" value="xiaoyu"/>

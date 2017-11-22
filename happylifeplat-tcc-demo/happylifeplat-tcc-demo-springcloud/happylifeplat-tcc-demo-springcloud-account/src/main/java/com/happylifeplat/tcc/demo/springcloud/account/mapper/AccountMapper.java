@@ -36,7 +36,7 @@ public interface AccountMapper {
      */
     @Update("update account set balance =#{balance}," +
             " freeze_amount= #{freezeAmount} ,update_time = #{updateTime}" +
-            " where user_id =#{userId}  and  balance > 0 and freeze_amount  = 0 ")
+            " where user_id =#{userId}  and  balance > 0 ")
     int update(AccountDO accountDO);
 
 

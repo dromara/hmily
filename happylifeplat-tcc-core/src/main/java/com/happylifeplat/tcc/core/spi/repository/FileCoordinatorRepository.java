@@ -132,6 +132,31 @@ public class FileCoordinatorRepository implements CoordinatorRepository {
         return 1;
     }
 
+    /**
+     * 更新补偿数据状态
+     *
+     * @param id     事务id
+     * @param status 状态
+     * @return rows 1 成功 0 失败
+     */
+    @Override
+    public int updateStatus(String id, Integer status) {
+        try {
+
+            final String fullFileName = RepositoryPathUtils.getFullFileName(filePath,id);
+            final File file = new File(fullFileName);
+            final CoordinatorRepositoryAdapter adapter = readAdapter(file);
+            if(Objects.nonNull(adapter)){
+                adapter.setStatus(status);
+            }
+            FileUtils.writeFile(fullFileName,serializer.serialize(adapter));
+
+        } catch (Exception e) {
+            throw new TccRuntimeException("更新数据异常！");
+        }
+        return 1;
+    }
+
 
     /**
      * 根据id获取对象

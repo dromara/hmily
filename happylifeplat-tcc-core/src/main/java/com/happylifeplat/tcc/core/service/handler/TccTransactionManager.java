@@ -87,7 +87,7 @@ public class TccTransactionManager {
      * 该方法为发起方第一次调用
      * 也是tcc事务的入口
      */
-    void begin(ProceedingJoinPoint point) {
+    TccTransaction begin(ProceedingJoinPoint point) {
         LogUtil.debug(LOGGER, () -> "开始执行tcc事务！start");
         TccTransaction tccTransaction = CURRENT.get();
         if (Objects.isNull(tccTransaction)) {
@@ -98,7 +98,7 @@ public class TccTransactionManager {
             Class<?> clazz = point.getTarget().getClass();
 
             tccTransaction = new TccTransaction();
-            tccTransaction.setStatus(TccActionEnum.TRYING.getCode());
+            tccTransaction.setStatus(TccActionEnum.PRE_TRY.getCode());
             tccTransaction.setRole(TccRoleEnum.START.getCode());
             tccTransaction.setTargetClass(clazz.getName());
             tccTransaction.setTargetMethod(method.getName());
@@ -116,6 +116,8 @@ public class TccTransactionManager {
         context.setTransId(tccTransaction.getTransId());
         TransactionContextLocal.getInstance().set(context);
 
+        return tccTransaction;
+
     }
 
     TccTransaction providerBegin(TccTransactionContext context, ProceedingJoinPoint point) {
@@ -128,7 +130,7 @@ public class TccTransactionManager {
         TccTransaction transaction = new TccTransaction(context.getTransId());
         //设置角色为提供者
         transaction.setRole(TccRoleEnum.PROVIDER.getCode());
-        transaction.setStatus(context.getAction());
+        transaction.setStatus(TccActionEnum.PRE_TRY.getCode());
 
         transaction.setTargetClass(clazz.getName());
         transaction.setTargetMethod(method.getName());
@@ -232,8 +234,9 @@ public class TccTransactionManager {
                     failList.add(participant);
                 }
             }
+            executeHandler(success, currentTransaction, failList);
         }
-        executeHandler(success, currentTransaction, failList);
+
 
 
     }
@@ -296,6 +299,11 @@ public class TccTransactionManager {
 
     void removeTccTransaction(TccTransaction tccTransaction) {
         coordinatorService.remove(tccTransaction.getTransId());
+    }
+
+
+    void updateStatus(String transId, Integer status) {
+        coordinatorService.updateStatus(transId, status);
     }
 
     public void enlistParticipant(Participant participant) {

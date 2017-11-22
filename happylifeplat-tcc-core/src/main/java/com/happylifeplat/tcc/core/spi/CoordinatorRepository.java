@@ -60,10 +60,20 @@ public interface CoordinatorRepository {
 
     /**
      * 更新 List<Participant>  只更新这一个字段数据
-     * @param tccTransaction  实体对象
+     *
+     * @param tccTransaction 实体对象
      * @return rows 1 成功 0 失败
      */
     int updateParticipant(TccTransaction tccTransaction);
+
+
+    /**
+     * 更新补偿数据状态
+     * @param id  事务id
+     * @param status  状态
+     * @return  rows 1 成功 0 失败
+     */
+    int updateStatus(String id, Integer status);
 
     /**
      * 根据id获取对象

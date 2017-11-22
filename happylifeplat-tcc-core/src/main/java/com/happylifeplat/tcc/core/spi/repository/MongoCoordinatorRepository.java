@@ -171,6 +171,26 @@ public class MongoCoordinatorRepository implements CoordinatorRepository {
         return 1;
     }
 
+    /**
+     * 更新补偿数据状态
+     *
+     * @param id     事务id
+     * @param status 状态
+     * @return rows 1 成功 0 失败
+     */
+    @Override
+    public int updateStatus(String id, Integer status) {
+        Query query = new Query();
+        query.addCriteria(new Criteria("transId").is(id));
+        Update update = new Update();
+        update.set("status", status);
+        final WriteResult writeResult = template.updateFirst(query, update, MongoAdapter.class, collectionName);
+        if (writeResult.getN() <= 0) {
+            throw new TccRuntimeException("更新数据异常!");
+        }
+        return 1;
+    }
+
 
     /**
      * 根据id获取对象

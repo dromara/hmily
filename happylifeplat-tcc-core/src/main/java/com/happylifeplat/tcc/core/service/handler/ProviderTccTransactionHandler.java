@@ -61,9 +61,13 @@ public class ProviderTccTransactionHandler implements TccTransactionHandler {
                 case TRYING:
                     try {
                         //创建事务信息
-                        tccTransaction = tccTransactionManager.providerBegin(context,point);
+                        tccTransaction = tccTransactionManager.providerBegin(context, point);
                         //发起方法调用
-                        return point.proceed();
+                        final Object proceed = point.proceed();
+
+                        tccTransactionManager.updateStatus(tccTransaction.getTransId(),
+                                TccActionEnum.TRYING.getCode());
+                        return proceed;
                     } catch (Throwable throwable) {
                         tccTransactionManager.removeTccTransaction(tccTransaction);
                         throw throwable;
@@ -71,7 +75,7 @@ public class ProviderTccTransactionHandler implements TccTransactionHandler {
                     }
                 case CONFIRMING:
                     //如果是confirm 通过之前保存的事务信息 进行反射调用
-                    final TccTransaction acquire = tccTransactionManager.acquire(context);
+                    tccTransactionManager.acquire(context);
                     tccTransactionManager.confirm();
                     break;
                 case CANCELING:

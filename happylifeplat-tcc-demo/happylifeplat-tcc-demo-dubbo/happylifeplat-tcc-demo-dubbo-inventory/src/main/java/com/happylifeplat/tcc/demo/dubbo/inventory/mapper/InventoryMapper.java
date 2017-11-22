@@ -37,7 +37,7 @@ public interface InventoryMapper {
      */
     @Update("update inventory set total_inventory =#{totalInventory}," +
             " lock_inventory= #{lockInventory} " +
-            " where product_id =#{productId}  and  total_inventory >0 and lock_inventory =0  ")
+            " where product_id =#{productId}  and  total_inventory >0  ")
     int decrease(Inventory inventory);
 
 

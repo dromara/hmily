@@ -160,7 +160,19 @@ public class CoordinatorServiceImpl implements CoordinatorService {
      */
     @Override
     public int updateParticipant(TccTransaction tccTransaction) {
-        return  coordinatorRepository.updateParticipant(tccTransaction);
+        return coordinatorRepository.updateParticipant(tccTransaction);
+    }
+
+    /**
+     * 更新补偿数据状态
+     *
+     * @param id     事务id
+     * @param status 状态
+     * @return rows 1 成功 0 失败
+     */
+    @Override
+    public int updateStatus(String id, Integer status) {
+        return coordinatorRepository.updateStatus(id, status);
     }
 
     /**
@@ -240,6 +252,12 @@ public class CoordinatorServiceImpl implements CoordinatorService {
 
                             for (TccTransaction tccTransaction : tccTransactions) {
 
+                                //如果try未执行完成，那么就不进行补偿 （防止在try阶段的各种异常情况）
+                                if (tccTransaction.getRole() == TccRoleEnum.PROVIDER.getCode() &&
+                                        tccTransaction.getStatus() == TccActionEnum.PRE_TRY.getCode()) {
+                                    continue;
+                                }
+
                                 if (tccTransaction.getRetriedCount() > tccConfig.getRetryMax()) {
                                     LogUtil.error(LOGGER, "此事务超过了最大重试次数，不再进行重试：{}",
                                             () -> tccTransaction);
@@ -266,6 +284,7 @@ public class CoordinatorServiceImpl implements CoordinatorService {
                                     if (rows > 0) {
                                         //如果是以下3种状态
                                         if ((tccTransaction.getStatus() == TccActionEnum.TRYING.getCode()
+                                                || tccTransaction.getStatus() == TccActionEnum.PRE_TRY.getCode()
                                                 || tccTransaction.getStatus() == TccActionEnum.CANCELING.getCode())) {
                                             cancel(tccTransaction);
                                         } else if (tccTransaction.getStatus() == TccActionEnum.CONFIRMING.getCode()) {
@@ -335,7 +354,7 @@ public class CoordinatorServiceImpl implements CoordinatorService {
 
 
     private void executeHandler(boolean success, final TccTransaction currentTransaction,
-                                List<Participant> failList ) {
+                                List<Participant> failList) {
         if (success) {
             coordinatorRepository.remove(currentTransaction.getTransId());
         } else {

@@ -19,6 +19,8 @@
 package com.happylifeplat.tcc.core.service.handler;
 
 import com.happylifeplat.tcc.common.bean.context.TccTransactionContext;
+import com.happylifeplat.tcc.common.bean.entity.TccTransaction;
+import com.happylifeplat.tcc.common.enums.TccActionEnum;
 import com.happylifeplat.tcc.core.service.TccTransactionHandler;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +40,7 @@ public class StartTccTransactionHandler implements TccTransactionHandler {
     private final TccTransactionManager tccTransactionManager;
 
 
-    private static final  Lock LOCK = new ReentrantLock();
+    private static final Lock LOCK = new ReentrantLock();
 
     @Autowired
     public StartTccTransactionHandler(TccTransactionManager tccTransactionManager) {
@@ -58,14 +60,15 @@ public class StartTccTransactionHandler implements TccTransactionHandler {
         Object returnValue;
         try {
             LOCK.lock();
-            tccTransactionManager.begin(point);
+            final TccTransaction tccTransaction = tccTransactionManager.begin(point);
             try {
                 //发起调用 执行try方法
                 returnValue = point.proceed();
+                tccTransactionManager.updateStatus(tccTransaction.getTransId(),
+                        TccActionEnum.TRYING.getCode());
 
             } catch (Throwable throwable) {
                 //异常执行cancel
-
                 tccTransactionManager.cancel();
 
                 throw throwable;

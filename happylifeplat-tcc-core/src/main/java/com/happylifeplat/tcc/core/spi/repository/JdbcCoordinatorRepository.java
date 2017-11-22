@@ -154,6 +154,22 @@ public class JdbcCoordinatorRepository implements CoordinatorRepository {
 
     }
 
+    /**
+     * 更新补偿数据状态
+     *
+     * @param id     事务id
+     * @param status 状态
+     * @return rows 1 成功 0 失败
+     */
+    @Override
+    public int updateStatus(String id, Integer status) {
+        String sql = "update " + tableName +
+                " set status=?  where trans_id = ?  ";
+        return executeUpdate(sql, status, id);
+
+
+    }
+
 
     /**
      * 根据id获取对象

@@ -146,6 +146,31 @@ public class RedisCoordinatorRepository implements CoordinatorRepository {
 
     }
 
+    /**
+     * 更新补偿数据状态
+     *
+     * @param id     事务id
+     * @param status 状态
+     * @return rows 1 成功 0 失败
+     */
+    @Override
+    public int updateStatus(String id, Integer status) {
+        final String redisKey =
+                RepositoryPathUtils.buildRedisKey(keyPrefix, id);
+
+        byte[] contents = jedisClient.get(redisKey.getBytes());
+        try {
+            CoordinatorRepositoryAdapter adapter = objectSerializer.deSerialize(contents, CoordinatorRepositoryAdapter.class);
+            adapter.setStatus(status);
+            jedisClient.set(redisKey, objectSerializer.serialize(adapter));
+        } catch (TccException e) {
+            e.printStackTrace();
+            return 0;
+        }
+
+        return 1;
+    }
+
 
     /**
      * 根据id获取对象
