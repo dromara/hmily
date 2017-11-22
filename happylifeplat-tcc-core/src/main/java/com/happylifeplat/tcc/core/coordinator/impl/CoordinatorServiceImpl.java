@@ -324,8 +324,9 @@ public class CoordinatorServiceImpl implements CoordinatorService {
                     failList.add(participant);
                 }
             }
+            executeHandler(success, tccTransaction, failList);
         }
-        executeHandler(success, tccTransaction, failList);
+
     }
 
     private void confirm(TccTransaction tccTransaction) {
@@ -348,8 +349,9 @@ public class CoordinatorServiceImpl implements CoordinatorService {
                     failList.add(participant);
                 }
             }
+            executeHandler(success, tccTransaction, failList);
         }
-        executeHandler(success, tccTransaction, failList);
+
     }
 
 
