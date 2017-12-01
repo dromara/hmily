@@ -2,7 +2,6 @@ happylifeplat-tcc
 ================
 
 碧桂园旺生活平台解决分布式事务方案之tcc开源框架。基于java语言来开发（JDK1.8），支持dubbo，springcloud等rpc框架进行分布式事务。
-#####   因为文件名太长，大家在拉取代码的时候执git命令：git config core.longpaths true
 
  # Features
 
