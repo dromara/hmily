@@ -45,7 +45,13 @@ public enum TccRoleEnum {
     /**
      * Provider tcc role enum.
      */
-    PROVIDER(3, "提供者");
+    PROVIDER(3, "提供者"),
+
+
+    /**
+     * Local tcc role enum.
+     */
+    LOCAL(4,"本地调用");
 
 
     private int code;

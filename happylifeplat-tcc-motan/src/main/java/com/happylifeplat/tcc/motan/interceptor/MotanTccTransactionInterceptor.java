@@ -16,44 +16,53 @@
  *
  */
 
-package com.happylifeplat.tcc.dubbo.interceptor;
+package com.happylifeplat.tcc.motan.interceptor;
 
-import com.alibaba.dubbo.rpc.RpcContext;
+import com.happylifeplat.tcc.common.bean.context.TccTransactionContext;
 import com.happylifeplat.tcc.common.constant.CommonConstant;
 import com.happylifeplat.tcc.common.utils.GsonUtils;
-import com.happylifeplat.tcc.common.bean.context.TccTransactionContext;
 import com.happylifeplat.tcc.core.concurrent.threadlocal.TransactionContextLocal;
 import com.happylifeplat.tcc.core.interceptor.TccTransactionInterceptor;
 import com.happylifeplat.tcc.core.service.TccTransactionAspectService;
-import org.apache.commons.lang3.StringUtils;
+import com.weibo.api.motan.rpc.Request;
+import com.weibo.api.motan.rpc.RpcContext;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author xiaoyu
  */
 @Component
-public class DubboTccTransactionInterceptor implements TccTransactionInterceptor {
+public class MotanTccTransactionInterceptor implements TccTransactionInterceptor {
 
     private final TccTransactionAspectService tccTransactionAspectService;
 
     @Autowired
-    public DubboTccTransactionInterceptor(TccTransactionAspectService tccTransactionAspectService) {
+    public MotanTccTransactionInterceptor(TccTransactionAspectService tccTransactionAspectService) {
         this.tccTransactionAspectService = tccTransactionAspectService;
     }
 
 
     @Override
     public Object interceptor(ProceedingJoinPoint pjp) throws Throwable {
-        final String context = RpcContext.getContext().getAttachment(CommonConstant.TCC_TRANSACTION_CONTEXT);
-        TccTransactionContext tccTransactionContext;
-        if (StringUtils.isNoneBlank(context)) {
-            tccTransactionContext =
-                    GsonUtils.getInstance().fromJson(context, TccTransactionContext.class);
+        TccTransactionContext tccTransactionContext = null;
+
+        final Request request = RpcContext.getContext().getRequest();
+        if (Objects.nonNull(request)) {
+            final Map<String, String> attachments = request.getAttachments();
+            if (attachments != null && !attachments.isEmpty()) {
+                String context = attachments.get(CommonConstant.TCC_TRANSACTION_CONTEXT);
+                tccTransactionContext =
+                        GsonUtils.getInstance().fromJson(context, TccTransactionContext.class);
+            }
         } else {
             tccTransactionContext = TransactionContextLocal.getInstance().get();
         }
+
         return tccTransactionAspectService.invoke(tccTransactionContext, pjp);
     }
 }
