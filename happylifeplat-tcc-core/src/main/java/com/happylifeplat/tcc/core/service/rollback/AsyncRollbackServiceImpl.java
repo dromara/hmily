@@ -18,29 +18,29 @@
 
 package com.happylifeplat.tcc.core.service.rollback;
 
-import com.happylifeplat.tcc.common.enums.TccActionEnum;
-import com.happylifeplat.tcc.common.utils.LogUtil;
-import com.happylifeplat.tcc.common.bean.context.TccTransactionContext;
-import com.happylifeplat.tcc.common.bean.entity.Participant;
-import com.happylifeplat.tcc.common.bean.entity.TccInvocation;
-import com.happylifeplat.tcc.core.concurrent.threadlocal.TransactionContextLocal;
-import com.happylifeplat.tcc.core.helper.SpringBeanUtils;
-import com.happylifeplat.tcc.core.service.RollbackService;
+import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.reflect.MethodUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.concurrent.CompletableFuture;
+import com.happylifeplat.tcc.common.bean.context.TccTransactionContext;
+import com.happylifeplat.tcc.common.bean.entity.Participant;
+import com.happylifeplat.tcc.common.bean.entity.TccInvocation;
+import com.happylifeplat.tcc.common.enums.TccActionEnum;
+import com.happylifeplat.tcc.common.utils.LogUtil;
+import com.happylifeplat.tcc.core.concurrent.threadlocal.TransactionContextLocal;
+import com.happylifeplat.tcc.core.helper.SpringBeanUtils;
+import com.happylifeplat.tcc.core.service.RollbackService;
 
 /**
  * @author xiaoyu
  */
 @Component
-@SuppressWarnings("unchecked")
 public class AsyncRollbackServiceImpl implements RollbackService {
 
     /**
@@ -57,7 +57,7 @@ public class AsyncRollbackServiceImpl implements RollbackService {
     public void execute(List<Participant> participantList) {
         try {
             if (CollectionUtils.isNotEmpty(participantList)) {
-                final CompletableFuture[] cfs = participantList
+                final CompletableFuture<?>[] cfs = participantList
                         .stream()
                         .map(participant ->
                                 CompletableFuture.runAsync(() -> {
@@ -86,10 +86,10 @@ public class AsyncRollbackServiceImpl implements RollbackService {
 
     private void executeParticipantMethod(TccInvocation tccInvocation) throws Exception {
         if (Objects.nonNull(tccInvocation)) {
-            final Class clazz = tccInvocation.getTargetClass();
+            final Class<?> clazz = tccInvocation.getTargetClass();
             final String method = tccInvocation.getMethodName();
             final Object[] args = tccInvocation.getArgs();
-            final Class[] parameterTypes = tccInvocation.getParameterTypes();
+            final Class<?>[] parameterTypes = tccInvocation.getParameterTypes();
             final Object bean = SpringBeanUtils.getInstance().getBean(clazz);
             LogUtil.debug(LOGGER, "开始执行：{}", () -> clazz.getName() + " ;" + method);
             MethodUtils.invokeMethod(bean, method, args, parameterTypes);

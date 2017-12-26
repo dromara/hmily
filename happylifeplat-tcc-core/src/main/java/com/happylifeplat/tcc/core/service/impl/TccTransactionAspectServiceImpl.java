@@ -18,21 +18,21 @@
 
 package com.happylifeplat.tcc.core.service.impl;
 
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.happylifeplat.tcc.common.bean.context.TccTransactionContext;
 import com.happylifeplat.tcc.core.helper.SpringBeanUtils;
 import com.happylifeplat.tcc.core.service.TccTransactionAspectService;
 import com.happylifeplat.tcc.core.service.TccTransactionFactoryService;
 import com.happylifeplat.tcc.core.service.TccTransactionHandler;
-import org.aspectj.lang.ProceedingJoinPoint;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 
 /**
  * @author xiaoyu
  */
 @Service("tccTransactionAspectService")
-@SuppressWarnings("unchecked")
 public class TccTransactionAspectServiceImpl implements TccTransactionAspectService {
 
     private final TccTransactionFactoryService tccTransactionFactoryService;
@@ -52,7 +52,7 @@ public class TccTransactionAspectServiceImpl implements TccTransactionAspectServ
      */
     @Override
     public Object invoke(TccTransactionContext tccTransactionContext, ProceedingJoinPoint point) throws Throwable {
-        final Class aClass = tccTransactionFactoryService.factoryOf(tccTransactionContext);
+        final Class<?> aClass = tccTransactionFactoryService.factoryOf(tccTransactionContext);
         final TccTransactionHandler txTransactionHandler =
                 (TccTransactionHandler) SpringBeanUtils.getInstance().getBean(aClass);
         return txTransactionHandler.handler(point, tccTransactionContext);
