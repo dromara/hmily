@@ -7,7 +7,7 @@ happylifeplat-tcc
 
  * **框架特性**
 
-     * 支持dubbo，springcloud等rpc框架进行分布式事务。
+     * 支持dubbo,motan,springcloud等rpc框架进行分布式事务。
 
      * 采用Aspect AOP 切面思想与Spring无缝集成，天然支持集群。
 
@@ -50,7 +50,8 @@ happylifeplat-tcc
 
 
  # Support
-   ##### 如有任何问题欢迎加入QQ群：162614487 进行讨论
 
+ ### 如有任何问题欢迎加入QQ群：162614487 进行讨论 
+  ![](https://yu199195.github.io/images/weixin.jpg)
 
  # Contribution
