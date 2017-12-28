@@ -18,16 +18,17 @@
 
 package com.happylifeplat.tcc.core.service.handler;
 
-import com.happylifeplat.tcc.common.enums.TccActionEnum;
-import com.happylifeplat.tcc.common.bean.context.TccTransactionContext;
-import com.happylifeplat.tcc.common.bean.entity.TccTransaction;
-import com.happylifeplat.tcc.core.service.TccTransactionHandler;
+import java.lang.reflect.Method;
+
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.lang.reflect.Method;
+import com.happylifeplat.tcc.common.bean.context.TccTransactionContext;
+import com.happylifeplat.tcc.common.bean.entity.TccTransaction;
+import com.happylifeplat.tcc.common.enums.TccActionEnum;
+import com.happylifeplat.tcc.core.service.TccTransactionHandler;
 
 /**
  * @author xiaoyu
@@ -93,7 +94,7 @@ public class ProviderTccTransactionHandler implements TccTransactionHandler {
         return getDefaultValue(method.getReturnType());
     }
 
-    private Object getDefaultValue(Class type) {
+    private Object getDefaultValue(Class<?> type) {
 
         if (boolean.class.equals(type)) {
             return false;

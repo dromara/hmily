@@ -18,16 +18,17 @@
 
 package com.happylifeplat.tcc.core.service.impl;
 
+import java.util.Objects;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.happylifeplat.tcc.common.bean.context.TccTransactionContext;
 import com.happylifeplat.tcc.core.service.TccTransactionFactoryService;
 import com.happylifeplat.tcc.core.service.handler.ConsumeTccTransactionHandler;
 import com.happylifeplat.tcc.core.service.handler.ProviderTccTransactionHandler;
 import com.happylifeplat.tcc.core.service.handler.StartTccTransactionHandler;
 import com.happylifeplat.tcc.core.service.handler.TccTransactionManager;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.util.Objects;
 
 
 /**
@@ -53,7 +54,7 @@ public class TccTransactionFactoryServiceImpl implements TccTransactionFactorySe
      * @throws Throwable 抛出异常
      */
     @Override
-    public Class factoryOf(TccTransactionContext context) throws Throwable {
+    public Class<?> factoryOf(TccTransactionContext context) throws Throwable {
 
         //如果事务还没开启或者 tcc事务上下文是空， 那么应该进入发起调用
         if (!tccTransactionManager.isBegin() && Objects.isNull(context)) {

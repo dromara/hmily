@@ -18,23 +18,11 @@
 package com.happylifeplat.tcc.core.service.handler;
 
 
-import com.google.common.collect.Lists;
-import com.happylifeplat.tcc.annotation.TccPatternEnum;
-import com.happylifeplat.tcc.common.enums.CoordinatorActionEnum;
-import com.happylifeplat.tcc.common.enums.TccActionEnum;
-import com.happylifeplat.tcc.common.enums.TccRoleEnum;
-import com.happylifeplat.tcc.common.exception.TccRuntimeException;
-import com.happylifeplat.tcc.common.utils.LogUtil;
-import com.happylifeplat.tcc.common.bean.context.TccTransactionContext;
-import com.happylifeplat.tcc.common.bean.entity.Participant;
-import com.happylifeplat.tcc.common.bean.entity.TccInvocation;
-import com.happylifeplat.tcc.common.bean.entity.TccTransaction;
-import com.happylifeplat.tcc.core.concurrent.threadlocal.TransactionContextLocal;
-import com.happylifeplat.tcc.core.coordinator.CoordinatorService;
-import com.happylifeplat.tcc.core.coordinator.command.CoordinatorAction;
-import com.happylifeplat.tcc.core.coordinator.command.CoordinatorCommand;
-import com.happylifeplat.tcc.core.helper.SpringBeanUtils;
-import com.happylifeplat.tcc.core.service.rollback.AsyncRollbackServiceImpl;
+import java.lang.reflect.Method;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.reflect.MethodUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -44,17 +32,29 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.lang.reflect.Method;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
+import com.google.common.collect.Lists;
+import com.happylifeplat.tcc.annotation.TccPatternEnum;
+import com.happylifeplat.tcc.common.bean.context.TccTransactionContext;
+import com.happylifeplat.tcc.common.bean.entity.Participant;
+import com.happylifeplat.tcc.common.bean.entity.TccInvocation;
+import com.happylifeplat.tcc.common.bean.entity.TccTransaction;
+import com.happylifeplat.tcc.common.enums.CoordinatorActionEnum;
+import com.happylifeplat.tcc.common.enums.TccActionEnum;
+import com.happylifeplat.tcc.common.enums.TccRoleEnum;
+import com.happylifeplat.tcc.common.exception.TccRuntimeException;
+import com.happylifeplat.tcc.common.utils.LogUtil;
+import com.happylifeplat.tcc.core.concurrent.threadlocal.TransactionContextLocal;
+import com.happylifeplat.tcc.core.coordinator.CoordinatorService;
+import com.happylifeplat.tcc.core.coordinator.command.CoordinatorAction;
+import com.happylifeplat.tcc.core.coordinator.command.CoordinatorCommand;
+import com.happylifeplat.tcc.core.helper.SpringBeanUtils;
+import com.happylifeplat.tcc.core.service.rollback.AsyncRollbackServiceImpl;
 
 
 /**
  * @author xiaoyu
  */
 @Component
-@SuppressWarnings("unchecked")
 public class TccTransactionManager {
 
     /**
@@ -272,10 +272,10 @@ public class TccTransactionManager {
 
     private void executeParticipantMethod(TccInvocation tccInvocation) throws Exception {
         if (Objects.nonNull(tccInvocation)) {
-            final Class clazz = tccInvocation.getTargetClass();
+            final Class<?> clazz = tccInvocation.getTargetClass();
             final String method = tccInvocation.getMethodName();
             final Object[] args = tccInvocation.getArgs();
-            final Class[] parameterTypes = tccInvocation.getParameterTypes();
+            final Class<?>[] parameterTypes = tccInvocation.getParameterTypes();
             final Object bean = SpringBeanUtils.getInstance().getBean(clazz);
             MethodUtils.invokeMethod(bean, method, args, parameterTypes);
 

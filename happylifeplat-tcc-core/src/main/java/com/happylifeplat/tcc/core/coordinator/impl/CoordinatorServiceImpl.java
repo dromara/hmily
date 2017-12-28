@@ -19,33 +19,6 @@
 package com.happylifeplat.tcc.core.coordinator.impl;
 
 
-import com.google.common.collect.Lists;
-import com.happylifeplat.tcc.annotation.TccPatternEnum;
-import com.happylifeplat.tcc.common.config.TccConfig;
-import com.happylifeplat.tcc.common.enums.CoordinatorActionEnum;
-import com.happylifeplat.tcc.common.enums.TccActionEnum;
-import com.happylifeplat.tcc.common.enums.TccRoleEnum;
-import com.happylifeplat.tcc.common.exception.TccRuntimeException;
-import com.happylifeplat.tcc.common.utils.LogUtil;
-import com.happylifeplat.tcc.common.bean.context.TccTransactionContext;
-import com.happylifeplat.tcc.common.bean.entity.Participant;
-import com.happylifeplat.tcc.common.bean.entity.TccInvocation;
-import com.happylifeplat.tcc.common.bean.entity.TccTransaction;
-import com.happylifeplat.tcc.core.concurrent.threadlocal.TransactionContextLocal;
-import com.happylifeplat.tcc.core.concurrent.threadpool.TccTransactionThreadFactory;
-import com.happylifeplat.tcc.core.concurrent.threadpool.TccTransactionThreadPool;
-import com.happylifeplat.tcc.core.coordinator.CoordinatorService;
-import com.happylifeplat.tcc.core.coordinator.command.CoordinatorAction;
-import com.happylifeplat.tcc.core.helper.SpringBeanUtils;
-import com.happylifeplat.tcc.core.service.ApplicationService;
-import com.happylifeplat.tcc.core.spi.CoordinatorRepository;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.reflect.MethodUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
@@ -57,7 +30,33 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.reflect.MethodUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.google.common.collect.Lists;
+import com.happylifeplat.tcc.annotation.TccPatternEnum;
+import com.happylifeplat.tcc.common.bean.context.TccTransactionContext;
+import com.happylifeplat.tcc.common.bean.entity.Participant;
+import com.happylifeplat.tcc.common.bean.entity.TccInvocation;
+import com.happylifeplat.tcc.common.bean.entity.TccTransaction;
+import com.happylifeplat.tcc.common.config.TccConfig;
+import com.happylifeplat.tcc.common.enums.CoordinatorActionEnum;
+import com.happylifeplat.tcc.common.enums.TccActionEnum;
+import com.happylifeplat.tcc.common.enums.TccRoleEnum;
+import com.happylifeplat.tcc.common.utils.LogUtil;
+import com.happylifeplat.tcc.core.concurrent.threadlocal.TransactionContextLocal;
+import com.happylifeplat.tcc.core.concurrent.threadpool.TccTransactionThreadFactory;
+import com.happylifeplat.tcc.core.concurrent.threadpool.TccTransactionThreadPool;
+import com.happylifeplat.tcc.core.coordinator.CoordinatorService;
+import com.happylifeplat.tcc.core.coordinator.command.CoordinatorAction;
+import com.happylifeplat.tcc.core.helper.SpringBeanUtils;
+import com.happylifeplat.tcc.core.service.ApplicationService;
+import com.happylifeplat.tcc.core.spi.CoordinatorRepository;
 
 /**
  * @author xiaoyu
@@ -366,13 +365,17 @@ public class CoordinatorServiceImpl implements CoordinatorService {
     }
 
 
-    @SuppressWarnings("unchecked")
+    /**
+     * 执行本地协调事务
+     * @param tccInvocation
+     * @throws Exception
+     */
     private void executeCoordinator(TccInvocation tccInvocation) throws Exception {
         if (Objects.nonNull(tccInvocation)) {
-            final Class clazz = tccInvocation.getTargetClass();
+            final Class<?> clazz = tccInvocation.getTargetClass();
             final String method = tccInvocation.getMethodName();
             final Object[] args = tccInvocation.getArgs();
-            final Class[] parameterTypes = tccInvocation.getParameterTypes();
+            final Class<?>[] parameterTypes = tccInvocation.getParameterTypes();
             final Object bean = SpringBeanUtils.getInstance().getBean(clazz);
             MethodUtils.invokeMethod(bean, method, args, parameterTypes);
             LogUtil.debug(LOGGER, "执行本地协调事务:{}", () -> tccInvocation.getTargetClass()

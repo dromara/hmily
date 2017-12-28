@@ -24,7 +24,7 @@ import com.happylifeplat.tcc.common.bean.context.TccTransactionContext;
  * @author xiaoyu
  */
 @FunctionalInterface
-public interface TccTransactionFactoryService<T> {
+public interface TccTransactionFactoryService {
 
     /**
      * 返回 实现TxTransactionHandler类的名称
@@ -33,5 +33,5 @@ public interface TccTransactionFactoryService<T> {
      * @return Class<T>
      * @throws Throwable 抛出异常
      */
-    Class<T> factoryOf(TccTransactionContext context) throws Throwable;
+    Class<?> factoryOf(TccTransactionContext context) throws Throwable;
 }
