@@ -32,15 +32,13 @@ happylifeplat-tcc
 
   *   ####  RPC framework dubbo or motan or springcloud。
 
-  *   #### Message Oriented Middleware
-
 # TCC原理介绍
   ###  [原理介绍](https://github.com/yu199195/happylifeplat-tcc/wiki/TCC%E5%8E%9F%E7%90%86%E4%BB%8B%E7%B4%B9)
 
 
 # Quick Start
 
-* #### Clone & Build
+ * #### Clone & Build
    ```
    > git clone https://github.com/yu199195/happylifeplat-tcc.git
 
@@ -67,11 +65,6 @@ happylifeplat-tcc
 
 
 ####  [springcloud 用户](https://github.com/yu199195/happylifeplat-tcc/wiki/springcloud%E7%94%A8%E6%88%B7%E6%8C%87%E5%8D%97)
-
-
-
-
-
 
 
 # FAQ
