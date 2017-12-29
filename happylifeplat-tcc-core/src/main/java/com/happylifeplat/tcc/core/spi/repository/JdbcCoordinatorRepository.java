@@ -301,7 +301,6 @@ public class JdbcCoordinatorRepository implements CoordinatorRepository {
             }
             return ps.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
             logger.error("executeUpdate-> " + e.getMessage());
         } finally {
             close(connection, ps, null);

@@ -15,7 +15,7 @@
  * along with this distribution; if not, see <http://www.gnu.org/licenses/>.
  *
  */
-package com.happylifeplat.tcc.demo.dubbo.inventory;
+package com.happylifeplat.tcc.demo.dubbo.account;
 
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
@@ -28,10 +28,10 @@ import org.springframework.context.annotation.ImportResource;
  */
 @SpringBootApplication
 @ImportResource({"classpath:applicationContext.xml"})
-@MapperScan("com.happylifeplat.tcc.demo.dubbo.inventory.mapper")
-public class InventoryApplication {
+@MapperScan("com.happylifeplat.tcc.demo.dubbo.account.mapper")
+public class DubboTccAccountApplication {
     public static void main(String[] args) {
-        SpringApplication.run(InventoryApplication.class, args);
+        SpringApplication.run(DubboTccAccountApplication.class, args);
     }
 
 

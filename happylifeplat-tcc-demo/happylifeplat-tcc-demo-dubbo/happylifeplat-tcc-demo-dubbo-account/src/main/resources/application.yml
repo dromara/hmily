@@ -6,7 +6,7 @@ server:
 spring:
     datasource:
         driver-class-name:  com.mysql.jdbc.Driver
-        url: jdbc:mysql://192.168.1.68:3306/account?useUnicode=true&characterEncoding=utf8
+        url: jdbc:mysql://192.168.1.68:3306/tcc_account?useUnicode=true&characterEncoding=utf8
         username: xiaoyu
         password: Wgj@555888
 
@@ -20,9 +20,9 @@ logging:
         root: error
         org.springframework.web: info
         org.apache.ibatis: info
-        com.happylifeplat.bonuspoint: info
-        com.happylifeplat.lottery: debug
-        com.happylifeplat: debug
+        com.happylifeplat.tcc.bonuspoint: info
+        com.happylifeplat.tcc.lottery: debug
+        com.happylifeplat.tcc: debug
         io.netty: info
 
     path: "./logs"

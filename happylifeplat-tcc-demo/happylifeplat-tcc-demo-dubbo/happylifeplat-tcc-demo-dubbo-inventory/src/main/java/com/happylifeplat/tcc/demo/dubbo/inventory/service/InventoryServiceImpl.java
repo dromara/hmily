@@ -21,7 +21,7 @@ package com.happylifeplat.tcc.demo.dubbo.inventory.service;
 import com.happylifeplat.tcc.annotation.Tcc;
 import com.happylifeplat.tcc.common.exception.TccRuntimeException;
 import com.happylifeplat.tcc.demo.dubbo.inventory.api.dto.InventoryDTO;
-import com.happylifeplat.tcc.demo.dubbo.inventory.api.entity.Inventory;
+import com.happylifeplat.tcc.demo.dubbo.inventory.api.entity.InventoryDO;
 import com.happylifeplat.tcc.demo.dubbo.inventory.api.service.InventoryService;
 import com.happylifeplat.tcc.demo.dubbo.inventory.mapper.InventoryMapper;
 import org.slf4j.Logger;
@@ -45,7 +45,7 @@ public class InventoryServiceImpl implements InventoryService {
 
     private final InventoryMapper inventoryMapper;
 
-    @Autowired
+    @Autowired(required = false)
     public InventoryServiceImpl(InventoryMapper inventoryMapper) {
         this.inventoryMapper = inventoryMapper;
     }
@@ -61,7 +61,7 @@ public class InventoryServiceImpl implements InventoryService {
     @Override
     @Tcc(confirmMethod = "confirmMethod", cancelMethod = "cancelMethod")
     public Boolean decrease(InventoryDTO inventoryDTO) {
-        final Inventory entity = inventoryMapper.findByProductId(inventoryDTO.getProductId());
+        final InventoryDO entity = inventoryMapper.findByProductId(inventoryDTO.getProductId());
         entity.setTotalInventory(entity.getTotalInventory() - inventoryDTO.getCount());
         entity.setLockInventory(entity.getLockInventory() + inventoryDTO.getCount());
         final int decrease = inventoryMapper.decrease(entity);
@@ -69,6 +69,17 @@ public class InventoryServiceImpl implements InventoryService {
             throw new TccRuntimeException("库存不足");
         }
         return true;
+    }
+
+    /**
+     * 获取商品库存信息
+     *
+     * @param productId 商品id
+     * @return InventoryDO
+     */
+    @Override
+    public InventoryDO findByProductId(String productId) {
+        return inventoryMapper.findByProductId(productId);
     }
 
     @Override
@@ -89,7 +100,7 @@ public class InventoryServiceImpl implements InventoryService {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        final Inventory entity = inventoryMapper.findByProductId(inventoryDTO.getProductId());
+        final InventoryDO entity = inventoryMapper.findByProductId(inventoryDTO.getProductId());
         entity.setTotalInventory(entity.getTotalInventory() - inventoryDTO.getCount());
         entity.setLockInventory(entity.getLockInventory() + inventoryDTO.getCount());
         final int decrease = inventoryMapper.decrease(entity);
@@ -103,7 +114,7 @@ public class InventoryServiceImpl implements InventoryService {
     @Tcc(confirmMethod = "confirmMethodException", cancelMethod = "cancelMethod")
     @Transactional(rollbackFor = Exception.class)
     public String mockWithConfirmException(InventoryDTO inventoryDTO) {
-        final Inventory entity = inventoryMapper.findByProductId(inventoryDTO.getProductId());
+        final InventoryDO entity = inventoryMapper.findByProductId(inventoryDTO.getProductId());
         entity.setTotalInventory(entity.getTotalInventory() - inventoryDTO.getCount());
         entity.setLockInventory(entity.getLockInventory() + inventoryDTO.getCount());
         final int decrease = inventoryMapper.decrease(entity);
@@ -119,7 +130,7 @@ public class InventoryServiceImpl implements InventoryService {
     @Transactional(rollbackFor = Exception.class)
     public Boolean mockWithConfirmTimeout(InventoryDTO inventoryDTO) {
         LOGGER.info("==========调用扣减库存确认方法mockWithConfirmTimeout===========");
-        final Inventory entity = inventoryMapper.findByProductId(inventoryDTO.getProductId());
+        final InventoryDO entity = inventoryMapper.findByProductId(inventoryDTO.getProductId());
         entity.setTotalInventory(entity.getTotalInventory() - inventoryDTO.getCount());
         entity.setLockInventory(entity.getLockInventory() + inventoryDTO.getCount());
         final int decrease = inventoryMapper.decrease(entity);
@@ -141,7 +152,7 @@ public class InventoryServiceImpl implements InventoryService {
         }
         LOGGER.info("==========调用扣减库存确认方法===========");
 
-        final Inventory entity = inventoryMapper.findByProductId(inventoryDTO.getProductId());
+        final InventoryDO entity = inventoryMapper.findByProductId(inventoryDTO.getProductId());
 
         entity.setLockInventory(entity.getLockInventory() - inventoryDTO.getCount());
         inventoryMapper.decrease(entity);
@@ -156,7 +167,7 @@ public class InventoryServiceImpl implements InventoryService {
 
         LOGGER.info("==========调用扣减库存确认方法===========");
 
-        final Inventory entity = inventoryMapper.findByProductId(inventoryDTO.getProductId());
+        final InventoryDO entity = inventoryMapper.findByProductId(inventoryDTO.getProductId());
 
         entity.setLockInventory(entity.getLockInventory() - inventoryDTO.getCount());
         final int decrease = inventoryMapper.decrease(entity);
@@ -177,7 +188,7 @@ public class InventoryServiceImpl implements InventoryService {
 
         LOGGER.info("==========调用扣减库存确认方法===========");
 
-        final Inventory entity = inventoryMapper.findByProductId(inventoryDTO.getProductId());
+        final InventoryDO entity = inventoryMapper.findByProductId(inventoryDTO.getProductId());
 
 
         entity.setLockInventory(entity.getLockInventory() - inventoryDTO.getCount());
@@ -199,13 +210,13 @@ public class InventoryServiceImpl implements InventoryService {
 
         LOGGER.info("==========调用扣减库存取消方法===========");
 
-        final Inventory entity = inventoryMapper.findByProductId(inventoryDTO.getProductId());
+        final InventoryDO entity = inventoryMapper.findByProductId(inventoryDTO.getProductId());
 
         entity.setTotalInventory(entity.getTotalInventory() + inventoryDTO.getCount());
 
         entity.setLockInventory(entity.getLockInventory() - inventoryDTO.getCount());
 
-        int rows= inventoryMapper.cancel(entity);
+        int rows = inventoryMapper.cancel(entity);
 
 
         if (rows != 1) {

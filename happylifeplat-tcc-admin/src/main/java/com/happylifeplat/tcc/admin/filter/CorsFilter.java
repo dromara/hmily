@@ -37,9 +37,7 @@ import java.io.IOException;
  * @version 1.0
  * @date 2017/10/23 17:57
  * @since JDK 1.8
- *//*
-
-*/
+ */
 @Component
 public class CorsFilter implements Filter {
 

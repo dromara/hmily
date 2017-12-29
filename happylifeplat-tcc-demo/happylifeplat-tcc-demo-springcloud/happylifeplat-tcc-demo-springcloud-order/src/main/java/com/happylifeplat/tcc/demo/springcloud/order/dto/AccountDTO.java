@@ -18,19 +18,22 @@
 
 package com.happylifeplat.tcc.demo.springcloud.order.dto;
 
+import lombok.Data;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 
 /**
  * @author xiaoyu
  */
+@Data
 public class AccountDTO implements Serializable {
 
     private static final long serialVersionUID = 7223470850578998427L;
     /**
      * 用户id
      */
-    private Integer userId;
+    private String userId;
 
     /**
      * 扣款金额
@@ -38,28 +41,4 @@ public class AccountDTO implements Serializable {
     private BigDecimal amount;
 
 
-    public Integer getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Integer userId) {
-        this.userId = userId;
-    }
-
-    public BigDecimal getAmount() {
-        return amount;
-    }
-
-    public void setAmount(BigDecimal amount) {
-        this.amount = amount;
-    }
-
-
-    @Override
-    public String toString() {
-        return "AccountDTO{" +
-                "userId=" + userId +
-                ", amount=" + amount +
-                '}';
-    }
 }

@@ -23,12 +23,16 @@ import java.util.Optional;
 
 
 /**
+ * The enum Tcc action enum.
+ *
  * @author xiaoyu
  */
-
 public enum TccActionEnum {
 
 
+    /**
+     * Pre try tcc action enum.
+     */
     PRE_TRY(0,"开始执行try"),
 
 

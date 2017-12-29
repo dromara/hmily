@@ -7,7 +7,7 @@
     <groupId>com.happylifeplat.tcc</groupId>
     <artifactId>happylifeplat-tcc</artifactId>
     <packaging>pom</packaging>
-    <version>1.1.0-RELEASE</version>
+    <version>1.1.1-SNAPSHOT</version>
     <name>happylifeplat-tcc</name>
     <modules>
         <module>happylifeplat-tcc-common</module>
@@ -30,13 +30,6 @@
         <url>https://github.com/yu199195/happylifeplat-tcc.git</url>
     </scm>
 
-    <parent>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-parent</artifactId>
-        <version>1.5.4.RELEASE</version>
-    </parent>
-
-
     <developers>
         <developer>
             <id>xiaoyu</id>
@@ -54,7 +47,7 @@
         <jdk.version>1.8</jdk.version>
         <spring.version>4.3.9.RELEASE</spring.version>
         <spring-cloud.version>Dalston.SR1</spring-cloud.version>
-        <dubbo.version>2.5.3</dubbo.version>
+        <dubbo.version>2.5.8</dubbo.version>
         <mongo.driver.version>3.5.0</mongo.driver.version>
         <mysql-connector-java>5.1.40</mysql-connector-java>
         <commons-lang3.version>3.3.2</commons-lang3.version>
@@ -78,6 +71,16 @@
 
     <dependencyManagement>
         <dependencies>
+
+            <dependency>
+                <!-- Import dependency management from Spring Boot -->
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>1.5.9.RELEASE</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
             <dependency>
                 <groupId>com.happylifeplat.tcc</groupId>
                 <artifactId>happylifeplat-tcc-admin</artifactId>

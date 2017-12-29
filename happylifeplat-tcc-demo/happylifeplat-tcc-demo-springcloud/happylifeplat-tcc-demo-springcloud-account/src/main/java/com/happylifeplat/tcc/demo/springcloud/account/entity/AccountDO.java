@@ -18,6 +18,8 @@
 
 package com.happylifeplat.tcc.demo.springcloud.account.entity;
 
+import lombok.Data;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
@@ -25,12 +27,13 @@ import java.util.Date;
 /**
  * @author xiaoyu
  */
+@Data
 public class AccountDO implements Serializable {
 
     private static final long serialVersionUID = -81849676368907419L;
     private Integer id;
 
-    private Integer userId;
+    private String userId;
 
     private BigDecimal balance;
 
@@ -40,64 +43,4 @@ public class AccountDO implements Serializable {
 
     private Date updateTime;
 
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public Integer getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Integer userId) {
-        this.userId = userId;
-    }
-
-    public BigDecimal getBalance() {
-        return balance;
-    }
-
-    public void setBalance(BigDecimal balance) {
-        this.balance = balance;
-    }
-
-    public BigDecimal getFreezeAmount() {
-        return freezeAmount;
-    }
-
-    public void setFreezeAmount(BigDecimal freezeAmount) {
-        this.freezeAmount = freezeAmount;
-    }
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
-    }
-
-    @Override
-    public String toString() {
-        return "AccountDO{" +
-                "id=" + id +
-                ", userId=" + userId +
-                ", balance=" + balance +
-                ", freezeAmount=" + freezeAmount +
-                ", createTime=" + createTime +
-                ", updateTime=" + updateTime +
-                '}';
-    }
 }

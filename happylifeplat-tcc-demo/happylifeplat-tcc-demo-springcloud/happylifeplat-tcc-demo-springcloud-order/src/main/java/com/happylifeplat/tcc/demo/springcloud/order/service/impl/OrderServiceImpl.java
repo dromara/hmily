@@ -23,6 +23,7 @@ import com.happylifeplat.tcc.demo.springcloud.order.entity.Order;
 import com.happylifeplat.tcc.demo.springcloud.order.enums.OrderStatusEnum;
 import com.happylifeplat.tcc.demo.springcloud.order.mapper.OrderMapper;
 import com.happylifeplat.tcc.demo.springcloud.order.service.OrderService;
+import com.happylifeplat.tcc.demo.springcloud.order.service.PaymentService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,12 +48,12 @@ public class OrderServiceImpl implements OrderService {
     private final OrderMapper orderMapper;
 
 
-    private final PaymentServiceImpl paymentServiceImpl;
+    private final PaymentService paymentService;
 
-    @Autowired
-    public OrderServiceImpl(OrderMapper orderMapper, PaymentServiceImpl paymentServiceImpl) {
+    @Autowired(required = false)
+    public OrderServiceImpl(OrderMapper orderMapper, PaymentService paymentService) {
         this.orderMapper = orderMapper;
-        this.paymentServiceImpl = paymentServiceImpl;
+        this.paymentService = paymentService;
     }
 
 
@@ -62,7 +63,7 @@ public class OrderServiceImpl implements OrderService {
         final int rows = orderMapper.save(order);
 
         if (rows > 0) {
-            paymentServiceImpl.makePayment(order);
+            paymentService.makePayment(order);
         }
 
 
@@ -82,7 +83,7 @@ public class OrderServiceImpl implements OrderService {
         final int rows = orderMapper.save(order);
 
         if (rows > 0) {
-            paymentServiceImpl.mockPaymentInventoryWithTryException(order);
+            paymentService.mockPaymentInventoryWithTryException(order);
         }
 
 
@@ -102,7 +103,7 @@ public class OrderServiceImpl implements OrderService {
         final int rows = orderMapper.save(order);
 
         if (rows > 0) {
-            paymentServiceImpl.mockPaymentInventoryWithTryTimeout(order);
+            paymentService.mockPaymentInventoryWithTryTimeout(order);
         }
 
 
@@ -121,12 +122,12 @@ public class OrderServiceImpl implements OrderService {
         order.setCreateTime(new Date());
         order.setNumber(IdWorkerUtils.getInstance().buildPartNumber());
         //demo中的表里只有商品id为 1的数据
-        order.setProductId(1);
+        order.setProductId("1");
         order.setStatus(OrderStatusEnum.NOT_PAY.getCode());
         order.setTotalAmount(amount);
         order.setCount(count);
         //demo中 表里面存的用户id为10000
-        order.setUserId(10000);
+        order.setUserId("10000");
         return order;
     }
 }

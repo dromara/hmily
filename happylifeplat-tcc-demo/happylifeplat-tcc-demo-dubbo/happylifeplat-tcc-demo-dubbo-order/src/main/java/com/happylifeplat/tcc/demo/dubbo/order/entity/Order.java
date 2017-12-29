@@ -18,6 +18,8 @@
 
 package com.happylifeplat.tcc.demo.dubbo.order.entity;
 
+import lombok.Data;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
@@ -25,6 +27,7 @@ import java.util.Date;
 /**
  * @author xiaoyu
  */
+@Data
 public class Order implements Serializable {
 
     private static final long serialVersionUID = -8551347266419380333L;
@@ -49,7 +52,7 @@ public class Order implements Serializable {
     /**
      * 商品id
      */
-    private Integer productId;
+    private String productId;
 
     /**
      * 付款金额
@@ -64,70 +67,7 @@ public class Order implements Serializable {
     /**
      * 购买人
      */
-    private Integer userId;
+    private String userId;
 
 
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public String getNumber() {
-        return number;
-    }
-
-    public void setNumber(String number) {
-        this.number = number;
-    }
-
-    public Integer getStatus() {
-        return status;
-    }
-
-    public void setStatus(Integer status) {
-        this.status = status;
-    }
-
-    public Integer getProductId() {
-        return productId;
-    }
-
-    public void setProductId(Integer productId) {
-        this.productId = productId;
-    }
-
-    public BigDecimal getTotalAmount() {
-        return totalAmount;
-    }
-
-    public void setTotalAmount(BigDecimal totalAmount) {
-        this.totalAmount = totalAmount;
-    }
-
-    public Integer getCount() {
-        return count;
-    }
-
-    public void setCount(Integer count) {
-        this.count = count;
-    }
-
-    public Integer getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Integer userId) {
-        this.userId = userId;
-    }
 }

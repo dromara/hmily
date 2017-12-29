@@ -5,7 +5,7 @@
     <parent>
         <artifactId>happylifeplat-tcc</artifactId>
         <groupId>com.happylifeplat.tcc</groupId>
-        <version>1.1.0-RELEASE</version>
+        <version>1.1.1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <packaging>jar</packaging>

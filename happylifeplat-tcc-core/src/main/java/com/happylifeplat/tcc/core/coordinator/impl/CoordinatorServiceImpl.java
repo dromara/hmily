@@ -21,16 +21,15 @@ package com.happylifeplat.tcc.core.coordinator.impl;
 
 import com.google.common.collect.Lists;
 import com.happylifeplat.tcc.annotation.TccPatternEnum;
-import com.happylifeplat.tcc.common.config.TccConfig;
-import com.happylifeplat.tcc.common.enums.CoordinatorActionEnum;
-import com.happylifeplat.tcc.common.enums.TccActionEnum;
-import com.happylifeplat.tcc.common.enums.TccRoleEnum;
-import com.happylifeplat.tcc.common.exception.TccRuntimeException;
-import com.happylifeplat.tcc.common.utils.LogUtil;
 import com.happylifeplat.tcc.common.bean.context.TccTransactionContext;
 import com.happylifeplat.tcc.common.bean.entity.Participant;
 import com.happylifeplat.tcc.common.bean.entity.TccInvocation;
 import com.happylifeplat.tcc.common.bean.entity.TccTransaction;
+import com.happylifeplat.tcc.common.config.TccConfig;
+import com.happylifeplat.tcc.common.enums.CoordinatorActionEnum;
+import com.happylifeplat.tcc.common.enums.TccActionEnum;
+import com.happylifeplat.tcc.common.enums.TccRoleEnum;
+import com.happylifeplat.tcc.common.utils.LogUtil;
 import com.happylifeplat.tcc.core.concurrent.threadlocal.TransactionContextLocal;
 import com.happylifeplat.tcc.core.concurrent.threadpool.TccTransactionThreadFactory;
 import com.happylifeplat.tcc.core.concurrent.threadpool.TccTransactionThreadPool;
@@ -40,6 +39,7 @@ import com.happylifeplat.tcc.core.helper.SpringBeanUtils;
 import com.happylifeplat.tcc.core.service.ApplicationService;
 import com.happylifeplat.tcc.core.spi.CoordinatorRepository;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.MethodUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,7 +57,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 /**
  * @author xiaoyu
@@ -100,10 +99,12 @@ public class CoordinatorServiceImpl implements CoordinatorService {
     @Override
     public void start(TccConfig tccConfig) throws Exception {
         this.tccConfig = tccConfig;
-        final String appName = applicationService.acquireName();
-        coordinatorRepository = SpringBeanUtils.getInstance().getBean(CoordinatorRepository.class);
+        final String repositorySuffix =
+                buildRepositorySuffix(tccConfig.getRepositorySuffix());
+        coordinatorRepository = SpringBeanUtils.getInstance()
+                .getBean(CoordinatorRepository.class);
         //初始化spi 协调资源存储
-        coordinatorRepository.init(appName, tccConfig);
+        coordinatorRepository.init(repositorySuffix, tccConfig);
         //初始化 协调资源线程池
         initCoordinatorPool();
         //定时执行补偿
@@ -382,7 +383,17 @@ public class CoordinatorServiceImpl implements CoordinatorService {
 
 
     private Date acquireData() {
-        return new Date(LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli() - (tccConfig.getRecoverDelayTime() * 1000));
+        return new Date(LocalDateTime.now().atZone(ZoneId.systemDefault())
+                .toInstant().toEpochMilli() - (tccConfig.getRecoverDelayTime() * 1000));
+    }
+
+
+    private String buildRepositorySuffix(String repositorySuffix) {
+        if (StringUtils.isNoneBlank(repositorySuffix)) {
+            return repositorySuffix;
+        } else {
+            return applicationService.acquireName();
+        }
 
     }
 

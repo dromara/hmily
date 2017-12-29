@@ -15,23 +15,29 @@
  * along with this distribution; if not, see <http://www.gnu.org/licenses/>.
  *
  */
-package com.happylifeplat.tcc.demo.dubbo.order;
+package com.happylifeplat.tcc.demo.springcloud.inventory;
 
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.data.mongo.MongoDataAutoConfiguration;
+import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
+import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
+import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.context.annotation.ImportResource;
-
 
 /**
  * @author xiaoyu
  */
-@SpringBootApplication
+@SpringBootApplication(exclude = {MongoAutoConfiguration.class, MongoDataAutoConfiguration.class})
+@EnableEurekaClient
+@EnableFeignClients
 @ImportResource({"classpath:applicationContext.xml"})
-@MapperScan("com.happylifeplat.tcc.demo.dubbo.order.mapper")
-public class OrderApplication {
+@MapperScan("com.happylifeplat.tcc.demo.springcloud.inventory.mapper")
+public class SpringCloudTccInventoryApplication {
+
     public static void main(String[] args) {
-        SpringApplication.run(OrderApplication.class, args);
+        SpringApplication.run(SpringCloudTccInventoryApplication.class, args);
     }
 
 

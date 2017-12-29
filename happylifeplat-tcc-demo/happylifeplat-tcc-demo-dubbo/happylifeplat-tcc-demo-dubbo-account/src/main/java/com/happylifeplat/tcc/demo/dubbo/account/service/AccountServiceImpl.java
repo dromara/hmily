@@ -46,7 +46,7 @@ public class AccountServiceImpl implements AccountService {
 
     private final AccountMapper accountMapper;
 
-    @Autowired
+    @Autowired(required = false)
     public AccountServiceImpl(AccountMapper accountMapper) {
         this.accountMapper = accountMapper;
     }
@@ -71,9 +71,20 @@ public class AccountServiceImpl implements AccountService {
         return Boolean.TRUE;
     }
 
+    /**
+     * 获取用户账户信息
+     *
+     * @param userId 用户id
+     * @return AccountDO
+     */
+    @Override
+    public AccountDO findByUserId(String userId) {
+        return accountMapper.findByUserId(userId);
+    }
+
     public boolean confirm(AccountDTO accountDTO) {
 
-        LOGGER.debug("============执行确认付款接口===============");
+        LOGGER.debug("============dubbo tcc 执行确认付款接口===============");
 
         final AccountDO accountDO = accountMapper.findByUserId(accountDTO.getUserId());
         accountDO.setFreezeAmount(accountDO.getFreezeAmount().subtract(accountDTO.getAmount()));
@@ -88,7 +99,7 @@ public class AccountServiceImpl implements AccountService {
 
     public boolean cancel(AccountDTO accountDTO) {
 
-        LOGGER.debug("============执行取消付款接口===============");
+        LOGGER.debug("============ dubbo tcc 执行取消付款接口===============");
         final AccountDO accountDO = accountMapper.findByUserId(accountDTO.getUserId());
         accountDO.setBalance(accountDO.getBalance().add(accountDTO.getAmount()));
         accountDO.setFreezeAmount(accountDO.getFreezeAmount().subtract(accountDTO.getAmount()));

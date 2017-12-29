@@ -21,8 +21,10 @@ package com.happylifeplat.tcc.demo.dubbo.order.service.impl;
 
 import com.happylifeplat.tcc.annotation.Tcc;
 import com.happylifeplat.tcc.demo.dubbo.account.api.dto.AccountDTO;
+import com.happylifeplat.tcc.demo.dubbo.account.api.entity.AccountDO;
 import com.happylifeplat.tcc.demo.dubbo.account.api.service.AccountService;
 import com.happylifeplat.tcc.demo.dubbo.inventory.api.dto.InventoryDTO;
+import com.happylifeplat.tcc.demo.dubbo.inventory.api.entity.InventoryDO;
 import com.happylifeplat.tcc.demo.dubbo.inventory.api.service.InventoryService;
 import com.happylifeplat.tcc.demo.dubbo.order.entity.Order;
 import com.happylifeplat.tcc.demo.dubbo.order.enums.OrderStatusEnum;
@@ -53,8 +55,10 @@ public class PaymentServiceImpl implements PaymentService {
 
     private final InventoryService inventoryService;
 
-    @Autowired
-    public PaymentServiceImpl(OrderMapper orderMapper, AccountService accountService, InventoryService inventoryService) {
+    @Autowired(required = false)
+    public PaymentServiceImpl(OrderMapper orderMapper,
+                              AccountService accountService,
+                              InventoryService inventoryService) {
         this.orderMapper = orderMapper;
         this.accountService = accountService;
         this.inventoryService = inventoryService;
@@ -64,6 +68,19 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     @Tcc(confirmMethod = "confirmOrderStatus", cancelMethod = "cancelOrderStatus")
     public void makePayment(Order order) {
+
+        //做库存和资金账户的检验工作 这里只是demo 。。。
+        final AccountDO accountDO = accountService.findByUserId(order.getUserId());
+        if (accountDO.getBalance().compareTo(order.getTotalAmount()) <= 0) {
+            return;
+        }
+
+        final InventoryDO inventory = inventoryService.findByProductId(order.getProductId());
+
+        if (inventory.getTotalInventory() < order.getCount()) {
+            return;
+        }
+
         order.setStatus(OrderStatusEnum.PAYING.getCode());
         orderMapper.update(order);
         //扣除用户余额
