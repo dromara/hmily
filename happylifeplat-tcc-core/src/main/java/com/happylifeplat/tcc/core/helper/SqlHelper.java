@@ -27,71 +27,77 @@ public class SqlHelper {
 
 
     public static String buildCreateTableSql(String driverClassName, String tableName) {
-        String createTableSql;
+        StringBuilder createTableSql = new StringBuilder();
         String dbType = DbTypeUtils.buildByDriverClassName(driverClassName);
         switch (dbType) {
             case "mysql": {
-                createTableSql = "CREATE TABLE `" + tableName + "` (\n" +
-                        "  `trans_id` varchar(64) NOT NULL,\n" +
-                        "  `target_class` varchar(256) ,\n" +
-                        "  `target_method` varchar(128) ,\n" +
-                        "  `confirm_method` varchar(128) ,\n" +
-                        "  `cancel_method` varchar(128) ,\n" +
-                        "  `retried_count` int(3) NOT NULL,\n" +
-                        "  `create_time` datetime NOT NULL,\n" +
-                        "  `last_time` datetime NOT NULL,\n" +
-                        "  `version` int(6) NOT NULL,\n" +
-                        "  `status` int(2) NOT NULL,\n" +
-                        "  `invocation` longblob,\n" +
-                        "  `role` int(2) NOT NULL,\n" +
-                        "  `pattern` int(2),\n" +
-                        "  PRIMARY KEY (`trans_id`)\n" +
-                        ")";
+                createTableSql
+                        .append("CREATE TABLE `")
+                        .append(tableName)
+                        .append("` (")
+                        .append("  `trans_id` varchar(64) NOT NULL,")
+                        .append("  `target_class` varchar(256) ,")
+                        .append("  `target_method` varchar(128) ,")
+                        .append("  `confirm_method` varchar(128) ,")
+                        .append("  `cancel_method` varchar(128) ,")
+                        .append("  `retried_count` int(3) NOT NULL,")
+                        .append("  `create_time` datetime NOT NULL,")
+                        .append("  `last_time` datetime NOT NULL,")
+                        .append("  `version` int(6) NOT NULL,")
+                        .append("  `status` int(2) NOT NULL,")
+                        .append("  `invocation` longblob,")
+                        .append("  `role` int(2) NOT NULL,")
+                        .append("  `pattern` int(2),")
+                        .append("  PRIMARY KEY (`trans_id`))");
                 break;
             }
             case "oracle": {
-                createTableSql = "CREATE TABLE `" + tableName + "` (\n" +
-                        "  `trans_id` varchar(64) NOT NULL,\n" +
-                        "  `target_class` varchar(256) ,\n" +
-                        "  `target_method` varchar(128) ,\n" +
-                        "  `confirm_method` varchar(128) ,\n" +
-                        "  `cancel_method` varchar(128) ,\n" +
-                        "  `retried_count` int(3) NOT NULL,\n" +
-                        "  `create_time` date NOT NULL,\n" +
-                        "  `last_time` date NOT NULL,\n" +
-                        "  `version` int(6) NOT NULL,\n" +
-                        "  `status` int(2) NOT NULL,\n" +
-                        "  `invocation` BLOB ,\n" +
-                        "  `role` int(2) NOT NULL,\n" +
-                        "  `pattern` int(2),\n" +
-                        "  PRIMARY KEY (`trans_id`)\n" +
-                        ")";
+                createTableSql
+                        .append("CREATE TABLE `")
+                        .append(tableName)
+                        .append("` (")
+                        .append("  `trans_id` varchar(64) NOT NULL,")
+                        .append("  `target_class` varchar(256) ,")
+                        .append("  `target_method` varchar(128) ,")
+                        .append("  `confirm_method` varchar(128) ,")
+                        .append("  `cancel_method` varchar(128) ,")
+                        .append("  `retried_count` int(3) NOT NULL,")
+                        .append("  `create_time` date NOT NULL,")
+                        .append("  `last_time` date NOT NULL,")
+                        .append("  `version` int(6) NOT NULL,")
+                        .append("  `status` int(2) NOT NULL,")
+                        .append("  `invocation` BLOB ,")
+                        .append("  `role` int(2) NOT NULL,")
+                        .append("  `pattern` int(2),")
+                        .append("  PRIMARY KEY (`trans_id`))");
                 break;
             }
             case "sqlserver": {
-                createTableSql = "CREATE TABLE `" + tableName + "` (\n" +
-                        "  `trans_id` varchar(64) NOT NULL,\n" +
-                        "  `target_class` varchar(256) ,\n" +
-                        "  `target_method` varchar(128) ,\n" +
-                        "  `confirm_method` varchar(128) ,\n" +
-                        "  `cancel_method` varchar(128) ,\n" +
-                        "  `retried_count` int(3) NOT NULL,\n" +
-                        "  `create_time` datetime NOT NULL,\n" +
-                        "  `last_time` datetime NOT NULL,\n" +
-                        "  `version` int(6) NOT NULL,\n" +
-                        "  `status` int(2) NOT NULL,\n" +
-                        "  `invocation` varbinary ,\n" +
-                        "  `role` int(2) NOT NULL,\n" +
-                        "  `pattern` int(2),\n" +
-                        "  PRIMARY KEY (`trans_id`)\n" +
-                        ")";
+                createTableSql
+                        .append("CREATE TABLE `")
+                        .append(tableName)
+                        .append("` (")
+                        .append("  `trans_id` varchar(64) NOT NULL,")
+                        .append("  `target_class` varchar(256) ,")
+                        .append("  `target_method` varchar(128) ,")
+                        .append("  `confirm_method` varchar(128) ,")
+                        .append("  `cancel_method` varchar(128) ,")
+                        .append("  `retried_count` int(3) NOT NULL,")
+                        .append("  `create_time` datetime NOT NULL,")
+                        .append("  `last_time` datetime NOT NULL,")
+                        .append("  `version` int(6) NOT NULL,")
+                        .append("  `status` int(2) NOT NULL,")
+                        .append("  `invocation` varbinary ,")
+                        .append("  `role` int(2) NOT NULL,")
+                        .append("  `pattern` int(2),")
+                        .append("  PRIMARY KEY (`trans_id`))");
                 break;
             }
             default: {
                 throw new RuntimeException("dbType类型不支持,目前仅支持mysql oracle sqlserver.");
             }
         }
-        return createTableSql;
+        return createTableSql.toString();
 
 
     }

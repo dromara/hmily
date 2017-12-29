@@ -18,12 +18,15 @@
 
 package com.happylifeplat.tcc.demo.dubbo.inventory.api.entity;
 
+import lombok.Data;
+
 import java.io.Serializable;
 
 /**
  * @author xiaoyu
  */
-public class Inventory implements Serializable {
+@Data
+public class InventoryDO implements Serializable {
 
     private static final long serialVersionUID = 6957734749389133832L;
     private Integer id;
@@ -31,7 +34,7 @@ public class Inventory implements Serializable {
     /**
      * 商品id
      */
-    private Integer productId;
+    private String productId;
 
     /**
      * 总库存
@@ -43,35 +46,4 @@ public class Inventory implements Serializable {
      */
     private Integer lockInventory;
 
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public Integer getProductId() {
-        return productId;
-    }
-
-    public void setProductId(Integer productId) {
-        this.productId = productId;
-    }
-
-    public Integer getTotalInventory() {
-        return totalInventory;
-    }
-
-    public void setTotalInventory(Integer totalInventory) {
-        this.totalInventory = totalInventory;
-    }
-
-    public Integer getLockInventory() {
-        return lockInventory;
-    }
-
-    public void setLockInventory(Integer lockInventory) {
-        this.lockInventory = lockInventory;
-    }
 }

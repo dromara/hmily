@@ -15,15 +15,14 @@
  * along with this distribution; if not, see <http://www.gnu.org/licenses/>.
  *
  */
-package com.happylifeplat.tcc.demo.springcloud.order;
+package com.happylifeplat.tcc.demo.springcloud.account;
 
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.data.mongo.MongoDataAutoConfiguration;
 import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
-import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.context.annotation.ImportResource;
 
@@ -31,14 +30,14 @@ import org.springframework.context.annotation.ImportResource;
  * @author xiaoyu
  */
 @SpringBootApplication(exclude = {MongoAutoConfiguration.class, MongoDataAutoConfiguration.class})
-@EnableEurekaClient
+@EnableDiscoveryClient
 @EnableFeignClients
 @ImportResource({"classpath:applicationContext.xml"})
-@MapperScan("com.happylifeplat.tcc.demo.springcloud.order.mapper")
-public class OrderApplication {
+@MapperScan("com.happylifeplat.tcc.demo.springcloud.account.mapper")
+public class SpringcloudTccAccountApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(OrderApplication.class, args);
+        SpringApplication.run(SpringcloudTccAccountApplication.class, args);
     }
 
 

@@ -6,7 +6,7 @@ server:
 spring:
     datasource:
         driver-class-name:  com.mysql.jdbc.Driver
-        url: jdbc:mysql://192.168.1.68:3306/stock?useUnicode=true&characterEncoding=utf8
+        url: jdbc:mysql://192.168.1.68:3306/tcc_stock?useUnicode=true&characterEncoding=utf8
         username: xiaoyu
         password: Wgj@555888
 

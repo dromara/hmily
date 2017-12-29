@@ -23,7 +23,10 @@ import com.happylifeplat.tcc.demo.springcloud.account.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.math.BigDecimal;
 
 /**
  * @author xiaoyu
@@ -44,6 +47,14 @@ public class AccountController {
     public Boolean save(@RequestBody AccountDTO accountDO) {
         return accountService.payment(accountDO);
     }
+
+
+    @RequestMapping("/findByUserId")
+    public BigDecimal findByUserId(@RequestParam("userId") String userId) {
+        return accountService.findByUserId(userId).getBalance();
+    }
+
+
 
 
 }

@@ -71,5 +71,5 @@ public interface AccountMapper {
      * @return AccountDO
      */
     @Select("select * from account where user_id =#{userId}")
-    AccountDO findByUserId(Integer userId);
+    AccountDO findByUserId(String userId);
 }

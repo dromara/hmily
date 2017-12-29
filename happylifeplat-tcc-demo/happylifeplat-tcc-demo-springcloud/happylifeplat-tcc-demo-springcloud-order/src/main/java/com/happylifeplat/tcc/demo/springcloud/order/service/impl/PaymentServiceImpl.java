@@ -33,6 +33,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+
 /**
  * @author xiaoyu
  */
@@ -52,8 +54,10 @@ public class PaymentServiceImpl implements PaymentService {
 
     private final InventoryClient inventoryClient;
 
-    @Autowired
-    public PaymentServiceImpl(OrderMapper orderMapper, AccountClient accountClient, InventoryClient inventoryClient) {
+    @Autowired(required = false)
+    public PaymentServiceImpl(OrderMapper orderMapper,
+                              AccountClient accountClient,
+                              InventoryClient inventoryClient) {
         this.orderMapper = orderMapper;
         this.accountClient = accountClient;
         this.inventoryClient = inventoryClient;
@@ -63,6 +67,22 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     @Tcc(confirmMethod = "confirmOrderStatus", cancelMethod = "cancelOrderStatus")
     public void makePayment(Order order) {
+
+
+        //检查数据
+        final BigDecimal accountInfo = accountClient.findByUserId(order.getUserId());
+
+        final Integer inventoryInfo= inventoryClient.findByProductId(order.getProductId());
+
+        if (accountInfo.compareTo(order.getTotalAmount()) <= 0) {
+            return;
+        }
+
+        if (inventoryInfo < order.getCount()) {
+            return;
+        }
+
+
         order.setStatus(OrderStatusEnum.PAYING.getCode());
         orderMapper.update(order);
         //扣除用户余额

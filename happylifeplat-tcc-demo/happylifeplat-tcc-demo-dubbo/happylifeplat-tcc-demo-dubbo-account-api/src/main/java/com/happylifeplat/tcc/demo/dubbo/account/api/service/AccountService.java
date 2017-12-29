@@ -20,6 +20,7 @@ package com.happylifeplat.tcc.demo.dubbo.account.api.service;
 
 import com.happylifeplat.tcc.annotation.Tcc;
 import com.happylifeplat.tcc.demo.dubbo.account.api.dto.AccountDTO;
+import com.happylifeplat.tcc.demo.dubbo.account.api.entity.AccountDO;
 
 /**
  * @author xiaoyu
@@ -35,4 +36,12 @@ public interface AccountService {
      */
     @Tcc
     boolean payment(AccountDTO accountDTO);
+
+
+    /**
+     * 获取用户账户信息
+     * @param userId 用户id
+     * @return AccountDO
+     */
+    AccountDO findByUserId(String userId);
 }

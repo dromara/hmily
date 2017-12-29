@@ -23,6 +23,7 @@ import com.happylifeplat.tcc.demo.springcloud.order.dto.InventoryDTO;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * @author xiaoyu
@@ -39,6 +40,18 @@ public interface InventoryClient {
     @Tcc
     @RequestMapping("/inventory-service/inventory/decrease")
     Boolean decrease(@RequestBody InventoryDTO inventoryDTO);
+
+
+
+    /**
+     * 获取商品库存
+     *
+     * @param productId 商品id
+     * @return InventoryDO
+     */
+    @RequestMapping("/inventory-service/inventory/findByProductId")
+    Integer findByProductId(@RequestParam("productId") String productId);
+
 
     /**
      * 模拟库存扣减异常

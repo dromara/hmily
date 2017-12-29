@@ -25,9 +25,9 @@
        http://code.alibabatech.com/schema/dubbo
        http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
 
-    <dubbo:application name="inventory"/>
+    <dubbo:application name="inventory_service"/>
 
-    <dubbo:registry protocol="zookeeper" address="192.168.1.143:2181"/>
+    <dubbo:registry protocol="zookeeper" address="192.168.1.148:2181"/>
 
     <dubbo:protocol accesslog="true" name="dubbo" port="20885"/>
 

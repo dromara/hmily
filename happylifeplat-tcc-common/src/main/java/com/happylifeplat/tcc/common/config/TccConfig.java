@@ -26,11 +26,14 @@ import lombok.Data;
 @Data
 public class TccConfig {
 
-    /**
-     * 应用名称
-     */
-    private String appName;
 
+
+    /**
+     * 资源后缀  此参数请填写  关于是事务存储路径
+     * 1 如果是表存储 这个就是表名后缀，其他方式存储一样
+     * 2 如果此参数不填写，那么会默认获取应用的applicationName
+     */
+    private String repositorySuffix;
 
     /**
      * 提供不同的序列化对象 {@linkplain SerializeEnum}

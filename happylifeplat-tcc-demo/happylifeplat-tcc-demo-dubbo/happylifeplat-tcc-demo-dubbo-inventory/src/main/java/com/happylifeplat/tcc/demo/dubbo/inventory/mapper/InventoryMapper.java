@@ -18,7 +18,7 @@
 
 package com.happylifeplat.tcc.demo.dubbo.inventory.mapper;
 
-import com.happylifeplat.tcc.demo.dubbo.inventory.api.entity.Inventory;
+import com.happylifeplat.tcc.demo.dubbo.inventory.api.entity.InventoryDO;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
@@ -38,7 +38,7 @@ public interface InventoryMapper {
     @Update("update inventory set total_inventory =#{totalInventory}," +
             " lock_inventory= #{lockInventory} " +
             " where product_id =#{productId}  and  total_inventory >0  ")
-    int decrease(Inventory inventory);
+    int decrease(InventoryDO inventory);
 
 
     /**
@@ -50,7 +50,7 @@ public interface InventoryMapper {
     @Update("update inventory set " +
             " lock_inventory= #{lockInventory} " +
             " where product_id =#{productId}  and lock_inventory >0 ")
-    int confirm(Inventory inventory);
+    int confirm(InventoryDO inventory);
 
 
     /**
@@ -62,7 +62,7 @@ public interface InventoryMapper {
     @Update("update inventory set total_inventory =#{totalInventory}," +
             " lock_inventory= #{lockInventory} " +
             " where product_id =#{productId}  and lock_inventory >0 ")
-    int cancel(Inventory inventory);
+    int cancel(InventoryDO inventory);
 
     /**
      * 根据商品id找到库存信息
@@ -71,5 +71,5 @@ public interface InventoryMapper {
      * @return Inventory
      */
     @Select("select * from inventory where product_id =#{productId}")
-    Inventory findByProductId(Integer productId);
+    InventoryDO findByProductId(String productId);
 }

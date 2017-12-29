@@ -58,8 +58,6 @@ public class SwaggerConfig {
                 .contact(new Contact("xiaoyu", "", "549477611@qq.com"))
                 .build();
     }
-
-    // swagger
     @Bean
     public Docket api() {
         return new Docket(DocumentationType.SWAGGER_2).apiInfo(apiInfo()).select().apis(RequestHandlerSelectors.withClassAnnotation(RestController.class))

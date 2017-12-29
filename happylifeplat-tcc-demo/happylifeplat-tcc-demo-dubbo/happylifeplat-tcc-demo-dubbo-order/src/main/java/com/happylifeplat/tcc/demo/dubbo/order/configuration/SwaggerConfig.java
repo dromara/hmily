@@ -59,7 +59,6 @@ public class SwaggerConfig {
                 .build();
     }
 
-    // swagger
     @Bean
     public Docket api() {
         return new Docket(DocumentationType.SWAGGER_2).apiInfo(apiInfo()).select().apis(RequestHandlerSelectors.withClassAnnotation(RestController.class))

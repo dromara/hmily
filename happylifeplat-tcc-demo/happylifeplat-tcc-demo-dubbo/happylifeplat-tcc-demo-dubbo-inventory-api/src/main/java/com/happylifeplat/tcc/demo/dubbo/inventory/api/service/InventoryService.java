@@ -20,7 +20,7 @@ package com.happylifeplat.tcc.demo.dubbo.inventory.api.service;
 
 import com.happylifeplat.tcc.annotation.Tcc;
 import com.happylifeplat.tcc.demo.dubbo.inventory.api.dto.InventoryDTO;
-import com.happylifeplat.tcc.demo.dubbo.inventory.api.entity.Inventory;
+import com.happylifeplat.tcc.demo.dubbo.inventory.api.entity.InventoryDO;
 
 /**
  * @author xiaoyu
@@ -37,6 +37,14 @@ public interface InventoryService {
      */
     @Tcc
     Boolean decrease(InventoryDTO inventoryDTO);
+
+
+    /**
+     * 获取商品库存信息
+     * @param productId 商品id
+     * @return InventoryDO
+     */
+    InventoryDO findByProductId(String productId);
 
 
     /**
