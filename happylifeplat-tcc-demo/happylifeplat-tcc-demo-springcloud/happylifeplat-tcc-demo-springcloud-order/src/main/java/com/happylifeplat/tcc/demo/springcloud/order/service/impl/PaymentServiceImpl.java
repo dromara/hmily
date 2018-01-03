@@ -20,6 +20,7 @@ package com.happylifeplat.tcc.demo.springcloud.order.service.impl;
 
 
 import com.happylifeplat.tcc.annotation.Tcc;
+import com.happylifeplat.tcc.common.exception.TccRuntimeException;
 import com.happylifeplat.tcc.demo.springcloud.order.client.AccountClient;
 import com.happylifeplat.tcc.demo.springcloud.order.client.InventoryClient;
 import com.happylifeplat.tcc.demo.springcloud.order.dto.AccountDTO;
@@ -68,23 +69,22 @@ public class PaymentServiceImpl implements PaymentService {
     @Tcc(confirmMethod = "confirmOrderStatus", cancelMethod = "cancelOrderStatus")
     public void makePayment(Order order) {
 
-
+        order.setStatus(OrderStatusEnum.PAYING.getCode());
+        orderMapper.update(order);
         //检查数据
         final BigDecimal accountInfo = accountClient.findByUserId(order.getUserId());
 
         final Integer inventoryInfo= inventoryClient.findByProductId(order.getProductId());
 
         if (accountInfo.compareTo(order.getTotalAmount()) <= 0) {
-            return;
+            throw  new TccRuntimeException("余额不足！");
         }
 
         if (inventoryInfo < order.getCount()) {
-            return;
+            throw  new TccRuntimeException("库存不足！");
         }
 
 
-        order.setStatus(OrderStatusEnum.PAYING.getCode());
-        orderMapper.update(order);
         //扣除用户余额
         AccountDTO accountDTO = new AccountDTO();
         accountDTO.setAmount(order.getTotalAmount());
