@@ -20,6 +20,7 @@ package com.happylifeplat.tcc.demo.dubbo.order.service.impl;
 
 
 import com.happylifeplat.tcc.annotation.Tcc;
+import com.happylifeplat.tcc.common.exception.TccRuntimeException;
 import com.happylifeplat.tcc.demo.dubbo.account.api.dto.AccountDTO;
 import com.happylifeplat.tcc.demo.dubbo.account.api.entity.AccountDO;
 import com.happylifeplat.tcc.demo.dubbo.account.api.service.AccountService;
@@ -68,21 +69,22 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     @Tcc(confirmMethod = "confirmOrderStatus", cancelMethod = "cancelOrderStatus")
     public void makePayment(Order order) {
+        order.setStatus(OrderStatusEnum.PAYING.getCode());
+        orderMapper.update(order);
 
         //做库存和资金账户的检验工作 这里只是demo 。。。
         final AccountDO accountDO = accountService.findByUserId(order.getUserId());
         if (accountDO.getBalance().compareTo(order.getTotalAmount()) <= 0) {
-            return;
+            throw  new TccRuntimeException("余额不足！");
         }
 
         final InventoryDO inventory = inventoryService.findByProductId(order.getProductId());
 
         if (inventory.getTotalInventory() < order.getCount()) {
-            return;
+            throw  new TccRuntimeException("库存不足！");
         }
 
-        order.setStatus(OrderStatusEnum.PAYING.getCode());
-        orderMapper.update(order);
+
         //扣除用户余额
         AccountDTO accountDTO = new AccountDTO();
         accountDTO.setAmount(order.getTotalAmount());
