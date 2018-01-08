@@ -29,8 +29,8 @@ happylifeplat-tcc
 
 #  视频详解
 
-  * ## 环境搭建以及运行：http://www.iqiyi.com/w_19rwkreutt.html
-  * ## 源码详解以及调试:http://www.iqiyi.com/w_19rwkrfu69.html#vfrm=16-1-1-1
+  * ## 环境搭建以及运行 : http://www.iqiyi.com/w_19rwkrfu69.html#vfrm=16-1-1-1
+  * ## 源码详解以及调试 : http://www.iqiyi.com/w_19rwkreutt.html
 
 
 # Prerequisite
