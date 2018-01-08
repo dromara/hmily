@@ -22,9 +22,16 @@ happylifeplat-tcc
      * 序列化方式，支持java，hessian，kryo，protostuff
 
 
-#  源码解析
+#  源码解析博客
 
   * ## https://yu199195.github.io/categories/happylifeplat-tcc/
+  
+
+#  视频详解
+
+  * ## 环境搭建以及运行：http://www.iqiyi.com/w_19rwkreutt.html
+  * ## 源码详解以及调试:http://www.iqiyi.com/w_19rwkrfu69.html#vfrm=16-1-1-1
+
 
 # Prerequisite
 
