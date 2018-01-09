@@ -102,6 +102,11 @@ happylifeplat-tcc
 * ### 为什么我运行demo工程，找不到applicationContent.xml呢？
   ##### 答：请设置项目的资源文件夹。
 
+* ### 为什么我启动tcc-admin项目的时候，会报mongo 集群连接错误呢？
+  ##### 答：这是因为项目里面有mongo代码，spring boot会自动配置，该错误没有关系，只要admin项目能正常启动就行。
+  
+  
+
 # Support
 
  * ###  如有任何问题欢迎加入QQ群进行讨论
