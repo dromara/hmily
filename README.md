@@ -1,7 +1,7 @@
 happylifeplat-tcc
 ================
 
-碧桂园旺生活平台解决分布式事务方案之tcc开源框架。基于java语言来开发（JDK1.8），支持dubbo，springcloud等rpc框架进行分布式事务。
+### 碧桂园旺生活平台解决分布式事务方案之tcc开源框架。基于java语言来开发（JDK1.8），支持dubbo，springcloud等rpc框架进行分布式事务。
 
  # Features
 
@@ -22,6 +22,17 @@ happylifeplat-tcc
      * 序列化方式，支持java，hessian，kryo，protostuff
 
 
+#  源码解析博客
+
+  * ## https://yu199195.github.io/categories/happylifeplat-tcc/
+  
+
+#  视频详解
+
+  * ## 环境搭建以及运行 : http://www.iqiyi.com/w_19rwkrfu69.html#vfrm=16-1-1-1
+  * ## 源码详解以及调试 : http://www.iqiyi.com/w_19rwkreutt.html
+
+
 # Prerequisite
 
   *   #### JDK 1.8+
@@ -32,8 +43,13 @@ happylifeplat-tcc
 
   *   ####  RPC framework dubbo or motan or springcloud。
 
+
 # TCC原理介绍
-  ###  [原理介绍](https://github.com/yu199195/happylifeplat-tcc/wiki/TCC%E5%8E%9F%E7%90%86%E4%BB%8B%E7%B4%B9)
+* ###  https://github.com/yu199195/happylifeplat-tcc/wiki/Theory
+
+#   Configuration
+
+  * ###  https://github.com/yu199195/happylifeplat-tcc/wiki/Configuration
 
 
 # Quick Start
@@ -47,24 +63,35 @@ happylifeplat-tcc
    > mvn -DskipTests clean install -U
    ```
 
-   #### [快速体验(dubbo)](https://github.com/yu199195/happylifeplat-tcc/wiki/%E5%BF%AB%E9%80%9F%E4%BD%93%E9%AA%8C%EF%BC%88dubbo%EF%BC%89)
+* #### execute this sql       
+    https://github.com/yu199195/happylifeplat-tcc/blob/master/happylifeplat-tcc-demo/sql/tcc-demo.sql
 
-   #### [快速体验(springcloud)](https://github.com/yu199195/happylifeplat-tcc/wiki/%E5%BF%AB%E9%80%9F%E4%BD%93%E9%AA%8C%EF%BC%88springcloud%EF%BC%89)
+* #### Find the RPC framework that works for you
+    https://github.com/yu199195/happylifeplat-tcc/tree/master/happylifeplat-tcc-demo
+* ### [Dubbo-Quick-Start](https://github.com/yu199195/happylifeplat-tcc/wiki/Dubbo-Quick-Start)
+
+* ### [SpringCloud-Quick-Start](https://github.com/yu199195/happylifeplat-tcc/wiki/SpringCloud-Quick-Start)
 
 
-
-#   Configuration
-
-  ###  [配置详解](https://github.com/yu199195/happylifeplat-tcc/wiki/%E9%85%8D%E7%BD%AE%E8%AF%A6%E8%A7%A3)
 
 
 
 # User Guide
 
-####  [dubbo 用户](https://github.com/yu199195/happylifeplat-tcc/wiki/dubbo%E7%94%A8%E6%88%B7%E6%8C%87%E5%8D%97)
+* #### 关于jar包引用问题，现在jar包还未上传到maven的中央仓库，所以使用者需要自行获取代码，然后打包上传到自己maven私服
+
+   ```
+   > git clone https://github.com/yu199195/happylifeplat-tcc.git
+
+   > mvn -DskipTests clean deploy -U
+   ```
+* #### 关于jar包版本问题 ，现在因为没有传到中央仓库，如果引用的话，请自行设置相应的版本。
 
 
-####  [springcloud 用户](https://github.com/yu199195/happylifeplat-tcc/wiki/springcloud%E7%94%A8%E6%88%B7%E6%8C%87%E5%8D%97)
+*  ## [Dubbo User Guide](https://github.com/yu199195/happylifeplat-tcc/wiki/Dubbo-User-Guide)
+
+*  ## [SpringCloud User Guide](https://github.com/yu199195/happylifeplat-tcc/wiki/SpringCloud-User-Gruid)
+
 
 
 # FAQ
@@ -75,9 +102,9 @@ happylifeplat-tcc
 * ### 为什么我运行demo工程，找不到applicationContent.xml呢？
   ##### 答：请设置项目的资源文件夹。
 
- # Support
+# Support
 
- ### 如有任何问题欢迎加入QQ群：162614487 进行讨论 
-  ![](https://yu199195.github.io/images/weixin.jpg)
+ * ###  如有任何问题欢迎加入QQ群进行讨论
+   ![](https://yu199195.github.io/images/qq.png)
 
  # Contribution
