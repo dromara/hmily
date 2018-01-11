@@ -7,19 +7,17 @@ happylifeplat-tcc
 
  * **框架特性**
 
-     * 支持dubbo,motan,springcloud等rpc框架进行分布式事务。
+     * ##### RPC框架支持 : dubbo,motan,springcloud。
+     
+     * ##### 本地事务存储支持 : redis,mogondb,zookeeper,file,mysql。
+     
+     * ##### 事务日志序列化支持 ：java，hessian，kryo，protostuff。
 
-     * 采用Aspect AOP 切面思想与Spring无缝集成，天然支持集群。
+     * ##### 采用Aspect AOP 切面思想与Spring无缝集成，天然支持集群。
 
-     * 配置简单，集成简单，源码简洁，稳定性高，已在生产环境使用。
+     * ##### 配置简单，集成简单，源码简洁，稳定性高，已在生产环境使用。
 
-     * 内置经典的分布式事务场景demo工程，并有swagger-ui可视化界面可以快速体验。
-
-
- * **SPI扩展**
-     * 本地事务存储，支持redis，mongodb，zookeeper，file，mysql等关系型数据库
-
-     * 序列化方式，支持java，hessian，kryo，protostuff
+     * ##### 内置经典的分布式事务场景demo工程，并有swagger-ui可视化界面可以快速体验。
 
 
 #  源码解析博客
