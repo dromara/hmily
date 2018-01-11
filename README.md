@@ -9,7 +9,7 @@ happylifeplat-tcc
 
      * ##### RPC框架支持 : dubbo,motan,springcloud。
      
-     * ##### 本地事务存储支持 : redis,mogondb,zookeeper,file,mysql。
+     * ##### 本地事务存储支持 : redis,mongodb,zookeeper,file,mysql。
      
      * ##### 事务日志序列化支持 ：java，hessian，kryo，protostuff。
 
