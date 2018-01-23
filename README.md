@@ -109,5 +109,9 @@ happylifeplat-tcc
 
  * ###  如有任何问题欢迎加入QQ群进行讨论
    ![](https://yu199195.github.io/images/qq.png)
+   
+      
+ * ###  微信公众号
+   ![](https://yu199195.github.io/images/public.jpg)
 
  # Contribution
