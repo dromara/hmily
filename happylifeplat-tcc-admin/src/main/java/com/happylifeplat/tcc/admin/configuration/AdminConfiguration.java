@@ -18,15 +18,11 @@
 package com.happylifeplat.tcc.admin.configuration;
 
 import com.happylifeplat.tcc.admin.interceptor.AuthInterceptor;
-
 import com.happylifeplat.tcc.common.enums.SerializeEnum;
 import com.happylifeplat.tcc.common.serializer.KryoSerializer;
 import com.happylifeplat.tcc.common.serializer.ObjectSerializer;
 import com.happylifeplat.tcc.common.utils.ServiceBootstrap;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
-import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
@@ -47,7 +43,6 @@ import java.util.stream.StreamSupport;
  * @since JDK 1.8
  */
 @Configuration
-@EnableAutoConfiguration(exclude = {DataSourceAutoConfiguration.class, HibernateJpaAutoConfiguration.class})
 public class AdminConfiguration {
 
 
