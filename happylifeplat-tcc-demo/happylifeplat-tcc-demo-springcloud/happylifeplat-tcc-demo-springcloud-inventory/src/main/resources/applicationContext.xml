@@ -48,8 +48,8 @@
                 <property name="url"
                           value="jdbc:mysql://192.168.1.68:3306/tcc?useUnicode=true&amp;characterEncoding=utf8"/>
                 <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
-                <property name="password" value="Wgj@555888"/>
                 <property name="username" value="xiaoyu"/>
+                <property name="password" value="Wgj@555888"/>
             </bean>
         </property>
     </bean>
