@@ -1,4 +1,4 @@
-happylifeplat-tcc
+Hmily
 ================
 
 ### 分布式事务方案之tcc开源框架。基于java语言来开发（JDK1.8），支持dubbo，springcloud等rpc框架进行分布式事务。
@@ -43,32 +43,32 @@ happylifeplat-tcc
 
 
 # TCC原理介绍
-* ###  https://github.com/yu199195/happylifeplat-tcc/wiki/Theory
+* ###  https://github.com/yu199195/hmily/wiki/Theory
 
 #   Configuration
 
-  * ###  https://github.com/yu199195/happylifeplat-tcc/wiki/Configuration
+  * ###  https://github.com/yu199195/hmily/wiki/Configuration
 
 
 # Quick Start
 
  * #### Clone & Build
    ```
-   > git clone https://github.com/yu199195/happylifeplat-tcc.git
+   > git clone https://github.com/yu199195/hmily.git
 
-   > cd happylifeplat-tcc
+   > cd hmily
 
    > mvn -DskipTests clean install -U
    ```
 
 * #### execute this sql       
-    https://github.com/yu199195/happylifeplat-tcc/blob/master/happylifeplat-tcc-demo/sql/tcc-demo.sql
+    https://github.com/yu199195/hmily/blob/master/hmily-tcc-demo/sql/tcc-demo.sql
 
 * #### Find the RPC framework that works for you
-    https://github.com/yu199195/happylifeplat-tcc/tree/master/happylifeplat-tcc-demo
-* ### [Dubbo-Quick-Start](https://github.com/yu199195/happylifeplat-tcc/wiki/Dubbo-Quick-Start)
+    https://github.com/yu199195/hmily/tree/master/hmily-tcc-demo
+* ### [Dubbo-Quick-Start](https://github.com/yu199195/hmily/wiki/Dubbo-Quick-Start)
 
-* ### [SpringCloud-Quick-Start](https://github.com/yu199195/happylifeplat-tcc/wiki/SpringCloud-Quick-Start)
+* ### [SpringCloud-Quick-Start](https://github.com/yu199195/hmily/wiki/SpringCloud-Quick-Start)
 
 
 
@@ -79,16 +79,16 @@ happylifeplat-tcc
 * #### 关于jar包引用问题，现在jar包还未上传到maven的中央仓库，所以使用者需要自行获取代码，然后打包上传到自己maven私服
 
    ```
-   > git clone https://github.com/yu199195/happylifeplat-tcc.git
+   > git clone https://github.com/yu199195/hmily.git
 
    > mvn -DskipTests clean deploy -U
    ```
 * #### 关于jar包版本问题 ，现在因为没有传到中央仓库，如果引用的话，请自行设置相应的版本。
 
 
-*  ## [Dubbo User Guide](https://github.com/yu199195/happylifeplat-tcc/wiki/Dubbo-User-Guide)
+*  ## [Dubbo User Guide](https://github.com/yu199195/hmily/wiki/Dubbo-User-Guide)
 
-*  ## [SpringCloud User Guide](https://github.com/yu199195/happylifeplat-tcc/wiki/SpringCloud-User-Gruid)
+*  ## [SpringCloud User Guide](https://github.com/yu199195/hmily/wiki/SpringCloud-User-Gruid)
 
 
 
