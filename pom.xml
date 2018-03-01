@@ -4,20 +4,20 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.happylifeplat.tcc</groupId>
-    <artifactId>happylifeplat-tcc</artifactId>
+    <groupId>com.hmily.tcc</groupId>
+    <artifactId>hmily-tcc</artifactId>
     <packaging>pom</packaging>
     <version>1.1.1-SNAPSHOT</version>
-    <name>happylifeplat-tcc</name>
+    <name>hmily-tcc</name>
     <modules>
-        <module>happylifeplat-tcc-common</module>
-        <module>happylifeplat-tcc-core</module>
-        <module>happylifeplat-tcc-demo</module>
-        <module>happylifeplat-tcc-dubbo</module>
-        <module>happylifeplat-tcc-springcloud</module>
-        <module>happylifeplat-tcc-annotation</module>
-        <module>happylifeplat-tcc-admin</module>
-        <module>happylifeplat-tcc-motan</module>
+        <module>hmily-tcc-common</module>
+        <module>hmily-tcc-core</module>
+        <module>hmily-tcc-demo</module>
+        <module>hmily-tcc-dubbo</module>
+        <module>hmily-tcc-springcloud</module>
+        <module>hmily-tcc-annotation</module>
+        <module>hmily-tcc-admin</module>
+        <module>hmily-tcc-motan</module>
     </modules>
 
     <licenses>
@@ -82,34 +82,34 @@
             </dependency>
 
             <dependency>
-                <groupId>com.happylifeplat.tcc</groupId>
-                <artifactId>happylifeplat-tcc-admin</artifactId>
+                <groupId>com.hmily.tcc</groupId>
+                <artifactId>hmily-tcc-admin</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.happylifeplat.tcc</groupId>
-                <artifactId>happylifeplat-tcc-common</artifactId>
+                <groupId>com.hmily.tcc</groupId>
+                <artifactId>hmily-tcc-common</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.happylifeplat.tcc</groupId>
-                <artifactId>happylifeplat-tcc-core</artifactId>
+                <groupId>com.hmily.tcc</groupId>
+                <artifactId>hmily-tcc-core</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.happylifeplat.tcc</groupId>
-                <artifactId>happylifeplat-tcc-dubbo</artifactId>
+                <groupId>com.hmily.tcc</groupId>
+                <artifactId>hmily-tcc-dubbo</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>com.happylifeplat.tcc</groupId>
-                <artifactId>happylifeplat-tcc-springcloud</artifactId>
+                <groupId>com.hmily.tcc</groupId>
+                <artifactId>hmily-tcc-springcloud</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.happylifeplat.tcc</groupId>
-                <artifactId>happylifeplat-tcc-annotation</artifactId>
+                <groupId>com.hmily.tcc</groupId>
+                <artifactId>hmily-tcc-annotation</artifactId>
                 <version>${project.version}</version>
             </dependency>
 

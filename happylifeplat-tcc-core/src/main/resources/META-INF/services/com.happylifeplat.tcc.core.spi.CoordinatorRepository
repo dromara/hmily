@@ -1,5 +1,0 @@
-com.happylifeplat.tcc.core.spi.repository.JdbcCoordinatorRepository
-com.happylifeplat.tcc.core.spi.repository.FileCoordinatorRepository
-com.happylifeplat.tcc.core.spi.repository.MongoCoordinatorRepository
-com.happylifeplat.tcc.core.spi.repository.RedisCoordinatorRepository
-com.happylifeplat.tcc.core.spi.repository.ZookeeperCoordinatorRepository
