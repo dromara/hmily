@@ -36,11 +36,11 @@ public abstract class AbstractTccTransactionAspect {
     }
 
     @Pointcut("@annotation(com.hmily.tcc.annotation.Tcc)")
-    public void txTransactionInterceptor() {
+    public void tccTransactionInterceptor() {
 
     }
 
-    @Around("txTransactionInterceptor()")
+    @Around("tccTransactionInterceptor()")
     public Object interceptCompensableMethod(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
         return tccTransactionInterceptor.interceptor(proceedingJoinPoint);
     }

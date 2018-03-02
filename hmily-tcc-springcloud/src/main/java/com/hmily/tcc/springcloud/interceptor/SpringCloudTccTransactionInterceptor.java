@@ -34,12 +34,12 @@ import javax.servlet.http.HttpServletRequest;
  * @author xiaoyu
  */
 @Component
-public class SpringCloudTxTransactionInterceptor implements TccTransactionInterceptor {
+public class SpringCloudTccTransactionInterceptor implements TccTransactionInterceptor {
 
     private final TccTransactionAspectService tccTransactionAspectService;
 
     @Autowired
-    public SpringCloudTxTransactionInterceptor(TccTransactionAspectService tccTransactionAspectService) {
+    public SpringCloudTccTransactionInterceptor(TccTransactionAspectService tccTransactionAspectService) {
         this.tccTransactionAspectService = tccTransactionAspectService;
     }
 

@@ -27,12 +27,12 @@ import org.springframework.stereotype.Component;
  */
 @Aspect
 @Component
-public class SpringCloudTxTransactionAspect extends AbstractTccTransactionAspect implements Ordered {
+public class SpringCloudTccTransactionAspect extends AbstractTccTransactionAspect implements Ordered {
 
 
     @Autowired
-    public SpringCloudTxTransactionAspect(SpringCloudTxTransactionInterceptor springCloudTxTransactionInterceptor) {
-        this.setTccTransactionInterceptor(springCloudTxTransactionInterceptor);
+    public SpringCloudTccTransactionAspect(SpringCloudTccTransactionInterceptor springCloudTccTransactionInterceptor) {
+        this.setTccTransactionInterceptor(springCloudTccTransactionInterceptor);
     }
 
 
