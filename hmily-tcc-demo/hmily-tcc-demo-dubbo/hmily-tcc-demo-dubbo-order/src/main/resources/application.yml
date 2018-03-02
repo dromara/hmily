@@ -1,0 +1,29 @@
+server:
+  port: 8083
+  contextPath: /
+  address: 0.0.0.0
+
+spring:
+    datasource:
+        driver-class-name:  com.mysql.jdbc.Driver
+        url: jdbc:mysql://192.168.1.68:3306/tcc_order?useUnicode=true&characterEncoding=utf8
+        username: xiaoyu
+        password: Wgj@555888
+
+
+mybatis:
+  type-aliases-package: com.hmily.tcc.demo.dubbo.order.entity
+  config-location: classpath:mybatis/mybatis-config.xml
+
+logging:
+    level:
+        root: error
+        org.springframework.web: info
+        org.apache.ibatis: info
+        com.hmily.bonuspoint: debug
+        com.hmily.lottery: debug
+        com.hmily: debug
+        io.netty: info
+
+    path: "./logs"
+
