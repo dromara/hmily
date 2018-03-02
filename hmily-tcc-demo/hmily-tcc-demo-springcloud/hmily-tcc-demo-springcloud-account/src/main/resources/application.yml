@@ -1,0 +1,47 @@
+server:
+  port: 8882
+  contextPath: /account-service
+  address: 0.0.0.0
+
+
+spring:
+    datasource:
+        driver-class-name:  com.mysql.jdbc.Driver
+        url: jdbc:mysql://192.168.1.68:3306/tcc_account?useUnicode=true&characterEncoding=utf8
+        username: xiaoyu
+        password: Wgj@555888
+        initialSize: 20
+        minIdle: 20
+        maxActive: 100
+        maxWait: 60000
+        timeBetweenEvictionRunsMillis: 60000
+        minEvictableIdleTimeMillis: 30000
+        validationQuery: select 'x'
+        testWhileIdle: true
+        testOnBorrow: false
+        testOnReturn: false
+        poolPreparedStatements: true
+        maxPoolPreparedStatementPerConnectionSize: 20
+        filters: stat,wall,slf4j
+        connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
+    application:
+      name: account-service
+
+mybatis:
+  type-aliases-package: com.hmily.tcc.demo.springcloud.account.entity
+  config-location: classpath:mybatis/mybatis-config.xml
+#${random.int[9000,9999]}
+eureka:
+ client:
+     serviceUrl:
+       defaultZone: http://localhost:8761/eureka/
+
+account-service :
+   ribbon.NFLoadBalancerRuleClassName : com.netflix.loadbalancer.RandomRule
+
+logging:
+            level:
+                root: info
+                com.hmily.tcc : debug
+            path: "./logs"
+
