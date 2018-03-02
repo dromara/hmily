@@ -22,7 +22,7 @@ Hmily
 
 #  源码解析博客
 
-  * ## https://yu199195.github.io/categories/happylifeplat-tcc/
+  * ## https://yu199195.github.io/categories/hmily-tcc/
   
 
 #  视频详解
