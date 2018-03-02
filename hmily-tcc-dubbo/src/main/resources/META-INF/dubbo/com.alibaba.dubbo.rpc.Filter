@@ -1,2 +1,1 @@
-
-TxTransactionFilter=TccTransactionFilter
+TxTransactionFilter=com.hmily.tcc.dubbo.filter.TccTransactionFilter
