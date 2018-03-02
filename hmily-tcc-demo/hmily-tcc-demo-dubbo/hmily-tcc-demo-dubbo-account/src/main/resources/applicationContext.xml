@@ -14,6 +14,7 @@
        default-autowire="byName">
 
     <context:component-scan base-package="com.hmily.tcc.*"/>
+
     <aop:aspectj-autoproxy expose-proxy="true"/>
     <bean id="tccTransactionBootstrap" class="com.hmily.tcc.core.bootstrap.TccTransactionBootstrap">
         <property name="serializer" value="kryo"/>
