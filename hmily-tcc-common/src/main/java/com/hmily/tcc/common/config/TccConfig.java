@@ -29,7 +29,6 @@ import lombok.Data;
 public class TccConfig {
 
 
-
     /**
      * 资源后缀  此参数请填写  关于是事务存储路径
      * 1 如果是表存储 这个就是表名后缀，其他方式存储一样
@@ -89,6 +88,9 @@ public class TccConfig {
      * 补偿存储类型 {@linkplain RepositorySupportEnum}
      */
     private String repositorySupport = "db";
+
+
+    private int bufferSize = 1024;
 
 
     /**

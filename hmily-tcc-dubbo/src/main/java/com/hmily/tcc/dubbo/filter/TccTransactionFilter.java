@@ -85,11 +85,13 @@ public class TccTransactionFilter implements Filter {
                 }
 
                 final Result result = invoker.invoke(invocation);
-                final Participant participant = buildParticipant(tccTransactionContext,tcc, method, clazz, arguments, args);
-                if (Objects.nonNull(participant)) {
-                    tccTransactionManager.enlistParticipant(participant);
+                //如果result 没有异常就保存
+                if(!result.hasException()){
+                    final Participant participant = buildParticipant(tccTransactionContext,tcc, method, clazz, arguments, args);
+                    if (Objects.nonNull(participant)) {
+                        tccTransactionManager.enlistParticipant(participant);
+                    }
                 }
-
                 return result;
             } catch (RpcException e) {
                 e.printStackTrace();

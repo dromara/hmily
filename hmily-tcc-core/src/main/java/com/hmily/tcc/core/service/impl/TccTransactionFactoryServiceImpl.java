@@ -20,7 +20,7 @@ package com.hmily.tcc.core.service.impl;
 import com.hmily.tcc.common.bean.context.TccTransactionContext;
 import com.hmily.tcc.core.service.TccTransactionFactoryService;
 import com.hmily.tcc.core.service.handler.ConsumeTccTransactionHandler;
-import com.hmily.tcc.core.service.handler.ProviderTccTransactionHandler;
+import com.hmily.tcc.core.service.handler.ParticipantTccTransactionHandler;
 import com.hmily.tcc.core.service.handler.StartTccTransactionHandler;
 import com.hmily.tcc.core.service.handler.TccTransactionManager;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,7 +60,7 @@ public class TccTransactionFactoryServiceImpl implements TccTransactionFactorySe
         } else if (tccTransactionManager.isBegin() && Objects.isNull(context)) {
             return ConsumeTccTransactionHandler.class;
         } else if (Objects.nonNull(context)) {
-            return ProviderTccTransactionHandler.class;
+            return ParticipantTccTransactionHandler.class;
         }
         return ConsumeTccTransactionHandler.class;
     }

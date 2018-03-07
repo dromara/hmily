@@ -66,11 +66,14 @@
         <springfox.version>2.6.1</springfox.version>
         <lombok.version>1.16.14</lombok.version>
         <motan.version>1.0.0</motan.version>
+        <disruptor.version>3.4.0</disruptor.version>
     </properties>
 
 
     <dependencyManagement>
         <dependencies>
+
+
 
             <dependency>
                 <!-- Import dependency management from Spring Boot -->
@@ -111,6 +114,12 @@
                 <groupId>com.hmily.tcc</groupId>
                 <artifactId>hmily-tcc-annotation</artifactId>
                 <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.lmax</groupId>
+                <artifactId>disruptor</artifactId>
+                <version>${disruptor.version}</version>
             </dependency>
 
             <dependency>

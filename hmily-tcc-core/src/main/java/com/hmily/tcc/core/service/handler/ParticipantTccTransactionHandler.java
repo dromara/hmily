@@ -20,6 +20,7 @@ package com.hmily.tcc.core.service.handler;
 import com.hmily.tcc.common.enums.TccActionEnum;
 import com.hmily.tcc.common.bean.context.TccTransactionContext;
 import com.hmily.tcc.common.bean.entity.TccTransaction;
+import com.hmily.tcc.core.cache.TccTransactionCacheManager;
 import com.hmily.tcc.core.service.TccTransactionHandler;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
@@ -32,13 +33,13 @@ import java.lang.reflect.Method;
  * @author xiaoyu
  */
 @Component
-public class ProviderTccTransactionHandler implements TccTransactionHandler {
+public class ParticipantTccTransactionHandler implements TccTransactionHandler {
 
 
     private final TccTransactionManager tccTransactionManager;
 
     @Autowired
-    public ProviderTccTransactionHandler(TccTransactionManager tccTransactionManager) {
+    public ParticipantTccTransactionHandler(TccTransactionManager tccTransactionManager) {
         this.tccTransactionManager = tccTransactionManager;
     }
 
@@ -55,38 +56,47 @@ public class ProviderTccTransactionHandler implements TccTransactionHandler {
     @Override
     public Object handler(ProceedingJoinPoint point, TccTransactionContext context) throws Throwable {
         TccTransaction tccTransaction = null;
+        TccTransaction currentTransaction;
         try {
             switch (TccActionEnum.acquireByCode(context.getAction())) {
                 case TRYING:
                     try {
                         //创建事务信息
-                        tccTransaction = tccTransactionManager.providerBegin(context, point);
+                        tccTransaction = tccTransactionManager.beginParticipant(context, point);
                         //发起方法调用
                         final Object proceed = point.proceed();
 
-                        tccTransactionManager.updateStatus(tccTransaction.getTransId(),
-                                TccActionEnum.TRYING.getCode());
+                        tccTransaction.setStatus(TccActionEnum.TRYING.getCode());
+
+                        //更新日志状态为try 完成
+                        tccTransactionManager.updateStatus(tccTransaction);
+
                         return proceed;
                     } catch (Throwable throwable) {
-                        tccTransactionManager.removeTccTransaction(tccTransaction);
+
+                        //删除事务日志
+                        tccTransactionManager.deleteTransaction(tccTransaction);
+
                         throw throwable;
 
                     }
                 case CONFIRMING:
                     //如果是confirm 通过之前保存的事务信息 进行反射调用
-                    tccTransactionManager.acquire(context);
-                    tccTransactionManager.confirm();
+                    currentTransaction =
+                            TccTransactionCacheManager.getInstance().getTccTransaction(context.getTransId());
+                    tccTransactionManager.confirm(currentTransaction);
                     break;
                 case CANCELING:
                     //如果是调用CANCELING 通过之前保存的事务信息 进行反射调用
-                    tccTransactionManager.acquire(context);
-                    tccTransactionManager.cancel();
+                    currentTransaction =
+                            TccTransactionCacheManager.getInstance().getTccTransaction(context.getTransId());
+                    tccTransactionManager.cancel(currentTransaction);
                     break;
                 default:
                     break;
             }
         } finally {
-            tccTransactionManager.remove();
+            TccTransactionCacheManager.getInstance().removeByKey(context.getTransId());
         }
         Method method = ((MethodSignature) (point.getSignature())).getMethod();
         return getDefaultValue(method.getReturnType());
