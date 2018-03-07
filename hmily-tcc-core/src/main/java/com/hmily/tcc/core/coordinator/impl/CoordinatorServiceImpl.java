@@ -18,44 +18,17 @@
 package com.hmily.tcc.core.coordinator.impl;
 
 
-import com.google.common.collect.Lists;
-import com.hmily.tcc.annotation.TccPatternEnum;
-import com.hmily.tcc.common.bean.context.TccTransactionContext;
-import com.hmily.tcc.common.bean.entity.Participant;
-import com.hmily.tcc.common.bean.entity.TccInvocation;
 import com.hmily.tcc.common.bean.entity.TccTransaction;
 import com.hmily.tcc.common.config.TccConfig;
-import com.hmily.tcc.common.enums.CoordinatorActionEnum;
-import com.hmily.tcc.common.enums.TccActionEnum;
-import com.hmily.tcc.common.enums.TccRoleEnum;
-import com.hmily.tcc.common.utils.LogUtil;
-import com.hmily.tcc.core.concurrent.threadlocal.TransactionContextLocal;
-import com.hmily.tcc.core.concurrent.threadpool.TccTransactionThreadFactory;
-import com.hmily.tcc.core.concurrent.threadpool.TccTransactionThreadPool;
 import com.hmily.tcc.core.coordinator.CoordinatorService;
 import com.hmily.tcc.core.coordinator.command.CoordinatorAction;
 import com.hmily.tcc.core.helper.SpringBeanUtils;
+import com.hmily.tcc.core.schedule.ScheduledService;
 import com.hmily.tcc.core.service.ApplicationService;
 import com.hmily.tcc.core.spi.CoordinatorRepository;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.reflect.MethodUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author xiaoyu
@@ -63,28 +36,13 @@ import java.util.concurrent.TimeUnit;
 @Service("coordinatorService")
 public class CoordinatorServiceImpl implements CoordinatorService {
 
-    /**
-     * logger
-     */
-    private static final Logger LOGGER = LoggerFactory.getLogger(CoordinatorServiceImpl.class);
-
-
-    private static BlockingQueue<CoordinatorAction> QUEUE;
-
-    private TccConfig tccConfig;
-
-
     private CoordinatorRepository coordinatorRepository;
 
     private final ApplicationService applicationService;
 
-    private ScheduledExecutorService scheduledExecutorService;
-
     @Autowired
     public CoordinatorServiceImpl(ApplicationService applicationService) {
         this.applicationService = applicationService;
-        this.scheduledExecutorService = new ScheduledThreadPoolExecutor(1,
-                TccTransactionThreadFactory.create("tccRollBackService", true));
 
     }
 
@@ -97,17 +55,14 @@ public class CoordinatorServiceImpl implements CoordinatorService {
      */
     @Override
     public void start(TccConfig tccConfig) throws Exception {
-        this.tccConfig = tccConfig;
         final String repositorySuffix =
                 buildRepositorySuffix(tccConfig.getRepositorySuffix());
         coordinatorRepository = SpringBeanUtils.getInstance()
                 .getBean(CoordinatorRepository.class);
         //初始化spi 协调资源存储
         coordinatorRepository.init(repositorySuffix, tccConfig);
-        //初始化 协调资源线程池
-        initCoordinatorPool();
-        //定时执行补偿
-        scheduledRollBack();
+
+        new ScheduledService(tccConfig, coordinatorRepository).scheduledRollBack();
 
     }
 
@@ -182,210 +137,8 @@ public class CoordinatorServiceImpl implements CoordinatorService {
      */
     @Override
     public Boolean submit(CoordinatorAction coordinatorAction) {
-        try {
-            QUEUE.put(coordinatorAction);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-            return Boolean.FALSE;
-        }
         return Boolean.TRUE;
     }
-
-
-    private void initCoordinatorPool() {
-        synchronized (LOGGER) {
-            QUEUE = new LinkedBlockingQueue<>(tccConfig.getCoordinatorQueueMax());
-            final int coordinatorThreadMax = tccConfig.getCoordinatorThreadMax();
-            final TccTransactionThreadPool threadPool = SpringBeanUtils.getInstance().getBean(TccTransactionThreadPool.class);
-            final ExecutorService executorService = threadPool.newCustomFixedThreadPool(coordinatorThreadMax);
-            LogUtil.info(LOGGER, "启动协调资源操作线程数量为:{}", () -> coordinatorThreadMax);
-            for (int i = 0; i < coordinatorThreadMax; i++) {
-                executorService.execute(new Worker());
-            }
-
-        }
-    }
-
-
-    /**
-     * 线程执行器
-     */
-    class Worker implements Runnable {
-
-        @Override
-        public void run() {
-            execute();
-        }
-
-        private void execute() {
-            while (true) {
-                try {
-                    final CoordinatorAction coordinatorAction = QUEUE.take();
-                    if (coordinatorAction != null) {
-                        final int code = coordinatorAction.getAction().getCode();
-                        if (CoordinatorActionEnum.SAVE.getCode() == code) {
-                            save(coordinatorAction.getTccTransaction());
-                        } else if (CoordinatorActionEnum.DELETE.getCode() == code) {
-                            remove(coordinatorAction.getTccTransaction().getTransId());
-                        } else if (CoordinatorActionEnum.UPDATE.getCode() == code) {
-                            update(coordinatorAction.getTccTransaction());
-                        }
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    LogUtil.error(LOGGER, "执行协调命令失败：{}", e::getMessage);
-                }
-            }
-
-        }
-    }
-
-
-    private void scheduledRollBack() {
-        scheduledExecutorService
-                .scheduleWithFixedDelay(() -> {
-                    LogUtil.debug(LOGGER, "rollback execute delayTime:{}", () -> tccConfig.getScheduledDelay());
-                    try {
-                        final List<TccTransaction> tccTransactions =
-                                coordinatorRepository.listAllByDelay(acquireData());
-                        if (CollectionUtils.isNotEmpty(tccTransactions)) {
-
-                            for (TccTransaction tccTransaction : tccTransactions) {
-
-                                //如果try未执行完成，那么就不进行补偿 （防止在try阶段的各种异常情况）
-                                if (tccTransaction.getRole() == TccRoleEnum.PROVIDER.getCode() &&
-                                        tccTransaction.getStatus() == TccActionEnum.PRE_TRY.getCode()) {
-                                    continue;
-                                }
-
-                                if (tccTransaction.getRetriedCount() > tccConfig.getRetryMax()) {
-                                    LogUtil.error(LOGGER, "此事务超过了最大重试次数，不再进行重试：{}",
-                                            () -> tccTransaction);
-                                    continue;
-                                }
-                                if (Objects.equals(tccTransaction.getPattern(), TccPatternEnum.CC.getCode())
-                                        && tccTransaction.getStatus() == TccActionEnum.TRYING.getCode()) {
-                                    continue;
-                                }
-
-                                //如果事务角色是提供者的话，并且在重试的次数范围类是不能执行的，只能由发起者执行
-                                if (tccTransaction.getRole() == TccRoleEnum.PROVIDER.getCode()
-                                        && (tccTransaction.getCreateTime().getTime() +
-                                        tccConfig.getRetryMax() * tccConfig.getRecoverDelayTime() * 1000
-                                        > System.currentTimeMillis())) {
-                                    continue;
-                                }
-
-                                try {
-                                    // 先更新数据，然后执行
-                                    tccTransaction.setRetriedCount(tccTransaction.getRetriedCount() + 1);
-                                    final int rows = coordinatorRepository.update(tccTransaction);
-                                    //判断当rows>0 才执行，为了防止业务方为集群模式时候的并发
-                                    if (rows > 0) {
-                                        //如果是以下3种状态
-                                        if ((tccTransaction.getStatus() == TccActionEnum.TRYING.getCode()
-                                                || tccTransaction.getStatus() == TccActionEnum.PRE_TRY.getCode()
-                                                || tccTransaction.getStatus() == TccActionEnum.CANCELING.getCode())) {
-                                            cancel(tccTransaction);
-                                        } else if (tccTransaction.getStatus() == TccActionEnum.CONFIRMING.getCode()) {
-                                            //执行confirm操作
-                                            confirm(tccTransaction);
-                                        }
-                                    }
-
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                    LogUtil.error(LOGGER, "执行事务补偿异常:{}", e::getMessage);
-                                }
-                            }
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }, 30, tccConfig.getScheduledDelay(), TimeUnit.SECONDS);
-
-    }
-
-    private void cancel(TccTransaction tccTransaction) {
-        final List<Participant> participants = tccTransaction.getParticipants();
-        List<Participant> failList = Lists.newArrayListWithCapacity(participants.size());
-        boolean success = true;
-        if (CollectionUtils.isNotEmpty(participants)) {
-            for (Participant participant : participants) {
-                try {
-                    TccTransactionContext context = new TccTransactionContext();
-                    context.setAction(TccActionEnum.CANCELING.getCode());
-                    context.setTransId(tccTransaction.getTransId());
-                    TransactionContextLocal.getInstance().set(context);
-                    executeCoordinator(participant.getCancelTccInvocation());
-                } catch (Exception e) {
-                    LogUtil.error(LOGGER, "执行cancel方法异常:{}", () -> e);
-                    success = false;
-                    failList.add(participant);
-                }
-            }
-            executeHandler(success, tccTransaction, failList);
-        }
-
-    }
-
-    private void confirm(TccTransaction tccTransaction) {
-
-        final List<Participant> participants = tccTransaction.getParticipants();
-
-        List<Participant> failList = Lists.newArrayListWithCapacity(participants.size());
-        boolean success = true;
-        if (CollectionUtils.isNotEmpty(participants)) {
-            for (Participant participant : participants) {
-                try {
-                    TccTransactionContext context = new TccTransactionContext();
-                    context.setAction(TccActionEnum.CONFIRMING.getCode());
-                    context.setTransId(tccTransaction.getTransId());
-                    TransactionContextLocal.getInstance().set(context);
-                    executeCoordinator(participant.getConfirmTccInvocation());
-                } catch (Exception e) {
-                    LogUtil.error(LOGGER, "执行confirm方法异常:{}", () -> e);
-                    success = false;
-                    failList.add(participant);
-                }
-            }
-            executeHandler(success, tccTransaction, failList);
-        }
-
-    }
-
-
-    private void executeHandler(boolean success, final TccTransaction currentTransaction,
-                                List<Participant> failList) {
-        if (success) {
-            coordinatorRepository.remove(currentTransaction.getTransId());
-        } else {
-            currentTransaction.setParticipants(failList);
-            coordinatorRepository.updateParticipant(currentTransaction);
-        }
-    }
-
-
-    @SuppressWarnings("unchecked")
-    private void executeCoordinator(TccInvocation tccInvocation) throws Exception {
-        if (Objects.nonNull(tccInvocation)) {
-            final Class clazz = tccInvocation.getTargetClass();
-            final String method = tccInvocation.getMethodName();
-            final Object[] args = tccInvocation.getArgs();
-            final Class[] parameterTypes = tccInvocation.getParameterTypes();
-            final Object bean = SpringBeanUtils.getInstance().getBean(clazz);
-            MethodUtils.invokeMethod(bean, method, args, parameterTypes);
-            LogUtil.debug(LOGGER, "执行本地协调事务:{}", () -> tccInvocation.getTargetClass()
-                    + ":" + tccInvocation.getMethodName());
-        }
-    }
-
-
-    private Date acquireData() {
-        return new Date(LocalDateTime.now().atZone(ZoneId.systemDefault())
-                .toInstant().toEpochMilli() - (tccConfig.getRecoverDelayTime() * 1000));
-    }
-
 
     private String buildRepositorySuffix(String repositorySuffix) {
         if (StringUtils.isNoneBlank(repositorySuffix)) {

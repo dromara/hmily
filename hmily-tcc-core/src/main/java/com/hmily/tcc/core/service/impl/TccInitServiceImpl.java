@@ -23,6 +23,7 @@ import com.hmily.tcc.common.enums.RepositorySupportEnum;
 import com.hmily.tcc.common.enums.SerializeEnum;
 import com.hmily.tcc.common.utils.LogUtil;
 import com.hmily.tcc.core.coordinator.CoordinatorService;
+import com.hmily.tcc.core.disruptor.publisher.TccTransactionEventPublisher;
 import com.hmily.tcc.core.helper.SpringBeanUtils;
 import com.hmily.tcc.core.service.TccInitService;
 import com.hmily.tcc.core.spi.CoordinatorRepository;
@@ -54,6 +55,9 @@ public class TccInitServiceImpl implements TccInitService {
     private final CoordinatorService coordinatorService;
 
     @Autowired
+    private TccTransactionEventPublisher tccTransactionEventPublisher;
+
+    @Autowired
     public TccInitServiceImpl(CoordinatorService coordinatorService) {
         this.coordinatorService = coordinatorService;
     }
@@ -68,6 +72,7 @@ public class TccInitServiceImpl implements TccInitService {
         Runtime.getRuntime().addShutdownHook(new Thread(() -> LOGGER.error("系统关闭")));
         try {
             loadSpiSupport(tccConfig);
+            tccTransactionEventPublisher.start(tccConfig.getBufferSize());
             coordinatorService.start(tccConfig);
         } catch (Exception ex) {
             LogUtil.error(LOGGER, "tcc事务初始化异常:{}", ex::getMessage);

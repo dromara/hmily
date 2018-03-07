@@ -35,15 +35,15 @@ import java.util.Objects;
 
 
 /**
+ * 资源切面废弃
  * @author xiaoyu
  */
-@Component
+@Deprecated
 public class TccCoordinatorMethodInterceptor {
 
 
     private final TccTransactionManager tccTransactionManager;
 
-    @Autowired
     public TccCoordinatorMethodInterceptor(TccTransactionManager tccTransactionManager) {
         this.tccTransactionManager = tccTransactionManager;
     }

@@ -58,25 +58,25 @@ public class StartTccTransactionHandler implements TccTransactionHandler {
     public Object handler(ProceedingJoinPoint point, TccTransactionContext context) throws Throwable {
         Object returnValue;
         try {
-            LOCK.lock();
             final TccTransaction tccTransaction = tccTransactionManager.begin(point);
             try {
                 //发起调用 执行try方法
                 returnValue = point.proceed();
-                tccTransactionManager.updateStatus(tccTransaction.getTransId(),
-                        TccActionEnum.TRYING.getCode());
+
+                tccTransaction.setStatus(TccActionEnum.TRYING.getCode());
+
+                tccTransactionManager.updateStatus(tccTransaction);
 
             } catch (Throwable throwable) {
                 //异常执行cancel
-                tccTransactionManager.cancel();
+                tccTransactionManager.cancel(tccTransactionManager.getCurrentTransaction());
 
                 throw throwable;
             }
             //try成功执行confirm confirm 失败的话，那就只能走本地补偿
-            tccTransactionManager.confirm();
+            tccTransactionManager.confirm(tccTransactionManager.getCurrentTransaction());
         } finally {
             tccTransactionManager.remove();
-            LOCK.unlock();
         }
         return returnValue;
     }
