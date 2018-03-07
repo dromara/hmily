@@ -30,7 +30,6 @@ import org.springframework.stereotype.Component;
 /**
  * @author xiaoyu
  */
-@Component
 public class TccTransactionBootstrap extends TccConfig implements ApplicationContextAware {
 
 

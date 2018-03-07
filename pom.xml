@@ -18,6 +18,7 @@
         <module>hmily-tcc-annotation</module>
         <module>hmily-tcc-admin</module>
         <module>hmily-tcc-motan</module>
+        <module>hmily-tcc-spring-boot-starter</module>
     </modules>
 
     <licenses>
@@ -74,7 +75,6 @@
         <dependencies>
 
 
-
             <dependency>
                 <!-- Import dependency management from Spring Boot -->
                 <groupId>org.springframework.boot</groupId>
@@ -113,6 +113,12 @@
             <dependency>
                 <groupId>com.hmily.tcc</groupId>
                 <artifactId>hmily-tcc-annotation</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.hmily.tcc</groupId>
+                <artifactId>hmily-tcc-spring-boot-starter</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
@@ -458,6 +464,14 @@
                 </configuration>
             </plugin>
 
+
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>1.5.4.RELEASE</version>
+            </plugin>
+
+
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>versions-maven-plugin</artifactId>
@@ -490,17 +504,6 @@
             <url>https://repo.spring.io/libs-release</url>
         </pluginRepository>
     </pluginRepositories>
-
-    <distributionManagement>
-        <repository>
-            <id>releases</id>
-            <url>http://maven.wang-guanjia.com/nexus/content/repositories/releases</url>
-        </repository>
-        <snapshotRepository>
-            <id>snapshots</id>
-            <url>http://maven.wang-guanjia.com/nexus/content/repositories/snapshots</url>
-        </snapshotRepository>
-    </distributionManagement>
 
 
 </project>

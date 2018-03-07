@@ -57,46 +57,42 @@ public class ParticipantTccTransactionHandler implements TccTransactionHandler {
     public Object handler(ProceedingJoinPoint point, TccTransactionContext context) throws Throwable {
         TccTransaction tccTransaction = null;
         TccTransaction currentTransaction;
-        try {
-            switch (TccActionEnum.acquireByCode(context.getAction())) {
-                case TRYING:
-                    try {
-                        //创建事务信息
-                        tccTransaction = tccTransactionManager.beginParticipant(context, point);
-                        //发起方法调用
-                        final Object proceed = point.proceed();
+        switch (TccActionEnum.acquireByCode(context.getAction())) {
+            case TRYING:
+                try {
+                    //创建事务信息
+                    tccTransaction = tccTransactionManager.beginParticipant(context, point);
+                    //发起方法调用
+                    final Object proceed = point.proceed();
 
-                        tccTransaction.setStatus(TccActionEnum.TRYING.getCode());
+                    tccTransaction.setStatus(TccActionEnum.TRYING.getCode());
 
-                        //更新日志状态为try 完成
-                        tccTransactionManager.updateStatus(tccTransaction);
+                    //更新日志状态为try 完成
+                    tccTransactionManager.updateStatus(tccTransaction);
 
-                        return proceed;
-                    } catch (Throwable throwable) {
+                    return proceed;
+                } catch (Throwable throwable) {
 
-                        //删除事务日志
-                        tccTransactionManager.deleteTransaction(tccTransaction);
+                    //删除事务日志
+                    tccTransactionManager.deleteTransaction(tccTransaction);
 
-                        throw throwable;
+                    throw throwable;
 
-                    }
-                case CONFIRMING:
-                    //如果是confirm 通过之前保存的事务信息 进行反射调用
-                    currentTransaction =
-                            TccTransactionCacheManager.getInstance().getTccTransaction(context.getTransId());
-                    tccTransactionManager.confirm(currentTransaction);
-                    break;
-                case CANCELING:
-                    //如果是调用CANCELING 通过之前保存的事务信息 进行反射调用
-                    currentTransaction =
-                            TccTransactionCacheManager.getInstance().getTccTransaction(context.getTransId());
-                    tccTransactionManager.cancel(currentTransaction);
-                    break;
-                default:
-                    break;
-            }
-        } finally {
-            TccTransactionCacheManager.getInstance().removeByKey(context.getTransId());
+                }
+            case CONFIRMING:
+                //如果是confirm 通过之前保存的事务信息 进行反射调用
+                currentTransaction =
+                        TccTransactionCacheManager.getInstance().getTccTransaction(context.getTransId());
+                tccTransactionManager.confirm(currentTransaction);
+                break;
+            case CANCELING:
+                //如果是调用CANCELING 通过之前保存的事务信息 进行反射调用
+                currentTransaction =
+                        TccTransactionCacheManager.getInstance().getTccTransaction(context.getTransId());
+                tccTransactionManager.cancel(currentTransaction);
+                break;
+            default:
+                break;
         }
         Method method = ((MethodSignature) (point.getSignature())).getMethod();
         return getDefaultValue(method.getReturnType());

@@ -13,7 +13,8 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ *//*
+
 package com.hmily.tcc.core.concurrent.threadpool;
 
 
@@ -42,15 +43,18 @@ import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+*/
 /**
  * @author xiaoyu
- */
-@Component
+ *//*
+
 public class TccTransactionThreadPool {
 
-    /**
+    */
+/**
      * logger
-     */
+     *//*
+
     private static final Logger LOGGER = LoggerFactory.getLogger(TccTransactionThreadPool.class);
 
     private static final String THREAD_FACTORY_NAME = "tccTransaction";
@@ -146,3 +150,4 @@ public class TccTransactionThreadPool {
 
 }
 
+*/

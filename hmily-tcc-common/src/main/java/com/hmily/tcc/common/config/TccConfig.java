@@ -16,9 +16,6 @@
  */
 package com.hmily.tcc.common.config;
 
-import com.hmily.tcc.common.enums.SerializeEnum;
-import com.hmily.tcc.common.enums.BlockingQueueTypeEnum;
-import com.hmily.tcc.common.enums.RejectedPolicyTypeEnum;
 import com.hmily.tcc.common.enums.RepositorySupportEnum;
 import lombok.Data;
 
@@ -37,18 +34,9 @@ public class TccConfig {
     private String repositorySuffix;
 
     /**
-     * 提供不同的序列化对象 {@linkplain SerializeEnum}
+     * 提供不同的序列化对象 {@linkplain com.hmily.tcc.common.enums.SerializeEnum}
      */
     private String serializer = "kryo";
-
-    /**
-     * 回滚队列大小
-     */
-    private int coordinatorQueueMax = 5000;
-    /**
-     * 监听回滚队列线程数
-     */
-    private int coordinatorThreadMax = Runtime.getRuntime().availableProcessors() << 1;
 
 
     /**
@@ -66,22 +54,10 @@ public class TccConfig {
      */
     private int retryMax = 3;
 
-
     /**
      * 事务恢复间隔时间 单位秒（注意 此时间表示本地事务创建的时间多少秒以后才会执行）
      */
     private int recoverDelayTime = 60;
-
-
-    /**
-     * 线程池的拒绝策略 {@linkplain RejectedPolicyTypeEnum}
-     */
-    private String rejectPolicy = "Abort";
-
-    /**
-     * 线程池的队列类型 {@linkplain BlockingQueueTypeEnum}
-     */
-    private String blockingQueueType = "Linked";
 
 
     /**
@@ -90,8 +66,10 @@ public class TccConfig {
     private String repositorySupport = "db";
 
 
+    /**
+     * disruptor  bufferSize
+     */
     private int bufferSize = 1024;
-
 
     /**
      * db配置

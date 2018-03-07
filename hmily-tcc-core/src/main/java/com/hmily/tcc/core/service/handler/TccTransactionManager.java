@@ -288,7 +288,7 @@ public class TccTransactionManager {
                                 List<Participant> failList) {
         if (success) {
             TransactionContextLocal.getInstance().remove();
-
+            TccTransactionCacheManager.getInstance().removeByKey(currentTransaction.getTransId());
             deleteTransaction(currentTransaction);
 
         } else {
