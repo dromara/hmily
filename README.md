@@ -7,6 +7,10 @@ Hmily
 
  * **框架特性**
 
+     * ##### 采用disruptor框架进行事务日志的异步读写，与RPC框架的性能毫无差别。
+     
+     * ##### 支持SpringBoot-starter 项目启动，使用简单。
+          
      * ##### RPC框架支持 : dubbo,motan,springcloud。
      
      * ##### 本地事务存储支持 : redis,mongodb,zookeeper,file,mysql。
@@ -14,8 +18,6 @@ Hmily
      * ##### 事务日志序列化支持 ：java，hessian，kryo，protostuff。
 
      * ##### 采用Aspect AOP 切面思想与Spring无缝集成，天然支持集群。
-
-     * ##### 配置简单，集成简单，源码简洁，稳定性高，已在生产环境使用。
 
      * ##### 内置经典的分布式事务场景demo工程，并有swagger-ui可视化界面可以快速体验。
 
