@@ -31,6 +31,12 @@
         <url>https://github.com/yu199195/hmily.git</url>
     </scm>
 
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>1.5.9.RELEASE</version>
+    </parent>
+
     <developers>
         <developer>
             <id>xiaoyu</id>
@@ -73,17 +79,6 @@
 
     <dependencyManagement>
         <dependencies>
-
-
-            <dependency>
-                <!-- Import dependency management from Spring Boot -->
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-dependencies</artifactId>
-                <version>1.5.9.RELEASE</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-
             <dependency>
                 <groupId>com.hmily.tcc</groupId>
                 <artifactId>hmily-tcc-admin</artifactId>
@@ -463,14 +458,6 @@
                     <autoVersionSubmodules>true</autoVersionSubmodules>
                 </configuration>
             </plugin>
-
-
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>1.5.4.RELEASE</version>
-            </plugin>
-
 
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
