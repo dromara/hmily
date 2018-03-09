@@ -27,6 +27,41 @@ spring:
     application:
       name: account-service
 
+hmily:
+    tcc :
+        serializer : kryo
+        recoverDelayTime : 128
+        retryMax : 30
+        scheduledDelay : 128
+        scheduledThreadMax :  10
+        repositorySupport : db
+        tccDbConfig :
+                 driverClassName  : com.mysql.jdbc.Driver
+                 url :  jdbc:mysql://192.168.1.68:3306/tcc?useUnicode=true&amp;characterEncoding=utf8
+                 username : xiaoyu
+                 password : Wgj@555888
+
+       # repositorySupport : redis
+       #         hostName  : 192.168.1.68
+       #         port      :  6379
+       #         password  :
+
+
+       # repositorySupport : zookeeper
+       #         host      : 92.168.1.73:2181
+       #         sessionTimeOut      :  100000
+       #         rootPath  : /tcc
+
+       # repositorySupport : mongodb
+       #       mongoDbUrl  : 192.168.1.68:27017
+       #       mongoDbName  :  happylife
+       #       mongoUserName  : xiaoyu
+       #       mongoUserPwd   : 123456
+
+       # repositorySupport : file
+       #         path      : /account
+       #         prefix    :  account
+
 mybatis:
   type-aliases-package: com.hmily.tcc.demo.springcloud.account.entity
   config-location: classpath:mybatis/mybatis-config.xml

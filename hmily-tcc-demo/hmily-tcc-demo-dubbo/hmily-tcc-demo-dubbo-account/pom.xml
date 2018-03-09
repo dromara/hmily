@@ -36,14 +36,10 @@
             <artifactId>hmily-tcc-demo-dubbo-account-api</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>com.hmily.tcc</groupId>
-            <artifactId>hmily-tcc-dubbo</artifactId>
-        </dependency>
 
         <dependency>
             <groupId>com.hmily.tcc</groupId>
-            <artifactId>hmily-tcc-spring-boot-starter</artifactId>
+            <artifactId>hmily-tcc-spring-boot-starter-dubbo</artifactId>
         </dependency>
 
         <!--spring boot的核心启动器-->
