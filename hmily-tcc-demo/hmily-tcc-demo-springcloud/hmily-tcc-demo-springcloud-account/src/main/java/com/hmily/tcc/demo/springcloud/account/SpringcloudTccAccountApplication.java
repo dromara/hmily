@@ -32,7 +32,6 @@ import org.springframework.context.annotation.ImportResource;
 @SpringBootApplication(exclude = {MongoAutoConfiguration.class, MongoDataAutoConfiguration.class})
 @EnableDiscoveryClient
 @EnableFeignClients
-@ImportResource({"classpath:applicationContext.xml"})
 @MapperScan("com.hmily.tcc.demo.springcloud.account.mapper")
 public class SpringcloudTccAccountApplication {
 

@@ -105,6 +105,13 @@
                 <artifactId>hmily-tcc-springcloud</artifactId>
                 <version>${project.version}</version>
             </dependency>
+
+            <dependency>
+                <groupId>com.hmily.tcc</groupId>
+                <artifactId>hmily-tcc-motan</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
             <dependency>
                 <groupId>com.hmily.tcc</groupId>
                 <artifactId>hmily-tcc-annotation</artifactId>
@@ -113,7 +120,19 @@
 
             <dependency>
                 <groupId>com.hmily.tcc</groupId>
-                <artifactId>hmily-tcc-spring-boot-starter</artifactId>
+                <artifactId>hmily-tcc-spring-boot-starter-dubbo</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.hmily.tcc</groupId>
+                <artifactId>hmily-tcc-spring-boot-starter-springcloud</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.hmily.tcc</groupId>
+                <artifactId>hmily-tcc-spring-boot-starter-motan</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
