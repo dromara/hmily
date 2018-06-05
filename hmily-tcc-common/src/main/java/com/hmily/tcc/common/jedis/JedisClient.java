@@ -20,48 +20,43 @@ package com.hmily.tcc.common.jedis;
 import java.util.Set;
 
 /**
- * <p>Description: .</p>
- *
+ * JedisClient.
  * @author xiaoyu(Myth)
- * @version 1.0
- * @date 2017/10/26 14:48
- * @since JDK 1.8
  */
 public interface JedisClient {
 
-
     /**
-     * set 操作
+     * set 操作.
      * @param key key
      * @param value key
-     * @return
+     * @return String
      */
     String set(String key, String value);
 
     /**
-     * set 操作
+     * set 操作.
      * @param key key
      * @param value key
-     * @return
+     * @return String
      */
     String set(String key, byte[] value);
 
     /**
-     * 批量删除key
+     * 批量删除key.
      * @param keys key集合
      * @return 数量
      */
     Long del(String... keys);
 
     /**
-     * 根据key获取
+     * 根据key获取.
      * @param key redis key
      * @return String
      */
     String get(String key);
 
     /**
-     * 根据key获取
+     * 根据key获取.
      * @param key redis key
      * @return  byte[]
      */
@@ -69,21 +64,21 @@ public interface JedisClient {
 
 
     /**
-     * 根据key 模糊匹配
+     * 根据key 模糊匹配.
      * @param pattern redis key
-     * @return  Set<byte[]>
+     * @return  Set byte[]
      */
-    Set<byte[]> keys(final byte[] pattern);
+    Set<byte[]> keys(byte[] pattern);
 
     /**
-     * 根据key 模糊匹配
+     * 根据key 模糊匹配.
      * @param key redis key
-     * @return      Set<String>
+     * @return      Set String
      */
     Set<String> keys(String key);
 
     /**
-     * hash set值
+     * hash set值.
      * @param key redis key
      * @param item hash key
      * @param value 值
@@ -92,7 +87,7 @@ public interface JedisClient {
     Long hset(String key, String item, String value);
 
     /**
-     * hash get 值
+     * hash get 值.
      * @param key key
      * @param item hash key
      * @return value
@@ -100,7 +95,7 @@ public interface JedisClient {
     String hget(String key, String item);
 
     /**
-     * hash del 值
+     * hash del 值.
      * @param key key
      * @param item hash key
      * @return 数量
@@ -108,14 +103,14 @@ public interface JedisClient {
     Long hdel(String key, String item);
 
     /**
-     * 增加
+     * 增加.
      * @param key key
      * @return Long
      */
     Long incr(String key);
 
     /**
-     * 减少
+     * 减少.
      * @param key key
      * @return Long
      */
@@ -123,22 +118,20 @@ public interface JedisClient {
 
 
     /**
-     * 设置key的过期时间
+     * 设置key的过期时间.
      * @param key key
      * @param second 过期时间 秒
      * @return  Long
      */
     Long expire(String key, int second);
 
-
     /**
-     * 分页获取zsort
+     * 分页获取zsort.
      * @param key key
      * @param start 开始
      * @param end 结束
-     * @return Set<String>
+     * @return Set String
      */
     Set<String> zrange(String key, long start, long end);
-
 
 }

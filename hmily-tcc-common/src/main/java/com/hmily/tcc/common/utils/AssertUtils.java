@@ -14,36 +14,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hmily.tcc.common.utils;
 
+package com.hmily.tcc.common.utils;
 
 import com.hmily.tcc.common.exception.TccRuntimeException;
 
-
 /**
+ * AssertUtils.
  * @author xiaoyu
  */
-public class AssertUtils {
+public final class AssertUtils {
 
     private AssertUtils() {
 
     }
 
-    public static void notNull(Object obj, String message) {
-        if (obj == null) {
-            throw new TccRuntimeException(message);
-        }
-    }
-
-    public static void notNull(Object obj) {
+    public static void notNull(final Object obj) {
         if (obj == null) {
             throw new TccRuntimeException("argument invalid,Please check");
-        }
-    }
-
-    public static void checkConditionArgument(boolean condition, String message) {
-        if (!condition) {
-            throw new TccRuntimeException(message);
         }
     }
 

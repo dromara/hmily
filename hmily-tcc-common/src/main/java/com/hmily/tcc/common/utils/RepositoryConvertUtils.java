@@ -28,32 +28,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * <p>Description: .</p>
- *
+ * RepositoryConvertUtils.
  * @author xiaoyu(Myth)
- * @version 1.0
- * @date 2017/11/7 15:12
- * @since JDK 1.8
  */
 public class RepositoryConvertUtils {
 
-
-    public static byte[] convert(TccTransaction tccTransaction,
-                                 ObjectSerializer objectSerializer) throws TccException {
+    public static byte[] convert(final TccTransaction tccTransaction, final ObjectSerializer objectSerializer) throws TccException {
         CoordinatorRepositoryAdapter adapter = new CoordinatorRepositoryAdapter();
-
         adapter.setTransId(tccTransaction.getTransId());
         adapter.setLastTime(tccTransaction.getLastTime());
         adapter.setCreateTime(tccTransaction.getCreateTime());
         adapter.setRetriedCount(tccTransaction.getRetriedCount());
         adapter.setStatus(tccTransaction.getStatus());
-
         adapter.setTargetClass(tccTransaction.getTargetClass());
         adapter.setTargetMethod(tccTransaction.getTargetMethod());
         adapter.setPattern(tccTransaction.getPattern());
-
         adapter.setRole(tccTransaction.getRole());
-
         adapter.setVersion(tccTransaction.getVersion());
         if (CollectionUtils.isNotEmpty(tccTransaction.getParticipants())) {
             final Participant participant = tccTransaction.getParticipants().get(0);
@@ -65,34 +55,22 @@ public class RepositoryConvertUtils {
     }
 
     @SuppressWarnings("unchecked")
-    public static  TccTransaction transformBean(byte[] contents,
-                                                ObjectSerializer objectSerializer) throws TccException {
-
-
+    public static TccTransaction transformBean(final byte[] contents, final ObjectSerializer objectSerializer) throws TccException {
         TccTransaction tccTransaction = new TccTransaction();
-
-        final CoordinatorRepositoryAdapter adapter =
-                objectSerializer.deSerialize(contents, CoordinatorRepositoryAdapter.class);
-
-        List<Participant> participants =
-                objectSerializer.deSerialize(adapter.getContents(), ArrayList.class);
-
+        final CoordinatorRepositoryAdapter adapter = objectSerializer.deSerialize(contents, CoordinatorRepositoryAdapter.class);
+        List<Participant> participants = objectSerializer.deSerialize(adapter.getContents(), ArrayList.class);
         tccTransaction.setLastTime(adapter.getLastTime());
         tccTransaction.setRetriedCount(adapter.getRetriedCount());
         tccTransaction.setCreateTime(adapter.getCreateTime());
         tccTransaction.setTransId(adapter.getTransId());
         tccTransaction.setStatus(adapter.getStatus());
-
         tccTransaction.setParticipants(participants);
-
         tccTransaction.setRole(adapter.getRole());
         tccTransaction.setPattern(adapter.getPattern());
-
         tccTransaction.setTargetClass(adapter.getTargetClass());
         tccTransaction.setTargetMethod(adapter.getTargetMethod());
-
         tccTransaction.setVersion(adapter.getVersion());
         return tccTransaction;
-
     }
+
 }

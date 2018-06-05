@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.hmily.tcc.common.serializer;
 
 import com.caucho.hessian.io.Hessian2Input;
@@ -25,28 +26,28 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-
 /**
+ * HessianSerializer.
  * @author xiaoyu
  */
+@SuppressWarnings("unchecked")
 public class HessianSerializer implements ObjectSerializer {
+
     @Override
-    public byte[] serialize(Object obj) throws TccException {
-        ByteArrayOutputStream baos;
-        try {
-            baos = new ByteArrayOutputStream();
-            Hessian2Output hos = new Hessian2Output(baos);
+    public byte[] serialize(final Object obj) throws TccException {
+        Hessian2Output hos;
+        try (ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
+            hos = new Hessian2Output(bos);
             hos.writeObject(obj);
             hos.flush();
-            hos.close();
+            return bos.toByteArray();
         } catch (IOException ex) {
             throw new TccException("Hessian serialize error " + ex.getMessage());
         }
-        return baos.toByteArray();
     }
 
     @Override
-    public <T> T deSerialize(byte[] param, Class<T> clazz) throws TccException {
+    public <T> T deSerialize(final byte[] param, final Class<T> clazz) throws TccException {
         ByteArrayInputStream bios;
         try {
             bios = new ByteArrayInputStream(param);
@@ -58,7 +59,7 @@ public class HessianSerializer implements ObjectSerializer {
     }
 
     /**
-     * 设置scheme
+     * 设置scheme.
      *
      * @return scheme 命名
      */

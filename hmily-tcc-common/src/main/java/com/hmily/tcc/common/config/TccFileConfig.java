@@ -14,26 +14,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hmily.tcc.common.config;
 
+package com.hmily.tcc.common.config;
 
 import lombok.Data;
 
 /**
+ * 文件保存事务日志配置.
  * @author xiaoyu
  */
 @Data
 public class TccFileConfig {
 
     /**
-     * 文件保存路径
+     * 文件保存路径.
      */
     private String path;
 
     /**
-     * 文件前缀
+     * 文件前缀.
      */
     private String prefix;
-
 
 }

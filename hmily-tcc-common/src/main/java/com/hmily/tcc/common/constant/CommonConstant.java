@@ -14,13 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.hmily.tcc.common.constant;
 
 /**
+ * CommonConstant.
  * @author xiaoyu
  */
 public interface CommonConstant {
-
 
     String DB_MYSQL = "mysql";
 
@@ -28,16 +29,12 @@ public interface CommonConstant {
 
     String DB_ORACLE = "oracle";
 
-
     String PATH_SUFFIX = "/tcc";
 
     String DB_SUFFIX = "tcc_";
 
-
-    String RECOVER_REDIS_KEY_PRE="tcc:transaction:%s";
-
+    String RECOVER_REDIS_KEY_PRE = "tcc:transaction:%s";
 
     String TCC_TRANSACTION_CONTEXT = "TCC_TRANSACTION_CONTEXT";
-
 
 }

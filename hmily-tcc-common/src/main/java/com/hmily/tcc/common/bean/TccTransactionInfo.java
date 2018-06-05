@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.hmily.tcc.common.bean;
 
 import com.hmily.tcc.common.bean.context.TccTransactionContext;
@@ -23,18 +24,17 @@ import lombok.Data;
 import java.io.Serializable;
 
 /**
+ * TccTransactionInfo.
  * @author xiaoyu
  */
 @Data
 @AllArgsConstructor
-public class TccTransactionInfo implements Serializable{
+public class TccTransactionInfo implements Serializable {
 
     private static final long serialVersionUID = 307176163211200916L;
+
     private String compensationId;
 
     private TccTransactionContext tccTransactionContext;
-
-
-
 
 }

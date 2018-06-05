@@ -14,33 +14,46 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.hmily.tcc.common.utils;
 
 import java.util.UUID;
 
-
 /**
+ * snow .
  * @author xiaoyu
  */
 public final class IdWorkerUtils {
 
-    private final long twepoch = 1288834974657L;
-    private final long workerIdBits = 5L;
-    private final long datacenterIdBits = 5L;
-    private final long maxWorkerId = -1L ^ (-1L << workerIdBits);
-    private final long maxDatacenterId = -1L ^ (-1L << datacenterIdBits);
-    private final long sequenceBits = 12L;
-    private final long workerIdShift = sequenceBits;
-    private final long datacenterIdShift = sequenceBits + workerIdBits;
-    private final long timestampLeftShift = sequenceBits + workerIdBits + datacenterIdBits;
-    private final long sequenceMask = -1L ^ (-1L << sequenceBits);
-
-    private long workerId = 0;
-    private long datacenterId = 0;
-    private long sequence = 0L;
-    private long lastTimestamp = -1L;
-
     private static final IdWorkerUtils ID_WORKER_UTILS = new IdWorkerUtils();
+
+    private final long twepoch = 1288834974657L;
+
+    private final long workerIdBits = 5L;
+
+    private final long datacenterIdBits = 5L;
+
+    private final long maxWorkerId = ~(-1L << workerIdBits);
+
+    private final long maxDatacenterId = ~(-1L << datacenterIdBits);
+
+    private final long sequenceBits = 12L;
+
+    private final long workerIdShift = sequenceBits;
+
+    private final long datacenterIdShift = sequenceBits + workerIdBits;
+
+    private final long timestampLeftShift = sequenceBits + workerIdBits + datacenterIdBits;
+
+    private final long sequenceMask = ~(-1L << sequenceBits);
+
+    private long workerId;
+
+    private long datacenterId;
+
+    private long sequence = 0L;
+
+    private long lastTimestamp = -1L;
 
     public static IdWorkerUtils getInstance() {
         return ID_WORKER_UTILS;
@@ -50,7 +63,7 @@ public final class IdWorkerUtils {
 
     }
 
-    private IdWorkerUtils(long workerId, long datacenterId) {
+    private IdWorkerUtils(final long workerId, final long datacenterId) {
         if (workerId > maxWorkerId || workerId < 0) {
             throw new IllegalArgumentException(String.format("worker Id can't be greater than %d or less than 0", maxWorkerId));
         }
@@ -93,33 +106,10 @@ public final class IdWorkerUtils {
     }
 
     public String buildPartNumber() {
-        return "P" + ID_WORKER_UTILS.nextId();
+        return String.valueOf(ID_WORKER_UTILS.nextId());
     }
-
-    public String buildSkuCode() {
-        return "S" + ID_WORKER_UTILS.nextId();
-    }
-
-    public String createTaskKey() {
-        return String.valueOf(UUID.randomUUID().hashCode() & 0x7fffffff);
-    }
-
 
     public String createUUID() {
         return String.valueOf(UUID.randomUUID().hashCode() & 0x7fffffff);
-    }
-
-
-    public String createGroupId() {
-        return String.valueOf(UUID.randomUUID().hashCode() & 0x7fffffff);
-    }
-
-    public long randomUUID() {
-        return ID_WORKER_UTILS.nextId();
-    }
-
-
-    public static void main(String[] args) {
-
     }
 }

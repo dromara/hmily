@@ -14,13 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.hmily.tcc.common.enums;
+
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 /**
  * The enum Coordinator action enum.
  *
  * @author xiaoyu
  */
+@RequiredArgsConstructor
+@Getter
 public enum CoordinatorActionEnum {
 
     /**
@@ -48,48 +54,8 @@ public enum CoordinatorActionEnum {
      */
     COMPENSATION(4, "补偿");
 
-    private int code;
+    private final int code;
 
-    private String desc;
+    private final String desc;
 
-    CoordinatorActionEnum(int code, String desc) {
-        this.code = code;
-        this.desc = desc;
-    }
-
-    /**
-     * Gets code.
-     *
-     * @return the code
-     */
-    public int getCode() {
-        return code;
-    }
-
-    /**
-     * Sets code.
-     *
-     * @param code the code
-     */
-    public void setCode(int code) {
-        this.code = code;
-    }
-
-    /**
-     * Gets desc.
-     *
-     * @return the desc
-     */
-    public String getDesc() {
-        return desc;
-    }
-
-    /**
-     * Sets desc.
-     *
-     * @param desc the desc
-     */
-    public void setDesc(String desc) {
-        this.desc = desc;
-    }
 }

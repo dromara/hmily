@@ -14,19 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.hmily.tcc.common.utils;
 
 import java.util.Iterator;
 import java.util.ServiceLoader;
 
-
 /**
+ * ServiceBootstrap.
  * @author xiaoyu
  */
 public class ServiceBootstrap {
 
-
-    public static <S> S loadFirst(Class<S> clazz) {
+    public static <S> S loadFirst(final Class<S> clazz) {
         final ServiceLoader<S> loader = loadAll(clazz);
         final Iterator<S> iterator = loader.iterator();
         if (!iterator.hasNext()) {
@@ -37,7 +37,8 @@ public class ServiceBootstrap {
         return iterator.next();
     }
 
-    public static <S> ServiceLoader<S> loadAll(Class<S> clazz) {
+    public static <S> ServiceLoader<S> loadAll(final Class<S> clazz) {
         return ServiceLoader.load(clazz);
     }
+
 }

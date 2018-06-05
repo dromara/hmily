@@ -17,21 +17,23 @@
 
 package com.hmily.tcc.common.utils;
 
+import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 
 /**
- * <p>Description: .</p>
- *
+ * FileUtils.
  * @author xiaoyu(Myth)
- * @version 1.0
- * @date 2017/11/8 14:25
- * @since JDK 1.8
  */
 public class FileUtils {
 
-    public static void writeFile(String fullFileName, byte[] contents){
+    /**
+     * 写入文件.
+     * @param fullFileName 文件路径全称
+     * @param contents 内容
+     */
+    public static void writeFile(final String fullFileName, final byte[] contents) {
         try {
             RandomAccessFile raf = new RandomAccessFile(fullFileName, "rw");
             try (FileChannel channel = raf.getChannel()) {
@@ -43,7 +45,7 @@ public class FileUtils {
                 }
                 channel.force(true);
             }
-        } catch (Exception e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }

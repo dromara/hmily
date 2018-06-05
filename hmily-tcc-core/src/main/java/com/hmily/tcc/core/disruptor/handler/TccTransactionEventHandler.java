@@ -45,8 +45,7 @@ public class TccTransactionEventHandler implements EventHandler<TccTransactionEv
 
     @Override
     public void onEvent(TccTransactionEvent tccTransactionEvent,
-                        long sequence, boolean endOfBatch)
-            throws Exception {
+                        long sequence, boolean endOfBatch) {
         if (tccTransactionEvent.getType() == EventTypeEnum.SAVE.getCode()) {
             coordinatorService.save(tccTransactionEvent.getTccTransaction());
         } else if (tccTransactionEvent.getType() == EventTypeEnum.UPDATE_PARTICIPANT.getCode()) {
