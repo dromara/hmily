@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.hmily.tcc.common.bean.entity;
 
 import lombok.AllArgsConstructor;
@@ -23,6 +24,7 @@ import java.io.Serializable;
 
 
 /**
+ * Participant 参与者.
  * @author xiaoyu
  */
 @Data
@@ -31,18 +33,13 @@ public class Participant implements Serializable {
 
     private static final long serialVersionUID = -2590970715288987627L;
 
-
     private String transId;
 
     private TccInvocation confirmTccInvocation;
 
     private TccInvocation cancelTccInvocation;
 
-    public Participant(){
-
+    public Participant() {
     }
-
-
-
 
 }

@@ -17,27 +17,23 @@
 
 package com.hmily.tcc.common.utils.httpclient;
 
-
 import java.io.Serializable;
 
 /**
+ * AjaxResponse.
  * @author  xiaoyu
- * @version 1.0
- * @date 2017 /3/1 11:52
- * @since JDK 1.8
  **/
 public class AjaxResponse implements Serializable {
 
     private static final long serialVersionUID = -2792556188993845048L;
 
-    protected int code;
-    protected String message;
+    private int code;
+
+    private String message;
+
     private Object data;
 
-    /**
-     * @param code <font color="red">非-1的数</font>
-     */
-    protected AjaxResponse(int code, String message, Object data) {
+    public AjaxResponse(int code, String message, Object data) {
         this.code = code;
         this.message = message;
         this.data = data;
@@ -63,13 +59,6 @@ public class AjaxResponse implements Serializable {
         return error(CommonErrorCode.ERROR, msg);
     }
 
-    /**
-     * 响应错误
-     *
-     * @param code <font color="red">非-1的数</font>
-     * @param msg
-     * @return
-     */
     public static AjaxResponse error(int code, String msg) {
         return get(code, msg, null);
     }

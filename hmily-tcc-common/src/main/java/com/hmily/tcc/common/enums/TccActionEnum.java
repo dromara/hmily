@@ -14,54 +14,48 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.hmily.tcc.common.enums;
+
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
-
 
 /**
  * The enum Tcc action enum.
  *
  * @author xiaoyu
  */
+@RequiredArgsConstructor
+@Getter
 public enum TccActionEnum {
-
 
     /**
      * Pre try tcc action enum.
      */
-    PRE_TRY(0,"开始执行try"),
-
+    PRE_TRY(0, "开始执行try"),
 
     /**
      * Trying tcc action enum.
      */
     TRYING(1, "try阶段完成"),
 
-
     /**
      * Confirming tcc action enum.
      */
     CONFIRMING(2, "confirm阶段"),
-
 
     /**
      * Canceling tcc action enum.
      */
     CANCELING(3, "cancel阶段");
 
+    private final int code;
 
-    private int code;
-
-    private String desc;
-
-    TccActionEnum(int code, String desc) {
-        this.code = code;
-        this.desc = desc;
-    }
-
+    private final String desc;
 
     /**
      * Acquire by code tcc action enum.
@@ -69,48 +63,12 @@ public enum TccActionEnum {
      * @param code the code
      * @return the tcc action enum
      */
-    public static TccActionEnum acquireByCode(int code) {
+    public static TccActionEnum acquireByCode(final int code) {
         Optional<TccActionEnum> tccActionEnum =
                 Arrays.stream(TccActionEnum.values())
                         .filter(v -> Objects.equals(v.getCode(), code))
                         .findFirst();
         return tccActionEnum.orElse(TccActionEnum.TRYING);
-
     }
 
-    /**
-     * Gets code.
-     *
-     * @return the code
-     */
-    public int getCode() {
-        return code;
-    }
-
-    /**
-     * Sets code.
-     *
-     * @param code the code
-     */
-    public void setCode(int code) {
-        this.code = code;
-    }
-
-    /**
-     * Gets desc.
-     *
-     * @return the desc
-     */
-    public String getDesc() {
-        return desc;
-    }
-
-    /**
-     * Sets desc.
-     *
-     * @param desc the desc
-     */
-    public void setDesc(String desc) {
-        this.desc = desc;
-    }
 }

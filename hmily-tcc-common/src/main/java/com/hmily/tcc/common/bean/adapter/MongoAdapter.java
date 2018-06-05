@@ -14,22 +14,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.hmily.tcc.common.bean.adapter;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.bson.types.ObjectId;
 
 import java.io.Serializable;
 
 /**
+ * Mongo adapter.
  * @author xiaoyu
  */
+@EqualsAndHashCode(callSuper = true)
 @Data
 public class MongoAdapter extends CoordinatorRepositoryAdapter implements Serializable {
 
     private static final long serialVersionUID = 7920817865031921102L;
 
     private ObjectId id;
-
 
 }

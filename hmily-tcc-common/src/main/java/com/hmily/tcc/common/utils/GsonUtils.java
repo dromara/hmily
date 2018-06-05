@@ -20,6 +20,7 @@ package com.hmily.tcc.common.utils;
 import com.google.gson.Gson;
 
 /**
+ * GsonUtils.
  * @author xiaoyu
  */
 public class GsonUtils {
@@ -32,11 +33,11 @@ public class GsonUtils {
         return GSON_UTILS;
     }
 
-    public String toJson(Object object) {
+    public String toJson(final Object object) {
         return GSON.toJson(object);
     }
 
-    public <T> T fromJson(String json, Class<T> tClass) {
+    public <T> T fromJson(final String json, final Class<T> tClass) {
         return GSON.fromJson(json, tClass);
     }
 }

@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.hmily.tcc.common.serializer;
 
 import com.dyuproject.protostuff.LinkedBuffer;
@@ -26,69 +27,68 @@ import org.objenesis.ObjenesisStd;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-
+import java.io.IOException;
 
 /**
+ * ProtostuffSerializer.
  * @author xiaoyu
  */
+@SuppressWarnings("unchecked")
 public class ProtostuffSerializer implements ObjectSerializer {
-    private static final SchemaCache CACHED_SCHEMA = SchemaCache.getInstance();
-    private static final Objenesis OBJENESIS_STD = new ObjenesisStd(true);
 
-    private static <T> Schema<T> getSchema(Class<T> cls) {
+    private static final SchemaCache CACHED_SCHEMA = SchemaCache.getInstance();
+
+    private static final Objenesis OBJENESIS = new ObjenesisStd(true);
+
+    private static <T> Schema<T> getSchema(final Class<T> cls) {
         return (Schema<T>) CACHED_SCHEMA.get(cls);
     }
 
-
     /**
-     * 序列化对象
+     * 序列化对象.
      *
      * @param obj 需要序更列化的对象
      * @return byte []
-     * @throws TccException
+     * @throws TccException 异常
      */
     @Override
-    public byte[] serialize(Object obj) throws TccException {
+    public byte[] serialize(final Object obj) throws TccException {
         Class cls = obj.getClass();
         LinkedBuffer buffer = LinkedBuffer.allocate(LinkedBuffer.DEFAULT_BUFFER_SIZE);
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        try {
+        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
             Schema schema = getSchema(cls);
             ProtostuffIOUtil.writeTo(outputStream, obj, schema, buffer);
-        } catch (Exception e) {
+            return outputStream.toByteArray();
+        } catch (IOException e) {
             throw new TccException(e.getMessage(), e);
         } finally {
             buffer.clear();
         }
-        return outputStream.toByteArray();
     }
 
     /**
-     * 反序列化对象
+     * 反序列化对象.
      *
      * @param param 需要反序列化的byte []
-     * @param clazz
+     * @param clazz 转出的对象.
      * @return 对象
-     * @throws TccException
+     * @throws TccException 异常
      */
     @Override
-    public <T> T deSerialize(byte[] param, Class<T> clazz) throws TccException {
+    public <T> T deSerialize(final byte[] param, final Class<T> clazz) throws TccException {
         T object;
-        try {
-            ByteArrayInputStream inputStream = new ByteArrayInputStream(param);
-            Class cls = clazz;
-            object = OBJENESIS_STD.newInstance((Class<T>) cls);
-            Schema schema = getSchema(cls);
+        try (ByteArrayInputStream inputStream = new ByteArrayInputStream(param)) {
+            object = OBJENESIS.newInstance(clazz);
+            Schema schema = getSchema((Class) clazz);
             ProtostuffIOUtil.mergeFrom(inputStream, object, schema);
             return object;
-        } catch (Exception e) {
+        } catch (IOException e) {
             throw new TccException(e.getMessage(), e);
         }
     }
 
     /**
-     * 设置scheme
-     *
+     * 设置scheme.
      * @return scheme 命名
      */
     @Override

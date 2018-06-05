@@ -14,11 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.hmily.tcc.annotation;
 
 /**
  * The enum Tcc pattern enum.
- * <p>
  * 当模式为tcc时候，在try异常中，会执行cancel方法，cc模式不会执行
  *
  * @author xiaoyu
@@ -39,7 +39,7 @@ public enum TccPatternEnum {
 
     private String desc;
 
-    TccPatternEnum(Integer code, String desc) {
+    TccPatternEnum(final Integer code, final String desc) {
         this.code = code;
         this.desc = desc;
     }
@@ -58,7 +58,7 @@ public enum TccPatternEnum {
      *
      * @param code the code
      */
-    public void setCode(Integer code) {
+    public void setCode(final Integer code) {
         this.code = code;
     }
 
@@ -76,7 +76,7 @@ public enum TccPatternEnum {
      *
      * @param desc the desc
      */
-    public void setDesc(String desc) {
+    public void setDesc(final String desc) {
         this.desc = desc;
     }
 }
