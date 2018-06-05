@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.hmily.tcc.common.bean.context;
 
 import com.hmily.tcc.common.enums.TccActionEnum;
@@ -22,8 +23,8 @@ import lombok.Data;
 
 import java.io.Serializable;
 
-
 /**
+ * TccTransactionContext.
  * @author xiaoyu
  */
 @Data
@@ -31,18 +32,19 @@ public class TccTransactionContext implements Serializable {
 
     private static final long serialVersionUID = -5289080166922118073L;
 
+    /**
+     * transId.
+     */
     private String transId;
 
     /**
-     * 事务执行动作 {@linkplain TccActionEnum}
+     * 事务执行动作. {@linkplain TccActionEnum}
      */
     private int action;
 
-
     /**
-     * 事务参与的角色 {@linkplain TccRoleEnum}
+     * 事务参与的角色. {@linkplain TccRoleEnum}
      */
     private int role;
-
 
 }

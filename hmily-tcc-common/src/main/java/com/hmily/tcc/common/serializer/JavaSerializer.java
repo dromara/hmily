@@ -14,8 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hmily.tcc.common.serializer;
 
+package com.hmily.tcc.common.serializer;
 
 import com.hmily.tcc.common.enums.SerializeEnum;
 import com.hmily.tcc.common.exception.TccException;
@@ -29,35 +29,34 @@ import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 
 /**
+ * JavaSerializer.
  * @author xiaoyu
  */
+@SuppressWarnings("unchecked")
 public class JavaSerializer implements ObjectSerializer {
+
     @Override
-    public byte[] serialize(Object obj) throws TccException {
-        try (ByteArrayOutputStream arrayOutputStream = new ByteArrayOutputStream()) {
-            ObjectOutput objectOutput = new ObjectOutputStream(arrayOutputStream);
+    public byte[] serialize(final Object obj) throws TccException {
+        try (ByteArrayOutputStream arrayOutputStream = new ByteArrayOutputStream(); ObjectOutput objectOutput = new ObjectOutputStream(arrayOutputStream)) {
             objectOutput.writeObject(obj);
             objectOutput.flush();
-            objectOutput.close();
             return arrayOutputStream.toByteArray();
         } catch (IOException e) {
-            throw new TccException("JAVA serialize error " + e.getMessage());
+            throw new TccException("java serialize error " + e.getMessage());
         }
     }
 
     @Override
-    public <T> T deSerialize(byte[] param, Class<T> clazz) throws TccException {
-        ByteArrayInputStream arrayInputStream = new ByteArrayInputStream(param);
-        try {
-            ObjectInput input = new ObjectInputStream(arrayInputStream);
+    public <T> T deSerialize(final byte[] param, final Class<T> clazz) throws TccException {
+        try (ByteArrayInputStream arrayInputStream = new ByteArrayInputStream(param); ObjectInput input = new ObjectInputStream(arrayInputStream)) {
             return (T) input.readObject();
         } catch (IOException | ClassNotFoundException e) {
-            throw new TccException("JAVA deSerialize error " + e.getMessage());
+            throw new TccException("java deSerialize error " + e.getMessage());
         }
     }
 
     /**
-     * 设置scheme
+     * 设置scheme.
      *
      * @return scheme 命名
      */

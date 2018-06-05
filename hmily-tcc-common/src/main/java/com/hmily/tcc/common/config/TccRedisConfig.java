@@ -14,41 +14,57 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hmily.tcc.common.config;
 
+package com.hmily.tcc.common.config;
 
 import lombok.Data;
 
 /**
+ * redis存储事务日志配置.
  * @author xiaoyu
  */
 @Data
 public class TccRedisConfig {
 
-
     private Boolean cluster = false;
 
     /**
-     * 集群url   ip:port;ip:port
+     * 集群url   example:ip:port;ip:port.
      */
     private String clusterUrl;
 
     private String hostName;
+
     private int port;
+
     private String password;
+
     private int maxTotal = 8;
+
     private int maxIdle = 8;
-    private int minIdle = 0;
+
+    private int minIdle;
+
     private long maxWaitMillis = -1L;
+
     private long minEvictableIdleTimeMillis = 1800000L;
+
     private long softMinEvictableIdleTimeMillis = 1800000L;
+
     private int numTestsPerEvictionRun = 3;
+
     private Boolean testOnCreate = false;
+
     private Boolean testOnBorrow = false;
+
     private Boolean testOnReturn = false;
+
     private Boolean testWhileIdle = false;
+
     private long timeBetweenEvictionRunsMillis = -1L;
+
     private boolean blockWhenExhausted = true;
+
     private int timeOut = 10000;
 
 }

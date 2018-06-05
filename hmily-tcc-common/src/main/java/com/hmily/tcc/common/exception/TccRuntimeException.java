@@ -14,27 +14,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.hmily.tcc.common.exception;
 
-
 /**
+ * TccRuntimeException.
  * @author xiaoyu
  */
 public class TccRuntimeException extends RuntimeException {
+
     private static final long serialVersionUID = -1949770547060521702L;
 
     public TccRuntimeException() {
     }
 
-    public TccRuntimeException(String message) {
+    public TccRuntimeException(final String message) {
         super(message);
     }
 
-    public TccRuntimeException(String message, Throwable cause) {
+    public TccRuntimeException(final String message, final Throwable cause) {
         super(message, cause);
     }
 
-    public TccRuntimeException(Throwable cause) {
+    public TccRuntimeException(final Throwable cause) {
         super(cause);
     }
 }

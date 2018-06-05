@@ -14,33 +14,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hmily.tcc.common.config;
 
+package com.hmily.tcc.common.config;
 
 import lombok.Data;
 
 /**
+ * mongo 保存事务日志配置.
  * @author xiaoyu
  */
 @Data
 public class TccMongoConfig {
 
     /**
-     * mongo数据库设置
+     * mongo数据库设置.
      */
     private String mongoDbName;
 
     /**
-     * mongo数据库URL
+     * mongo数据库URL.
      */
     private String mongoDbUrl;
+
     /**
-     * mongo数据库用户名
+     * mongo数据库用户名.
      */
     private String mongoUserName;
 
     /**
-     * mongo数据库密码
+     * mongo数据库密码.
      */
     private String mongoUserPwd;
 

@@ -14,19 +14,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.hmily.tcc.common.enums;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
-
 
 /**
  * The enum Rejected policy type enum.
  *
  * @author xiaoyu
  */
+@RequiredArgsConstructor
+@Getter
 public enum RejectedPolicyTypeEnum {
     /**
      * Abort policy rejected policy type enum.
@@ -49,20 +53,7 @@ public enum RejectedPolicyTypeEnum {
      */
     REJECTED_POLICY("Rejected");
 
-    private String value;
-
-    RejectedPolicyTypeEnum(String value) {
-        this.value = value;
-    }
-
-    /**
-     * Gets value.
-     *
-     * @return the value
-     */
-    public String getValue() {
-        return value;
-    }
+    private final String value;
 
     /**
      * From string rejected policy type enum.
@@ -70,17 +61,12 @@ public enum RejectedPolicyTypeEnum {
      * @param value the value
      * @return the rejected policy type enum
      */
-    public static RejectedPolicyTypeEnum fromString(String value) {
+    public static RejectedPolicyTypeEnum fromString(final String value) {
         Optional<RejectedPolicyTypeEnum> rejectedPolicyTypeEnum =
                 Arrays.stream(RejectedPolicyTypeEnum.values())
                         .filter(v -> Objects.equals(v.getValue(), value))
                         .findFirst();
         return rejectedPolicyTypeEnum.orElse(RejectedPolicyTypeEnum.ABORT_POLICY);
-    }
-
-    @Override
-    public String toString() {
-        return value;
     }
 }
 

@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.hmily.tcc.common.bean.entity;
 
 import com.google.common.collect.Lists;
@@ -28,71 +29,72 @@ import java.util.List;
 
 
 /**
+ * TccTransaction 实体日志对象.
  * @author xiaoyu
  */
 @Data
 public class TccTransaction implements Serializable {
 
-
     private static final long serialVersionUID = -6792063780987394917L;
 
     /**
-     * 事务id
+     * 事务id.
      */
     private String transId;
 
     /**
-     * 事务状态 {@linkplain TccActionEnum}
+     * 事务状态.
+     * {@linkplain TccActionEnum}
      */
     private int status;
 
     /**
-     * 事务类型 {@linkplain TccRoleEnum}
+     * 事务类型.
+     * {@linkplain TccRoleEnum}
      */
     private int role;
 
     /**
-     * 重试次数
+     * 重试次数.
      */
-    private volatile int retriedCount = 0;
+    private volatile int retriedCount;
 
     /**
-     * 创建时间
+     * 创建时间.
      */
     private Date createTime;
 
     /**
-     * 更新时间
+     * 更新时间.
      */
     private Date lastTime;
 
     /**
-     * 版本号 乐观锁控制
+     * 版本号 乐观锁控制.
      */
     private Integer version = 1;
 
     /**
-     * 模式
+     * 模式.
      */
     private Integer pattern;
 
 
     /**
-     * 调用接口名称
+     * 调用接口名称.
      */
     private String targetClass;
 
 
     /**
-     * 调用方法名称
+     * 调用方法名称.
      */
     private String targetMethod;
 
     /**
-     * 参与协调的方法集合
+     * 参与协调的方法集合.
      */
     private List<Participant> participants;
-
 
     public TccTransaction() {
         this.transId = IdWorkerUtils.getInstance().createUUID();
@@ -102,16 +104,19 @@ public class TccTransaction implements Serializable {
 
     }
 
-    public TccTransaction(String transId) {
+    public TccTransaction(final String transId) {
         this.transId = transId;
         this.createTime = new Date();
         this.lastTime = new Date();
         participants = Lists.newCopyOnWriteArrayList();
     }
 
-    public void registerParticipant(Participant participant) {
+    /**
+     * 保存参与者.
+     * @param participant 参与者对象
+     */
+    public void registerParticipant(final Participant participant) {
         participants.add(participant);
     }
-
 
 }

@@ -14,7 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.hmily.tcc.common.enums;
+
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import java.util.Arrays;
 import java.util.Objects;
@@ -22,8 +26,11 @@ import java.util.Optional;
 
 
 /**
+ * RepositorySupportEnum.
  * @author xiaoyu
  */
+@RequiredArgsConstructor
+@Getter
 public enum RepositorySupportEnum {
 
     /**
@@ -51,11 +58,7 @@ public enum RepositorySupportEnum {
      */
     ZOOKEEPER("zookeeper");
 
-    private String support;
-
-    RepositorySupportEnum(String support) {
-        this.support = support;
-    }
+    private final String support;
 
     /**
      * Acquire compensate cache type compensate cache type enum.
@@ -63,20 +66,11 @@ public enum RepositorySupportEnum {
      * @param support the compensate cache type
      * @return the compensate cache type enum
      */
-    public static RepositorySupportEnum acquire(String support) {
+    public static RepositorySupportEnum acquire(final String support) {
         Optional<RepositorySupportEnum> repositorySupportEnum =
                 Arrays.stream(RepositorySupportEnum.values())
                         .filter(v -> Objects.equals(v.getSupport(), support))
                         .findFirst();
         return repositorySupportEnum.orElse(RepositorySupportEnum.DB);
-    }
-
-
-    public String getSupport() {
-        return support;
-    }
-
-    public void setSupport(String support) {
-        this.support = support;
     }
 }

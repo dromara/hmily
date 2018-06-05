@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.hmily.tcc.common.serializer;
 
 import com.esotericsoftware.kryo.Kryo;
@@ -24,58 +25,59 @@ import com.hmily.tcc.common.exception.TccException;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-
+import java.io.IOException;
 
 /**
+ * KryoSerializer.
  * @author xiaoyu
  */
 public class KryoSerializer implements ObjectSerializer {
+
     /**
-     * 序列化
+     * 序列化.
      *
      * @param obj 需要序更列化的对象
      * @return 序列化后的byte 数组
-     * @throws TccException
+     * @throws TccException 异常
      */
     @Override
-    public byte[] serialize(Object obj) throws TccException {
+    public byte[] serialize(final Object obj) throws TccException {
         byte[] bytes;
-        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream(); Output output = new Output(outputStream)) {
             //获取kryo对象
             Kryo kryo = new Kryo();
-            Output output = new Output(outputStream);
             kryo.writeObject(output, obj);
             bytes = output.toBytes();
             output.flush();
-        } catch (Exception ex) {
+        } catch (IOException ex) {
             throw new TccException("kryo serialize error" + ex.getMessage());
         }
         return bytes;
     }
 
     /**
-     * 反序列化
+     * 反序列化.
      *
      * @param param 需要反序列化的byte []
      * @return 序列化对象
-     * @throws TccException
+     * @throws TccException 异常
      */
     @Override
-    public <T> T deSerialize(byte[] param, Class<T> clazz) throws TccException {
+    public <T> T deSerialize(final byte[] param, final Class<T> clazz) throws TccException {
         T object;
         try (ByteArrayInputStream inputStream = new ByteArrayInputStream(param)) {
             Kryo kryo = new Kryo();
             Input input = new Input(inputStream);
             object = kryo.readObject(input, clazz);
             input.close();
-        } catch (Exception e) {
+        } catch (IOException e) {
             throw new TccException("kryo deSerialize error" + e.getMessage());
         }
         return object;
     }
 
     /**
-     * 设置scheme
+     * 设置scheme.
      *
      * @return scheme 命名
      */

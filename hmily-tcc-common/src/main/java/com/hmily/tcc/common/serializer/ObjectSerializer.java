@@ -14,17 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.hmily.tcc.common.serializer;
 
 import com.hmily.tcc.common.exception.TccException;
 
-
 /**
+ * ObjectSerializer.
  * @author xiaoyu
  */
 public interface ObjectSerializer {
+
     /**
-     * 序列化对象
+     * 序列化对象.
      *
      * @param obj 需要序更列化的对象
      * @return byte []
@@ -34,7 +36,7 @@ public interface ObjectSerializer {
 
 
     /**
-     * 反序列化对象
+     * 反序列化对象.
      *
      * @param param 需要反序列化的byte []
      * @param clazz java对象
@@ -44,9 +46,8 @@ public interface ObjectSerializer {
      */
     <T> T deSerialize(byte[] param, Class<T> clazz) throws TccException;
 
-
     /**
-     * 设置scheme
+     * 设置scheme.
      *
      * @return scheme 命名
      */

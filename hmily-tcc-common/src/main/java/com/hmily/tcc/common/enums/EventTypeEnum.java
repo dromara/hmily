@@ -16,11 +16,16 @@
  */
 package com.hmily.tcc.common.enums;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
 /**
  * The enum Coordinator action enum.
  *
  * @author xiaoyu
  */
+@RequiredArgsConstructor
+@Getter
 public enum EventTypeEnum {
 
     /**
@@ -43,50 +48,8 @@ public enum EventTypeEnum {
      */
     UPDATE_PARTICIPANT(3, "更新参与者");
 
+    private final int code;
 
+    private final String desc;
 
-    private int code;
-
-    private String desc;
-
-    EventTypeEnum(int code, String desc) {
-        this.code = code;
-        this.desc = desc;
-    }
-
-    /**
-     * Gets code.
-     *
-     * @return the code
-     */
-    public int getCode() {
-        return code;
-    }
-
-    /**
-     * Sets code.
-     *
-     * @param code the code
-     */
-    public void setCode(int code) {
-        this.code = code;
-    }
-
-    /**
-     * Gets desc.
-     *
-     * @return the desc
-     */
-    public String getDesc() {
-        return desc;
-    }
-
-    /**
-     * Sets desc.
-     *
-     * @param desc the desc
-     */
-    public void setDesc(String desc) {
-        this.desc = desc;
-    }
 }

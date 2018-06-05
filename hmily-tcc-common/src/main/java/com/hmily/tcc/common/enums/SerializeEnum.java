@@ -14,17 +14,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.hmily.tcc.common.enums;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
 
 /**
+ * SerializeEnum.
  * @author xiaoyu
  */
-
+@RequiredArgsConstructor
+@Getter
 public enum SerializeEnum {
 
     /**
@@ -47,11 +52,7 @@ public enum SerializeEnum {
      */
     PROTOSTUFF("protostuff");
 
-    private String serialize;
-
-    SerializeEnum(String serialize) {
-        this.serialize = serialize;
-    }
+    private final String serialize;
 
     /**
      * Acquire serialize protocol serialize protocol enum.
@@ -59,32 +60,12 @@ public enum SerializeEnum {
      * @param serialize the serialize protocol
      * @return the serialize protocol enum
      */
-    public static SerializeEnum acquire(String serialize) {
+    public static SerializeEnum acquire(final String serialize) {
         Optional<SerializeEnum> serializeEnum =
                 Arrays.stream(SerializeEnum.values())
                         .filter(v -> Objects.equals(v.getSerialize(), serialize))
                         .findFirst();
         return serializeEnum.orElse(SerializeEnum.KRYO);
-
     }
-
-    /**
-     * Gets serialize protocol.
-     *
-     * @return the serialize protocol
-     */
-    public String getSerialize() {
-        return serialize;
-    }
-
-    /**
-     * Sets serialize protocol.
-     *
-     * @param serialize the serialize protocol
-     */
-    public void setSerialize(String serialize) {
-        this.serialize = serialize;
-    }
-
 
 }

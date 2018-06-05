@@ -14,18 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.hmily.tcc.common.bean.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.util.Arrays;
 
 
 /**
+ * TccInvocation 封装方法调用点.
  * @author xiaoyu
  */
 @Data
@@ -37,7 +37,6 @@ public class TccInvocation implements Serializable {
     @Getter
     private Class targetClass;
 
-
     @Getter
     private String methodName;
 
@@ -46,12 +45,5 @@ public class TccInvocation implements Serializable {
 
     @Getter
     private Object[] args;
-
-
-    public TccInvocation(){
-
-    }
-
-
 
 }
