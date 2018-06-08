@@ -20,7 +20,7 @@ import com.hmily.tcc.common.constant.CommonConstant;
 import com.hmily.tcc.common.utils.GsonUtils;
 import com.hmily.tcc.common.bean.context.TccTransactionContext;
 import com.hmily.tcc.core.interceptor.TccTransactionInterceptor;
-import com.hmily.tcc.core.service.TccTransactionAspectService;
+import com.hmily.tcc.core.service.HmilyTransactionAspectService;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -36,11 +36,11 @@ import javax.servlet.http.HttpServletRequest;
 @Component
 public class SpringCloudTccTransactionInterceptor implements TccTransactionInterceptor {
 
-    private final TccTransactionAspectService tccTransactionAspectService;
+    private final HmilyTransactionAspectService hmilyTransactionAspectService;
 
     @Autowired
-    public SpringCloudTccTransactionInterceptor(TccTransactionAspectService tccTransactionAspectService) {
-        this.tccTransactionAspectService = tccTransactionAspectService;
+    public SpringCloudTccTransactionInterceptor(HmilyTransactionAspectService hmilyTransactionAspectService) {
+        this.hmilyTransactionAspectService = hmilyTransactionAspectService;
     }
 
 
@@ -54,7 +54,7 @@ public class SpringCloudTccTransactionInterceptor implements TccTransactionInter
         tccTransactionContext =
                 GsonUtils.getInstance().fromJson(context, TccTransactionContext.class);
 
-        return tccTransactionAspectService.invoke(tccTransactionContext, pjp);
+        return hmilyTransactionAspectService.invoke(tccTransactionContext, pjp);
     }
 
 }

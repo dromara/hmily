@@ -17,79 +17,67 @@
 
 package com.hmily.tcc.core.coordinator;
 
-
-import com.hmily.tcc.common.config.TccConfig;
 import com.hmily.tcc.common.bean.entity.TccTransaction;
-import com.hmily.tcc.core.coordinator.command.CoordinatorAction;
+import com.hmily.tcc.common.config.TccConfig;
 
 /**
+ * this is save transaction log service.
  * @author xiaoyu
  */
 public interface CoordinatorService {
 
     /**
-     * 启动本地补偿事务，根据配置是否进行补偿
+     * init hmily config.
      *
-     * @param tccConfig 配置信息
-     * @throws Exception 异常
+     * @param tccConfig {@linkplain TccConfig}
+     * @throws Exception exception
      */
     void start(TccConfig tccConfig) throws Exception;
 
     /**
-     * 保存补偿事务信息
+     * save tccTransaction.
      *
-     * @param tccTransaction 实体对象
-     * @return 主键id
+     * @param tccTransaction {@linkplain TccTransaction }
+     * @return id
      */
     String save(TccTransaction tccTransaction);
 
     /**
-     * 根据事务id获取TccTransaction
+     * find by transId.
      *
-     * @param transId 事务id
-     * @return TccTransaction
+     * @param transId  transId
+     * @return {@linkplain TccTransaction }
      */
     TccTransaction findByTransId(String transId);
 
-
     /**
-     * 删除补偿事务信息
+     * remove transaction.
      *
-     * @param id 主键id
-     * @return true成功 false 失败
+     * @param id  transaction pk.
+     * @return true success
      */
     boolean remove(String id);
 
-
     /**
-     * 更新
-     *
-     * @param tccTransaction 实体对象
+     * update.
+     * @param tccTransaction {@linkplain TccTransaction }
      */
     void update(TccTransaction tccTransaction);
 
-
     /**
-     * 更新 List<Participant>  只更新这一个字段数据
-     * @param tccTransaction  实体对象
+     * update TccTransaction .
+     * this is only update Participant field.
+     * @param tccTransaction  {@linkplain TccTransaction }
      * @return rows
      */
     int updateParticipant(TccTransaction tccTransaction);
 
-
     /**
-     * 更新补偿数据状态
-     * @param id  事务id
-     * @param status  状态
-     * @return  rows 1 成功 0 失败
+     * update TccTransaction status.
+     * @param id  pk.
+     * @param status   {@linkplain com.hmily.tcc.common.enums.TccActionEnum}
+     * @return rows
      */
     int updateStatus(String id, Integer status);
 
-    /**
-     * 提交补偿操作
-     *
-     * @param coordinatorAction 执行动作
-     * @return true 成功
-     */
-    Boolean submit(CoordinatorAction coordinatorAction);
 }

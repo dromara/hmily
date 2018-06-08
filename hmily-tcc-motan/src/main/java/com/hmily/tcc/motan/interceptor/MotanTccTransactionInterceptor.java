@@ -22,7 +22,7 @@ import com.hmily.tcc.common.constant.CommonConstant;
 import com.hmily.tcc.common.utils.GsonUtils;
 import com.hmily.tcc.core.concurrent.threadlocal.TransactionContextLocal;
 import com.hmily.tcc.core.interceptor.TccTransactionInterceptor;
-import com.hmily.tcc.core.service.TccTransactionAspectService;
+import com.hmily.tcc.core.service.HmilyTransactionAspectService;
 import com.weibo.api.motan.rpc.Request;
 import com.weibo.api.motan.rpc.RpcContext;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -38,11 +38,11 @@ import java.util.Objects;
 @Component
 public class MotanTccTransactionInterceptor implements TccTransactionInterceptor {
 
-    private final TccTransactionAspectService tccTransactionAspectService;
+    private final HmilyTransactionAspectService hmilyTransactionAspectService;
 
     @Autowired
-    public MotanTccTransactionInterceptor(TccTransactionAspectService tccTransactionAspectService) {
-        this.tccTransactionAspectService = tccTransactionAspectService;
+    public MotanTccTransactionInterceptor(HmilyTransactionAspectService hmilyTransactionAspectService) {
+        this.hmilyTransactionAspectService = hmilyTransactionAspectService;
     }
 
 
@@ -62,6 +62,6 @@ public class MotanTccTransactionInterceptor implements TccTransactionInterceptor
             tccTransactionContext = TransactionContextLocal.getInstance().get();
         }
 
-        return tccTransactionAspectService.invoke(tccTransactionContext, pjp);
+        return hmilyTransactionAspectService.invoke(tccTransactionContext, pjp);
     }
 }

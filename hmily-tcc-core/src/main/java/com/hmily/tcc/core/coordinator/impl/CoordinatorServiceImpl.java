@@ -17,20 +17,19 @@
 
 package com.hmily.tcc.core.coordinator.impl;
 
-
 import com.hmily.tcc.common.bean.entity.TccTransaction;
 import com.hmily.tcc.common.config.TccConfig;
 import com.hmily.tcc.core.coordinator.CoordinatorService;
-import com.hmily.tcc.core.coordinator.command.CoordinatorAction;
 import com.hmily.tcc.core.helper.SpringBeanUtils;
 import com.hmily.tcc.core.schedule.ScheduledService;
-import com.hmily.tcc.core.service.ApplicationService;
+import com.hmily.tcc.core.service.RpcApplicationService;
 import com.hmily.tcc.core.spi.CoordinatorRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
+ * CoordinatorServiceImpl.
  * @author xiaoyu
  */
 @Service("coordinatorService")
@@ -38,43 +37,23 @@ public class CoordinatorServiceImpl implements CoordinatorService {
 
     private CoordinatorRepository coordinatorRepository;
 
-    private final ApplicationService applicationService;
+    private final RpcApplicationService rpcApplicationService;
 
     @Autowired
-    public CoordinatorServiceImpl(ApplicationService applicationService) {
-        this.applicationService = applicationService;
-
+    public CoordinatorServiceImpl(final RpcApplicationService rpcApplicationService) {
+        this.rpcApplicationService = rpcApplicationService;
     }
 
-
-    /**
-     * 初始化协调资源
-     *
-     * @param tccConfig 配置信息
-     * @throws Exception 异常
-     */
     @Override
-    public void start(TccConfig tccConfig) throws Exception {
-        final String repositorySuffix =
-                buildRepositorySuffix(tccConfig.getRepositorySuffix());
-        coordinatorRepository = SpringBeanUtils.getInstance()
-                .getBean(CoordinatorRepository.class);
-        //初始化spi 协调资源存储
+    public void start(final TccConfig tccConfig) {
+        final String repositorySuffix = buildRepositorySuffix(tccConfig.getRepositorySuffix());
+        coordinatorRepository = SpringBeanUtils.getInstance().getBean(CoordinatorRepository.class);
         coordinatorRepository.init(repositorySuffix, tccConfig);
-
         new ScheduledService(tccConfig, coordinatorRepository).scheduledRollBack();
-
     }
 
-
-    /**
-     * 保存补偿事务信息
-     *
-     * @param tccTransaction 实体对象
-     * @return 主键id
-     */
     @Override
-    public String save(TccTransaction tccTransaction) {
+    public String save(final TccTransaction tccTransaction) {
         final int rows = coordinatorRepository.create(tccTransaction);
         if (rows > 0) {
             return tccTransaction.getTransId();
@@ -83,71 +62,36 @@ public class CoordinatorServiceImpl implements CoordinatorService {
     }
 
     @Override
-    public TccTransaction findByTransId(String transId) {
+    public TccTransaction findByTransId(final String transId) {
         return coordinatorRepository.findById(transId);
     }
 
-    /**
-     * 删除补偿事务信息
-     *
-     * @param id 主键id
-     * @return true成功 false 失败
-     */
     @Override
-    public boolean remove(String id) {
+    public boolean remove(final String id) {
         return coordinatorRepository.remove(id) > 0;
     }
 
-    /**
-     * 更新
-     *
-     * @param tccTransaction 实体对象
-     */
     @Override
-    public void update(TccTransaction tccTransaction) {
+    public void update(final TccTransaction tccTransaction) {
         coordinatorRepository.update(tccTransaction);
     }
 
-    /**
-     * 更新 List<Participant>  只更新这一个字段数据
-     *
-     * @param tccTransaction 实体对象
-     */
     @Override
-    public int updateParticipant(TccTransaction tccTransaction) {
+    public int updateParticipant(final TccTransaction tccTransaction) {
         return coordinatorRepository.updateParticipant(tccTransaction);
     }
 
-    /**
-     * 更新补偿数据状态
-     *
-     * @param id     事务id
-     * @param status 状态
-     * @return rows 1 成功 0 失败
-     */
     @Override
-    public int updateStatus(String id, Integer status) {
+    public int updateStatus(final String id, final Integer status) {
         return coordinatorRepository.updateStatus(id, status);
     }
 
-    /**
-     * 提交补偿操作
-     *
-     * @param coordinatorAction 执行动作
-     */
-    @Override
-    public Boolean submit(CoordinatorAction coordinatorAction) {
-        return Boolean.TRUE;
-    }
-
-    private String buildRepositorySuffix(String repositorySuffix) {
+    private String buildRepositorySuffix(final String repositorySuffix) {
         if (StringUtils.isNoneBlank(repositorySuffix)) {
             return repositorySuffix;
         } else {
-            return applicationService.acquireName();
+            return rpcApplicationService.acquireName();
         }
-
     }
-
 
 }

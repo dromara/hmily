@@ -23,7 +23,7 @@ import com.hmily.tcc.common.utils.GsonUtils;
 import com.hmily.tcc.common.bean.context.TccTransactionContext;
 import com.hmily.tcc.core.concurrent.threadlocal.TransactionContextLocal;
 import com.hmily.tcc.core.interceptor.TccTransactionInterceptor;
-import com.hmily.tcc.core.service.TccTransactionAspectService;
+import com.hmily.tcc.core.service.HmilyTransactionAspectService;
 import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,11 +35,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class DubboTccTransactionInterceptor implements TccTransactionInterceptor {
 
-    private final TccTransactionAspectService tccTransactionAspectService;
+    private final HmilyTransactionAspectService hmilyTransactionAspectService;
 
     @Autowired
-    public DubboTccTransactionInterceptor(TccTransactionAspectService tccTransactionAspectService) {
-        this.tccTransactionAspectService = tccTransactionAspectService;
+    public DubboTccTransactionInterceptor(HmilyTransactionAspectService hmilyTransactionAspectService) {
+        this.hmilyTransactionAspectService = hmilyTransactionAspectService;
     }
 
 
@@ -53,6 +53,6 @@ public class DubboTccTransactionInterceptor implements TccTransactionInterceptor
         } else {
             tccTransactionContext = TransactionContextLocal.getInstance().get();
         }
-        return tccTransactionAspectService.invoke(tccTransactionContext, pjp);
+        return hmilyTransactionAspectService.invoke(tccTransactionContext, pjp);
     }
 }

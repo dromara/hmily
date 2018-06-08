@@ -36,7 +36,7 @@ import com.hmily.tcc.common.bean.context.TccTransactionContext;
 import com.hmily.tcc.common.bean.entity.Participant;
 import com.hmily.tcc.common.bean.entity.TccInvocation;
 import com.hmily.tcc.core.concurrent.threadlocal.TransactionContextLocal;
-import com.hmily.tcc.core.service.handler.TccTransactionManager;
+import com.hmily.tcc.core.service.executor.HmilyTransactionExecutor;
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.Method;
@@ -49,10 +49,10 @@ import java.util.Objects;
 public class TccTransactionFilter implements Filter {
 
 
-    private TccTransactionManager tccTransactionManager;
+    private HmilyTransactionExecutor hmilyTransactionExecutor;
 
-    public void setTccTransactionManager(TccTransactionManager tccTransactionManager) {
-        this.tccTransactionManager = tccTransactionManager;
+    public void setHmilyTransactionExecutor(HmilyTransactionExecutor hmilyTransactionExecutor) {
+        this.hmilyTransactionExecutor = hmilyTransactionExecutor;
     }
 
     @Override
@@ -89,7 +89,7 @@ public class TccTransactionFilter implements Filter {
                 if(!result.hasException()){
                     final Participant participant = buildParticipant(tccTransactionContext,tcc, method, clazz, arguments, args);
                     if (Objects.nonNull(participant)) {
-                        tccTransactionManager.enlistParticipant(participant);
+                        hmilyTransactionExecutor.enlistParticipant(participant);
                     }
                 }
                 return result;
@@ -124,7 +124,7 @@ public class TccTransactionFilter implements Filter {
                 //设置模式
                 final TccPatternEnum pattern = tcc.pattern();
 
-                tccTransactionManager.getCurrentTransaction().setPattern(pattern.getCode());
+                hmilyTransactionExecutor.getCurrentTransaction().setPattern(pattern.getCode());
 
 
                 TccInvocation confirmInvocation = new TccInvocation(clazz,

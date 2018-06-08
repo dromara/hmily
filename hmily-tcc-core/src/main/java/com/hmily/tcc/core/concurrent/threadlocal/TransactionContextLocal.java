@@ -20,10 +20,10 @@ package com.hmily.tcc.core.concurrent.threadlocal;
 import com.hmily.tcc.common.bean.context.TccTransactionContext;
 
 /**
+ * this is save hmily transactionContext in threadLocal.
  * @author xiaoyu
  */
-public class TransactionContextLocal {
-
+public final class TransactionContextLocal {
 
     private static final ThreadLocal<TccTransactionContext> CURRENT_LOCAL = new ThreadLocal<>();
 
@@ -33,19 +33,33 @@ public class TransactionContextLocal {
 
     }
 
+    /**
+     * singleton TransactionContextLocal.
+     * @return this
+     */
     public static TransactionContextLocal getInstance() {
         return TRANSACTION_CONTEXT_LOCAL;
     }
 
-
-    public void set(TccTransactionContext context) {
+    /**
+     * set value.
+     * @param context context
+     */
+    public void set(final TccTransactionContext context) {
         CURRENT_LOCAL.set(context);
     }
 
+    /**
+     * get value.
+     * @return TccTransactionContext
+     */
     public TccTransactionContext get() {
         return CURRENT_LOCAL.get();
     }
 
+    /**
+     * clean threadLocal for gc.
+     */
     public void remove() {
         CURRENT_LOCAL.remove();
     }

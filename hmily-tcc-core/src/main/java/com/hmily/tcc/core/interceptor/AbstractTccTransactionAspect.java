@@ -14,16 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hmily.tcc.core.interceptor;
 
+package com.hmily.tcc.core.interceptor;
 
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 
-
 /**
+ * this is {@linkplain com.hmily.tcc.annotation.Tcc} aspect handler.
  * @author xiaoyu
  */
 @Aspect
@@ -31,24 +31,32 @@ public abstract class AbstractTccTransactionAspect {
 
     private TccTransactionInterceptor tccTransactionInterceptor;
 
-    public void setTccTransactionInterceptor(TccTransactionInterceptor tccTransactionInterceptor) {
+    protected void setTccTransactionInterceptor(final TccTransactionInterceptor tccTransactionInterceptor) {
         this.tccTransactionInterceptor = tccTransactionInterceptor;
     }
 
+    /**
+     * this is point cut with {@linkplain com.hmily.tcc.annotation.Tcc }.
+     */
     @Pointcut("@annotation(com.hmily.tcc.annotation.Tcc)")
-    public void tccTransactionInterceptor() {
-
+    public void hmilyTccInterceptor() {
     }
 
-    @Around("tccTransactionInterceptor()")
-    public Object interceptCompensableMethod(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
+    /**
+     * this is around in {@linkplain com.hmily.tcc.annotation.Tcc }.
+     * @param proceedingJoinPoint proceedingJoinPoint
+     * @return Object
+     * @throws Throwable  Throwable
+     */
+    @Around("hmilyTccInterceptor()")
+    public Object interceptTccMethod(final ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
         return tccTransactionInterceptor.interceptor(proceedingJoinPoint);
     }
 
     /**
-     * spring Order 接口，该值的返回直接会影响springBean的加载顺序
+     * spring Order.
      *
-     * @return int 类型
+     * @return int
      */
     public abstract int getOrder();
 }
