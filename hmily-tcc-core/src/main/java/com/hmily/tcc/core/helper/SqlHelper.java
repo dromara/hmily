@@ -14,22 +14,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hmily.tcc.core.helper;
 
+package com.hmily.tcc.core.helper;
 
 import com.hmily.tcc.common.utils.DbTypeUtils;
 
 /**
+ * SqlHelper.
  * @author xiaoyu
  */
 public class SqlHelper {
 
-
-    public static String buildCreateTableSql(String driverClassName, String tableName) {
+    /**
+     * create table sql.
+     *
+     * @param driverClassName driverClassName .
+     * @param tableName       table name .
+     * @return sql.
+     */
+    public static String buildCreateTableSql(final String driverClassName, final String tableName) {
         StringBuilder createTableSql = new StringBuilder();
         String dbType = DbTypeUtils.buildByDriverClassName(driverClassName);
         switch (dbType) {
-            case "mysql": {
+            case "mysql":
                 createTableSql
                         .append("CREATE TABLE `")
                         .append(tableName)
@@ -49,8 +56,7 @@ public class SqlHelper {
                         .append("  `pattern` int(2),")
                         .append("  PRIMARY KEY (`trans_id`))");
                 break;
-            }
-            case "oracle": {
+            case "oracle":
                 createTableSql
                         .append("CREATE TABLE `")
                         .append(tableName)
@@ -70,8 +76,7 @@ public class SqlHelper {
                         .append("  `pattern` int(2),")
                         .append("  PRIMARY KEY (`trans_id`))");
                 break;
-            }
-            case "sqlserver": {
+            case "sqlserver":
                 createTableSql
                         .append("CREATE TABLE `")
                         .append(tableName)
@@ -91,14 +96,10 @@ public class SqlHelper {
                         .append("  `pattern` int(2),")
                         .append("  PRIMARY KEY (`trans_id`))");
                 break;
-            }
-            default: {
+            default:
                 throw new RuntimeException("dbType类型不支持,目前仅支持mysql oracle sqlserver.");
-            }
         }
         return createTableSql.toString();
-
-
     }
 
 }

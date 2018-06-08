@@ -14,12 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.hmily.tcc.core.interceptor;
 
 import org.aspectj.lang.ProceedingJoinPoint;
 
-
 /**
+ * TccTransactionInterceptor.
  * @author xiaoyu
  */
 @FunctionalInterface
@@ -27,11 +28,11 @@ public interface TccTransactionInterceptor {
 
 
     /**
-     * tcc分布式事务拦截方法
+     * hmily interceptor handler.
      *
-     * @param pjp tcc切入点
+     * @param pjp tcc point cut.
      * @return Object
-     * @throws Throwable 异常
+     * @throws Throwable Throwable
      */
     Object interceptor(ProceedingJoinPoint pjp) throws Throwable;
 }
