@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.hmily.tcc.motan.service;
 
 import com.hmily.tcc.core.service.RpcApplicationService;
@@ -21,29 +22,30 @@ import com.weibo.api.motan.config.springsupport.BasicServiceConfigBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
 
 /**
+ * MotanRpcApplicationServiceImpl.
  * @author xiaoyu
  */
-@Service
+@Service("applicationService")
 public class MotanRpcApplicationServiceImpl implements RpcApplicationService {
-
 
     private final BasicServiceConfigBean basicServiceConfigBean;
 
     @Autowired
-    public MotanRpcApplicationServiceImpl(BasicServiceConfigBean basicServiceConfigBean) {
+    public MotanRpcApplicationServiceImpl(final BasicServiceConfigBean basicServiceConfigBean) {
         this.basicServiceConfigBean = basicServiceConfigBean;
     }
 
-
-    /**
-     * 获取applicationName
-     *
-     * @return applicationName
-     */
     @Override
     public String acquireName() {
-        return basicServiceConfigBean.getModule();
+        return Optional.ofNullable(basicServiceConfigBean).orElse(build()).getModule();
+    }
+
+    private BasicServiceConfigBean build() {
+        final BasicServiceConfigBean basicServiceConfigBean = new BasicServiceConfigBean();
+        basicServiceConfigBean.setBeanName("hmily-motan");
+        return basicServiceConfigBean;
     }
 }

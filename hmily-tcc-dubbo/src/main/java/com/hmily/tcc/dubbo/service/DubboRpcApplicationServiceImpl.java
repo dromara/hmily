@@ -22,26 +22,27 @@ import com.hmily.tcc.core.service.RpcApplicationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 /**
+ * DubboRpcApplicationServiceImpl.
  * @author xiaoyu
  */
 @Service("applicationService")
 public class DubboRpcApplicationServiceImpl implements RpcApplicationService {
 
-
     /**
-     * dubbo ApplicationConfig
+     * dubbo ApplicationConfig.
      */
     private final ApplicationConfig applicationConfig;
 
     @Autowired(required = false)
-    public DubboRpcApplicationServiceImpl(ApplicationConfig applicationConfig) {
+    public DubboRpcApplicationServiceImpl(final ApplicationConfig applicationConfig) {
         this.applicationConfig = applicationConfig;
     }
 
-
     @Override
     public String acquireName() {
-        return applicationConfig.getName();
+        return Optional.ofNullable(applicationConfig).orElse(new ApplicationConfig("hmily-dubbo")).getName();
     }
 }

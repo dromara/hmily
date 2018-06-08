@@ -18,9 +18,9 @@
 package com.hmily.tcc.dubbo.interceptor;
 
 import com.alibaba.dubbo.rpc.RpcContext;
+import com.hmily.tcc.common.bean.context.TccTransactionContext;
 import com.hmily.tcc.common.constant.CommonConstant;
 import com.hmily.tcc.common.utils.GsonUtils;
-import com.hmily.tcc.common.bean.context.TccTransactionContext;
 import com.hmily.tcc.core.concurrent.threadlocal.TransactionContextLocal;
 import com.hmily.tcc.core.interceptor.TccTransactionInterceptor;
 import com.hmily.tcc.core.service.HmilyTransactionAspectService;
@@ -30,26 +30,25 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
+ * DubboHmilyTransactionInterceptor.
  * @author xiaoyu
  */
 @Component
-public class DubboTccTransactionInterceptor implements TccTransactionInterceptor {
+public class DubboHmilyTransactionInterceptor implements TccTransactionInterceptor {
 
     private final HmilyTransactionAspectService hmilyTransactionAspectService;
 
     @Autowired
-    public DubboTccTransactionInterceptor(HmilyTransactionAspectService hmilyTransactionAspectService) {
+    public DubboHmilyTransactionInterceptor(final HmilyTransactionAspectService hmilyTransactionAspectService) {
         this.hmilyTransactionAspectService = hmilyTransactionAspectService;
     }
 
-
     @Override
-    public Object interceptor(ProceedingJoinPoint pjp) throws Throwable {
+    public Object interceptor(final ProceedingJoinPoint pjp) throws Throwable {
         final String context = RpcContext.getContext().getAttachment(CommonConstant.TCC_TRANSACTION_CONTEXT);
         TccTransactionContext tccTransactionContext;
         if (StringUtils.isNoneBlank(context)) {
-            tccTransactionContext =
-                    GsonUtils.getInstance().fromJson(context, TccTransactionContext.class);
+            tccTransactionContext = GsonUtils.getInstance().fromJson(context, TccTransactionContext.class);
         } else {
             tccTransactionContext = TransactionContextLocal.getInstance().get();
         }

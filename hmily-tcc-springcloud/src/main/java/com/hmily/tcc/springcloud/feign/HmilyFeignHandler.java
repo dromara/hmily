@@ -14,22 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.hmily.tcc.springcloud.feign;
 
 import com.hmily.tcc.annotation.Tcc;
 import com.hmily.tcc.annotation.TccPatternEnum;
-import com.hmily.tcc.common.enums.TccActionEnum;
 import com.hmily.tcc.common.bean.context.TccTransactionContext;
 import com.hmily.tcc.common.bean.entity.Participant;
 import com.hmily.tcc.common.bean.entity.TccInvocation;
+import com.hmily.tcc.common.enums.TccActionEnum;
 import com.hmily.tcc.core.concurrent.threadlocal.TransactionContextLocal;
 import com.hmily.tcc.core.helper.SpringBeanUtils;
 import com.hmily.tcc.core.service.executor.HmilyTransactionExecutor;
 import feign.InvocationHandlerFactory.MethodHandler;
-import feign.Target;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -37,23 +35,19 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
+ * HmilyFeignHandler.
+ *
  * @author xiaoyu
  */
-public class TccFeignHandler implements InvocationHandler {
-    /**
-     * logger
-     */
-    private static final Logger LOGGER = LoggerFactory.getLogger(TccFeignHandler.class);
+public class HmilyFeignHandler implements InvocationHandler {
 
-    private Target<?> target;
     private Map<Method, MethodHandler> handlers;
 
     @Override
-    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+    public Object invoke(final Object proxy, final Method method, final Object[] args) throws Throwable {
         if (Object.class.equals(method.getDeclaringClass())) {
             return method.invoke(this, args);
         } else {
-
             final Tcc tcc = method.getAnnotation(Tcc.class);
             if (Objects.isNull(tcc)) {
                 return this.handlers.get(method).invoke(args);
@@ -71,68 +65,40 @@ public class TccFeignHandler implements InvocationHandler {
                 throwable.printStackTrace();
                 throw throwable;
             }
-
-
         }
     }
 
-
-    private Participant buildParticipant(Tcc tcc, Method method, Object[] args,
-                                         HmilyTransactionExecutor hmilyTransactionExecutor) {
-
-        final TccTransactionContext tccTransactionContext =
-                TransactionContextLocal.getInstance().get();
-        Participant participant=null;
-        if (Objects.nonNull(tccTransactionContext)) {
-
-            if (TccActionEnum.TRYING.getCode() == tccTransactionContext.getAction()) {
-                //获取协调方法
-                String confirmMethodName = tcc.confirmMethod();
-
-                if (StringUtils.isBlank(confirmMethodName)) {
-                    confirmMethodName = method.getName();
-                }
-
-                String cancelMethodName = tcc.cancelMethod();
-
-                if (StringUtils.isBlank(cancelMethodName)) {
-                    cancelMethodName = method.getName();
-                }
-
-                //设置模式
-                final TccPatternEnum pattern = tcc.pattern();
-
-                hmilyTransactionExecutor.getCurrentTransaction().setPattern(pattern.getCode());
-
-                final Class<?> declaringClass = method.getDeclaringClass();
-
-                TccInvocation confirmInvocation = new TccInvocation(declaringClass,
-                        confirmMethodName,
-                        method.getParameterTypes(), args);
-
-                TccInvocation cancelInvocation = new TccInvocation(declaringClass,
-                        cancelMethodName,
-                        method.getParameterTypes(), args);
-
-                //封装调用点
-                participant = new Participant(
-                        tccTransactionContext.getTransId(),
-                        confirmInvocation,
-                        cancelInvocation);
-
-                return participant;
-            }
+    private Participant buildParticipant(final Tcc tcc, final Method method, final Object[] args,
+                                         final HmilyTransactionExecutor hmilyTransactionExecutor) {
+        final TccTransactionContext tccTransactionContext = TransactionContextLocal.getInstance().get();
+        if (Objects.isNull(tccTransactionContext)
+                || (TccActionEnum.TRYING.getCode() != tccTransactionContext.getAction())) {
+            return null;
         }
-        return participant;
+        //获取协调方法
+        String confirmMethodName = tcc.confirmMethod();
+        if (StringUtils.isBlank(confirmMethodName)) {
+            confirmMethodName = method.getName();
+        }
+        String cancelMethodName = tcc.cancelMethod();
+        if (StringUtils.isBlank(cancelMethodName)) {
+            cancelMethodName = method.getName();
+        }
+        //设置模式
+        final TccPatternEnum pattern = tcc.pattern();
+        hmilyTransactionExecutor.getCurrentTransaction().setPattern(pattern.getCode());
+        final Class<?> declaringClass = method.getDeclaringClass();
+        TccInvocation confirmInvocation = new TccInvocation(declaringClass, confirmMethodName, method.getParameterTypes(), args);
+        TccInvocation cancelInvocation = new TccInvocation(declaringClass, cancelMethodName, method.getParameterTypes(), args);
+        //封装调用点
+        return new Participant(tccTransactionContext.getTransId(), confirmInvocation, cancelInvocation);
     }
 
-
-    public void setTarget(Target<?> target) {
-        this.target = target;
-    }
-
-
-    public void setHandlers(Map<Method, MethodHandler> handlers) {
+    /**
+     * set handlers.
+     * @param handlers handlers
+     */
+    public void setHandlers(final Map<Method, MethodHandler> handlers) {
         this.handlers = handlers;
     }
 

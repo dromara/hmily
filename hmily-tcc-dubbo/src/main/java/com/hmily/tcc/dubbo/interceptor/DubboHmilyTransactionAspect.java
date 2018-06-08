@@ -14,7 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hmily.tcc.springcloud.interceptor;
+
+package com.hmily.tcc.dubbo.interceptor;
 
 import com.hmily.tcc.core.interceptor.AbstractTccTransactionAspect;
 import org.aspectj.lang.annotation.Aspect;
@@ -22,22 +23,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.Ordered;
 import org.springframework.stereotype.Component;
 
+
 /**
+ * dubbo impl aspect.
  * @author xiaoyu
  */
 @Aspect
 @Component
-public class SpringCloudTccTransactionAspect extends AbstractTccTransactionAspect implements Ordered {
-
+public class DubboHmilyTransactionAspect extends AbstractTccTransactionAspect implements Ordered {
 
     @Autowired
-    public SpringCloudTccTransactionAspect(SpringCloudTccTransactionInterceptor springCloudTccTransactionInterceptor) {
-        this.setTccTransactionInterceptor(springCloudTccTransactionInterceptor);
-    }
-
-
-    public void init() {
-
+    public DubboHmilyTransactionAspect(final DubboHmilyTransactionInterceptor dubboHmilyTransactionInterceptor) {
+        super.setTccTransactionInterceptor(dubboHmilyTransactionInterceptor);
     }
 
     @Override
