@@ -32,7 +32,7 @@
 
     <context:component-scan base-package="com.hmily.tcc.*"/>
     <aop:aspectj-autoproxy expose-proxy="true"/>
-    <bean id="tccTransactionBootstrap" class="com.hmily.tcc.core.bootstrap.TccTransactionBootstrap">
+    <bean id="hmilyTransactionBootstrap" class="com.hmily.tcc.core.bootstrap.HmilyTransactionBootstrap">
         <property name="serializer" value="kryo"/>
         <property name="recoverDelayTime" value="120"/>
         <property name="retryMax" value="3"/>

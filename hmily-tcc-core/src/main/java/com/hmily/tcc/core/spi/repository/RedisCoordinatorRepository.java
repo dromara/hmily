@@ -14,26 +14,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.hmily.tcc.core.spi.repository;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.hmily.tcc.common.bean.adapter.CoordinatorRepositoryAdapter;
+import com.hmily.tcc.common.bean.entity.TccTransaction;
 import com.hmily.tcc.common.config.TccConfig;
 import com.hmily.tcc.common.config.TccRedisConfig;
-import com.hmily.tcc.common.bean.entity.TccTransaction;
 import com.hmily.tcc.common.enums.RepositorySupportEnum;
 import com.hmily.tcc.common.exception.TccException;
 import com.hmily.tcc.common.exception.TccRuntimeException;
 import com.hmily.tcc.common.jedis.JedisClient;
 import com.hmily.tcc.common.jedis.JedisClientCluster;
 import com.hmily.tcc.common.jedis.JedisClientSingle;
+import com.hmily.tcc.common.serializer.ObjectSerializer;
 import com.hmily.tcc.common.utils.LogUtil;
 import com.hmily.tcc.common.utils.RepositoryConvertUtils;
 import com.hmily.tcc.common.utils.RepositoryPathUtils;
-import com.hmily.tcc.common.serializer.ObjectSerializer;
 import com.hmily.tcc.core.spi.CoordinatorRepository;
-
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,48 +48,35 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
+ * redis impl.
  * @author xiaoyu
  */
 public class RedisCoordinatorRepository implements CoordinatorRepository {
 
     /**
-     * logger
+     * logger.
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(RedisCoordinatorRepository.class);
 
-
     private ObjectSerializer objectSerializer;
-
 
     private JedisClient jedisClient;
 
     private String keyPrefix;
 
-    /**
-     * 创建本地事务对象
-     *
-     * @param tccTransaction 事务对象
-     * @return rows
-     */
     @Override
-    public int create(TccTransaction tccTransaction) {
+    public int create(final TccTransaction tccTransaction) {
         try {
             final String redisKey = RepositoryPathUtils.buildRedisKey(keyPrefix, tccTransaction.getTransId());
             jedisClient.set(redisKey, RepositoryConvertUtils.convert(tccTransaction, objectSerializer));
-            return 1;
+            return ROWS;
         } catch (Exception e) {
             throw new TccRuntimeException(e);
         }
     }
 
-    /**
-     * 删除对象
-     *
-     * @param id 事务对象id
-     * @return rows
-     */
     @Override
-    public int remove(String id) {
+    public int remove(final String id) {
         try {
             final String redisKey = RepositoryPathUtils.buildRedisKey(keyPrefix, id);
             return jedisClient.del(redisKey).intValue();
@@ -98,36 +85,23 @@ public class RedisCoordinatorRepository implements CoordinatorRepository {
         }
     }
 
-    /**
-     * 更新数据
-     *
-     * @param tccTransaction 事务对象
-     * @return rows 1 成功 0 失败 失败需要抛异常
-     */
     @Override
-    public int update(TccTransaction tccTransaction) throws TccRuntimeException {
+    public int update(final TccTransaction tccTransaction) throws TccRuntimeException {
         try {
             final String redisKey = RepositoryPathUtils.buildRedisKey(keyPrefix, tccTransaction.getTransId());
             tccTransaction.setVersion(tccTransaction.getVersion() + 1);
             tccTransaction.setLastTime(new Date());
             tccTransaction.setRetriedCount(tccTransaction.getRetriedCount() + 1);
-            final String result = jedisClient.set(redisKey, RepositoryConvertUtils.convert(tccTransaction, objectSerializer));
-            return 1;
+            jedisClient.set(redisKey, RepositoryConvertUtils.convert(tccTransaction, objectSerializer));
+            return ROWS;
         } catch (Exception e) {
             throw new TccRuntimeException(e);
         }
     }
 
-    /**
-     * 更新 List<Participant>  只更新这一个字段数据
-     *
-     * @param tccTransaction 实体对象
-     */
     @Override
-    public int updateParticipant(TccTransaction tccTransaction) {
-        final String redisKey =
-                RepositoryPathUtils.buildRedisKey(keyPrefix, tccTransaction.getTransId());
-
+    public int updateParticipant(final TccTransaction tccTransaction) {
+        final String redisKey = RepositoryPathUtils.buildRedisKey(keyPrefix, tccTransaction.getTransId());
         byte[] contents = jedisClient.get(redisKey.getBytes());
         try {
             CoordinatorRepositoryAdapter adapter = objectSerializer.deSerialize(contents, CoordinatorRepositoryAdapter.class);
@@ -135,25 +109,14 @@ public class RedisCoordinatorRepository implements CoordinatorRepository {
             jedisClient.set(redisKey, objectSerializer.serialize(adapter));
         } catch (TccException e) {
             e.printStackTrace();
-            return 0;
+            return FAIL_ROWS;
         }
-
-        return 1;
-
+        return ROWS;
     }
 
-    /**
-     * 更新补偿数据状态
-     *
-     * @param id     事务id
-     * @param status 状态
-     * @return rows 1 成功 0 失败
-     */
     @Override
-    public int updateStatus(String id, Integer status) {
-        final String redisKey =
-                RepositoryPathUtils.buildRedisKey(keyPrefix, id);
-
+    public int updateStatus(final String id, final Integer status) {
+        final String redisKey = RepositoryPathUtils.buildRedisKey(keyPrefix, id);
         byte[] contents = jedisClient.get(redisKey.getBytes());
         try {
             CoordinatorRepositoryAdapter adapter = objectSerializer.deSerialize(contents, CoordinatorRepositoryAdapter.class);
@@ -161,37 +124,22 @@ public class RedisCoordinatorRepository implements CoordinatorRepository {
             jedisClient.set(redisKey, objectSerializer.serialize(adapter));
         } catch (TccException e) {
             e.printStackTrace();
-            return 0;
+            return FAIL_ROWS;
         }
-
-        return 1;
+        return ROWS;
     }
 
-
-    /**
-     * 根据id获取对象
-     *
-     * @param id 主键id
-     * @return TccTransaction
-     */
     @Override
-    public TccTransaction findById(String id) {
+    public TccTransaction findById(final String id) {
         try {
-
             final String redisKey = RepositoryPathUtils.buildRedisKey(keyPrefix, id);
             byte[] contents = jedisClient.get(redisKey.getBytes());
-
             return RepositoryConvertUtils.transformBean(contents, objectSerializer);
         } catch (Exception e) {
             throw new TccRuntimeException(e);
         }
     }
 
-    /**
-     * 获取需要提交的事务
-     *
-     * @return List<TransactionRecover>
-     */
     @Override
     public List<TccTransaction> listAll() {
         try {
@@ -209,26 +157,16 @@ public class RedisCoordinatorRepository implements CoordinatorRepository {
         }
     }
 
-    /**
-     * 获取延迟多长时间后的事务信息,只要为了防止并发的时候，刚新增的数据被执行
-     *
-     * @param date 延迟后的时间
-     * @return List<TccTransaction>
-     */
     @Override
-    public List<TccTransaction> listAllByDelay(Date date) {
+    public List<TccTransaction> listAllByDelay(final Date date) {
         final List<TccTransaction> tccTransactions = listAll();
-        return tccTransactions.stream().filter(tccTransaction -> tccTransaction.getLastTime().compareTo(date) > 0).collect(Collectors.toList());
+        return tccTransactions.stream()
+                .filter(tccTransaction -> tccTransaction.getLastTime().compareTo(date) > 0)
+                .collect(Collectors.toList());
     }
 
-    /**
-     * 初始化操作
-     *
-     * @param modelName 模块名称
-     * @param tccConfig 配置信息
-     */
     @Override
-    public void init(String modelName, TccConfig tccConfig) {
+    public void init(final String modelName, final TccConfig tccConfig) {
         keyPrefix = RepositoryPathUtils.buildRedisKeyPrefix(modelName);
         final TccRedisConfig tccRedisConfig = tccConfig.getTccRedisConfig();
         try {
@@ -238,28 +176,17 @@ public class RedisCoordinatorRepository implements CoordinatorRepository {
         }
     }
 
-
-    /**
-     * 设置scheme
-     *
-     * @return scheme 命名
-     */
     @Override
     public String getScheme() {
         return RepositorySupportEnum.REDIS.getSupport();
     }
 
-    /**
-     * 设置序列化信息
-     *
-     * @param objectSerializer 序列化实现
-     */
     @Override
-    public void setSerializer(ObjectSerializer objectSerializer) {
+    public void setSerializer(final ObjectSerializer objectSerializer) {
         this.objectSerializer = objectSerializer;
     }
 
-    private void buildJedisPool(TccRedisConfig tccRedisConfig) {
+    private void buildJedisPool(final TccRedisConfig tccRedisConfig) {
         LogUtil.debug(LOGGER, () -> "开始构建redis配置信息");
         JedisPoolConfig config = new JedisPoolConfig();
         config.setMaxIdle(tccRedisConfig.getMaxIdle());
@@ -289,9 +216,11 @@ public class RedisCoordinatorRepository implements CoordinatorRepository {
         if (tccRedisConfig.getCluster()) {
             LogUtil.info(LOGGER, () -> "构造redis集群模式");
             final String clusterUrl = tccRedisConfig.getClusterUrl();
-            final Set<HostAndPort> hostAndPorts = Splitter.on(clusterUrl)
-                    .splitToList(";").stream()
-                    .map(HostAndPort::parseString).collect(Collectors.toSet());
+            final Set<HostAndPort> hostAndPorts =
+                    Splitter.on(clusterUrl)
+                            .splitToList(";")
+                            .stream()
+                            .map(HostAndPort::parseString).collect(Collectors.toSet());
             JedisCluster jedisCluster = new JedisCluster(hostAndPorts, config);
             jedisClient = new JedisClientCluster(jedisCluster);
         } else {
@@ -302,6 +231,6 @@ public class RedisCoordinatorRepository implements CoordinatorRepository {
             }
             jedisClient = new JedisClientSingle(jedisPool);
         }
-
     }
+
 }

@@ -24,7 +24,7 @@ import com.hmily.tcc.common.bean.entity.Participant;
 import com.hmily.tcc.common.bean.entity.TccInvocation;
 import com.hmily.tcc.core.concurrent.threadlocal.TransactionContextLocal;
 import com.hmily.tcc.core.helper.SpringBeanUtils;
-import com.hmily.tcc.core.service.handler.TccTransactionManager;
+import com.hmily.tcc.core.service.executor.HmilyTransactionExecutor;
 import feign.InvocationHandlerFactory.MethodHandler;
 import feign.Target;
 import org.apache.commons.lang3.StringUtils;
@@ -59,12 +59,12 @@ public class TccFeignHandler implements InvocationHandler {
                 return this.handlers.get(method).invoke(args);
             }
             try {
-                final TccTransactionManager tccTransactionManager =
-                        SpringBeanUtils.getInstance().getBean(TccTransactionManager.class);
+                final HmilyTransactionExecutor hmilyTransactionExecutor =
+                        SpringBeanUtils.getInstance().getBean(HmilyTransactionExecutor.class);
                 final Object invoke = this.handlers.get(method).invoke(args);
-                final Participant participant = buildParticipant(tcc, method, args, tccTransactionManager);
+                final Participant participant = buildParticipant(tcc, method, args, hmilyTransactionExecutor);
                 if (Objects.nonNull(participant)) {
-                    tccTransactionManager.enlistParticipant(participant);
+                    hmilyTransactionExecutor.enlistParticipant(participant);
                 }
                 return invoke;
             } catch (Throwable throwable) {
@@ -78,7 +78,7 @@ public class TccFeignHandler implements InvocationHandler {
 
 
     private Participant buildParticipant(Tcc tcc, Method method, Object[] args,
-                                         TccTransactionManager tccTransactionManager) {
+                                         HmilyTransactionExecutor hmilyTransactionExecutor) {
 
         final TccTransactionContext tccTransactionContext =
                 TransactionContextLocal.getInstance().get();
@@ -102,7 +102,7 @@ public class TccFeignHandler implements InvocationHandler {
                 //设置模式
                 final TccPatternEnum pattern = tcc.pattern();
 
-                tccTransactionManager.getCurrentTransaction().setPattern(pattern.getCode());
+                hmilyTransactionExecutor.getCurrentTransaction().setPattern(pattern.getCode());
 
                 final Class<?> declaringClass = method.getDeclaringClass();
 

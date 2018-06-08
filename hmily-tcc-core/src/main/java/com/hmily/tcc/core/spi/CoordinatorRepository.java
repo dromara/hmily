@@ -14,112 +14,110 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.hmily.tcc.core.spi;
 
-
+import com.hmily.tcc.common.bean.entity.TccTransaction;
 import com.hmily.tcc.common.config.TccConfig;
 import com.hmily.tcc.common.serializer.ObjectSerializer;
-import com.hmily.tcc.common.bean.entity.TccTransaction;
-import com.hmily.tcc.common.exception.TccRuntimeException;
 
 import java.util.Date;
 import java.util.List;
 
-
 /**
+ * CoordinatorRepository.
  * @author xiaoyu
  */
 public interface CoordinatorRepository {
 
+    int ROWS = 1;
+
+    int FAIL_ROWS = 0;
+
     /**
-     * 创建本地事务对象
+     * create TccTransaction.
      *
-     * @param tccTransaction 事务对象
-     * @return rows
+     * @param tccTransaction {@linkplain TccTransaction}
+     * @return rows 1
      */
     int create(TccTransaction tccTransaction);
 
     /**
-     * 删除对象
+     * delete TccTransaction.
      *
-     * @param id 事务对象id
-     * @return rows
+     * @param id  pk
+     * @return rows 1
      */
     int remove(String id);
 
-
     /**
-     * 更新数据
+     * update TccTransaction.
      *
-     * @param tccTransaction 事务对象
-     * @return rows 1 成功 0 失败 失败需要抛异常
+     * @param tccTransaction {@linkplain TccTransaction}
+     * @return rows 1 success 0 fail
      */
     int update(TccTransaction tccTransaction);
 
-
     /**
-     * 更新 List<Participant>  只更新这一个字段数据
+     * update  participants.
      *
-     * @param tccTransaction 实体对象
-     * @return rows 1 成功 0 失败
+     * @param tccTransaction {@linkplain TccTransaction}
+     * @return rows 1 success 0 fail
      */
     int updateParticipant(TccTransaction tccTransaction);
 
 
     /**
-     * 更新补偿数据状态
-     * @param id  事务id
-     * @param status  状态
-     * @return  rows 1 成功 0 失败
+     * update status .
+     * @param id  pk
+     * @param status  status
+     * @return rows 1 success 0 fail
      */
     int updateStatus(String id, Integer status);
 
     /**
-     * 根据id获取对象
+     * acquired by id.
      *
-     * @param id 主键id
-     * @return TccTransaction
+     * @param id pk
+     * @return {@linkplain TccTransaction}
      */
     TccTransaction findById(String id);
 
     /**
-     * 获取需要提交的事务
+     * list all.
      *
-     * @return List<TransactionRecover>
+     * @return {@linkplain TccTransaction}
      */
-    List listAll();
+    List<TccTransaction> listAll();
 
 
     /**
-     * 获取延迟多长时间后的事务信息,只要为了防止并发的时候，刚新增的数据被执行
+     * 获取延迟多长时间后的事务信息,只要为了防止并发的时候，刚新增的数据被执行.
      *
      * @param date 延迟后的时间
-     * @return List<TccTransaction>
+     * @return {@linkplain TccTransaction}
      */
     List<TccTransaction> listAllByDelay(Date date);
 
-
     /**
-     * 初始化操作
+     * init.
      *
-     * @param modelName 模块名称
-     * @param tccConfig 配置信息
-     * @throws TccRuntimeException 自定义异常
+     * @param modelName modelName
+     * @param tccConfig {@linkplain TccConfig}
      */
-    void init(String modelName, TccConfig tccConfig) throws TccRuntimeException;
+    void init(String modelName, TccConfig tccConfig);
 
     /**
-     * 设置scheme
+     * set scheme.
      *
-     * @return scheme 命名
+     * @return scheme
      */
     String getScheme();
 
-
     /**
-     * 设置序列化信息
+     * set objectSerializer.
      *
-     * @param objectSerializer 序列化实现
+     * @param objectSerializer {@linkplain ObjectSerializer}
      */
     void setSerializer(ObjectSerializer objectSerializer);
 }

@@ -32,6 +32,10 @@
     <dependencies>
         <dependency>
             <groupId>com.hmily.tcc</groupId>
+            <artifactId>hmily-tcc-spring-boot-starter-parent</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.hmily.tcc</groupId>
             <artifactId>hmily-tcc-springcloud</artifactId>
         </dependency>
     </dependencies>

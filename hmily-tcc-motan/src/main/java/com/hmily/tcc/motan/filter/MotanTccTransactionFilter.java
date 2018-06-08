@@ -29,7 +29,7 @@ import com.hmily.tcc.common.exception.TccRuntimeException;
 import com.hmily.tcc.common.utils.GsonUtils;
 import com.hmily.tcc.core.concurrent.threadlocal.TransactionContextLocal;
 import com.hmily.tcc.core.helper.SpringBeanUtils;
-import com.hmily.tcc.core.service.handler.TccTransactionManager;
+import com.hmily.tcc.core.service.executor.HmilyTransactionExecutor;
 import com.weibo.api.motan.common.MotanConstants;
 import com.weibo.api.motan.core.extension.Activation;
 import com.weibo.api.motan.core.extension.SpiMeta;
@@ -101,7 +101,7 @@ public class MotanTccTransactionFilter implements Filter {
                 final Response response = caller.call(request);
                 final Participant participant = buildParticipant(tccTransactionContext,tcc, method, clazz, arguments, args);
                 if (Objects.nonNull(participant)) {
-                    SpringBeanUtils.getInstance().getBean(TccTransactionManager.class).enlistParticipant(participant);
+                    SpringBeanUtils.getInstance().getBean(HmilyTransactionExecutor.class).enlistParticipant(participant);
                 }
 
                 return response;
@@ -139,7 +139,7 @@ public class MotanTccTransactionFilter implements Filter {
                 //设置模式
                 final TccPatternEnum pattern = tcc.pattern();
 
-                SpringBeanUtils.getInstance().getBean(TccTransactionManager.class)
+                SpringBeanUtils.getInstance().getBean(HmilyTransactionExecutor.class)
                         .getCurrentTransaction().setPattern(pattern.getCode());
 
 

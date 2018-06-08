@@ -30,7 +30,7 @@ import com.hmily.tcc.common.enums.TccActionEnum;
 import com.hmily.tcc.common.enums.TccRoleEnum;
 import com.hmily.tcc.common.utils.LogUtil;
 import com.hmily.tcc.core.concurrent.threadlocal.TransactionContextLocal;
-import com.hmily.tcc.core.concurrent.threadpool.TccTransactionThreadFactory;
+import com.hmily.tcc.core.concurrent.threadpool.HmilyThreadFactory;
 import com.hmily.tcc.core.helper.SpringBeanUtils;
 import com.hmily.tcc.core.spi.CoordinatorRepository;
 import org.apache.commons.collections.CollectionUtils;
@@ -48,17 +48,13 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 /**
- * <p>Description: .</p>
- *
+ * this is scheduled execute transaction log.
  * @author xiaoyu(Myth)
- * @version 1.0
- * @date 2018/3/5 14:29
- * @since JDK 1.8
  */
 public class ScheduledService {
 
     /**
-     * logger
+     * logger.
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(ScheduledService.class);
 
@@ -66,73 +62,64 @@ public class ScheduledService {
 
     private TccConfig tccConfig;
 
-
     private CoordinatorRepository coordinatorRepository;
 
-    public ScheduledService(TccConfig tccConfig, CoordinatorRepository coordinatorRepository) {
+    public ScheduledService(final TccConfig tccConfig, final CoordinatorRepository coordinatorRepository) {
         this.tccConfig = tccConfig;
         this.coordinatorRepository = coordinatorRepository;
-        this.scheduledExecutorService = new ScheduledThreadPoolExecutor(1,
-                TccTransactionThreadFactory.create("tccRollBackService", true));
+        this.scheduledExecutorService = new ScheduledThreadPoolExecutor(1, HmilyThreadFactory.create("tccRollBackService", true));
     }
 
-
+    /**
+     * if have some exception by schedule execute tcc transaction log.
+     */
     public void scheduledRollBack() {
         scheduledExecutorService
                 .scheduleWithFixedDelay(() -> {
                     LogUtil.debug(LOGGER, "rollback execute delayTime:{}", () -> tccConfig.getScheduledDelay());
                     try {
-                        final List<TccTransaction> tccTransactions =
-                                coordinatorRepository.listAllByDelay(acquireData());
-                        if (CollectionUtils.isNotEmpty(tccTransactions)) {
-
-                            for (TccTransaction tccTransaction : tccTransactions) {
-
+                        final List<TccTransaction> tccTransactions = coordinatorRepository.listAllByDelay(acquireData());
+                        if (CollectionUtils.isEmpty(tccTransactions)) {
+                            return;
+                        }
+                        for (TccTransaction tccTransaction : tccTransactions) {
                                 //如果try未执行完成，那么就不进行补偿 （防止在try阶段的各种异常情况）
-                                if (tccTransaction.getRole() == TccRoleEnum.PROVIDER.getCode() &&
-                                        tccTransaction.getStatus() == TccActionEnum.PRE_TRY.getCode()) {
-                                    continue;
-                                }
-
-                                if (tccTransaction.getRetriedCount() > tccConfig.getRetryMax()) {
-                                    LogUtil.error(LOGGER, "此事务超过了最大重试次数，不再进行重试：{}",
-                                            () -> tccTransaction);
-                                    continue;
-                                }
-                                if (Objects.equals(tccTransaction.getPattern(), TccPatternEnum.CC.getCode())
-                                        && tccTransaction.getStatus() == TccActionEnum.TRYING.getCode()) {
-                                    continue;
-                                }
-
+                            if (tccTransaction.getRole() == TccRoleEnum.PROVIDER.getCode() && tccTransaction.getStatus() == TccActionEnum.PRE_TRY.getCode()) {
+                                continue;
+                            }
+                            if (tccTransaction.getRetriedCount() > tccConfig.getRetryMax()) {
+                                LogUtil.error(LOGGER, "此事务超过了最大重试次数，不再进行重试：{}", () -> tccTransaction);
+                                continue;
+                            }
+                            if (Objects.equals(tccTransaction.getPattern(), TccPatternEnum.CC.getCode())
+                                    && tccTransaction.getStatus() == TccActionEnum.TRYING.getCode()) {
+                                continue;
+                            }
                                 //如果事务角色是提供者的话，并且在重试的次数范围类是不能执行的，只能由发起者执行
-                                if (tccTransaction.getRole() == TccRoleEnum.PROVIDER.getCode()
-                                        && (tccTransaction.getCreateTime().getTime() +
-                                        tccConfig.getRetryMax() * tccConfig.getRecoverDelayTime() * 1000
-                                        > System.currentTimeMillis())) {
-                                    continue;
-                                }
-
-                                try {
-                                    // 先更新数据，然后执行
-                                    tccTransaction.setRetriedCount(tccTransaction.getRetriedCount() + 1);
-                                    final int rows = coordinatorRepository.update(tccTransaction);
+                            if (tccTransaction.getRole() == TccRoleEnum.PROVIDER.getCode()
+                                    && (tccTransaction.getCreateTime().getTime()
+                                    + tccConfig.getRetryMax() * tccConfig.getRecoverDelayTime() * 1000 > System.currentTimeMillis())) {
+                                continue;
+                            }
+                            try {
+                                // 先更新数据，然后执行
+                                tccTransaction.setRetriedCount(tccTransaction.getRetriedCount() + 1);
+                                final int rows = coordinatorRepository.update(tccTransaction);
                                     //判断当rows>0 才执行，为了防止业务方为集群模式时候的并发
-                                    if (rows > 0) {
+                                if (rows > 0) {
                                         //如果是以下3种状态
-                                        if ((tccTransaction.getStatus() == TccActionEnum.TRYING.getCode()
+                                    if (tccTransaction.getStatus() == TccActionEnum.TRYING.getCode()
                                                 || tccTransaction.getStatus() == TccActionEnum.PRE_TRY.getCode()
-                                                || tccTransaction.getStatus() == TccActionEnum.CANCELING.getCode())) {
-                                            cancel(tccTransaction);
-                                        } else if (tccTransaction.getStatus() == TccActionEnum.CONFIRMING.getCode()) {
+                                            || tccTransaction.getStatus() == TccActionEnum.CANCELING.getCode()) {
+                                        cancel(tccTransaction);
+                                    } else if (tccTransaction.getStatus() == TccActionEnum.CONFIRMING.getCode()) {
                                             //执行confirm操作
-                                            confirm(tccTransaction);
-                                        }
+                                        confirm(tccTransaction);
                                     }
-
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                    LogUtil.error(LOGGER, "执行事务补偿异常:{}", e::getMessage);
                                 }
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                                LogUtil.error(LOGGER, "执行事务补偿异常:{}", e::getMessage);
                             }
                         }
                     } catch (Exception e) {
@@ -142,7 +129,7 @@ public class ScheduledService {
 
     }
 
-    private void cancel(TccTransaction tccTransaction) {
+    private void cancel(final TccTransaction tccTransaction) {
         final List<Participant> participants = tccTransaction.getParticipants();
         List<Participant> failList = Lists.newArrayListWithCapacity(participants.size());
         boolean success = true;
@@ -165,10 +152,8 @@ public class ScheduledService {
 
     }
 
-    private void confirm(TccTransaction tccTransaction) {
-
+    private void confirm(final TccTransaction tccTransaction) {
         final List<Participant> participants = tccTransaction.getParticipants();
-
         List<Participant> failList = Lists.newArrayListWithCapacity(participants.size());
         boolean success = true;
         if (CollectionUtils.isNotEmpty(participants)) {
@@ -187,12 +172,9 @@ public class ScheduledService {
             }
             executeHandler(success, tccTransaction, failList);
         }
-
     }
 
-
-    private void executeHandler(boolean success, final TccTransaction currentTransaction,
-                                List<Participant> failList) {
+    private void executeHandler(final boolean success, final TccTransaction currentTransaction, final List<Participant> failList) {
         if (success) {
             coordinatorRepository.remove(currentTransaction.getTransId());
         } else {
@@ -201,9 +183,8 @@ public class ScheduledService {
         }
     }
 
-
     @SuppressWarnings("unchecked")
-    private void executeCoordinator(TccInvocation tccInvocation) throws Exception {
+    private void executeCoordinator(final TccInvocation tccInvocation) throws Exception {
         if (Objects.nonNull(tccInvocation)) {
             final Class clazz = tccInvocation.getTargetClass();
             final String method = tccInvocation.getMethodName();
@@ -211,11 +192,9 @@ public class ScheduledService {
             final Class[] parameterTypes = tccInvocation.getParameterTypes();
             final Object bean = SpringBeanUtils.getInstance().getBean(clazz);
             MethodUtils.invokeMethod(bean, method, args, parameterTypes);
-            LogUtil.debug(LOGGER, "执行本地协调事务:{}", () -> tccInvocation.getTargetClass()
-                    + ":" + tccInvocation.getMethodName());
+            LogUtil.debug(LOGGER, "执行本地协调事务:{}", () -> tccInvocation.getTargetClass() + ":" + tccInvocation.getMethodName());
         }
     }
-
 
     private Date acquireData() {
         return new Date(LocalDateTime.now().atZone(ZoneId.systemDefault())

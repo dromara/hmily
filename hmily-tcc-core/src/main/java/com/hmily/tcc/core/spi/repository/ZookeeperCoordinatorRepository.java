@@ -14,24 +14,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.hmily.tcc.core.spi.repository;
 
 import com.google.common.collect.Lists;
 import com.hmily.tcc.common.bean.adapter.CoordinatorRepositoryAdapter;
+import com.hmily.tcc.common.bean.entity.TccTransaction;
 import com.hmily.tcc.common.config.TccConfig;
 import com.hmily.tcc.common.config.TccZookeeperConfig;
-import com.hmily.tcc.common.bean.entity.TccTransaction;
 import com.hmily.tcc.common.enums.RepositorySupportEnum;
 import com.hmily.tcc.common.exception.TccException;
 import com.hmily.tcc.common.exception.TccRuntimeException;
+import com.hmily.tcc.common.serializer.ObjectSerializer;
 import com.hmily.tcc.common.utils.LogUtil;
 import com.hmily.tcc.common.utils.RepositoryConvertUtils;
 import com.hmily.tcc.common.utils.RepositoryPathUtils;
 import com.hmily.tcc.core.spi.CoordinatorRepository;
-import com.hmily.tcc.common.serializer.ObjectSerializer;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.KeeperException;
 import org.apache.zookeeper.Watcher;
@@ -46,144 +46,92 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.stream.Collectors;
 
-
 /**
+ * zookeeper impl.
  * @author xiaoyu
  */
 public class ZookeeperCoordinatorRepository implements CoordinatorRepository {
 
     /**
-     * logger
+     * logger.
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(ZookeeperCoordinatorRepository.class);
-
-    private ObjectSerializer objectSerializer;
-
-    private String rootPathPrefix = "/tcc";
-
 
     private static volatile ZooKeeper zooKeeper;
 
     private static final CountDownLatch LATCH = new CountDownLatch(1);
 
+    private ObjectSerializer objectSerializer;
 
-    /**
-     * 创建本地事务对象
-     *
-     * @param tccTransaction 事务对象
-     * @return rows
-     */
+    private String rootPathPrefix = "/hmily";
 
     @Override
-    public int create(TccTransaction tccTransaction) {
+    public int create(final TccTransaction tccTransaction) {
         try {
             zooKeeper.create(buildRootPath(tccTransaction.getTransId()),
                     RepositoryConvertUtils.convert(tccTransaction, objectSerializer),
                     ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
-            return 1;
+            return ROWS;
         } catch (Exception e) {
             throw new TccRuntimeException(e);
         }
     }
 
-
-    /**
-     * 删除对象
-     *
-     * @param id 事务对象id
-     * @return rows
-     */
     @Override
-    public int remove(String id) {
+    public int remove(final String id) {
         try {
-            final TccTransaction byId = findById(id);
             zooKeeper.delete(buildRootPath(id), -1);
-            return 1;
+            return ROWS;
         } catch (Exception e) {
             throw new TccRuntimeException(e);
         }
     }
 
-    /**
-     * 更新数据
-     *
-     * @param tccTransaction 事务对象
-     * @return rows 1 成功 0 失败 失败需要抛异常
-     */
     @Override
-    public int update(TccTransaction tccTransaction) throws TccRuntimeException {
+    public int update(final TccTransaction tccTransaction) throws TccRuntimeException {
         try {
             tccTransaction.setLastTime(new Date());
             tccTransaction.setVersion(tccTransaction.getVersion() + 1);
             zooKeeper.setData(buildRootPath(tccTransaction.getTransId()),
                     RepositoryConvertUtils.convert(tccTransaction, objectSerializer), -1);
-            return 1;
+            return ROWS;
         } catch (Exception e) {
             throw new TccRuntimeException(e);
         }
     }
 
-    /**
-     * 更新 List<Participant>  只更新这一个字段数据
-     *
-     * @param tccTransaction 实体对象
-     */
     @Override
-    public int updateParticipant(TccTransaction tccTransaction) {
-
+    public int updateParticipant(final TccTransaction tccTransaction) {
         final String path = RepositoryPathUtils.buildZookeeperRootPath(rootPathPrefix, tccTransaction.getTransId());
         try {
-            byte[] content = zooKeeper.getData(path,
-                    false, new Stat());
+            byte[] content = zooKeeper.getData(path, false, new Stat());
             final CoordinatorRepositoryAdapter adapter = objectSerializer.deSerialize(content, CoordinatorRepositoryAdapter.class);
-
             adapter.setContents(objectSerializer.serialize(tccTransaction.getParticipants()));
-            zooKeeper.create(path,
-                    objectSerializer.serialize(adapter),
-                    ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
-            return 1;
+            zooKeeper.create(path, objectSerializer.serialize(adapter), ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
+            return ROWS;
         } catch (Exception e) {
             e.printStackTrace();
-            return 0;
+            return FAIL_ROWS;
         }
-
     }
 
-    /**
-     * 更新补偿数据状态
-     *
-     * @param id     事务id
-     * @param status 状态
-     * @return rows 1 成功 0 失败
-     */
     @Override
-    public int updateStatus(String id, Integer status) {
-        final String path = RepositoryPathUtils.buildZookeeperRootPath(rootPathPrefix,id);
+    public int updateStatus(final String id, final Integer status) {
+        final String path = RepositoryPathUtils.buildZookeeperRootPath(rootPathPrefix, id);
         try {
-            byte[] content = zooKeeper.getData(path,
-                    false, new Stat());
+            byte[] content = zooKeeper.getData(path, false, new Stat());
             final CoordinatorRepositoryAdapter adapter = objectSerializer.deSerialize(content, CoordinatorRepositoryAdapter.class);
-
             adapter.setStatus(status);
-            zooKeeper.create(path,
-                    objectSerializer.serialize(adapter),
-                    ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
-            return 1;
+            zooKeeper.create(path, objectSerializer.serialize(adapter), ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
+            return ROWS;
         } catch (Exception e) {
             e.printStackTrace();
-            return 0;
+            return FAIL_ROWS;
         }
-
     }
 
-    /**
-     * 根据id获取对象
-     *
-     * @param id 主键id
-     * @return TransactionRecover
-     */
     @Override
-    public TccTransaction findById(String id) {
+    public TccTransaction findById(final String id) {
         try {
             Stat stat = new Stat();
             byte[] content = zooKeeper.getData(buildRootPath(id), false, stat);
@@ -193,15 +141,9 @@ public class ZookeeperCoordinatorRepository implements CoordinatorRepository {
         }
     }
 
-    /**
-     * 获取需要提交的事务
-     *
-     * @return List<TransactionRecover>
-     */
     @Override
     public List<TccTransaction> listAll() {
         List<TccTransaction> transactionRecovers = Lists.newArrayList();
-
         List<String> zNodePaths;
         try {
             zNodePaths = zooKeeper.getChildren(rootPathPrefix, false);
@@ -221,30 +163,19 @@ public class ZookeeperCoordinatorRepository implements CoordinatorRepository {
                         return null;
                     }).collect(Collectors.toList());
         }
-
         return transactionRecovers;
     }
 
-    /**
-     * 获取延迟多长时间后的事务信息,只要为了防止并发的时候，刚新增的数据被执行
-     *
-     * @param date 延迟后的时间
-     * @return List<TccTransaction>
-     */
     @Override
-    public List<TccTransaction> listAllByDelay(Date date) {
+    public List<TccTransaction> listAllByDelay(final Date date) {
         final List<TccTransaction> tccTransactions = listAll();
-        return tccTransactions.stream().filter(tccTransaction -> tccTransaction.getLastTime().compareTo(date) > 0).collect(Collectors.toList());
+        return tccTransactions.stream()
+                .filter(tccTransaction -> tccTransaction.getLastTime().compareTo(date) > 0)
+                .collect(Collectors.toList());
     }
 
-    /**
-     * 初始化操作
-     *
-     * @param modelName 模块名称
-     * @param tccConfig 配置信息
-     */
     @Override
-    public void init(String modelName, TccConfig tccConfig) {
+    public void init(final String modelName, final TccConfig tccConfig) {
         rootPathPrefix = RepositoryPathUtils.buildZookeeperPathPrefix(modelName);
         try {
             connect(tccConfig.getTccZookeeperConfig());
@@ -252,11 +183,9 @@ public class ZookeeperCoordinatorRepository implements CoordinatorRepository {
             LogUtil.error(LOGGER, "zookeeper连接异常请检查配置信息是否正确:{}", e::getMessage);
             throw new TccRuntimeException(e.getMessage());
         }
-
-
     }
 
-    private void connect(TccZookeeperConfig config) {
+    private void connect(final TccZookeeperConfig config) {
         try {
             zooKeeper = new ZooKeeper(config.getHost(), config.getSessionTimeOut(), watchedEvent -> {
                 if (watchedEvent.getState() == Watcher.Event.KeeperState.SyncConnected) {
@@ -272,31 +201,19 @@ public class ZookeeperCoordinatorRepository implements CoordinatorRepository {
         } catch (Exception e) {
             throw new TccRuntimeException(e);
         }
-
-
     }
 
-    /**
-     * 设置scheme
-     *
-     * @return scheme 命名
-     */
     @Override
     public String getScheme() {
         return RepositorySupportEnum.ZOOKEEPER.getSupport();
     }
 
-    /**
-     * 设置序列化信息
-     *
-     * @param objectSerializer 序列化实现
-     */
     @Override
-    public void setSerializer(ObjectSerializer objectSerializer) {
+    public void setSerializer(final ObjectSerializer objectSerializer) {
         this.objectSerializer = objectSerializer;
     }
 
-    private String buildRootPath(String id) {
+    private String buildRootPath(final String id) {
         return RepositoryPathUtils.buildZookeeperRootPath(rootPathPrefix, id);
     }
 }

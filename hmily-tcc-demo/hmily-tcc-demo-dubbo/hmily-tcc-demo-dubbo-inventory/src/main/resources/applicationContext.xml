@@ -15,7 +15,7 @@
 
     <context:component-scan base-package="com.hmily.tcc.*"/>
     <aop:aspectj-autoproxy expose-proxy="true"/>
-    <bean id="tccTransactionBootstrap" class="com.hmily.tcc.core.bootstrap.TccTransactionBootstrap">
+    <bean id="hmilyTransactionBootstrap" class="com.hmily.tcc.core.bootstrap.HmilyTransactionBootstrap">
         <property name="serializer" value="kryo"/>
         <property name="recoverDelayTime" value="120"/>
         <property name="retryMax" value="3"/>
@@ -25,10 +25,10 @@
         <property name="tccDbConfig">
             <bean class="com.hmily.tcc.common.config.TccDbConfig">
                 <property name="url"
-                          value="jdbc:mysql://192.168.1.68:3306/tcc?useUnicode=true&amp;characterEncoding=utf8"/>
+                          value="jdbc:mysql://10.4.4.202:3306/tcc?useUnicode=true&amp;characterEncoding=utf8"/>
                 <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
-                <property name="password" value="Wgj@555888"/>
-                <property name="username" value="xiaoyu"/>
+                <property name="username" value="root"/>
+                <property name="password" value="123123"/>
             </bean>
         </property>
     </bean>
