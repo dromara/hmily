@@ -17,8 +17,8 @@
  */
 package com.hmily.tcc.demo.springcloud.order.configuration;
 
-import com.hmily.tcc.springcloud.feign.TccFeignHandler;
-import com.hmily.tcc.springcloud.feign.TccRestTemplateInterceptor;
+import com.hmily.tcc.springcloud.feign.HmilyFeignHandler;
+import com.hmily.tcc.springcloud.feign.HmilyRestTemplateInterceptor;
 import feign.Feign;
 import feign.InvocationHandlerFactory;
 import feign.Request;
@@ -37,14 +37,14 @@ public class MyConfiguration {
     @Scope("prototype")
     public Feign.Builder feignBuilder() {
         return Feign.builder()
-                .requestInterceptor(new TccRestTemplateInterceptor())
+                .requestInterceptor(new HmilyRestTemplateInterceptor())
                 .invocationHandlerFactory(invocationHandlerFactory());
     }
 
     @Bean
     public InvocationHandlerFactory invocationHandlerFactory() {
         return (target, dispatch) -> {
-            TccFeignHandler handler = new TccFeignHandler();
+            HmilyFeignHandler handler = new HmilyFeignHandler();
             handler.setTarget(target);
             handler.setHandlers(dispatch);
             return handler;

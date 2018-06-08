@@ -17,7 +17,6 @@
 
 package com.hmily.tcc.dubbo.filter;
 
-
 import com.alibaba.dubbo.common.Constants;
 import com.alibaba.dubbo.common.extension.Activate;
 import com.alibaba.dubbo.rpc.Filter;
@@ -28,13 +27,13 @@ import com.alibaba.dubbo.rpc.RpcContext;
 import com.alibaba.dubbo.rpc.RpcException;
 import com.hmily.tcc.annotation.Tcc;
 import com.hmily.tcc.annotation.TccPatternEnum;
+import com.hmily.tcc.common.bean.context.TccTransactionContext;
+import com.hmily.tcc.common.bean.entity.Participant;
+import com.hmily.tcc.common.bean.entity.TccInvocation;
 import com.hmily.tcc.common.constant.CommonConstant;
 import com.hmily.tcc.common.enums.TccActionEnum;
 import com.hmily.tcc.common.exception.TccRuntimeException;
 import com.hmily.tcc.common.utils.GsonUtils;
-import com.hmily.tcc.common.bean.context.TccTransactionContext;
-import com.hmily.tcc.common.bean.entity.Participant;
-import com.hmily.tcc.common.bean.entity.TccInvocation;
 import com.hmily.tcc.core.concurrent.threadlocal.TransactionContextLocal;
 import com.hmily.tcc.core.service.executor.HmilyTransactionExecutor;
 import org.apache.commons.lang3.StringUtils;
@@ -43,27 +42,30 @@ import java.lang.reflect.Method;
 import java.util.Objects;
 
 /**
+ * impl dubbo filter.
  * @author xiaoyu
  */
 @Activate(group = {Constants.SERVER_KEY, Constants.CONSUMER})
-public class TccTransactionFilter implements Filter {
-
+public class HmilyTransactionFilter implements Filter {
 
     private HmilyTransactionExecutor hmilyTransactionExecutor;
 
-    public void setHmilyTransactionExecutor(HmilyTransactionExecutor hmilyTransactionExecutor) {
+    /**
+     * set hmilyTransactionExecutor.
+     *
+     * @param hmilyTransactionExecutor {@linkplain HmilyTransactionExecutor }
+     */
+    public void setHmilyTransactionExecutor(final HmilyTransactionExecutor hmilyTransactionExecutor) {
         this.hmilyTransactionExecutor = hmilyTransactionExecutor;
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {
-
+    public Result invoke(final Invoker<?> invoker, final Invocation invocation) throws RpcException {
         String methodName = invocation.getMethodName();
         Class clazz = invoker.getInterface();
         Class[] args = invocation.getParameterTypes();
         final Object[] arguments = invocation.getArguments();
-
         Method method = null;
         Tcc tcc = null;
         try {
@@ -72,22 +74,17 @@ public class TccTransactionFilter implements Filter {
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }
-
         if (Objects.nonNull(tcc)) {
             try {
-
-                final TccTransactionContext tccTransactionContext =
-                        TransactionContextLocal.getInstance().get();
+                final TccTransactionContext tccTransactionContext = TransactionContextLocal.getInstance().get();
                 if (Objects.nonNull(tccTransactionContext)) {
                     RpcContext.getContext()
-                            .setAttachment(CommonConstant.TCC_TRANSACTION_CONTEXT,
-                                    GsonUtils.getInstance().toJson(tccTransactionContext));
+                            .setAttachment(CommonConstant.TCC_TRANSACTION_CONTEXT, GsonUtils.getInstance().toJson(tccTransactionContext));
                 }
-
                 final Result result = invoker.invoke(invocation);
                 //如果result 没有异常就保存
-                if(!result.hasException()){
-                    final Participant participant = buildParticipant(tccTransactionContext,tcc, method, clazz, arguments, args);
+                if (!result.hasException()) {
+                    final Participant participant = buildParticipant(tccTransactionContext, tcc, method, clazz, arguments, args);
                     if (Objects.nonNull(participant)) {
                         hmilyTransactionExecutor.enlistParticipant(participant);
                     }
@@ -100,52 +97,33 @@ public class TccTransactionFilter implements Filter {
         } else {
             return invoker.invoke(invocation);
         }
-
     }
 
     @SuppressWarnings("unchecked")
-    private Participant buildParticipant(TccTransactionContext tccTransactionContext,Tcc tcc, Method method, Class clazz, Object[] arguments, Class... args) throws TccRuntimeException {
+    private Participant buildParticipant(final TccTransactionContext tccTransactionContext,
+                                         final Tcc tcc,
+                                         final Method method, final Class clazz,
+                                         final Object[] arguments, final Class... args) throws TccRuntimeException {
 
-        if (Objects.nonNull(tccTransactionContext)) {
-            if (TccActionEnum.TRYING.getCode() == tccTransactionContext.getAction()) {
-                //获取协调方法
-                String confirmMethodName = tcc.confirmMethod();
-
-                if (StringUtils.isBlank(confirmMethodName)) {
-                    confirmMethodName = method.getName();
-                }
-
-                String cancelMethodName = tcc.cancelMethod();
-
-                if (StringUtils.isBlank(cancelMethodName)) {
-                    cancelMethodName = method.getName();
-                }
-
-                //设置模式
-                final TccPatternEnum pattern = tcc.pattern();
-
-                hmilyTransactionExecutor.getCurrentTransaction().setPattern(pattern.getCode());
-
-
-                TccInvocation confirmInvocation = new TccInvocation(clazz,
-                        confirmMethodName,
-                        args, arguments);
-
-                TccInvocation cancelInvocation = new TccInvocation(clazz,
-                        cancelMethodName,
-                        args, arguments);
-
-                //封装调用点
-                return new Participant(
-                        tccTransactionContext.getTransId(),
-                        confirmInvocation,
-                        cancelInvocation);
-            }
-
+        if (Objects.isNull(tccTransactionContext)
+                || (TccActionEnum.TRYING.getCode() != tccTransactionContext.getAction())) {
+            return null;
         }
-
-        return null;
-
-
+        //获取协调方法
+        String confirmMethodName = tcc.confirmMethod();
+        if (StringUtils.isBlank(confirmMethodName)) {
+            confirmMethodName = method.getName();
+        }
+        String cancelMethodName = tcc.cancelMethod();
+        if (StringUtils.isBlank(cancelMethodName)) {
+            cancelMethodName = method.getName();
+        }
+        //设置模式
+        final TccPatternEnum pattern = tcc.pattern();
+        hmilyTransactionExecutor.getCurrentTransaction().setPattern(pattern.getCode());
+        TccInvocation confirmInvocation = new TccInvocation(clazz, confirmMethodName, args, arguments);
+        TccInvocation cancelInvocation = new TccInvocation(clazz, cancelMethodName, args, arguments);
+        //封装调用点
+        return new Participant(tccTransactionContext.getTransId(), confirmInvocation, cancelInvocation);
     }
 }

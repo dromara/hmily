@@ -14,8 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hmily.tcc.springcloud.feign;
 
+package com.hmily.tcc.springcloud.feign;
 
 import feign.Feign;
 import feign.InvocationHandlerFactory;
@@ -24,23 +24,31 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
 
 /**
+ * HmilyRestTemplateConfiguration.
  * @author xiaoyu
  */
 @Configuration
-public class TccRestTemplateConfiguration {
+public class HmilyRestTemplateConfiguration {
 
+    /**
+     * build feign.
+     *
+     * @return Feign.Builder
+     */
     @Bean
     @Scope("prototype")
     public Feign.Builder feignBuilder() {
-        return Feign.builder().requestInterceptor(new TccRestTemplateInterceptor()).invocationHandlerFactory(invocationHandlerFactory());
+        return Feign.builder().requestInterceptor(new HmilyRestTemplateInterceptor()).invocationHandlerFactory(invocationHandlerFactory());
     }
 
-
+    /**
+     * build InvocationHandlerFactory.
+     * @return InvocationHandlerFactory
+     */
     @Bean
     public InvocationHandlerFactory invocationHandlerFactory() {
         return (target, dispatch) -> {
-            TccFeignHandler handler = new TccFeignHandler();
-            handler.setTarget(target);
+            HmilyFeignHandler handler = new HmilyFeignHandler();
             handler.setHandlers(dispatch);
             return handler;
         };
