@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.hmily.tcc.dubbo.interceptor;
+package com.hmily.tcc.motan.interceptor;
 
 import com.hmily.tcc.core.interceptor.AbstractTccTransactionAspect;
 import org.aspectj.lang.annotation.Aspect;
@@ -23,20 +23,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.Ordered;
 import org.springframework.stereotype.Component;
 
-
 /**
+ * MotanHmilyTransactionAspect.
  * @author xiaoyu
  */
 @Aspect
 @Component
-public class DubboTccTransactionAspect extends AbstractTccTransactionAspect implements Ordered {
-
+public class MotanHmilyTransactionAspect extends AbstractTccTransactionAspect implements Ordered {
 
     @Autowired
-    public DubboTccTransactionAspect(DubboTccTransactionInterceptor dubboTccTransactionInterceptor) {
-        super.setTccTransactionInterceptor(dubboTccTransactionInterceptor);
+    public MotanHmilyTransactionAspect(final MotanHmilyTransactionInterceptor motanHmilyTransactionInterceptor) {
+        super.setTccTransactionInterceptor(motanHmilyTransactionInterceptor);
     }
-
 
     @Override
     public int getOrder() {

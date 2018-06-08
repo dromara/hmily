@@ -14,31 +14,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hmily.tcc.springcloud.feign;
 
+package com.hmily.tcc.springcloud.interceptor;
 
-import com.hmily.tcc.common.constant.CommonConstant;
-import com.hmily.tcc.common.utils.GsonUtils;
-import com.hmily.tcc.common.bean.context.TccTransactionContext;
-import com.hmily.tcc.core.concurrent.threadlocal.TransactionContextLocal;
-import feign.RequestInterceptor;
-import feign.RequestTemplate;
-import org.springframework.context.annotation.Configuration;
-
+import com.hmily.tcc.core.interceptor.AbstractTccTransactionAspect;
+import org.aspectj.lang.annotation.Aspect;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.Ordered;
+import org.springframework.stereotype.Component;
 
 /**
+ * SpringCloudHmilyTransactionAspect.
  * @author xiaoyu
  */
-@Configuration
-public class TccRestTemplateInterceptor implements RequestInterceptor {
+@Aspect
+@Component
+public class SpringCloudHmilyTransactionAspect extends AbstractTccTransactionAspect implements Ordered {
 
-
-    @Override
-    public void apply(RequestTemplate requestTemplate) {
-        final TccTransactionContext tccTransactionContext =
-                TransactionContextLocal.getInstance().get();
-        requestTemplate.header(CommonConstant.TCC_TRANSACTION_CONTEXT,
-                GsonUtils.getInstance().toJson(tccTransactionContext));
+    @Autowired
+    public SpringCloudHmilyTransactionAspect(final SpringCloudHmilyTransactionInterceptor springCloudHmilyTransactionInterceptor) {
+        this.setTccTransactionInterceptor(springCloudHmilyTransactionInterceptor);
     }
 
+    @Override
+    public int getOrder() {
+        return Ordered.HIGHEST_PRECEDENCE;
+    }
 }

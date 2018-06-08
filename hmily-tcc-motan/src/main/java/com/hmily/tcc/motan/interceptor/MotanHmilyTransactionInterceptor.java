@@ -14,47 +14,51 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hmily.tcc.springcloud.interceptor;
 
+package com.hmily.tcc.motan.interceptor;
+
+import com.hmily.tcc.common.bean.context.TccTransactionContext;
 import com.hmily.tcc.common.constant.CommonConstant;
 import com.hmily.tcc.common.utils.GsonUtils;
-import com.hmily.tcc.common.bean.context.TccTransactionContext;
+import com.hmily.tcc.core.concurrent.threadlocal.TransactionContextLocal;
 import com.hmily.tcc.core.interceptor.TccTransactionInterceptor;
 import com.hmily.tcc.core.service.HmilyTransactionAspectService;
+import com.weibo.api.motan.rpc.Request;
+import com.weibo.api.motan.rpc.RpcContext;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.web.context.request.RequestAttributes;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
-import javax.servlet.http.HttpServletRequest;
+import java.util.Map;
+import java.util.Objects;
 
 /**
+ * MotanHmilyTransactionInterceptor.
  * @author xiaoyu
  */
 @Component
-public class SpringCloudTccTransactionInterceptor implements TccTransactionInterceptor {
+public class MotanHmilyTransactionInterceptor implements TccTransactionInterceptor {
 
     private final HmilyTransactionAspectService hmilyTransactionAspectService;
 
     @Autowired
-    public SpringCloudTccTransactionInterceptor(HmilyTransactionAspectService hmilyTransactionAspectService) {
+    public MotanHmilyTransactionInterceptor(final HmilyTransactionAspectService hmilyTransactionAspectService) {
         this.hmilyTransactionAspectService = hmilyTransactionAspectService;
     }
 
-
     @Override
-    public Object interceptor(ProceedingJoinPoint pjp) throws Throwable {
-        TccTransactionContext tccTransactionContext;
-        //如果不是本地反射调用补偿
-        RequestAttributes requestAttributes = RequestContextHolder.currentRequestAttributes();
-        HttpServletRequest request = requestAttributes == null ? null : ((ServletRequestAttributes) requestAttributes).getRequest();
-        String context = request == null ? null : request.getHeader(CommonConstant.TCC_TRANSACTION_CONTEXT);
-        tccTransactionContext =
-                GsonUtils.getInstance().fromJson(context, TccTransactionContext.class);
-
+    public Object interceptor(final ProceedingJoinPoint pjp) throws Throwable {
+        TccTransactionContext tccTransactionContext = null;
+        final Request request = RpcContext.getContext().getRequest();
+        if (Objects.nonNull(request)) {
+            final Map<String, String> attachments = request.getAttachments();
+            if (attachments != null && !attachments.isEmpty()) {
+                String context = attachments.get(CommonConstant.TCC_TRANSACTION_CONTEXT);
+                tccTransactionContext = GsonUtils.getInstance().fromJson(context, TccTransactionContext.class);
+            }
+        } else {
+            tccTransactionContext = TransactionContextLocal.getInstance().get();
+        }
         return hmilyTransactionAspectService.invoke(tccTransactionContext, pjp);
     }
-
 }
