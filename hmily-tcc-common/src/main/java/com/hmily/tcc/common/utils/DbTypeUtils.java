@@ -17,20 +17,20 @@
 
 package com.hmily.tcc.common.utils;
 
-
 import com.hmily.tcc.common.constant.CommonConstant;
 
 /**
- * <p>Description: .</p>
- *
+ * DbTypeUtils.
  * @author xiaoyu(Myth)
- * @version 1.0
- * @date 2017/10/20 11:39
- * @since JDK 1.8
  */
 public class DbTypeUtils {
 
-    public static String buildByDriverClassName(String driverClassName) {
+    /**
+     * 判断是什么类型的数据库.
+     * @param driverClassName 驱动名称
+     * @return mysql sqlserver oracle .
+     */
+    public static String buildByDriverClassName(final String driverClassName) {
         String dbType = "mysql";
         if (driverClassName.contains(CommonConstant.DB_MYSQL)) {
             dbType = "mysql";
@@ -41,6 +41,5 @@ public class DbTypeUtils {
         }
         return dbType;
     }
-
 
 }
