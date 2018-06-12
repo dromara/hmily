@@ -68,6 +68,21 @@ public class DateUtils {
         return LocalDateTime.parse(str, DateTimeFormatter.ofPattern(DATE_FORMAT_DATETIME));
     }
 
+    public static Date getDateYYYY() throws  ParseException{
+        LocalDateTime localDateTime = parseLocalDateTime(getCurrentDateTime());
+        ZoneId zone = ZoneId.systemDefault();
+        Instant instant = localDateTime.atZone(zone).toInstant();
+        return Date.from(instant);
+    }
+
+    public static String parseDate(Date date) {
+        Instant instant = date.toInstant();
+        ZoneId zone = ZoneId.systemDefault();
+        LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, zone);
+        return formaterLocalDateTime(localDateTime);
+    }
+
+
     /**
      * 把字符串转成特定格式的日期类型.
      * 输入的日期格式:yyyy-MM-dd HH:mm:ss

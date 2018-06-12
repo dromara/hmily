@@ -45,7 +45,7 @@ public class MyConfiguration {
     public InvocationHandlerFactory invocationHandlerFactory() {
         return (target, dispatch) -> {
             HmilyFeignHandler handler = new HmilyFeignHandler();
-            handler.setTarget(target);
+            //handler.setTarget(target);
             handler.setHandlers(dispatch);
             return handler;
         };
