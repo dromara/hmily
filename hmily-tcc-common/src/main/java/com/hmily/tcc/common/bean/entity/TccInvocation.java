@@ -20,6 +20,7 @@ package com.hmily.tcc.common.bean.entity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 
@@ -30,6 +31,7 @@ import java.io.Serializable;
  */
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class TccInvocation implements Serializable {
 
     private static final long serialVersionUID = -5108578223428529356L;
