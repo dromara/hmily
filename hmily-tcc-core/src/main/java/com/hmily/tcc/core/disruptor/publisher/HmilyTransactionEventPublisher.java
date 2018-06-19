@@ -25,6 +25,7 @@ import com.hmily.tcc.core.disruptor.event.HmilyTransactionEvent;
 import com.hmily.tcc.core.disruptor.factory.HmilyTransactionEventFactory;
 import com.hmily.tcc.core.disruptor.handler.HmilyTransactionEventHandler;
 import com.hmily.tcc.core.disruptor.translator.HmilyTransactionEventTranslator;
+import com.lmax.disruptor.BlockingWaitStrategy;
 import com.lmax.disruptor.RingBuffer;
 import com.lmax.disruptor.YieldingWaitStrategy;
 import com.lmax.disruptor.dsl.Disruptor;
@@ -56,7 +57,7 @@ public class HmilyTransactionEventPublisher implements DisposableBean {
         disruptor = new Disruptor<>(new HmilyTransactionEventFactory(), bufferSize, r -> {
             AtomicInteger index = new AtomicInteger(1);
             return new Thread(null, r, "disruptor-thread-" + index.getAndIncrement());
-        }, ProducerType.MULTI, new YieldingWaitStrategy());
+        }, ProducerType.MULTI, new BlockingWaitStrategy());
         disruptor.handleEventsWith(hmilyTransactionEventHandler);
         disruptor.start();
     }
