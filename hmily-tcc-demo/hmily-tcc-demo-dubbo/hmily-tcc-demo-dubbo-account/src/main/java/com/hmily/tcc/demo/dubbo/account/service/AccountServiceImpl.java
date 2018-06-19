@@ -19,7 +19,6 @@
 package com.hmily.tcc.demo.dubbo.account.service;
 
 import com.hmily.tcc.annotation.Tcc;
-import com.hmily.tcc.common.exception.TccRuntimeException;
 import com.hmily.tcc.demo.dubbo.account.api.dto.AccountDTO;
 import com.hmily.tcc.demo.dubbo.account.api.entity.AccountDO;
 import com.hmily.tcc.demo.dubbo.account.api.service.AccountService;
@@ -30,6 +29,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @author xiaoyu
@@ -50,6 +51,8 @@ public class AccountServiceImpl implements AccountService {
         this.accountMapper = accountMapper;
     }
 
+    private static final Lock LOCK = new ReentrantLock();
+
     /**
      * 扣款支付
      *
@@ -60,12 +63,14 @@ public class AccountServiceImpl implements AccountService {
     @Tcc(confirmMethod = "confirm", cancelMethod = "cancel")
     public boolean payment(AccountDTO accountDTO) {
         final AccountDO accountDO = accountMapper.findByUserId(accountDTO.getUserId());
-        accountDO.setBalance(accountDO.getBalance().subtract(accountDTO.getAmount()));
-        accountDO.setFreezeAmount(accountDO.getFreezeAmount().add(accountDTO.getAmount()));
-        accountDO.setUpdateTime(new Date());
-        final int update = accountMapper.update(accountDO);
-        if (update != 1) {
-            throw new TccRuntimeException("资金不足！");
+        try {
+            LOCK.lock();
+            accountDO.setBalance(accountDO.getBalance().subtract(accountDTO.getAmount()));
+            accountDO.setFreezeAmount(accountDO.getFreezeAmount().add(accountDTO.getAmount()));
+            accountDO.setUpdateTime(new Date());
+            accountMapper.update(accountDO);
+        } finally {
+            LOCK.unlock();
         }
         return Boolean.TRUE;
     }
@@ -85,13 +90,17 @@ public class AccountServiceImpl implements AccountService {
 
         LOGGER.debug("============dubbo tcc 执行确认付款接口===============");
 
-        final AccountDO accountDO = accountMapper.findByUserId(accountDTO.getUserId());
-        accountDO.setFreezeAmount(accountDO.getFreezeAmount().subtract(accountDTO.getAmount()));
-        accountDO.setUpdateTime(new Date());
-        final int rows = accountMapper.confirm(accountDO);
-        if(rows!=1){
-            throw  new TccRuntimeException("确认扣减账户异常！");
+        try {
+            LOCK.lock();
+            final AccountDO accountDO = accountMapper.findByUserId(accountDTO.getUserId());
+            accountDO.setFreezeAmount(accountDO.getFreezeAmount().subtract(accountDTO.getAmount()));
+            accountDO.setUpdateTime(new Date());
+            accountMapper.confirm(accountDO);
+
+        } finally {
+            LOCK.unlock();
         }
+
         return Boolean.TRUE;
     }
 
@@ -103,10 +112,7 @@ public class AccountServiceImpl implements AccountService {
         accountDO.setBalance(accountDO.getBalance().add(accountDTO.getAmount()));
         accountDO.setFreezeAmount(accountDO.getFreezeAmount().subtract(accountDTO.getAmount()));
         accountDO.setUpdateTime(new Date());
-        final int rows = accountMapper.cancel(accountDO);
-        if(rows!=1){
-            throw  new TccRuntimeException("取消扣减账户异常！");
-        }
+        accountMapper.cancel(accountDO);
         return Boolean.TRUE;
     }
 }
