@@ -26,12 +26,17 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
 /**
  * this is transaction starter.
  * @author xiaoyu
  */
 @Component
 public class StarterHmilyTransactionHandler implements HmilyTransactionHandler {
+
+    private static final Lock LOCK = new ReentrantLock();
 
     private final HmilyTransactionExecutor hmilyTransactionExecutor;
 
@@ -56,7 +61,12 @@ public class StarterHmilyTransactionHandler implements HmilyTransactionHandler {
                 throw throwable;
             }
             //try成功执行confirm confirm 失败的话，那就只能走本地补偿
-            hmilyTransactionExecutor.confirm(hmilyTransactionExecutor.getCurrentTransaction());
+            try {
+                LOCK.lock();
+                hmilyTransactionExecutor.confirm(hmilyTransactionExecutor.getCurrentTransaction());
+            } finally {
+                LOCK.unlock();
+            }
         } finally {
             hmilyTransactionExecutor.remove();
         }
