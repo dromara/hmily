@@ -22,7 +22,6 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.Arrays;
 import java.util.Objects;
-import java.util.Optional;
 
 /**
  * The enum Tcc action enum.
@@ -64,11 +63,9 @@ public enum TccActionEnum {
      * @return the tcc action enum
      */
     public static TccActionEnum acquireByCode(final int code) {
-        Optional<TccActionEnum> tccActionEnum =
-                Arrays.stream(TccActionEnum.values())
+        return Arrays.stream(TccActionEnum.values())
                         .filter(v -> Objects.equals(v.getCode(), code))
-                        .findFirst();
-        return tccActionEnum.orElse(TccActionEnum.TRYING);
+                        .findFirst().orElse(TccActionEnum.TRYING);
     }
 
 }
