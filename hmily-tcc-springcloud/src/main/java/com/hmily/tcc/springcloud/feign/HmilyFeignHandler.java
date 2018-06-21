@@ -23,6 +23,7 @@ import com.hmily.tcc.common.bean.context.TccTransactionContext;
 import com.hmily.tcc.common.bean.entity.Participant;
 import com.hmily.tcc.common.bean.entity.TccInvocation;
 import com.hmily.tcc.common.enums.TccActionEnum;
+import com.hmily.tcc.common.enums.TccRoleEnum;
 import com.hmily.tcc.core.concurrent.threadlocal.TransactionContextLocal;
 import com.hmily.tcc.core.helper.SpringBeanUtils;
 import com.hmily.tcc.core.service.executor.HmilyTransactionExecutor;
@@ -53,11 +54,15 @@ public class HmilyFeignHandler implements InvocationHandler {
                 return this.handlers.get(method).invoke(args);
             }
             try {
+                final TccTransactionContext tccTransactionContext = TransactionContextLocal.getInstance().get();
                 final HmilyTransactionExecutor hmilyTransactionExecutor =
                         SpringBeanUtils.getInstance().getBean(HmilyTransactionExecutor.class);
                 final Object invoke = this.handlers.get(method).invoke(args);
-                final Participant participant = buildParticipant(tcc, method, args, hmilyTransactionExecutor);
-                if (Objects.nonNull(participant)) {
+                final Participant participant = buildParticipant(tcc, method, args, tccTransactionContext);
+                if (tccTransactionContext.getRole() == TccRoleEnum.PROVIDER.getCode()) {
+                    hmilyTransactionExecutor.registerByNested(tccTransactionContext.getTransId(),
+                            participant);
+                } else {
                     hmilyTransactionExecutor.enlistParticipant(participant);
                 }
                 return invoke;
@@ -69,8 +74,7 @@ public class HmilyFeignHandler implements InvocationHandler {
     }
 
     private Participant buildParticipant(final Tcc tcc, final Method method, final Object[] args,
-                                         final HmilyTransactionExecutor hmilyTransactionExecutor) {
-        final TccTransactionContext tccTransactionContext = TransactionContextLocal.getInstance().get();
+                                         final TccTransactionContext tccTransactionContext ) {
         if (Objects.isNull(tccTransactionContext)
                 || (TccActionEnum.TRYING.getCode() != tccTransactionContext.getAction())) {
             return null;
@@ -84,9 +88,6 @@ public class HmilyFeignHandler implements InvocationHandler {
         if (StringUtils.isBlank(cancelMethodName)) {
             cancelMethodName = method.getName();
         }
-        //设置模式
-        final TccPatternEnum pattern = tcc.pattern();
-        hmilyTransactionExecutor.getCurrentTransaction().setPattern(pattern.getCode());
         final Class<?> declaringClass = method.getDeclaringClass();
         TccInvocation confirmInvocation = new TccInvocation(declaringClass, confirmMethodName, method.getParameterTypes(), args);
         TccInvocation cancelInvocation = new TccInvocation(declaringClass, cancelMethodName, method.getParameterTypes(), args);

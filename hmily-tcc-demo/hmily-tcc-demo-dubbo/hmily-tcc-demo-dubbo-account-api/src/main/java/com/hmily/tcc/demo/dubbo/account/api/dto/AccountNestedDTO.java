@@ -16,43 +16,39 @@
  *
  */
 
-package com.hmily.tcc.demo.dubbo.account.api.service;
+package com.hmily.tcc.demo.dubbo.account.api.dto;
 
-import com.hmily.tcc.annotation.Tcc;
-import com.hmily.tcc.demo.dubbo.account.api.dto.AccountDTO;
-import com.hmily.tcc.demo.dubbo.account.api.dto.AccountNestedDTO;
-import com.hmily.tcc.demo.dubbo.account.api.entity.AccountDO;
+import lombok.Data;
+
+import java.io.Serializable;
+import java.math.BigDecimal;
 
 /**
  * @author xiaoyu
  */
-public interface AccountService {
+@Data
+public class AccountNestedDTO implements Serializable {
 
+    private static final long serialVersionUID = 7223470850578998427L;
+    /**
+     * 用户id
+     */
+    private String userId;
 
     /**
-     * 扣款支付
-     *
-     * @param accountDTO 参数dto
-     * @return true
+     * 扣款金额
      */
-    @Tcc
-    boolean payment(AccountDTO accountDTO);
-
+    private BigDecimal amount;
 
     /**
-     * 扣款支付
-     *
-     * @param accountNestedDTO 参数dto
-     * @return true
+     * productId
      */
-    @Tcc
-    boolean paymentWithNested(AccountNestedDTO accountNestedDTO);
-
+    private String productId;
 
     /**
-     * 获取用户账户信息
-     * @param userId 用户id
-     * @return AccountDO
+     * count
      */
-    AccountDO findByUserId(String userId);
+    private Integer count;
+
+
 }

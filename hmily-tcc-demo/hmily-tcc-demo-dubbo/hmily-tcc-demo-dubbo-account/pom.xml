@@ -36,6 +36,11 @@
             <artifactId>hmily-tcc-demo-dubbo-account-api</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.hmily.tcc</groupId>
+            <artifactId>hmily-tcc-demo-dubbo-inventory-api</artifactId>
+        </dependency>
+
 
         <dependency>
             <groupId>com.hmily.tcc</groupId>

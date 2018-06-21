@@ -38,6 +38,16 @@ public interface OrderService {
 
 
     /**
+     * 创建订单并且进行扣除账户余额支付，并进行库存扣减操作
+     *  in this  Inventory nested in account.
+     * @param count  购买数量
+     * @param amount 支付金额
+     * @return string
+     */
+    String orderPayWithNested(Integer count, BigDecimal amount);
+
+
+    /**
      * 模拟在订单支付操作中，库存在try阶段中的库存异常
      *
      * @param count  购买数量
