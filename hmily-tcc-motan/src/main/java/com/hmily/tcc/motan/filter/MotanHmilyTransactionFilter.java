@@ -24,6 +24,7 @@ import com.hmily.tcc.common.bean.entity.Participant;
 import com.hmily.tcc.common.bean.entity.TccInvocation;
 import com.hmily.tcc.common.constant.CommonConstant;
 import com.hmily.tcc.common.enums.TccActionEnum;
+import com.hmily.tcc.common.enums.TccRoleEnum;
 import com.hmily.tcc.common.exception.TccRuntimeException;
 import com.hmily.tcc.common.utils.GsonUtils;
 import com.hmily.tcc.core.concurrent.threadlocal.TransactionContextLocal;
@@ -84,14 +85,18 @@ public class MotanHmilyTransactionFilter implements Filter {
         }
         if (Objects.nonNull(tcc)) {
             try {
+                final HmilyTransactionExecutor hmilyTransactionExecutor = SpringBeanUtils.getInstance().getBean(HmilyTransactionExecutor.class);
                 final TccTransactionContext tccTransactionContext = TransactionContextLocal.getInstance().get();
                 if (Objects.nonNull(tccTransactionContext)) {
                     request.setAttachment(CommonConstant.TCC_TRANSACTION_CONTEXT, GsonUtils.getInstance().toJson(tccTransactionContext));
                 }
                 final Response response = caller.call(request);
                 final Participant participant = buildParticipant(tccTransactionContext, tcc, method, clazz, arguments, args);
-                if (Objects.nonNull(participant)) {
-                    SpringBeanUtils.getInstance().getBean(HmilyTransactionExecutor.class).enlistParticipant(participant);
+                if (tccTransactionContext.getRole() == TccRoleEnum.PROVIDER.getCode()) {
+                    hmilyTransactionExecutor.registerByNested(tccTransactionContext.getTransId(),
+                            participant);
+                } else {
+                    hmilyTransactionExecutor.enlistParticipant(participant);
                 }
                 return response;
             } catch (Exception e) {

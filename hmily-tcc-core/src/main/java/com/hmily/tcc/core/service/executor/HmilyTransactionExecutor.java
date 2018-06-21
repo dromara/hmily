@@ -46,6 +46,7 @@ import org.springframework.stereotype.Component;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 
@@ -80,7 +81,7 @@ public class HmilyTransactionExecutor {
      * @return TccTransaction
      */
     public TccTransaction begin(final ProceedingJoinPoint point) {
-        LogUtil.debug(LOGGER, () -> "开始执行tcc事务！start");
+        LogUtil.debug(LOGGER, () -> "......hmily transaction！start....");
         //构建事务对象
         final TccTransaction tccTransaction = buildTccTransaction(point, TccRoleEnum.START.getCode(), null);
         //将事务对象保存在threadLocal中
@@ -93,6 +94,7 @@ public class HmilyTransactionExecutor {
         context.setAction(TccActionEnum.TRYING.getCode());
         //设置事务id
         context.setTransId(tccTransaction.getTransId());
+        context.setRole(TccRoleEnum.START.getCode());
         TransactionContextLocal.getInstance().set(context);
         return tccTransaction;
     }
@@ -106,12 +108,15 @@ public class HmilyTransactionExecutor {
      * @return TccTransaction
      */
     public TccTransaction beginParticipant(final TccTransactionContext context, final ProceedingJoinPoint point) {
-        LogUtil.debug(LOGGER, "参与方开始执行tcc事务！start：{}", context::toString);
+        LogUtil.debug(LOGGER, "...Participant hmily transaction ！start..：{}", context::toString);
         final TccTransaction tccTransaction = buildTccTransaction(point, TccRoleEnum.PROVIDER.getCode(), context.getTransId());
         //提供者事务存储到guava
         TccTransactionCacheManager.getInstance().cacheTccTransaction(tccTransaction);
         //发布事务保存事件，异步保存
         hmilyTransactionEventPublisher.publishEvent(tccTransaction, EventTypeEnum.SAVE.getCode());
+        //Nested transaction support
+        context.setRole(TccRoleEnum.PROVIDER.getCode());
+        TransactionContextLocal.getInstance().set(context);
         return tccTransaction;
     }
 
@@ -157,9 +162,32 @@ public class HmilyTransactionExecutor {
      * @param participant {@linkplain Participant}
      */
     public void enlistParticipant(final Participant participant) {
-        final TccTransaction currentTransaction = this.getCurrentTransaction();
-        currentTransaction.registerParticipant(participant);
-        updateParticipant(currentTransaction);
+        if (Objects.isNull(participant)) {
+            return;
+        }
+        Optional.ofNullable(getCurrentTransaction())
+                .ifPresent(c -> {
+                    c.registerParticipant(participant);
+                    updateParticipant(c);
+                });
+    }
+
+    /**
+     * when nested transaction add participant.
+     *
+     * @param transId     key
+     * @param participant {@linkplain Participant}
+     */
+    public void registerByNested(final String transId, final Participant participant) {
+        if (Objects.isNull(participant)) {
+            return;
+        }
+        final TccTransaction tccTransaction = TccTransactionCacheManager.getInstance().getTccTransaction(transId);
+        Optional.ofNullable(tccTransaction)
+                .ifPresent(c -> {
+                    c.registerParticipant(participant);
+                    updateParticipant(c);
+                });
     }
 
     /**

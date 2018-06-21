@@ -20,9 +20,13 @@ package com.hmily.tcc.demo.dubbo.account.service;
 
 import com.hmily.tcc.annotation.Tcc;
 import com.hmily.tcc.demo.dubbo.account.api.dto.AccountDTO;
+import com.hmily.tcc.demo.dubbo.account.api.dto.AccountNestedDTO;
 import com.hmily.tcc.demo.dubbo.account.api.entity.AccountDO;
 import com.hmily.tcc.demo.dubbo.account.api.service.AccountService;
 import com.hmily.tcc.demo.dubbo.account.mapper.AccountMapper;
+import com.hmily.tcc.demo.dubbo.inventory.api.dto.InventoryDTO;
+import com.hmily.tcc.demo.dubbo.inventory.api.entity.InventoryDO;
+import com.hmily.tcc.demo.dubbo.inventory.api.service.InventoryService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +49,9 @@ public class AccountServiceImpl implements AccountService {
 
 
     private final AccountMapper accountMapper;
+
+    @Autowired(required = false)
+    private InventoryService inventoryService;
 
     @Autowired(required = false)
     public AccountServiceImpl(AccountMapper accountMapper) {
@@ -76,6 +83,35 @@ public class AccountServiceImpl implements AccountService {
     }
 
     /**
+     * 扣款支付
+     *
+     * @param accountNestedDTO 参数dto
+     * @return true
+     */
+    @Override
+    @Tcc(confirmMethod = "confirmNested", cancelMethod = "cancelNested")
+    public boolean paymentWithNested(AccountNestedDTO accountNestedDTO) {
+        final AccountDO accountDO = accountMapper.findByUserId(accountNestedDTO.getUserId());
+        try {
+            LOCK.lock();
+            accountDO.setBalance(accountDO.getBalance().subtract(accountNestedDTO.getAmount()));
+            accountDO.setFreezeAmount(accountDO.getFreezeAmount().add(accountNestedDTO.getAmount()));
+            accountDO.setUpdateTime(new Date());
+            accountMapper.update(accountDO);
+
+            InventoryDTO inventoryDTO = new InventoryDTO();
+
+            inventoryDTO.setCount(accountNestedDTO.getCount());
+            inventoryDTO.setProductId(accountNestedDTO.getProductId());
+            inventoryService.decrease(inventoryDTO);
+
+        } finally {
+            LOCK.unlock();
+        }
+        return Boolean.TRUE;
+    }
+
+    /**
      * 获取用户账户信息
      *
      * @param userId 用户id
@@ -84,6 +120,36 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public AccountDO findByUserId(String userId) {
         return accountMapper.findByUserId(userId);
+    }
+
+    public boolean confirmNested(AccountNestedDTO accountNestedDTO) {
+
+        LOGGER.debug("============dubbo tcc 执行确认付款接口===============");
+
+        try {
+            LOCK.lock();
+            final AccountDO accountDO = accountMapper.findByUserId(accountNestedDTO.getUserId());
+            accountDO.setFreezeAmount(accountDO.getFreezeAmount().subtract(accountNestedDTO.getAmount()));
+            accountDO.setUpdateTime(new Date());
+            accountMapper.confirm(accountDO);
+
+        } finally {
+            LOCK.unlock();
+        }
+
+        return Boolean.TRUE;
+    }
+
+
+    public boolean cancelNested(AccountNestedDTO accountNestedDTO) {
+
+        LOGGER.debug("============ dubbo tcc 执行取消付款接口===============");
+        final AccountDO accountDO = accountMapper.findByUserId(accountNestedDTO.getUserId());
+        accountDO.setBalance(accountDO.getBalance().add(accountNestedDTO.getAmount()));
+        accountDO.setFreezeAmount(accountDO.getFreezeAmount().subtract(accountNestedDTO.getAmount()));
+        accountDO.setUpdateTime(new Date());
+        accountMapper.cancel(accountDO);
+        return Boolean.TRUE;
     }
 
     public boolean confirm(AccountDTO accountDTO) {

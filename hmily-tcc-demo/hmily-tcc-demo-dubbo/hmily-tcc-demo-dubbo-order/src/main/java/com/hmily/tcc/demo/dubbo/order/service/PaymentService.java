@@ -32,6 +32,14 @@ public interface PaymentService {
      */
     void makePayment(Order order);
 
+
+    /**
+     * 订单支付
+     *
+     * @param order 订单实体
+     */
+    void makePaymentWithNested(Order order);
+
     /**
      * mock订单支付的时候库存异常
      *
