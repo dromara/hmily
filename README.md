@@ -6,6 +6,8 @@ Hmily
  # Features
 
  * **框架特性**
+ 
+     * ##### 支持嵌套事务(Nested transaction support).
 
      * ##### 采用disruptor框架进行事务日志的异步读写，与RPC框架的性能毫无差别。
 
