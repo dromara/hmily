@@ -22,6 +22,7 @@ package com.hmily.tcc.demo.dubbo.order.service.impl;
 import com.hmily.tcc.annotation.Tcc;
 import com.hmily.tcc.common.exception.TccRuntimeException;
 import com.hmily.tcc.demo.dubbo.account.api.dto.AccountDTO;
+import com.hmily.tcc.demo.dubbo.account.api.dto.AccountNestedDTO;
 import com.hmily.tcc.demo.dubbo.account.api.entity.AccountDO;
 import com.hmily.tcc.demo.dubbo.account.api.service.AccountService;
 import com.hmily.tcc.demo.dubbo.inventory.api.dto.InventoryDTO;
@@ -94,6 +95,32 @@ public class PaymentServiceImpl implements PaymentService {
         inventoryDTO.setCount(order.getCount());
         inventoryDTO.setProductId(order.getProductId());
         inventoryService.decrease(inventoryDTO);
+    }
+
+    /**
+     * 订单支付
+     *
+     * @param order 订单实体
+     */
+    @Override
+    @Tcc(confirmMethod = "confirmOrderStatus", cancelMethod = "cancelOrderStatus")
+    public void makePaymentWithNested(Order order) {
+        order.setStatus(OrderStatusEnum.PAYING.getCode());
+        orderMapper.update(order);
+
+        //做库存和资金账户的检验工作 这里只是demo 。。。
+        final AccountDO accountDO = accountService.findByUserId(order.getUserId());
+        if (accountDO.getBalance().compareTo(order.getTotalAmount()) <= 0) {
+            throw  new TccRuntimeException("余额不足！");
+        }
+
+        //扣除用户余额
+        AccountNestedDTO accountDTO = new AccountNestedDTO();
+        accountDTO.setAmount(order.getTotalAmount());
+        accountDTO.setUserId(order.getUserId());
+        accountDTO.setProductId(order.getProductId());
+        accountDTO.setCount(order.getCount());
+        accountService.paymentWithNested(accountDTO);
     }
 
     @Override

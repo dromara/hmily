@@ -26,12 +26,12 @@ import com.alibaba.dubbo.rpc.Result;
 import com.alibaba.dubbo.rpc.RpcContext;
 import com.alibaba.dubbo.rpc.RpcException;
 import com.hmily.tcc.annotation.Tcc;
-import com.hmily.tcc.annotation.TccPatternEnum;
 import com.hmily.tcc.common.bean.context.TccTransactionContext;
 import com.hmily.tcc.common.bean.entity.Participant;
 import com.hmily.tcc.common.bean.entity.TccInvocation;
 import com.hmily.tcc.common.constant.CommonConstant;
 import com.hmily.tcc.common.enums.TccActionEnum;
+import com.hmily.tcc.common.enums.TccRoleEnum;
 import com.hmily.tcc.common.exception.TccRuntimeException;
 import com.hmily.tcc.common.utils.GsonUtils;
 import com.hmily.tcc.core.concurrent.threadlocal.TransactionContextLocal;
@@ -51,6 +51,7 @@ public class HmilyTransactionFilter implements Filter {
     private HmilyTransactionExecutor hmilyTransactionExecutor;
 
     /**
+     * this is init by dubbo spi
      * set hmilyTransactionExecutor.
      *
      * @param hmilyTransactionExecutor {@linkplain HmilyTransactionExecutor }
@@ -85,7 +86,10 @@ public class HmilyTransactionFilter implements Filter {
                 //如果result 没有异常就保存
                 if (!result.hasException()) {
                     final Participant participant = buildParticipant(tccTransactionContext, tcc, method, clazz, arguments, args);
-                    if (Objects.nonNull(participant)) {
+                    if (tccTransactionContext.getRole() == TccRoleEnum.PROVIDER.getCode()) {
+                        hmilyTransactionExecutor.registerByNested(tccTransactionContext.getTransId(),
+                                participant);
+                    } else {
                         hmilyTransactionExecutor.enlistParticipant(participant);
                     }
                 }
@@ -118,9 +122,6 @@ public class HmilyTransactionFilter implements Filter {
         if (StringUtils.isBlank(cancelMethodName)) {
             cancelMethodName = method.getName();
         }
-        //设置模式
-        final TccPatternEnum pattern = tcc.pattern();
-        hmilyTransactionExecutor.getCurrentTransaction().setPattern(pattern.getCode());
         TccInvocation confirmInvocation = new TccInvocation(clazz, confirmMethodName, args, arguments);
         TccInvocation cancelInvocation = new TccInvocation(clazz, cancelMethodName, args, arguments);
         //封装调用点

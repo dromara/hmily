@@ -68,6 +68,18 @@ public class OrderController {
     }
 
 
+    @PostMapping(value = "/orderPayWithNested")
+    @ApiOperation(value = "订单支付接口（注意这里模拟的是创建订单并进行支付扣减库存等操作）")
+    public String orderPayWithNested(@RequestParam(value = "count") Integer count,
+                           @RequestParam(value = "amount") BigDecimal amount) {
+
+        return orderService.orderPayWithNested(count, amount);
+
+    }
+
+
+
+
     /*@PostMapping(value = "/mockInventoryWithConfirmException")
     @ApiOperation(value = "模拟下单付款操作在Confirm阶段异常，此时所有的系统调用都会执行cancel方法，达到数据的一致性（注意:这里模拟的是系统异常，或者rpc异常）")
     public String mockInventoryWithConfirmException(@RequestParam(value = "count") Integer count,
