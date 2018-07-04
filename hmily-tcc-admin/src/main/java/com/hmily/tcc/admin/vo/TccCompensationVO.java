@@ -22,63 +22,30 @@ import lombok.Data;
 import java.io.Serializable;
 
 /**
- * <p>Description: .</p>
- *
+ * TccCompensationVO.
  * @author xiaoyu(Myth)
- * @version 1.0
- * @date 2017/10/19 16:37
- * @since JDK 1.8
  */
 @Data
 public class TccCompensationVO implements Serializable {
 
-
     private static final long serialVersionUID = 564418979137349581L;
-
 
     private String transId;
 
-
-    /**
-     * 重试次数，
-     */
     private Integer retriedCount;
 
-    /**
-     * 创建时间
-     */
     private String createTime;
 
-
-    /**
-     * 创建时间
-     */
     private String lastTime;
 
-    /**
-     * 版本控制 防止并发问题
-     */
     private Integer version;
 
-
-    /**
-     * 执行类名称
-     */
     private String targetClass;
-    /**
-     * 执行方法
-     */
+
     private String targetMethod;
 
-    /**
-     * 确认方法
-     */
     private String confirmMethod;
 
-    /**
-     * 取消方法
-     */
     private String cancelMethod;
-
 
 }

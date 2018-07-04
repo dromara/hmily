@@ -20,20 +20,23 @@ package com.hmily.tcc.admin.helper;
 import com.hmily.tcc.admin.page.PageParameter;
 
 /**
- * <p>Description: .</p>
- *
+ * ConvertHelper.
  * @author xiaoyu(Myth)
  * @version 1.0
- * @date 2017/10/19 18:30
- * @since JDK 1.8
  */
 public class PageHelper {
 
-    public static PageParameter buildPage(PageParameter pageParameter, int totalCount) {
+    /**
+     * build  PageParameter.
+     * @param pageParameter pageParameter
+     * @param totalCount  totalCount
+     * @return {@linkplain PageParameter}
+     */
+    public static PageParameter buildPage(final PageParameter pageParameter, final int totalCount) {
         final int currentPage = pageParameter.getCurrentPage();
         pageParameter.setTotalCount(totalCount);
-        int totalPage = totalCount / pageParameter.getPageSize() +
-                ((totalCount % pageParameter.getPageSize() == 0) ? 0 : 1);
+        int totalPage = totalCount / pageParameter.getPageSize()
+                + ((totalCount % pageParameter.getPageSize() == 0) ? 0 : 1);
         pageParameter.setTotalPage(totalPage);
         pageParameter.setPrePage(currentPage - 1);
         pageParameter.setNextPage(currentPage + 1);
@@ -42,79 +45,54 @@ public class PageHelper {
 
 
     /**
-     * sqlserver的分页语句
+     * sqlserver page.
      *
-     * @param sql
-     * @param page
+     * @param sql  sql
+     * @param  page page
      * @return String
      */
-    public static  StringBuilder buildPageSqlForSqlserver(String sql, PageParameter page) {
+    public static StringBuilder buildPageSqlForSqlserver(final String sql, final PageParameter page) {
         StringBuilder pageSql = new StringBuilder(100);
         String start = String.valueOf((page.getCurrentPage() - 1) * page.getPageSize());
         pageSql.append(sql);
         pageSql.append(" order by 1");
-        pageSql.append(" offset " + start + " rows fetch next " + page.getPageSize() + " rows only ");
+        pageSql.append(" offset ")
+                .append(start)
+                .append(" rows fetch next ")
+                .append(page.getPageSize())
+                .append(" rows only ");
+        return pageSql;
+    }
+
+
+    /**
+     * mysql build page sql.
+     *
+     * @param sql sql
+     * @param page page
+     * @return String
+     */
+    public static StringBuilder buildPageSqlForMysql(final String sql, final PageParameter page) {
+        StringBuilder pageSql = new StringBuilder(100);
+        String start = String.valueOf((page.getCurrentPage() - 1) * page.getPageSize());
+        pageSql.append(sql);
+        pageSql.append(" limit ").append(start).append(",").append(page.getPageSize());
         return pageSql;
     }
 
     /**
-     * sqlserver的分页语句
+     * oracle page sql.
      *
-     * @param sql
-     * @param page
+     * @param sql sql
+     * @param page page
      * @return String
      */
-    public static StringBuilder buildPageSqlForSqlserver(String sql, PageParameter page, String orderBy) {
-        StringBuilder pageSql = new StringBuilder(100);
-        String start = String.valueOf((page.getCurrentPage() - 1) * page.getPageSize());
-        pageSql.append(sql);
-        pageSql.append(orderBy);
-        pageSql.append(" offset " + start + " rows fetch next " + page.getPageSize() + " rows only ");
-        return pageSql;
-    }
-    /**
-     * mysql的分页语句
-     *
-     * @param sql
-     * @param page
-     * @return String
-     */
-    public static StringBuilder buildPageSqlForMysql(String sql, PageParameter page) {
-        StringBuilder pageSql = new StringBuilder(100);
-        String start = String.valueOf((page.getCurrentPage() - 1) * page.getPageSize());
-        pageSql.append(sql);
-        pageSql.append(" limit " + start + "," + page.getPageSize());
-        return pageSql;
-    }
-    /**
-     * mysql的分页语句
-     *
-     * @param sql
-     * @param page
-     * @return String
-     */
-    public static StringBuilder buildPageSqlForMysql(String sql, PageParameter page, String orderBy) {
-        StringBuilder pageSql = new StringBuilder(100);
-        String start = String.valueOf((page.getCurrentPage() - 1) * page.getPageSize());
-        pageSql.append(sql);
-        pageSql.append(orderBy);
-        pageSql.append(" limit " + start + "," + page.getPageSize());
-        return pageSql;
-    }
-    /**
-     * 参考hibernate的实现完成oracle的分页
-     *
-     * @param sql
-     * @param page
-     * @return String
-     */
-    public static StringBuilder buildPageSqlForOracle(String sql, PageParameter page) {
+    public static StringBuilder buildPageSqlForOracle(final String sql, final PageParameter page) {
         StringBuilder pageSql = new StringBuilder(100);
         String start = String.valueOf((page.getCurrentPage() - 1) * page.getPageSize());
         String end = String.valueOf(page.getCurrentPage() * page.getPageSize());
         pageSql.append("select * from ( select temp.*, rownum row_id from ( ");
-        pageSql.append(sql);
-        pageSql.append(" ) temp where rownum <= ").append(end);
+        pageSql.append(sql).append(" ) temp where rownum <= ").append(end);
         pageSql.append(" ) where row_id > ").append(start);
         return pageSql;
     }
