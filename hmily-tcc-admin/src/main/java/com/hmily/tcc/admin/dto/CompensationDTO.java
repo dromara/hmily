@@ -23,17 +23,14 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
- * <p>Description: .</p>
- *
+ * CompensationDTO.
  * @author xiaoyu(Myth)
- * @version 1.0
- * @date 2017/10/24 16:24
- * @since JDK 1.8
  */
 @Data
 public class CompensationDTO implements Serializable {
 
     private static final long serialVersionUID = 6905402148490426011L;
+
     private String applicationName;
 
     private List<String> ids;

@@ -24,42 +24,36 @@ import com.hmily.tcc.admin.vo.TccCompensationVO;
 import java.util.List;
 
 /**
- * <p>Description: .</p>
- *
+ * compensation log Service.
  * @author xiaoyu(Myth)
- * @version 1.0
- * @date 2017/10/19 16:36
- * @since JDK 1.8
  */
 public interface CompensationService {
 
 
     /**
-     * 分页获取补偿事务信息
+     * acquired {@linkplain TccCompensationVO} by page.
      *
-     * @param query 查询条件
-     * @return CommonPager<TransactionRecoverVO>
+     * @param query {@linkplain CompensationQuery}
+     * @return CommonPager TransactionRecoverVO
      */
     CommonPager<TccCompensationVO> listByPage(CompensationQuery query);
 
+    /**
+     * batch remove transaction log by ids.
+     *
+     * @param ids             ids  pk ids
+     * @param appName app name
+     * @return true success
+     */
+    Boolean batchRemove(List<String> ids, String appName);
 
     /**
-     * 批量删除补偿事务信息
+     * modify retry count.
      *
-     * @param ids             ids 事务id集合
-     * @param applicationName 应用名称
-     * @return true 成功
+     * @param id              transId
+     * @param retry           retry
+     * @param appName         appName
+     * @return true success
      */
-    Boolean batchRemove(List<String> ids, String applicationName);
-
-
-    /**
-     * 更改恢复次数
-     *
-     * @param id              事务id
-     * @param retry           恢复次数
-     * @param applicationName 应用名称
-     * @return true 成功
-     */
-    Boolean updateRetry(String id, Integer retry, String applicationName);
+    Boolean updateRetry(String id, Integer retry, String appName);
 }

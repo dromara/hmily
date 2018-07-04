@@ -28,6 +28,7 @@ import com.hmily.tcc.admin.service.compensate.ZookeeperCompensationServiceImpl;
 import com.hmily.tcc.common.jedis.JedisClient;
 import com.hmily.tcc.common.jedis.JedisClientCluster;
 import com.hmily.tcc.common.jedis.JedisClientSingle;
+import com.hmily.tcc.common.serializer.ObjectSerializer;
 import com.mongodb.MongoCredential;
 import com.mongodb.ServerAddress;
 import org.apache.commons.lang3.StringUtils;
@@ -41,6 +42,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.Environment;
 import org.springframework.data.mongodb.core.MongoClientFactoryBean;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.jdbc.core.JdbcTemplate;
 import redis.clients.jedis.HostAndPort;
 import redis.clients.jedis.JedisCluster;
 import redis.clients.jedis.JedisPool;
@@ -55,13 +57,14 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
 /**
+ * CompensationConfiguration.
  * @author xiaoyu
  */
 @Configuration
 public class CompensationConfiguration {
 
     /**
-     * spring.profiles.active = {}
+     * spring.profiles.active = {}.
      */
     @Configuration
     @Profile("db")
@@ -70,7 +73,7 @@ public class CompensationConfiguration {
         private final Environment env;
 
         @Autowired
-        public JdbcRecoverConfiguration(Environment env) {
+        JdbcRecoverConfiguration(final Environment env) {
             this.env = env;
         }
 
@@ -101,10 +104,7 @@ public class CompensationConfiguration {
             jdbcTransactionRecoverService.setDbType(env.getProperty("compensation.db.driver"));
             return jdbcTransactionRecoverService;
         }
-
-
     }
-
 
     @Configuration
     @Profile("redis")
@@ -112,15 +112,17 @@ public class CompensationConfiguration {
 
         private final Environment env;
 
+        private final ObjectSerializer objectSerializer;
+
         @Autowired
-        public RedisRecoverConfiguration(Environment env) {
+        RedisRecoverConfiguration(final Environment env, final ObjectSerializer objectSerializer) {
             this.env = env;
+            this.objectSerializer = objectSerializer;
         }
 
         @Bean
         @Qualifier("redisTransactionRecoverService")
         public CompensationService redisTransactionRecoverService() {
-
             JedisPool jedisPool;
             JedisPoolConfig config = new JedisPoolConfig();
             JedisClient jedisClient;
@@ -144,23 +146,26 @@ public class CompensationConfiguration {
                             Integer.parseInt(port), 30);
                 }
                 jedisClient = new JedisClientSingle(jedisPool);
-
             }
-
-            return new RedisCompensationServiceImpl(jedisClient);
+            return new RedisCompensationServiceImpl(jedisClient, objectSerializer);
         }
-
-
     }
 
     @Configuration
     @Profile("file")
     static class FileRecoverConfiguration {
 
+        private final ObjectSerializer objectSerializer;
+
+        @Autowired
+        FileRecoverConfiguration(final ObjectSerializer objectSerializer) {
+            this.objectSerializer = objectSerializer;
+        }
+
         @Bean
         @Qualifier("fileTransactionRecoverService")
         public CompensationService fileTransactionRecoverService() {
-            return new FileCompensationServiceImpl();
+            return new FileCompensationServiceImpl(objectSerializer);
         }
 
     }
@@ -169,15 +174,17 @@ public class CompensationConfiguration {
     @Profile("zookeeper")
     static class ZookeeperRecoverConfiguration {
 
-        private final Environment env;
-
-        @Autowired
-        public ZookeeperRecoverConfiguration(Environment env) {
-            this.env = env;
-        }
-
         private static final Lock LOCK = new ReentrantLock();
 
+        private final Environment env;
+
+        private final ObjectSerializer objectSerializer;
+
+        @Autowired
+        ZookeeperRecoverConfiguration(final Environment env, final ObjectSerializer objectSerializer) {
+            this.env = env;
+            this.objectSerializer = objectSerializer;
+        }
 
         @Bean
         @Qualifier("zookeeperTransactionRecoverService")
@@ -196,8 +203,7 @@ public class CompensationConfiguration {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
-            return new ZookeeperCompensationServiceImpl(zooKeeper);
+            return new ZookeeperCompensationServiceImpl(zooKeeper, objectSerializer);
         }
 
     }
@@ -209,7 +215,7 @@ public class CompensationConfiguration {
         private final Environment env;
 
         @Autowired
-        public MongoRecoverConfiguration(Environment env) {
+        MongoRecoverConfiguration(final Environment env) {
             this.env = env;
         }
 
@@ -222,9 +228,7 @@ public class CompensationConfiguration {
                     env.getProperty("compensation.mongo.userName"),
                     env.getProperty("compensation.mongo.dbName"),
                     env.getProperty("compensation.mongo.password").toCharArray());
-            clientFactoryBean.setCredentials(new MongoCredential[]{
-                    credential
-            });
+            clientFactoryBean.setCredentials(new MongoCredential[]{credential});
             List<String> urls = Splitter.on(",").trimResults().splitToList(env.getProperty("compensation.mongo.url"));
             ServerAddress[] sds = new ServerAddress[urls.size()];
             for (int i = 0; i < sds.length; i++) {
@@ -241,7 +245,6 @@ public class CompensationConfiguration {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
             return new MongoCompensationServiceImpl(mongoTemplate);
         }
 

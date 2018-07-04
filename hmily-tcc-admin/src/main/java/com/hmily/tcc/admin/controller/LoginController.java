@@ -26,27 +26,21 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * <p>Description: .</p>
- *
+ * login rest controller.
  * @author xiaoyu(Myth)
- * @version 1.0
- * @date 2017/10/20 10:11
- * @since JDK 1.8
  */
 @RestController
 public class LoginController {
 
-
     private final LoginService loginService;
 
     @Autowired
-    public LoginController(LoginService loginService) {
+    public LoginController(final LoginService loginService) {
         this.loginService = loginService;
     }
 
-
     @PostMapping("/login")
-    public AjaxResponse login(@RequestBody UserDTO userDTO) {
+    public AjaxResponse login(@RequestBody final UserDTO userDTO) {
         final Boolean login = loginService.login(userDTO.getUserName(), userDTO.getPassword());
         return AjaxResponse.success(login);
     }

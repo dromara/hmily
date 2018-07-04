@@ -30,11 +30,9 @@ import com.hmily.tcc.common.jedis.JedisClient;
 import com.hmily.tcc.common.serializer.ObjectSerializer;
 import com.hmily.tcc.common.utils.DateUtils;
 import com.hmily.tcc.common.utils.RepositoryPathUtils;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 import java.util.Objects;
@@ -42,60 +40,27 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * <p>Description: .</p>
- * redis实现
- *
+ * redis impl.
  * @author xiaoyu(Myth)
- * @version 1.0
- * @date 2017/10/19 17:08
- * @since JDK 1.8
  */
 @SuppressWarnings("unchecked")
+@RequiredArgsConstructor
 public class RedisCompensationServiceImpl implements CompensationService {
 
+    private final JedisClient jedisClient;
 
-    private JedisClient jedisClient;
+    private final ObjectSerializer objectSerializer;
 
-
-    public RedisCompensationServiceImpl(JedisClient jedisClient) {
-        this.jedisClient = jedisClient;
-    }
-
-
-    @Autowired
-    private ObjectSerializer objectSerializer;
-
-
-    /** logger */
-    private static final Logger LOGGER = LoggerFactory.getLogger(RedisCompensationServiceImpl.class);
-
-    /**
-     * 分页获取补偿事务信息
-     *
-     * @param query 查询条件
-     * @return CommonPager<TransactionRecoverVO>
-     */
     @Override
-    public CommonPager<TccCompensationVO> listByPage(CompensationQuery query) {
-
+    public CommonPager<TccCompensationVO> listByPage(final CompensationQuery query) {
         CommonPager<TccCompensationVO> commonPager = new CommonPager<>();
-
         final String redisKeyPrefix = RepositoryPathUtils.buildRedisKeyPrefix(query.getApplicationName());
-
         final int currentPage = query.getPageParameter().getCurrentPage();
         final int pageSize = query.getPageParameter().getPageSize();
-
         int start = (currentPage - 1) * pageSize;
-
-
-        //transaction:compensate:alipay-service:
-        //获取所有的key
         Set<byte[]> keys;
-
         List<TccCompensationVO> voList;
-
         int totalCount;
-
         //如果只查 重试条件的
         if (StringUtils.isBlank(query.getTransId()) && Objects.nonNull(query.getRetry())) {
             keys = jedisClient.keys((redisKeyPrefix + "*").getBytes());
@@ -125,7 +90,6 @@ public class RedisCompensationServiceImpl implements CompensationService {
             totalCount = keys.size();
             voList = findByPage(keys, start, pageSize);
         }
-
         if (keys.size() <= 0 || keys.size() < start) {
             return commonPager;
         }
@@ -134,14 +98,11 @@ public class RedisCompensationServiceImpl implements CompensationService {
         return commonPager;
     }
 
-
-
-
-
-    private TccCompensationVO buildVOByKey(byte[] key) {
+    private TccCompensationVO buildVOByKey(final byte[] key) {
         final byte[] bytes = jedisClient.get(key);
         try {
-            final CoordinatorRepositoryAdapter adapter = objectSerializer.deSerialize(bytes, CoordinatorRepositoryAdapter.class);
+            final CoordinatorRepositoryAdapter adapter =
+                    objectSerializer.deSerialize(bytes, CoordinatorRepositoryAdapter.class);
             return ConvertHelper.buildVO(adapter);
         } catch (TccException e) {
             e.printStackTrace();
@@ -149,41 +110,25 @@ public class RedisCompensationServiceImpl implements CompensationService {
         }
     }
 
-    /**
-     * 批量删除补偿事务信息
-     *
-     * @param ids             ids 事务id集合
-     * @param applicationName 应用名称
-     * @return true 成功
-     */
     @Override
-    public Boolean batchRemove(List<String> ids, String applicationName) {
+    public Boolean batchRemove(final List<String> ids, final String applicationName) {
         if (CollectionUtils.isEmpty(ids) || StringUtils.isBlank(applicationName)) {
             return Boolean.FALSE;
         }
         String keyPrefix = RepositoryPathUtils.buildRedisKeyPrefix(applicationName);
         final String[] keys = ids.stream()
-                .map(id -> RepositoryPathUtils.buildRedisKey(keyPrefix,id)).toArray(String[]::new);
-
+                .map(id -> RepositoryPathUtils.buildRedisKey(keyPrefix, id)).toArray(String[]::new);
         jedisClient.del(keys);
         return Boolean.TRUE;
     }
 
-    /**
-     * 更改恢复次数
-     *
-     * @param id              事务id
-     * @param retry           恢复次数
-     * @param applicationName 应用名称
-     * @return true 成功
-     */
     @Override
-    public Boolean updateRetry(String id, Integer retry, String applicationName) {
-        if (StringUtils.isBlank(id) || StringUtils.isBlank(applicationName) || Objects.isNull(retry)) {
+    public Boolean updateRetry(final String id, final Integer retry, final String appName) {
+        if (StringUtils.isBlank(id) || StringUtils.isBlank(appName) || Objects.isNull(retry)) {
             return Boolean.FALSE;
         }
-        String keyPrefix = RepositoryPathUtils.buildRedisKeyPrefix(applicationName);
-        final String key = RepositoryPathUtils.buildRedisKey(keyPrefix,id);
+        String keyPrefix = RepositoryPathUtils.buildRedisKeyPrefix(appName);
+        final String key = RepositoryPathUtils.buildRedisKey(keyPrefix, id);
         final byte[] bytes = jedisClient.get(key.getBytes());
         try {
             final CoordinatorRepositoryAdapter adapter =
@@ -196,18 +141,22 @@ public class RedisCompensationServiceImpl implements CompensationService {
             e.printStackTrace();
             return Boolean.FALSE;
         }
-
     }
 
-
-    private List<TccCompensationVO> findAll(Set<byte[]> keys) {
+    private List<TccCompensationVO> findAll(final Set<byte[]> keys) {
         return keys.parallelStream()
-                .map(this::buildVOByKey).filter(Objects::nonNull).collect(Collectors.toList());
+                .map(this::buildVOByKey)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
     }
 
-
-    private List<TccCompensationVO> findByPage(Set<byte[]> keys, int start, int pageSize) {
-        return keys.parallelStream().skip(start).limit(pageSize)
-                .map(this::buildVOByKey).filter(Objects::nonNull).collect(Collectors.toList());
+    private List<TccCompensationVO> findByPage(final Set<byte[]> keys, final int start, final int pageSize) {
+        return keys.parallelStream()
+                .skip(start)
+                .limit(pageSize)
+                .map(this::buildVOByKey)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
     }
+
 }

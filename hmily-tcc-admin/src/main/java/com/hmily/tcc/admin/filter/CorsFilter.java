@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-
 package com.hmily.tcc.admin.filter;
 
 import org.springframework.stereotype.Component;
@@ -30,31 +29,27 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
- * <p>Description: .</p>
- *
+ * cors filter .
  * @author xiaoyu(Myth)
- * @version 1.0
- * @date 2017/10/23 17:57
- * @since JDK 1.8
  */
 @Component
 public class CorsFilter implements Filter {
 
-
     @Override
-    public void init(FilterConfig filterConfig) throws ServletException {
+    public void init(final FilterConfig filterConfig) {
 
     }
 
     @Override
-    public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
+    public void doFilter(final ServletRequest req, final ServletResponse res, final FilterChain chain)
+            throws IOException, ServletException {
         HttpServletResponse response = (HttpServletResponse) res;
-        response.setHeader("Access-Control-Allow-Origin","*");
+        response.setHeader("Access-Control-Allow-Origin", "*");
         response.setHeader("Access-Control-Allow-Credentials", "true");
         response.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE");
         response.setHeader("Access-Control-Max-Age", "3600");
         response.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-        response.setHeader("Access-Control-Request-Headers","content-type");
+        response.setHeader("Access-Control-Request-Headers", "content-type");
         chain.doFilter(req, res);
     }
 
@@ -62,7 +57,6 @@ public class CorsFilter implements Filter {
     public void destroy() {
 
     }
-
 
 }
 
