@@ -14,30 +14,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.hmily.tcc.admin.service;
 
 /**
- * <p>Description: .</p>
- *
+ * LoginService.
  * @author xiaoyu(Myth)
- * @version 1.0
- * @date 2017/10/20 10:17
- * @since JDK 1.8
  */
 public interface LoginService {
 
     /**
-     * 登录接口，验证用户名 密码
-     * @param userName 用户名
-     * @param password 密码
-     * @return  true 成功
+     * login.
+     * @param userName userName
+     * @param password password
+     * @return  true   success
      */
-    Boolean login(String userName,String password);
-
+    Boolean login(String userName, String password);
 
     /**
-     * 用户登出
-     * @return true 成功
+     * logout.
+     * @return true success
      */
     Boolean logout();
 }

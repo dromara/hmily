@@ -35,18 +35,12 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 /**
- * <p>Description: .</p>
- * 事务恢复controller
- *
+ * transaction log rest controller.
  * @author xiaoyu(Myth)
- * @version 1.0
- * @date 2017/10/18 10:31
- * @since JDK 1.8
  */
 @RestController
 @RequestMapping("/compensate")
 public class CompensationController {
-
 
     private final CompensationService compensationService;
 
@@ -56,32 +50,32 @@ public class CompensationController {
     private Integer recoverRetryMax;
 
     @Autowired
-    public CompensationController(CompensationService compensationService, ApplicationNameService applicationNameService) {
+    public CompensationController(final CompensationService compensationService,
+                                  final ApplicationNameService applicationNameService) {
         this.compensationService = compensationService;
         this.applicationNameService = applicationNameService;
     }
 
     @Permission
     @PostMapping(value = "/listPage")
-    public AjaxResponse listPage(@RequestBody CompensationQuery recoverQuery) {
+    public AjaxResponse listPage(@RequestBody final CompensationQuery recoverQuery) {
         final CommonPager<TccCompensationVO> pager =
                 compensationService.listByPage(recoverQuery);
         return AjaxResponse.success(pager);
     }
 
-
     @PostMapping(value = "/batchRemove")
     @Permission
-    public AjaxResponse batchRemove(@RequestBody CompensationDTO compensationDTO) {
-
-        final Boolean success = compensationService.batchRemove(compensationDTO.getIds(), compensationDTO.getApplicationName());
+    public AjaxResponse batchRemove(@RequestBody final CompensationDTO compensationDTO) {
+        final Boolean success = compensationService.batchRemove(compensationDTO.getIds(),
+                compensationDTO.getApplicationName());
         return AjaxResponse.success(success);
 
     }
 
     @PostMapping(value = "/update")
     @Permission
-    public AjaxResponse update(@RequestBody CompensationDTO compensationDTO) {
+    public AjaxResponse update(@RequestBody final CompensationDTO compensationDTO) {
         if (recoverRetryMax < compensationDTO.getRetry()) {
             return AjaxResponse.error("重试次数超过最大设置，请您重新设置！");
         }
@@ -97,6 +91,5 @@ public class CompensationController {
         final List<String> list = applicationNameService.list();
         return AjaxResponse.success(list);
     }
-
 
 }

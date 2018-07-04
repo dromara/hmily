@@ -23,14 +23,18 @@ import org.springframework.boot.autoconfigure.data.mongo.MongoDataAutoConfigurat
 import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
 
 /**
+ * hmily tcc start.
  * @author xiaoyu
  */
 @SpringBootApplication(exclude = {MongoAutoConfiguration.class, MongoDataAutoConfiguration.class})
 public class AdminApplication {
-    public static void main(String[] args) {
+
+    /**
+     * main start.
+     * @param args args
+     */
+    public static void main(final String[] args) {
         SpringApplication.run(AdminApplication.class, args);
     }
-
-
 
 }

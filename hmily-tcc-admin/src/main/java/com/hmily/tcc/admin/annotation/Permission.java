@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.hmily.tcc.admin.annotation;
 
 import java.lang.annotation.ElementType;
@@ -21,23 +22,18 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-
 /**
- * <p>Description: .</p>
- *
+ * Permission.
  * @author xiaoyu(Myth)
- * @version 1.0
- * @date 2017/10/23 20:10
- * @since JDK 1.8
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface Permission {
 
     /**
-     * 是否登录
+     * is login.
      *
-     * @return  true 需要  false 不需要
+     * @return  true
      */
     boolean isLogin() default true;
 

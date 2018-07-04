@@ -23,12 +23,8 @@ import lombok.Data;
 import java.io.Serializable;
 
 /**
- * <p>Description: .</p>
- *
+ * query condition.
  * @author xiaoyu(Myth)
- * @version 1.0
- * @date 2017/10/19 16:46
- * @since JDK 1.8
  */
 @Data
 public class CompensationQuery implements Serializable {
@@ -36,24 +32,20 @@ public class CompensationQuery implements Serializable {
     private static final long serialVersionUID = 3297929795348894462L;
 
     /**
-     * 应用名称
+     * app name.
      */
     private String applicationName;
 
     /**
-     * 事务id
+     * transId.
      */
     private String transId;
 
     /**
-     * 重试次数
+     * retry.
      */
     private Integer retry;
 
-
-    /**
-     * 分页信息
-     */
     private PageParameter pageParameter;
 
 
