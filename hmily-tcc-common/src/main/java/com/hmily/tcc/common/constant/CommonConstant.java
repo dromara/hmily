@@ -19,22 +19,28 @@ package com.hmily.tcc.common.constant;
 
 /**
  * CommonConstant.
+ *
  * @author xiaoyu
  */
-public interface CommonConstant {
+public final class CommonConstant {
 
-    String DB_MYSQL = "mysql";
+    private CommonConstant() {
+    }
 
-    String DB_SQLSERVER = "sqlserver";
+    public final static String DB_MYSQL = "mysql";
 
-    String DB_ORACLE = "oracle";
+    public final static String DB_SQLSERVER = "sqlserver";
 
-    String PATH_SUFFIX = "/tcc";
+    public final static String DB_ORACLE = "oracle";
 
-    String DB_SUFFIX = "tcc_";
+    public final static String DB_POSTGRESQL = "postgresql";
 
-    String RECOVER_REDIS_KEY_PRE = "tcc:transaction:%s";
+    public final static String PATH_SUFFIX = "/tcc";
 
-    String TCC_TRANSACTION_CONTEXT = "TCC_TRANSACTION_CONTEXT";
+    public final static String DB_SUFFIX = "tcc_";
+
+    public final static String RECOVER_REDIS_KEY_PRE = "tcc:transaction:%s";
+
+    public final static String TCC_TRANSACTION_CONTEXT = "TCC_TRANSACTION_CONTEXT";
 
 }

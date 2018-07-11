@@ -23,9 +23,11 @@ import com.hmily.tcc.common.bean.entity.Participant;
 import com.hmily.tcc.common.bean.entity.TccTransaction;
 import com.hmily.tcc.common.config.TccConfig;
 import com.hmily.tcc.common.config.TccDbConfig;
+import com.hmily.tcc.common.constant.CommonConstant;
 import com.hmily.tcc.common.enums.RepositorySupportEnum;
 import com.hmily.tcc.common.exception.TccException;
 import com.hmily.tcc.common.serializer.ObjectSerializer;
+import com.hmily.tcc.common.utils.DbTypeUtils;
 import com.hmily.tcc.common.utils.RepositoryPathUtils;
 import com.hmily.tcc.core.helper.SqlHelper;
 import com.hmily.tcc.core.spi.CoordinatorRepository;
@@ -33,22 +35,18 @@ import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collections;
+import java.sql.*;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.*;
 import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 /**
  * jdbc impl.
+ *
  * @author xiaoyu
  */
 @SuppressWarnings("unchecked")
@@ -59,6 +57,8 @@ public class JdbcCoordinatorRepository implements CoordinatorRepository {
     private DruidDataSource dataSource;
 
     private String tableName;
+
+    private String currentDBType;
 
     private ObjectSerializer serializer;
 
@@ -211,6 +211,8 @@ public class JdbcCoordinatorRepository implements CoordinatorRepository {
         dataSource.setPoolPreparedStatements(tccDbConfig.getPoolPreparedStatements());
         dataSource.setMaxPoolPreparedStatementPerConnectionSize(tccDbConfig.getMaxPoolPreparedStatementPerConnectionSize());
         this.tableName = RepositoryPathUtils.buildDbTableName(modelName);
+        //save current database type
+        this.currentDBType = DbTypeUtils.buildByDriverClassName(tccDbConfig.getDriverClassName());
         executeUpdate(SqlHelper.buildCreateTableSql(tccDbConfig.getDriverClassName(), tableName));
     }
 
@@ -227,7 +229,7 @@ public class JdbcCoordinatorRepository implements CoordinatorRepository {
             ps = connection.prepareStatement(sql);
             if (params != null) {
                 for (int i = 0; i < params.length; i++) {
-                    ps.setObject(i + 1, params[i]);
+                    ps.setObject(i + 1, convertDataTypeToDB(params[i]));
                 }
             }
             return ps.executeUpdate();
@@ -240,6 +242,15 @@ public class JdbcCoordinatorRepository implements CoordinatorRepository {
 
     }
 
+    private Object convertDataTypeToDB(Object params) {
+        //https://jdbc.postgresql.org/documentation/head/8-date-time.html
+        if (CommonConstant.DB_POSTGRESQL.equals(currentDBType) && params instanceof java.util.Date) {
+            return LocalDateTime.ofInstant(Instant.ofEpochMilli(((Date) params).getTime()), ZoneId.systemDefault());
+        }
+        return params;
+    }
+
+
     private List<Map<String, Object>> executeQuery(final String sql, final Object... params) {
         Connection connection = null;
         PreparedStatement ps = null;
@@ -250,7 +261,7 @@ public class JdbcCoordinatorRepository implements CoordinatorRepository {
             ps = connection.prepareStatement(sql);
             if (params != null) {
                 for (int i = 0; i < params.length; i++) {
-                    ps.setObject(i + 1, params[i]);
+                    ps.setObject(i + 1, convertDataTypeToDB(params[i]));
                 }
             }
             rs = ps.executeQuery();
