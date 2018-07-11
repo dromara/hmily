@@ -31,13 +31,15 @@ public class DbTypeUtils {
      * @return mysql sqlserver oracle .
      */
     public static String buildByDriverClassName(final String driverClassName) {
-        String dbType = "mysql";
+        String dbType = null;
         if (driverClassName.contains(CommonConstant.DB_MYSQL)) {
-            dbType = "mysql";
+            dbType = CommonConstant.DB_MYSQL;
         } else if (driverClassName.contains(CommonConstant.DB_SQLSERVER)) {
-            dbType = "sqlserver";
+            dbType = CommonConstant.DB_SQLSERVER;
         } else if (driverClassName.contains(CommonConstant.DB_ORACLE)) {
-            dbType = "oracle";
+            dbType = CommonConstant.DB_ORACLE;
+        }else if (driverClassName.contains(CommonConstant.DB_POSTGRESQL)) {
+            dbType = CommonConstant.DB_POSTGRESQL;
         }
         return dbType;
     }

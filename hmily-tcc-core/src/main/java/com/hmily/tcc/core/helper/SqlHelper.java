@@ -17,10 +17,12 @@
 
 package com.hmily.tcc.core.helper;
 
+import com.hmily.tcc.common.constant.CommonConstant;
 import com.hmily.tcc.common.utils.DbTypeUtils;
 
 /**
  * SqlHelper.
+ *
  * @author xiaoyu
  */
 public class SqlHelper {
@@ -36,7 +38,7 @@ public class SqlHelper {
         StringBuilder createTableSql = new StringBuilder();
         String dbType = DbTypeUtils.buildByDriverClassName(driverClassName);
         switch (dbType) {
-            case "mysql":
+            case CommonConstant.DB_MYSQL:
                 createTableSql
                         .append("CREATE TABLE `")
                         .append(tableName)
@@ -56,7 +58,7 @@ public class SqlHelper {
                         .append("  `pattern` int(2),")
                         .append("  PRIMARY KEY (`trans_id`))");
                 break;
-            case "oracle":
+            case CommonConstant.DB_ORACLE:
                 createTableSql
                         .append("CREATE TABLE `")
                         .append(tableName)
@@ -76,7 +78,7 @@ public class SqlHelper {
                         .append("  `pattern` int(2),")
                         .append("  PRIMARY KEY (`trans_id`))");
                 break;
-            case "sqlserver":
+            case CommonConstant.DB_SQLSERVER:
                 createTableSql
                         .append("CREATE TABLE `")
                         .append(tableName)
@@ -96,8 +98,28 @@ public class SqlHelper {
                         .append("  `pattern` int(2),")
                         .append("  PRIMARY KEY (`trans_id`))");
                 break;
+            case CommonConstant.DB_POSTGRESQL:
+                createTableSql
+                        .append(" CREATE TABLE IF NOT EXISTS ")
+                        .append(tableName)
+                        .append("(")
+                        .append("  trans_id       VARCHAR(64) PRIMARY KEY,")
+                        .append("  target_class   VARCHAR(256),")
+                        .append("  target_method  VARCHAR(128),")
+                        .append("  confirm_method VARCHAR(128),")
+                        .append("  cancel_method  VARCHAR(128),")
+                        .append("  retried_count  SMALLINT    NOT NULL,")
+                        .append("  create_time    TIMESTAMP   NOT NULL,")
+                        .append("  last_time      TIMESTAMP   NOT NULL,")
+                        .append("  version        SMALLINT    NOT NULL,")
+                        .append("  status         SMALLINT    NOT NULL,")
+                        .append("  invocation     BYTEA,")
+                        .append("  role           SMALLINT    NOT NULL,")
+                        .append("  pattern        SMALLINT    NOT NULL")
+                        .append(");");
+                break;
             default:
-                throw new RuntimeException("dbType类型不支持,目前仅支持mysql oracle sqlserver.");
+                throw new RuntimeException("dbType类型不支持,目前仅支持mysql oracle sqlserver postgresql.");
         }
         return createTableSql.toString();
     }
