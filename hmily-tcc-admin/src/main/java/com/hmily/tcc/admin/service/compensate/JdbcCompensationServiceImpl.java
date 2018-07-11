@@ -23,10 +23,10 @@ import com.hmily.tcc.admin.page.PageParameter;
 import com.hmily.tcc.admin.query.CompensationQuery;
 import com.hmily.tcc.admin.service.CompensationService;
 import com.hmily.tcc.admin.vo.TccCompensationVO;
+import com.hmily.tcc.common.constant.CommonConstant;
 import com.hmily.tcc.common.utils.DateUtils;
 import com.hmily.tcc.common.utils.DbTypeUtils;
 import com.hmily.tcc.common.utils.RepositoryPathUtils;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -119,12 +119,14 @@ public class JdbcCompensationServiceImpl implements CompensationService {
 
     private String buildPageSql(final String sql, final PageParameter pageParameter) {
         switch (dbType) {
-            case "mysql":
+            case CommonConstant.DB_MYSQL:
                 return PageHelper.buildPageSqlForMysql(sql, pageParameter).toString();
-            case "oracle":
+            case CommonConstant.DB_ORACLE:
                 return PageHelper.buildPageSqlForOracle(sql, pageParameter).toString();
-            case "sqlserver":
+            case CommonConstant.DB_SQLSERVER:
                 return PageHelper.buildPageSqlForSqlserver(sql, pageParameter).toString();
+            case CommonConstant.DB_POSTGRESQL:
+                return PageHelper.buildPageSqlForPostgreSQL(sql, pageParameter).toString();
             default:
                 return "";
         }
