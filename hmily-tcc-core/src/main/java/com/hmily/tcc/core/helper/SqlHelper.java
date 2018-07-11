@@ -38,7 +38,7 @@ public class SqlHelper {
         switch (dbType) {
             case "mysql":
                 createTableSql
-                        .append("CREATE TABLE `")
+                        .append("CREATE TABLE IF NOT EXISTS `")
                         .append(tableName)
                         .append("` (")
                         .append("  `trans_id` varchar(64) NOT NULL,")
@@ -46,19 +46,19 @@ public class SqlHelper {
                         .append("  `target_method` varchar(128) ,")
                         .append("  `confirm_method` varchar(128) ,")
                         .append("  `cancel_method` varchar(128) ,")
-                        .append("  `retried_count` int(3) NOT NULL,")
+                        .append("  `retried_count` tinyint NOT NULL,")
                         .append("  `create_time` datetime NOT NULL,")
                         .append("  `last_time` datetime NOT NULL,")
-                        .append("  `version` int(6) NOT NULL,")
-                        .append("  `status` int(2) NOT NULL,")
+                        .append("  `version` tinyint NOT NULL,")
+                        .append("  `status` tinyint NOT NULL,")
                         .append("  `invocation` longblob,")
-                        .append("  `role` int(2) NOT NULL,")
-                        .append("  `pattern` int(2),")
+                        .append("  `role` tinyint NOT NULL,")
+                        .append("  `pattern` tinyint,")
                         .append("  PRIMARY KEY (`trans_id`))");
                 break;
             case "oracle":
                 createTableSql
-                        .append("CREATE TABLE `")
+                        .append("CREATE TABLE IF NOT EXISTS `")
                         .append(tableName)
                         .append("` (")
                         .append("  `trans_id` varchar(64) NOT NULL,")
@@ -78,7 +78,7 @@ public class SqlHelper {
                 break;
             case "sqlserver":
                 createTableSql
-                        .append("CREATE TABLE `")
+                        .append("CREATE TABLE IF NOT EXISTS `")
                         .append(tableName)
                         .append("` (")
                         .append("  `trans_id` varchar(64) NOT NULL,")
