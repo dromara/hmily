@@ -68,7 +68,7 @@ public class HmilyInitServiceImpl implements HmilyInitService {
      */
     @Override
     public void initialization(final TccConfig tccConfig) {
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> LOGGER.error("hmily tcc init error !")));
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> LOGGER.info("hmily shutdown now")));
         try {
             loadSpiSupport(tccConfig);
             hmilyTransactionEventPublisher.start(tccConfig.getBufferSize());
