@@ -119,7 +119,7 @@ public class SqlHelper {
                         .append(");");
                 break;
             default:
-                throw new RuntimeException("dbType类型不支持,目前仅支持mysql oracle sqlserver postgresql.");
+                throw new RuntimeException("dbType not support ! The current support mysql oracle sqlserver postgresql.");
         }
         return createTableSql.toString();
     }

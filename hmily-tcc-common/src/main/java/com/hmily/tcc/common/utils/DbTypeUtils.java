@@ -26,9 +26,9 @@ import com.hmily.tcc.common.constant.CommonConstant;
 public class DbTypeUtils {
 
     /**
-     * 判断是什么类型的数据库.
-     * @param driverClassName 驱动名称
-     * @return mysql sqlserver oracle .
+     *  check db type
+     * @param driverClassName driverClassName
+     * @return mysql sqlserver oracle postgresql.
      */
     public static String buildByDriverClassName(final String driverClassName) {
         String dbType = null;
