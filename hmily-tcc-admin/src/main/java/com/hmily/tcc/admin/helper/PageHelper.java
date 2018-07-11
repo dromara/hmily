@@ -97,4 +97,12 @@ public class PageHelper {
         return pageSql;
     }
 
+    public static StringBuilder buildPageSqlForPostgreSQL(final String sql, final PageParameter page) {
+        StringBuilder pageSql = new StringBuilder(100);
+        String start = String.valueOf((page.getCurrentPage() - 1) * page.getPageSize());
+        pageSql.append(sql);
+        pageSql.append(" limit ").append(page.getPageSize()).append(" offset ").append(start);
+        return pageSql;
+    }
+
 }
