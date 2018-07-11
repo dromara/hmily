@@ -74,6 +74,7 @@
         <lombok.version>1.16.14</lombok.version>
         <motan.version>1.0.0</motan.version>
         <disruptor.version>3.4.0</disruptor.version>
+        <hikaricp.version>3.1.0</hikaricp.version>
     </properties>
 
 
@@ -155,9 +156,9 @@
             </dependency>
 
             <dependency>
-                <groupId>com.alibaba</groupId>
-                <artifactId>druid</artifactId>
-                <version>${druid.version}</version>
+                <groupId>com.zaxxer</groupId>
+                <artifactId>HikariCP</artifactId>
+                <version>${hikaricp.version}</version>
             </dependency>
 
             <dependency>
