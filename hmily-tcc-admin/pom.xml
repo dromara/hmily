@@ -73,10 +73,9 @@
             <artifactId>spring-web</artifactId>
         </dependency>
 
-
         <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>druid</artifactId>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
         </dependency>
 
         <dependency>

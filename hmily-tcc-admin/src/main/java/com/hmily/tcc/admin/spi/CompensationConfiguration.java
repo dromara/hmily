@@ -17,20 +17,16 @@
 
 package com.hmily.tcc.admin.spi;
 
-import com.alibaba.druid.pool.DruidDataSource;
 import com.google.common.base.Splitter;
 import com.hmily.tcc.admin.service.CompensationService;
-import com.hmily.tcc.admin.service.compensate.FileCompensationServiceImpl;
-import com.hmily.tcc.admin.service.compensate.JdbcCompensationServiceImpl;
-import com.hmily.tcc.admin.service.compensate.MongoCompensationServiceImpl;
-import com.hmily.tcc.admin.service.compensate.RedisCompensationServiceImpl;
-import com.hmily.tcc.admin.service.compensate.ZookeeperCompensationServiceImpl;
+import com.hmily.tcc.admin.service.compensate.*;
 import com.hmily.tcc.common.jedis.JedisClient;
 import com.hmily.tcc.common.jedis.JedisClientCluster;
 import com.hmily.tcc.common.jedis.JedisClientSingle;
 import com.hmily.tcc.common.serializer.ObjectSerializer;
 import com.mongodb.MongoCredential;
 import com.mongodb.ServerAddress;
+import com.zaxxer.hikari.HikariDataSource;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.ZooKeeper;
@@ -42,7 +38,6 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.Environment;
 import org.springframework.data.mongodb.core.MongoClientFactoryBean;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.jdbc.core.JdbcTemplate;
 import redis.clients.jedis.HostAndPort;
 import redis.clients.jedis.JedisCluster;
 import redis.clients.jedis.JedisPool;
@@ -79,22 +74,16 @@ public class CompensationConfiguration {
 
         @Bean
         public DataSource dataSource() {
-            DruidDataSource dataSource = new DruidDataSource();
-            dataSource.setDriverClassName(env.getProperty("compensation.db.driver"));
-            dataSource.setUrl(env.getProperty("compensation.db.url"));
+            HikariDataSource hikariDataSource = new HikariDataSource();
+            hikariDataSource.setDriverClassName(env.getProperty("compensation.db.driver"));
+            hikariDataSource.setJdbcUrl(env.getProperty("compensation.db.url"));
             //用户名
-            dataSource.setUsername(env.getProperty("compensation.db.username"));
+            hikariDataSource.setUsername(env.getProperty("compensation.db.username"));
             //密码
-            dataSource.setPassword(env.getProperty("compensation.db.password"));
-            dataSource.setInitialSize(2);
-            dataSource.setMaxActive(20);
-            dataSource.setMinIdle(0);
-            dataSource.setMaxWait(60000);
-            dataSource.setValidationQuery("SELECT 1");
-            dataSource.setTestOnBorrow(false);
-            dataSource.setTestWhileIdle(true);
-            dataSource.setPoolPreparedStatements(false);
-            return dataSource;
+            hikariDataSource.setPassword(env.getProperty("compensation.db.password"));
+            hikariDataSource.setMinimumIdle(5);
+            hikariDataSource.setMaximumPoolSize(10);
+            return hikariDataSource;
         }
 
         @Bean
