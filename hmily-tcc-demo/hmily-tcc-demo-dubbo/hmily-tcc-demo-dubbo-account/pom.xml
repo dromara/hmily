@@ -86,14 +86,8 @@
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <version>5.1.38</version>
+            <version>5.1.46</version>
         </dependency>
-
-        <!--<dependency>-->
-            <!--<groupId>com.alibaba</groupId>-->
-            <!--<artifactId>druid</artifactId>-->
-            <!--<version>1.0.29</version>-->
-        <!--</dependency>-->
 
         <dependency>
             <groupId>org.mybatis.spring.boot</groupId>
