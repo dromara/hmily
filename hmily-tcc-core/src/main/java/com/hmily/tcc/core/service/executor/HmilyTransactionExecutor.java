@@ -52,7 +52,6 @@ import java.util.stream.Collectors;
 
 /**
  * this is transaction manager.
- *
  * @author xiaoyu
  */
 @Component
