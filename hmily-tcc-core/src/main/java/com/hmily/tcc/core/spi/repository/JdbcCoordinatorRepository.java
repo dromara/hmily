@@ -17,7 +17,6 @@
 
 package com.hmily.tcc.core.spi.repository;
 
-import com.alibaba.druid.pool.DruidDataSource;
 import com.google.common.collect.Maps;
 import com.hmily.tcc.common.bean.entity.Participant;
 import com.hmily.tcc.common.bean.entity.TccTransaction;
@@ -31,6 +30,7 @@ import com.hmily.tcc.common.utils.DbTypeUtils;
 import com.hmily.tcc.common.utils.RepositoryPathUtils;
 import com.hmily.tcc.core.helper.SqlHelper;
 import com.hmily.tcc.core.spi.CoordinatorRepository;
+import com.zaxxer.hikari.HikariDataSource;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,7 +54,7 @@ public class JdbcCoordinatorRepository implements CoordinatorRepository {
 
     private Logger logger = LoggerFactory.getLogger(JdbcCoordinatorRepository.class);
 
-    private DruidDataSource dataSource;
+    private HikariDataSource dataSource;
 
     private String tableName;
 
@@ -194,22 +194,21 @@ public class JdbcCoordinatorRepository implements CoordinatorRepository {
 
     @Override
     public void init(final String modelName, final TccConfig txConfig) {
-        dataSource = new DruidDataSource();
         final TccDbConfig tccDbConfig = txConfig.getTccDbConfig();
-        dataSource.setUrl(tccDbConfig.getUrl());
+        dataSource = new HikariDataSource();
+        dataSource.setJdbcUrl(tccDbConfig.getUrl());
         dataSource.setDriverClassName(tccDbConfig.getDriverClassName());
         dataSource.setUsername(tccDbConfig.getUsername());
         dataSource.setPassword(tccDbConfig.getPassword());
-        dataSource.setInitialSize(tccDbConfig.getInitialSize());
-        dataSource.setMaxActive(tccDbConfig.getMaxActive());
-        dataSource.setMinIdle(tccDbConfig.getMinIdle());
-        dataSource.setMaxWait(tccDbConfig.getMaxWait());
-        dataSource.setValidationQuery(tccDbConfig.getValidationQuery());
-        dataSource.setTestOnBorrow(tccDbConfig.getTestOnBorrow());
-        dataSource.setTestOnReturn(tccDbConfig.getTestOnReturn());
-        dataSource.setTestWhileIdle(tccDbConfig.getTestWhileIdle());
-        dataSource.setPoolPreparedStatements(tccDbConfig.getPoolPreparedStatements());
-        dataSource.setMaxPoolPreparedStatementPerConnectionSize(tccDbConfig.getMaxPoolPreparedStatementPerConnectionSize());
+        dataSource.setMaximumPoolSize(tccDbConfig.getMaxActive());
+        dataSource.setMinimumIdle(tccDbConfig.getMinIdle());
+        dataSource.setConnectionTimeout(tccDbConfig.getConnectionTimeout());
+        dataSource.setIdleTimeout(tccDbConfig.getIdleTimeout());
+        dataSource.setMaxLifetime(tccDbConfig.getMaxLifetime());
+        dataSource.setConnectionTestQuery(tccDbConfig.getConnectionTestQuery());
+        if (tccDbConfig.getDataSourcePropertyMap() != null && !tccDbConfig.getDataSourcePropertyMap().isEmpty()) {
+            tccDbConfig.getDataSourcePropertyMap().forEach((key, value) -> dataSource.addDataSourceProperty(key, value));
+        }
         this.tableName = RepositoryPathUtils.buildDbTableName(modelName);
         //save current database type
         this.currentDBType = DbTypeUtils.buildByDriverClassName(tccDbConfig.getDriverClassName());
