@@ -25,7 +25,6 @@ import com.hmily.tcc.demo.dubbo.account.api.entity.AccountDO;
 import com.hmily.tcc.demo.dubbo.account.api.service.AccountService;
 import com.hmily.tcc.demo.dubbo.account.mapper.AccountMapper;
 import com.hmily.tcc.demo.dubbo.inventory.api.dto.InventoryDTO;
-import com.hmily.tcc.demo.dubbo.inventory.api.entity.InventoryDO;
 import com.hmily.tcc.demo.dubbo.inventory.api.service.InventoryService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

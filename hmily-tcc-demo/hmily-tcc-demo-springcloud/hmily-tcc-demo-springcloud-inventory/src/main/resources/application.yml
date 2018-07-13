@@ -1,7 +1,8 @@
 server:
   port: 8883
-  contextPath: /inventory-service
   address: 0.0.0.0
+  servlet:
+    context-path: /inventory-service
 
 spring:
     datasource:
@@ -20,6 +21,8 @@ eureka:
  client:
      serviceUrl:
        defaultZone: http://localhost:8761/eureka/
+ instance:
+   prefer-ip-address: true
 
 inventory-service :
    ribbon.NFLoadBalancerRuleClassName : com.netflix.loadbalancer.RandomRule
