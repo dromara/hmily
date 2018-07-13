@@ -28,7 +28,7 @@ import com.hmily.tcc.common.bean.adapter.MongoAdapter;
 import com.hmily.tcc.common.exception.TccRuntimeException;
 import com.hmily.tcc.common.utils.DateUtils;
 import com.hmily.tcc.common.utils.RepositoryPathUtils;
-import com.mongodb.WriteResult;
+import com.mongodb.client.result.UpdateResult;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -109,9 +109,9 @@ public class MongoCompensationServiceImpl implements CompensationService {
         Update update = new Update();
         update.set("lastTime", DateUtils.getCurrentDateTime());
         update.set("retriedCount", retry);
-        final WriteResult writeResult = mongoTemplate.updateFirst(query, update,
+        final UpdateResult updateResult = mongoTemplate.updateFirst(query, update,
                 MongoAdapter.class, mongoTableName);
-        if (writeResult.getN() <= 0) {
+        if (updateResult.getModifiedCount() <= 0) {
             throw new TccRuntimeException("更新数据异常!");
         }
         return Boolean.TRUE;
