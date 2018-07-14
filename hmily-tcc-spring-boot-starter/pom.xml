@@ -36,7 +36,6 @@
         <module>hmily-tcc-spring-boot-starter-motan</module>
         <module>hmily-tcc-spring-boot-starter-parent</module>
     </modules>
-
     <dependencies>
 
         <dependency>
@@ -58,6 +57,7 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
         </dependency>
+
     </dependencies>
 
 </project>
