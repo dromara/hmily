@@ -29,15 +29,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class ConsumeHmilyTransactionHandler implements HmilyTransactionHandler {
 
-
-    /**
-     * 分布式事务处理接口.
-     *
-     * @param point   point 切点
-     * @param context 信息
-     * @return Object
-     * @throws Throwable 异常
-     */
     @Override
     public Object handler(final ProceedingJoinPoint point, final TccTransactionContext context) throws Throwable {
         return point.proceed();
