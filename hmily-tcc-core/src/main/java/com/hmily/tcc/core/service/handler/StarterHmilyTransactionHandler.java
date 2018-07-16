@@ -26,17 +26,12 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-
 /**
  * this is transaction starter.
  * @author xiaoyu
  */
 @Component
 public class StarterHmilyTransactionHandler implements HmilyTransactionHandler {
-
-    private static final Lock LOCK = new ReentrantLock();
 
     private final HmilyTransactionExecutor hmilyTransactionExecutor;
 
@@ -51,22 +46,17 @@ public class StarterHmilyTransactionHandler implements HmilyTransactionHandler {
         try {
             final TccTransaction tccTransaction = hmilyTransactionExecutor.begin(point);
             try {
-                //发起调用 执行try方法
+                //execute try
                 returnValue = point.proceed();
                 tccTransaction.setStatus(TccActionEnum.TRYING.getCode());
                 hmilyTransactionExecutor.updateStatus(tccTransaction);
             } catch (Throwable throwable) {
-                //异常执行cancel
+                //if exception ,execute cancel
                 hmilyTransactionExecutor.cancel(hmilyTransactionExecutor.getCurrentTransaction());
                 throw throwable;
             }
-            //try成功执行confirm confirm 失败的话，那就只能走本地补偿
-            try {
-                LOCK.lock();
-                hmilyTransactionExecutor.confirm(hmilyTransactionExecutor.getCurrentTransaction());
-            } finally {
-                LOCK.unlock();
-            }
+            //execute confirm
+            hmilyTransactionExecutor.confirm(hmilyTransactionExecutor.getCurrentTransaction());
         } finally {
             hmilyTransactionExecutor.remove();
         }
