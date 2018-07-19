@@ -113,4 +113,11 @@ public class TccDbConfig {
      * Add a property (name/value pair) that will be used to configure the {@link DataSource}/{@link java.sql.Driver}.
      */
     private Map<String, Object> dataSourcePropertyMap;
+
+
+    /**
+     * You can use a existing DataSource or generate a new DataSource based on the configuration.
+     */
+    private DataSource dataSource;
+
 }
