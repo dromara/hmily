@@ -24,11 +24,12 @@
         <property name="repositorySupport" value="db"/>
         <property name="tccDbConfig">
             <bean class="com.hmily.tcc.common.config.TccDbConfig">
-                <property name="url"
-                          value="jdbc:mysql://10.4.4.202:3306/tcc?useUnicode=true&amp;characterEncoding=utf8"/>
-                <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
-                <property name="username" value="root"/>
-                <property name="password" value="123123"/>
+                <property name="dataSource" ref="dataSource"/>
+                <!--<property name="url"-->
+                          <!--value="jdbc:mysql://localhost:3306/tcc?useUnicode=true&amp;characterEncoding=utf8"/>-->
+                <!--<property name="driverClassName" value="com.mysql.jdbc.Driver"/>-->
+                <!--<property name="username" value="root"/>-->
+                <!--<property name="password" value="123456"/>-->
             </bean>
         </property>
     </bean>
