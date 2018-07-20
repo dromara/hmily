@@ -21,32 +21,45 @@ package com.hmily.tcc.core.disruptor.publisher;
 
 import com.hmily.tcc.common.bean.entity.TccTransaction;
 import com.hmily.tcc.common.enums.EventTypeEnum;
+import com.hmily.tcc.core.concurrent.threadpool.HmilyThreadFactory;
 import com.hmily.tcc.core.disruptor.event.HmilyTransactionEvent;
 import com.hmily.tcc.core.disruptor.factory.HmilyTransactionEventFactory;
 import com.hmily.tcc.core.disruptor.handler.HmilyTransactionEventHandler;
 import com.hmily.tcc.core.disruptor.translator.HmilyTransactionEventTranslator;
 import com.lmax.disruptor.BlockingWaitStrategy;
 import com.lmax.disruptor.RingBuffer;
-import com.lmax.disruptor.YieldingWaitStrategy;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.dsl.ProducerType;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.concurrent.Executor;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * event publisher.
+ *
  * @author xiaoyu(Myth)
  */
 @Component
 public class HmilyTransactionEventPublisher implements DisposableBean {
 
+    private static final int MAX_THREAD = Runtime.getRuntime().availableProcessors() << 1;
+
+    private Executor executor;
+
     private Disruptor<HmilyTransactionEvent> disruptor;
 
+    private final HmilyTransactionEventHandler hmilyTransactionEventHandler;
+
     @Autowired
-    private HmilyTransactionEventHandler hmilyTransactionEventHandler;
+    public HmilyTransactionEventPublisher(HmilyTransactionEventHandler hmilyTransactionEventHandler) {
+        this.hmilyTransactionEventHandler = hmilyTransactionEventHandler;
+    }
 
     /**
      * disruptor start.
@@ -58,6 +71,12 @@ public class HmilyTransactionEventPublisher implements DisposableBean {
             AtomicInteger index = new AtomicInteger(1);
             return new Thread(null, r, "disruptor-thread-" + index.getAndIncrement());
         }, ProducerType.MULTI, new BlockingWaitStrategy());
+
+        executor = new ThreadPoolExecutor(MAX_THREAD, MAX_THREAD, 0, TimeUnit.MILLISECONDS,
+                new LinkedBlockingQueue<>(),
+                HmilyThreadFactory.create("hmily-log-disruptor", false),
+                new ThreadPoolExecutor.AbortPolicy());
+
         disruptor.handleEventsWith(hmilyTransactionEventHandler);
         disruptor.start();
     }
@@ -69,8 +88,10 @@ public class HmilyTransactionEventPublisher implements DisposableBean {
      * @param type           {@linkplain EventTypeEnum}
      */
     public void publishEvent(final TccTransaction tccTransaction, final int type) {
-        final RingBuffer<HmilyTransactionEvent> ringBuffer = disruptor.getRingBuffer();
-        ringBuffer.publishEvent(new HmilyTransactionEventTranslator(type), tccTransaction);
+        executor.execute(() -> {
+            final RingBuffer<HmilyTransactionEvent> ringBuffer = disruptor.getRingBuffer();
+            ringBuffer.publishEvent(new HmilyTransactionEventTranslator(type), tccTransaction);
+        });
     }
 
     @Override
