@@ -61,6 +61,7 @@ public class InventoryServiceImpl implements InventoryService {
      */
     @Override
     @Tcc(confirmMethod = "confirmMethod", cancelMethod = "cancelMethod")
+    @Transactional
     public Boolean decrease(InventoryDTO inventoryDTO) {
         LOGGER.info("==========springcloud调用扣减库存decrease===========");
         final InventoryDO entity = inventoryMapper.findByProductId(inventoryDTO.getProductId());
@@ -70,6 +71,7 @@ public class InventoryServiceImpl implements InventoryService {
         if (decrease != 1) {
             throw new TccRuntimeException("库存不足");
         }
+//        throw new RuntimeException("测试");
         return true;
     }
 
@@ -86,6 +88,7 @@ public class InventoryServiceImpl implements InventoryService {
 
     @Override
     @Tcc(confirmMethod = "confirmMethod", cancelMethod = "cancelMethod")
+    @Transactional
     public Boolean mockWithTryException(InventoryDTO inventoryDTO) {
         //这里是模拟异常所以就直接抛出异常了
         throw new TccRuntimeException("库存扣减异常！");

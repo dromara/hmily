@@ -20,6 +20,7 @@ package com.hmily.tcc.core.service.handler;
 import com.hmily.tcc.common.bean.context.TccTransactionContext;
 import com.hmily.tcc.common.bean.entity.TccTransaction;
 import com.hmily.tcc.common.enums.TccActionEnum;
+import com.hmily.tcc.core.concurrent.threadlocal.TransactionContextLocal;
 import com.hmily.tcc.core.service.HmilyTransactionHandler;
 import com.hmily.tcc.core.service.executor.HmilyTransactionExecutor;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -28,6 +29,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * this is transaction starter.
+ *
  * @author xiaoyu
  */
 @Component
@@ -41,22 +43,32 @@ public class StarterHmilyTransactionHandler implements HmilyTransactionHandler {
     }
 
     @Override
-    public Object handler(final ProceedingJoinPoint point, final TccTransactionContext context) throws Throwable {
-        Object returnValue;
+    public Object handler(final ProceedingJoinPoint point, TccTransactionContext context)
+            throws Throwable {
+        Object returnValue = null;
         try {
-            final TccTransaction tccTransaction = hmilyTransactionExecutor.begin(point);
-            try {
-                //execute try
-                returnValue = point.proceed();
-                tccTransaction.setStatus(TccActionEnum.TRYING.getCode());
-                hmilyTransactionExecutor.updateStatus(tccTransaction);
-            } catch (Throwable throwable) {
-                //if exception ,execute cancel
-                hmilyTransactionExecutor.cancel(hmilyTransactionExecutor.getCurrentTransaction());
-                throw throwable;
+            TccTransaction tccTransaction;
+            context = TransactionContextLocal.getInstance().get();
+            if (context == null) {
+                tccTransaction = hmilyTransactionExecutor.begin(point);
+                try {
+                    //execute try
+                    returnValue = point.proceed();
+                    tccTransaction.setStatus(TccActionEnum.TRYING.getCode());
+                    hmilyTransactionExecutor.updateStatus(tccTransaction);
+                } catch (Throwable throwable) {
+                    //if exception ,execute cancel
+                    hmilyTransactionExecutor
+                            .cancel(hmilyTransactionExecutor.getCurrentTransaction());
+                    throw throwable;
+                }
+                //execute confirm
+                hmilyTransactionExecutor.confirm(hmilyTransactionExecutor.getCurrentTransaction());
+            } else if (context.getAction() == TccActionEnum.CONFIRMING.getCode()) {
+                //execute confirm
+                hmilyTransactionExecutor.confirm(hmilyTransactionExecutor.getCurrentTransaction());
             }
-            //execute confirm
-            hmilyTransactionExecutor.confirm(hmilyTransactionExecutor.getCurrentTransaction());
+
         } finally {
             hmilyTransactionExecutor.remove();
         }
