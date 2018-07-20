@@ -35,6 +35,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.sql.DataSource;
 import java.sql.*;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -54,7 +55,7 @@ public class JdbcCoordinatorRepository implements CoordinatorRepository {
 
     private Logger logger = LoggerFactory.getLogger(JdbcCoordinatorRepository.class);
 
-    private HikariDataSource dataSource;
+    private DataSource dataSource;
 
     private String tableName;
 
@@ -195,22 +196,27 @@ public class JdbcCoordinatorRepository implements CoordinatorRepository {
     @Override
     public void init(final String modelName, final TccConfig txConfig) {
         final TccDbConfig tccDbConfig = txConfig.getTccDbConfig();
-        dataSource = new HikariDataSource();
-        dataSource.setJdbcUrl(tccDbConfig.getUrl());
-        dataSource.setDriverClassName(tccDbConfig.getDriverClassName());
-        dataSource.setUsername(tccDbConfig.getUsername());
-        dataSource.setPassword(tccDbConfig.getPassword());
-        dataSource.setMaximumPoolSize(tccDbConfig.getMaxActive());
-        dataSource.setMinimumIdle(tccDbConfig.getMinIdle());
-        dataSource.setConnectionTimeout(tccDbConfig.getConnectionTimeout());
-        dataSource.setIdleTimeout(tccDbConfig.getIdleTimeout());
-        dataSource.setMaxLifetime(tccDbConfig.getMaxLifetime());
-        dataSource.setConnectionTestQuery(tccDbConfig.getConnectionTestQuery());
-        if (tccDbConfig.getDataSourcePropertyMap() != null && !tccDbConfig.getDataSourcePropertyMap().isEmpty()) {
-            tccDbConfig.getDataSourcePropertyMap().forEach((key, value) -> dataSource.addDataSourceProperty(key, value));
+        if (tccDbConfig.getDataSource() != null) {
+            dataSource = tccDbConfig.getDataSource();
+        } else {
+            HikariDataSource hikariDataSource = new HikariDataSource();
+            hikariDataSource.setJdbcUrl(tccDbConfig.getUrl());
+            hikariDataSource.setDriverClassName(tccDbConfig.getDriverClassName());
+            hikariDataSource.setUsername(tccDbConfig.getUsername());
+            hikariDataSource.setPassword(tccDbConfig.getPassword());
+            hikariDataSource.setMaximumPoolSize(tccDbConfig.getMaxActive());
+            hikariDataSource.setMinimumIdle(tccDbConfig.getMinIdle());
+            hikariDataSource.setConnectionTimeout(tccDbConfig.getConnectionTimeout());
+            hikariDataSource.setIdleTimeout(tccDbConfig.getIdleTimeout());
+            hikariDataSource.setMaxLifetime(tccDbConfig.getMaxLifetime());
+            hikariDataSource.setConnectionTestQuery(tccDbConfig.getConnectionTestQuery());
+            if (tccDbConfig.getDataSourcePropertyMap() != null && !tccDbConfig.getDataSourcePropertyMap().isEmpty()) {
+                tccDbConfig.getDataSourcePropertyMap().forEach(hikariDataSource::addDataSourceProperty);
+            }
+            dataSource = hikariDataSource;
         }
         this.tableName = RepositoryPathUtils.buildDbTableName(modelName);
-        //save current database type
+//        //save current database type
         this.currentDBType = DbTypeUtils.buildByDriverClassName(tccDbConfig.getDriverClassName());
         executeUpdate(SqlHelper.buildCreateTableSql(tccDbConfig.getDriverClassName(), tableName));
     }
