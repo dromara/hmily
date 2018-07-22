@@ -30,9 +30,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-
 
 /**
  * @author xiaoyu
@@ -53,8 +50,6 @@ public class InventoryServiceImpl implements InventoryService {
         this.inventoryMapper = inventoryMapper;
     }
 
-    private static final Lock LOCK = new ReentrantLock();
-
     /**
      * 扣减库存操作
      * 这一个tcc接口
@@ -64,17 +59,12 @@ public class InventoryServiceImpl implements InventoryService {
      */
     @Override
     @Tcc(confirmMethod = "confirmMethod", cancelMethod = "cancelMethod")
+    @Transactional
     public Boolean decrease(InventoryDTO inventoryDTO) {
         final InventoryDO entity = inventoryMapper.findByProductId(inventoryDTO.getProductId());
-        try {
-            LOCK.lock();
-            entity.setTotalInventory(entity.getTotalInventory() - inventoryDTO.getCount());
-            entity.setLockInventory(entity.getLockInventory() + inventoryDTO.getCount());
-            inventoryMapper.decrease(entity);
-        } finally {
-            LOCK.unlock();
-        }
-
+        entity.setTotalInventory(entity.getTotalInventory() - inventoryDTO.getCount());
+        entity.setLockInventory(entity.getLockInventory() + inventoryDTO.getCount());
+        inventoryMapper.decrease(entity);
         return true;
     }
 
@@ -171,24 +161,15 @@ public class InventoryServiceImpl implements InventoryService {
 
     @Transactional(rollbackFor = Exception.class)
     public Boolean confirmMethodException(InventoryDTO inventoryDTO) {
-
         LOGGER.info("==========调用扣减库存确认方法===========");
-
         final InventoryDO entity = inventoryMapper.findByProductId(inventoryDTO.getProductId());
+        entity.setLockInventory(entity.getLockInventory() - inventoryDTO.getCount());
+        final int decrease = inventoryMapper.decrease(entity);
 
-        try {
-            LOCK.lock();
-            entity.setLockInventory(entity.getLockInventory() - inventoryDTO.getCount());
-            final int decrease = inventoryMapper.decrease(entity);
-
-            if (decrease != 1) {
-                throw new TccRuntimeException("库存不足");
-            }
-            return true;
-        } finally {
-            LOCK.unlock();
+        if (decrease != 1) {
+            throw new TccRuntimeException("库存不足");
         }
-
+        return true;
     }
 
 
@@ -196,14 +177,9 @@ public class InventoryServiceImpl implements InventoryService {
     public Boolean confirmMethod(InventoryDTO inventoryDTO) {
         LOGGER.info("==========调用扣减库存确认方法===========");
         final InventoryDO entity = inventoryMapper.findByProductId(inventoryDTO.getProductId());
-        try {
-            LOCK.lock();
-            entity.setLockInventory(entity.getLockInventory() - inventoryDTO.getCount());
-            inventoryMapper.confirm(entity);
-            return true;
-        }finally {
-            LOCK.unlock();
-        }
+        entity.setLockInventory(entity.getLockInventory() - inventoryDTO.getCount());
+        inventoryMapper.confirm(entity);
+        return true;
     }
 
     @Transactional(rollbackFor = Exception.class)
