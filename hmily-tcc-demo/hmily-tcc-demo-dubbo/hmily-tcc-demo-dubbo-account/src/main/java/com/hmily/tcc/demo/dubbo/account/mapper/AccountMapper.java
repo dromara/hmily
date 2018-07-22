@@ -69,6 +69,6 @@ public interface AccountMapper {
      * @param userId 用户id
      * @return AccountDO
      */
-    @Select("select * from account where user_id =#{userId}")
+    @Select("select * from account where user_id =#{userId} for update")
     AccountDO findByUserId(String userId);
 }
