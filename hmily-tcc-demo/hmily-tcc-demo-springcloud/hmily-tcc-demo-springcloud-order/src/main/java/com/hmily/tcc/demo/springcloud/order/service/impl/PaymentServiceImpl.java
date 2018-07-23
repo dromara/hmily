@@ -76,7 +76,7 @@ public class PaymentServiceImpl implements PaymentService {
 
         final Integer inventoryInfo= inventoryClient.findByProductId(order.getProductId());
 
-        if (accountInfo.compareTo(order.getTotalAmount()) <= 0) {
+        if (accountInfo.compareTo(order.getTotalAmount()) < 0) {
             throw  new TccRuntimeException("余额不足！");
         }
 

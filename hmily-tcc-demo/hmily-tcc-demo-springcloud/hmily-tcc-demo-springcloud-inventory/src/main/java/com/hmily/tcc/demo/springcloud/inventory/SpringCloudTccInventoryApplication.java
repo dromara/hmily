@@ -25,6 +25,7 @@ import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.ImportResource;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 /**
  * @author xiaoyu
@@ -34,6 +35,7 @@ import org.springframework.context.annotation.ImportResource;
 @EnableFeignClients
 @ImportResource({"classpath:applicationContext.xml"})
 @MapperScan("com.hmily.tcc.demo.springcloud.inventory.mapper")
+@EnableTransactionManagement
 public class SpringCloudTccInventoryApplication {
 
     public static void main(String[] args) {
