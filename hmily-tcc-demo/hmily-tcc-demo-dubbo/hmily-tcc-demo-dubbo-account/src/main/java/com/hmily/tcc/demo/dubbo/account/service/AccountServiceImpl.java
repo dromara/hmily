@@ -30,10 +30,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @author xiaoyu
@@ -57,8 +56,6 @@ public class AccountServiceImpl implements AccountService {
         this.accountMapper = accountMapper;
     }
 
-    private static final Lock LOCK = new ReentrantLock();
-
     /**
      * 扣款支付
      *
@@ -67,17 +64,13 @@ public class AccountServiceImpl implements AccountService {
      */
     @Override
     @Tcc(confirmMethod = "confirm", cancelMethod = "cancel")
+    @Transactional
     public boolean payment(AccountDTO accountDTO) {
         final AccountDO accountDO = accountMapper.findByUserId(accountDTO.getUserId());
-        try {
-            LOCK.lock();
-            accountDO.setBalance(accountDO.getBalance().subtract(accountDTO.getAmount()));
-            accountDO.setFreezeAmount(accountDO.getFreezeAmount().add(accountDTO.getAmount()));
-            accountDO.setUpdateTime(new Date());
-            accountMapper.update(accountDO);
-        } finally {
-            LOCK.unlock();
-        }
+        accountDO.setBalance(accountDO.getBalance().subtract(accountDTO.getAmount()));
+        accountDO.setFreezeAmount(accountDO.getFreezeAmount().add(accountDTO.getAmount()));
+        accountDO.setUpdateTime(new Date());
+        accountMapper.update(accountDO);
         return Boolean.TRUE;
     }
 
@@ -89,24 +82,19 @@ public class AccountServiceImpl implements AccountService {
      */
     @Override
     @Tcc(confirmMethod = "confirmNested", cancelMethod = "cancelNested")
+    @Transactional
     public boolean paymentWithNested(AccountNestedDTO accountNestedDTO) {
         final AccountDO accountDO = accountMapper.findByUserId(accountNestedDTO.getUserId());
-        try {
-            LOCK.lock();
-            accountDO.setBalance(accountDO.getBalance().subtract(accountNestedDTO.getAmount()));
-            accountDO.setFreezeAmount(accountDO.getFreezeAmount().add(accountNestedDTO.getAmount()));
-            accountDO.setUpdateTime(new Date());
-            accountMapper.update(accountDO);
+        accountDO.setBalance(accountDO.getBalance().subtract(accountNestedDTO.getAmount()));
+        accountDO.setFreezeAmount(accountDO.getFreezeAmount().add(accountNestedDTO.getAmount()));
+        accountDO.setUpdateTime(new Date());
+        accountMapper.update(accountDO);
 
-            InventoryDTO inventoryDTO = new InventoryDTO();
+        InventoryDTO inventoryDTO = new InventoryDTO();
 
-            inventoryDTO.setCount(accountNestedDTO.getCount());
-            inventoryDTO.setProductId(accountNestedDTO.getProductId());
-            inventoryService.decrease(inventoryDTO);
-
-        } finally {
-            LOCK.unlock();
-        }
+        inventoryDTO.setCount(accountNestedDTO.getCount());
+        inventoryDTO.setProductId(accountNestedDTO.getProductId());
+        inventoryService.decrease(inventoryDTO);
         return Boolean.TRUE;
     }
 
@@ -121,27 +109,18 @@ public class AccountServiceImpl implements AccountService {
         return accountMapper.findByUserId(userId);
     }
 
+    @Transactional
     public boolean confirmNested(AccountNestedDTO accountNestedDTO) {
-
         LOGGER.debug("============dubbo tcc 执行确认付款接口===============");
-
-        try {
-            LOCK.lock();
-            final AccountDO accountDO = accountMapper.findByUserId(accountNestedDTO.getUserId());
-            accountDO.setFreezeAmount(accountDO.getFreezeAmount().subtract(accountNestedDTO.getAmount()));
-            accountDO.setUpdateTime(new Date());
-            accountMapper.confirm(accountDO);
-
-        } finally {
-            LOCK.unlock();
-        }
-
+        final AccountDO accountDO = accountMapper.findByUserId(accountNestedDTO.getUserId());
+        accountDO.setFreezeAmount(accountDO.getFreezeAmount().subtract(accountNestedDTO.getAmount()));
+        accountDO.setUpdateTime(new Date());
+        accountMapper.confirm(accountDO);
         return Boolean.TRUE;
     }
 
-
+    @Transactional
     public boolean cancelNested(AccountNestedDTO accountNestedDTO) {
-
         LOGGER.debug("============ dubbo tcc 执行取消付款接口===============");
         final AccountDO accountDO = accountMapper.findByUserId(accountNestedDTO.getUserId());
         accountDO.setBalance(accountDO.getBalance().add(accountNestedDTO.getAmount()));
@@ -151,27 +130,19 @@ public class AccountServiceImpl implements AccountService {
         return Boolean.TRUE;
     }
 
+    @Transactional
     public boolean confirm(AccountDTO accountDTO) {
-
         LOGGER.debug("============dubbo tcc 执行确认付款接口===============");
-
-        try {
-            LOCK.lock();
-            final AccountDO accountDO = accountMapper.findByUserId(accountDTO.getUserId());
-            accountDO.setFreezeAmount(accountDO.getFreezeAmount().subtract(accountDTO.getAmount()));
-            accountDO.setUpdateTime(new Date());
-            accountMapper.confirm(accountDO);
-
-        } finally {
-            LOCK.unlock();
-        }
-
+        final AccountDO accountDO = accountMapper.findByUserId(accountDTO.getUserId());
+        accountDO.setFreezeAmount(accountDO.getFreezeAmount().subtract(accountDTO.getAmount()));
+        accountDO.setUpdateTime(new Date());
+        accountMapper.confirm(accountDO);
         return Boolean.TRUE;
     }
 
 
+    @Transactional
     public boolean cancel(AccountDTO accountDTO) {
-
         LOGGER.debug("============ dubbo tcc 执行取消付款接口===============");
         final AccountDO accountDO = accountMapper.findByUserId(accountDTO.getUserId());
         accountDO.setBalance(accountDO.getBalance().add(accountDTO.getAmount()));
