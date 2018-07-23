@@ -32,6 +32,7 @@ import com.hmily.tcc.common.utils.LogUtil;
 import com.hmily.tcc.core.concurrent.threadlocal.TransactionContextLocal;
 import com.hmily.tcc.core.concurrent.threadpool.HmilyThreadFactory;
 import com.hmily.tcc.core.helper.SpringBeanUtils;
+import com.hmily.tcc.core.service.executor.HmilyTransactionExecutor;
 import com.hmily.tcc.core.spi.CoordinatorRepository;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.reflect.MethodUtils;
@@ -111,9 +112,11 @@ public class ScheduledService {
                                     if (tccTransaction.getStatus() == TccActionEnum.TRYING.getCode()
                                                 || tccTransaction.getStatus() == TccActionEnum.PRE_TRY.getCode()
                                             || tccTransaction.getStatus() == TccActionEnum.CANCELING.getCode()) {
+                                        HmilyTransactionExecutor.instance().set(tccTransaction);
                                         cancel(tccTransaction);
                                     } else if (tccTransaction.getStatus() == TccActionEnum.CONFIRMING.getCode()) {
                                             //执行confirm操作
+                                        HmilyTransactionExecutor.instance().set(tccTransaction);
                                         confirm(tccTransaction);
                                     }
                                 }
@@ -163,6 +166,7 @@ public class ScheduledService {
                     context.setAction(TccActionEnum.CONFIRMING.getCode());
                     context.setTransId(tccTransaction.getTransId());
                     TransactionContextLocal.getInstance().set(context);
+
                     executeCoordinator(participant.getConfirmTccInvocation());
                 } catch (Exception e) {
                     LogUtil.error(LOGGER, "执行confirm方法异常:{}", () -> e);
