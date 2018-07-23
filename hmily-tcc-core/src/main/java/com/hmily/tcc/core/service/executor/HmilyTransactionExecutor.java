@@ -33,7 +33,6 @@ import com.hmily.tcc.core.cache.TccTransactionCacheManager;
 import com.hmily.tcc.core.concurrent.threadlocal.TransactionContextLocal;
 import com.hmily.tcc.core.disruptor.publisher.HmilyTransactionEventPublisher;
 import com.hmily.tcc.core.helper.SpringBeanUtils;
-import javafx.stage.StageStyle;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.MethodUtils;

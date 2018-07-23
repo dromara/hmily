@@ -19,11 +19,12 @@ package com.hmily.tcc.springcloud.interceptor;
 import com.hmily.tcc.common.bean.context.TccTransactionContext;
 import com.hmily.tcc.common.constant.CommonConstant;
 import com.hmily.tcc.common.utils.GsonUtils;
-import com.hmily.tcc.core.concurrent.threadlocal.TransactionContextLocal;
+import com.hmily.tcc.common.utils.LogUtil;
 import com.hmily.tcc.core.interceptor.TccTransactionInterceptor;
 import com.hmily.tcc.core.service.HmilyTransactionAspectService;
-import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestAttributes;
@@ -35,11 +36,16 @@ import javax.servlet.http.HttpServletRequest;
 
 /**
  * SpringCloudHmilyTransactionInterceptor.
+ *
  * @author xiaoyu
  */
 @Component
-@Slf4j
 public class SpringCloudHmilyTransactionInterceptor implements TccTransactionInterceptor {
+
+    /**
+     * logger.
+     */
+    private static final Logger LOGGER = LoggerFactory.getLogger(SpringCloudHmilyTransactionInterceptor.class);
 
     private final HmilyTransactionAspectService hmilyTransactionAspectService;
 
@@ -52,20 +58,16 @@ public class SpringCloudHmilyTransactionInterceptor implements TccTransactionInt
     public Object interceptor(final ProceedingJoinPoint pjp) throws Throwable {
         TccTransactionContext tccTransactionContext;
         //如果不是本地反射调用补偿
-        RequestAttributes requestAttributes=null;
+        RequestAttributes requestAttributes = null;
         try {
             requestAttributes = RequestContextHolder.currentRequestAttributes();
-        }
-        catch (Throwable ex){
-            log.warn("未取到请求信息,"+ex.getLocalizedMessage());
+        } catch (Throwable ex) {
+            LogUtil.warn(LOGGER, () -> "can not acquire request info:" + ex.getLocalizedMessage());
         }
 
         HttpServletRequest request = requestAttributes == null ? null : ((ServletRequestAttributes) requestAttributes).getRequest();
         String context = request == null ? null : request.getHeader(CommonConstant.TCC_TRANSACTION_CONTEXT);
-        tccTransactionContext =  GsonUtils.getInstance().fromJson(context, TccTransactionContext.class);
-//        if(tccTransactionContext==null){
-//            tccTransactionContext= TransactionContextLocal.getInstance().get();
-//        }
+        tccTransactionContext = GsonUtils.getInstance().fromJson(context, TccTransactionContext.class);
         return hmilyTransactionAspectService.invoke(tccTransactionContext, pjp);
     }
 
