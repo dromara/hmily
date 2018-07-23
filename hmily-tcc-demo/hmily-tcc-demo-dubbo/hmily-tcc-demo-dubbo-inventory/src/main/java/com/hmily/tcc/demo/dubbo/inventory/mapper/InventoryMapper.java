@@ -70,6 +70,6 @@ public interface InventoryMapper {
      * @param productId 商品id
      * @return Inventory
      */
-    @Select("select * from inventory where product_id =#{productId}")
+    @Select("select * from inventory where product_id =#{productId} for update")
     InventoryDO findByProductId(String productId);
 }
