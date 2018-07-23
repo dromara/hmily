@@ -28,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -118,6 +119,7 @@ public class OrderServiceImpl implements OrderService {
      * @return string
      */
     @Override
+    @Transactional
     public String mockInventoryWithTryTimeout(Integer count, BigDecimal amount) {
         final Order order = buildOrder(count, amount);
         final int rows = orderMapper.save(order);
