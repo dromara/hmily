@@ -52,6 +52,7 @@ import java.util.stream.Collectors;
 
 /**
  * this is transaction manager.
+ *
  * @author xiaoyu
  */
 @Component
@@ -75,7 +76,7 @@ public class HmilyTransactionExecutor {
         this.hmilyTransactionEventPublisher = hmilyTransactionEventPublisher;
     }
 
-    public static ThreadLocal<TccTransaction> instance(){
+    public static ThreadLocal<TccTransaction> instance() {
         return CURRENT;
     }
 
