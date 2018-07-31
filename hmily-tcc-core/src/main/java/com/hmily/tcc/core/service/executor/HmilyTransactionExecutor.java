@@ -209,7 +209,6 @@ public class HmilyTransactionExecutor {
             return;
         }
         currentTransaction.setStatus(TccActionEnum.CONFIRMING.getCode());
-        //更新事务日志状态 为confirm
         updateStatus(currentTransaction);
         final List<Participant> participants = currentTransaction.getParticipants();
         List<Participant> failList = Lists.newArrayListWithCapacity(participants.size());
