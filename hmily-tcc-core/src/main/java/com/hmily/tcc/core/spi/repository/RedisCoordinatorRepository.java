@@ -49,6 +49,7 @@ import java.util.stream.Collectors;
 
 /**
  * redis impl.
+ *
  * @author xiaoyu
  */
 public class RedisCoordinatorRepository implements CoordinatorRepository {
@@ -136,7 +137,7 @@ public class RedisCoordinatorRepository implements CoordinatorRepository {
             byte[] contents = jedisClient.get(redisKey.getBytes());
             return RepositoryConvertUtils.transformBean(contents, objectSerializer);
         } catch (Exception e) {
-            throw new TccRuntimeException(e);
+            return null;
         }
     }
 
