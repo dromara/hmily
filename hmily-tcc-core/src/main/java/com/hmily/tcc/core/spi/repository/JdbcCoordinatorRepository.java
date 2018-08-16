@@ -32,6 +32,7 @@ import com.hmily.tcc.core.helper.SqlHelper;
 import com.hmily.tcc.core.spi.CoordinatorRepository;
 import com.zaxxer.hikari.HikariDataSource;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -196,7 +197,7 @@ public class JdbcCoordinatorRepository implements CoordinatorRepository {
     @Override
     public void init(final String modelName, final TccConfig txConfig) {
         final TccDbConfig tccDbConfig = txConfig.getTccDbConfig();
-        if (tccDbConfig.getDataSource() != null) {
+        if (tccDbConfig.getDataSource() != null && StringUtils.isBlank(tccDbConfig.getUrl())) {
             dataSource = tccDbConfig.getDataSource();
         } else {
             HikariDataSource hikariDataSource = new HikariDataSource();
