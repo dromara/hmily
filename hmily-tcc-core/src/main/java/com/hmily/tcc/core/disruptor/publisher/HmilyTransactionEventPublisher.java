@@ -21,6 +21,7 @@ package com.hmily.tcc.core.disruptor.publisher;
 
 import com.hmily.tcc.common.bean.entity.TccTransaction;
 import com.hmily.tcc.common.enums.EventTypeEnum;
+import com.hmily.tcc.common.utils.LogUtil;
 import com.hmily.tcc.core.concurrent.threadpool.HmilyThreadFactory;
 import com.hmily.tcc.core.disruptor.event.HmilyTransactionEvent;
 import com.hmily.tcc.core.disruptor.factory.HmilyTransactionEventFactory;
@@ -30,9 +31,12 @@ import com.hmily.tcc.core.disruptor.handler.UpdateParticipantEventHandler;
 import com.hmily.tcc.core.disruptor.handler.UpdateStatusEventHandler;
 import com.hmily.tcc.core.disruptor.translator.HmilyTransactionEventTranslator;
 import com.lmax.disruptor.BlockingWaitStrategy;
+import com.lmax.disruptor.ExceptionHandler;
 import com.lmax.disruptor.RingBuffer;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.dsl.ProducerType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -50,6 +54,11 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 @Component
 public class HmilyTransactionEventPublisher implements DisposableBean {
+
+    /**
+     * logger.
+     */
+    private static final Logger LOGGER = LoggerFactory.getLogger(HmilyTransactionEventPublisher.class);
 
     private static final int MAX_THREAD = Runtime.getRuntime().availableProcessors() << 1;
 
@@ -92,6 +101,25 @@ public class HmilyTransactionEventPublisher implements DisposableBean {
         disruptor.handleEventsWith(saveAndDeleteEventHandler)
                 .then(updateParticipantEventHandler, updateStatusEventHandler)
                 .then(cleanEventHandler);
+
+        disruptor.setDefaultExceptionHandler(new ExceptionHandler<HmilyTransactionEvent>() {
+            @Override
+            public void handleEventException(Throwable ex, long sequence, HmilyTransactionEvent event) {
+                LogUtil.error(LOGGER, () -> "Disruptor handleEventException:"
+                        + event.getType() + event.getTccTransaction().toString());
+            }
+
+            @Override
+            public void handleOnStartException(Throwable ex) {
+                LogUtil.error(LOGGER, () -> "Disruptor start exception");
+            }
+
+            @Override
+            public void handleOnShutdownException(Throwable ex) {
+                LogUtil.error(LOGGER, () -> "Disruptor close Exception ");
+            }
+        });
+
         disruptor.start();
     }
 
