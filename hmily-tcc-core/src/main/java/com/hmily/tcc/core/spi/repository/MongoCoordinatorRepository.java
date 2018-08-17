@@ -222,7 +222,8 @@ public class MongoCoordinatorRepository implements CoordinatorRepository {
             clientFactoryBean.afterPropertiesSet();
             template = new MongoTemplate(Objects.requireNonNull(clientFactoryBean.getObject()), tccMongoConfig.getMongoDbName());
         } catch (Exception e) {
-            e.printStackTrace();
+            LogUtil.error(LOGGER, "mongo 初始化异常！请检查配置信息:{}", e::getMessage);
+            throw new TccRuntimeException(e);
         }
     }
 

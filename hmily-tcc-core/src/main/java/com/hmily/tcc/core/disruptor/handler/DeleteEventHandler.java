@@ -27,27 +27,24 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- * save data handler.
+ * delete data handler.
  *
  * @author xiaoyu(Myth)
  */
 @Component
-public class SaveAndDeleteEventHandler implements EventHandler<HmilyTransactionEvent> {
+public class DeleteEventHandler implements EventHandler<HmilyTransactionEvent> {
 
     private final CoordinatorService coordinatorService;
 
     @Autowired
-    public SaveAndDeleteEventHandler(CoordinatorService coordinatorService) {
+    public DeleteEventHandler(CoordinatorService coordinatorService) {
         this.coordinatorService = coordinatorService;
     }
 
     @Override
     public void onEvent(final HmilyTransactionEvent hmilyTransactionEvent, final long sequence, final boolean endOfBatch) {
-        if (hmilyTransactionEvent.getType() == EventTypeEnum.SAVE.getCode()) {
-            coordinatorService.save(hmilyTransactionEvent.getTccTransaction());
-        } else if (hmilyTransactionEvent.getType() == EventTypeEnum.DELETE.getCode()) {
+        if (hmilyTransactionEvent.getType() == EventTypeEnum.DELETE.getCode()) {
             coordinatorService.remove(hmilyTransactionEvent.getTccTransaction().getTransId());
         }
-
     }
 }
