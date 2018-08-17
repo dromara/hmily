@@ -53,6 +53,7 @@ import java.util.stream.Collectors;
 
 /**
  * CompensationConfiguration.
+ *
  * @author xiaoyu
  */
 @Configuration
@@ -118,8 +119,8 @@ public class CompensationConfiguration {
             final Boolean cluster = env.getProperty("compensation.redis.cluster", Boolean.class);
             if (cluster) {
                 final String clusterUrl = env.getProperty("compensate.redis.clusterUrl");
-                final Set<HostAndPort> hostAndPorts = Splitter.on(clusterUrl)
-                        .splitToList(";").stream()
+                final Set<HostAndPort> hostAndPorts = Splitter.on(";")
+                        .splitToList(clusterUrl).stream()
                         .map(HostAndPort::parseString).collect(Collectors.toSet());
                 JedisCluster jedisCluster = new JedisCluster(hostAndPorts, config);
                 jedisClient = new JedisClientCluster(jedisCluster);

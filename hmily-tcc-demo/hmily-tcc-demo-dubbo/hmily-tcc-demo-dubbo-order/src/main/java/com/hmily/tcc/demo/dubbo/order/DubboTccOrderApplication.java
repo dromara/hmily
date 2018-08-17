@@ -27,7 +27,7 @@ import org.springframework.context.annotation.ImportResource;
  * @author xiaoyu
  */
 @SpringBootApplication
-@ImportResource({"classpath:applicationContext.xml"})
+@ImportResource({"classpath:spring-dubbo.xml"})
 @MapperScan("com.hmily.tcc.demo.dubbo.order.mapper")
 public class DubboTccOrderApplication {
     public static void main(String[] args) {
