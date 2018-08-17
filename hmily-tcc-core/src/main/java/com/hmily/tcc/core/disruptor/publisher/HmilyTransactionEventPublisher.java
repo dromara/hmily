@@ -26,7 +26,8 @@ import com.hmily.tcc.core.concurrent.threadpool.HmilyThreadFactory;
 import com.hmily.tcc.core.disruptor.event.HmilyTransactionEvent;
 import com.hmily.tcc.core.disruptor.factory.HmilyTransactionEventFactory;
 import com.hmily.tcc.core.disruptor.handler.CleanEventHandler;
-import com.hmily.tcc.core.disruptor.handler.SaveAndDeleteEventHandler;
+import com.hmily.tcc.core.disruptor.handler.DeleteEventHandler;
+import com.hmily.tcc.core.disruptor.handler.SaveEventHandler;
 import com.hmily.tcc.core.disruptor.handler.UpdateParticipantEventHandler;
 import com.hmily.tcc.core.disruptor.handler.UpdateStatusEventHandler;
 import com.hmily.tcc.core.disruptor.translator.HmilyTransactionEventTranslator;
@@ -66,20 +67,23 @@ public class HmilyTransactionEventPublisher implements DisposableBean {
 
     private Disruptor<HmilyTransactionEvent> disruptor;
 
-    private final SaveAndDeleteEventHandler saveAndDeleteEventHandler;
+    private final SaveEventHandler saveEventHandler;
 
     private final UpdateParticipantEventHandler updateParticipantEventHandler;
 
     private final UpdateStatusEventHandler updateStatusEventHandler;
 
+    private final DeleteEventHandler deleteEventHandler;
+
     private final CleanEventHandler cleanEventHandler;
 
     @Autowired
-    public HmilyTransactionEventPublisher(SaveAndDeleteEventHandler saveAndDeleteEventHandler, UpdateParticipantEventHandler updateParticipantEventHandler, UpdateStatusEventHandler updateStatusEventHandler, CleanEventHandler cleanEventHandler) {
-        this.saveAndDeleteEventHandler = saveAndDeleteEventHandler;
+    public HmilyTransactionEventPublisher(SaveEventHandler saveEventHandler, UpdateParticipantEventHandler updateParticipantEventHandler, UpdateStatusEventHandler updateStatusEventHandler, CleanEventHandler cleanEventHandler, DeleteEventHandler deleteEventHandler) {
+        this.saveEventHandler = saveEventHandler;
         this.updateParticipantEventHandler = updateParticipantEventHandler;
         this.updateStatusEventHandler = updateStatusEventHandler;
         this.cleanEventHandler = cleanEventHandler;
+        this.deleteEventHandler = deleteEventHandler;
     }
 
     /**
@@ -98,15 +102,16 @@ public class HmilyTransactionEventPublisher implements DisposableBean {
                 HmilyThreadFactory.create("hmily-log-disruptor", false),
                 new ThreadPoolExecutor.AbortPolicy());
 
-        disruptor.handleEventsWith(saveAndDeleteEventHandler)
-                .then(updateParticipantEventHandler, updateStatusEventHandler)
+        disruptor.handleEventsWith(saveEventHandler)
+                .then(updateParticipantEventHandler,updateStatusEventHandler)
+                .then(deleteEventHandler)
                 .then(cleanEventHandler);
 
         disruptor.setDefaultExceptionHandler(new ExceptionHandler<HmilyTransactionEvent>() {
             @Override
             public void handleEventException(Throwable ex, long sequence, HmilyTransactionEvent event) {
                 LogUtil.error(LOGGER, () -> "Disruptor handleEventException:"
-                        + event.getType() + event.getTccTransaction().toString());
+                        + event.getType() + event.getTccTransaction().toString() + ex.getMessage());
             }
 
             @Override
