@@ -19,36 +19,19 @@
 
 package com.hmily.tcc.core.disruptor.handler;
 
-import com.hmily.tcc.common.bean.entity.TccTransaction;
-import com.hmily.tcc.common.enums.EventTypeEnum;
-import com.hmily.tcc.core.coordinator.CoordinatorService;
 import com.hmily.tcc.core.disruptor.event.HmilyTransactionEvent;
 import com.lmax.disruptor.EventHandler;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- * Disroptor handler.
+ * clean data handler.
  * @author xiaoyu(Myth)
  */
 @Component
-public class HmilyTransactionEventHandler implements EventHandler<HmilyTransactionEvent> {
-
-    @Autowired
-    private CoordinatorService coordinatorService;
+public class CleanEventHandler implements EventHandler<HmilyTransactionEvent> {
 
     @Override
     public void onEvent(final HmilyTransactionEvent hmilyTransactionEvent, final long sequence, final boolean endOfBatch) {
-        if (hmilyTransactionEvent.getType() == EventTypeEnum.SAVE.getCode()) {
-            coordinatorService.save(hmilyTransactionEvent.getTccTransaction());
-        } else if (hmilyTransactionEvent.getType() == EventTypeEnum.UPDATE_PARTICIPANT.getCode()) {
-            coordinatorService.updateParticipant(hmilyTransactionEvent.getTccTransaction());
-        } else if (hmilyTransactionEvent.getType() == EventTypeEnum.UPDATE_STATUS.getCode()) {
-            final TccTransaction tccTransaction = hmilyTransactionEvent.getTccTransaction();
-            coordinatorService.updateStatus(tccTransaction.getTransId(), tccTransaction.getStatus());
-        } else if (hmilyTransactionEvent.getType() == EventTypeEnum.DELETE.getCode()) {
-            coordinatorService.remove(hmilyTransactionEvent.getTccTransaction().getTransId());
-        }
         hmilyTransactionEvent.clear();
     }
 }

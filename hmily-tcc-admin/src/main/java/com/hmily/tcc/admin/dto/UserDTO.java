@@ -22,17 +22,14 @@ import lombok.Data;
 import java.io.Serializable;
 
 /**
- * <p>Description: .</p>
- *
+ * UserDTO.
  * @author xiaoyu(Myth)
- * @version 1.0
- * @date 2017/10/23 18:18
- * @since JDK 1.8
  */
 @Data
 public class UserDTO implements Serializable {
 
     private static final long serialVersionUID = -3479973014221253748L;
+
     private String userName;
 
     private String password;

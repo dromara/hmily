@@ -1,7 +1,8 @@
 server:
   port: 8883
-  contextPath: /inventory-service
   address: 0.0.0.0
+  servlet:
+    context-path: /inventory-service
 
 spring:
     datasource:
@@ -9,22 +10,6 @@ spring:
         url: jdbc:mysql://192.168.1.68:3306/tcc_stock?useUnicode=true&characterEncoding=utf8
         username: xiaoyu
         password: Wgj@555888
-        platform: mysql
-        type: com.alibaba.druid.pool.DruidDataSource
-        initialSize: 20
-        minIdle: 20
-        maxActive: 100
-        maxWait: 60000
-        timeBetweenEvictionRunsMillis: 60000
-        minEvictableIdleTimeMillis: 30000
-        validationQuery: select 'x'
-        testWhileIdle: true
-        testOnBorrow: false
-        testOnReturn: false
-        poolPreparedStatements: true
-        maxPoolPreparedStatementPerConnectionSize: 20
-        filters: stat,wall,slf4j
-        connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
     application:
       name: inventory-service
 
@@ -36,6 +21,8 @@ eureka:
  client:
      serviceUrl:
        defaultZone: http://localhost:8761/eureka/
+ instance:
+   prefer-ip-address: true
 
 inventory-service :
    ribbon.NFLoadBalancerRuleClassName : com.netflix.loadbalancer.RandomRule

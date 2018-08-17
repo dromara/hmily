@@ -43,13 +43,12 @@ import static com.google.common.collect.Lists.newArrayList;
 @EnableSwagger2
 public class SwaggerConfig {
 
-    private static final String SWAGGER_SCAN_BASE_PACKAGE = "com.happylifeplat.transaction.admin.controller";
     private static final String VERSION = "1.0.0";
 
-    ApiInfo apiInfo() {
+    private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
                 .title("Swagger API")
-                .description("transaction-admin 平台接口测试")
+                .description("hmily-admin 平台接口测试")
                 .license("Apache 2.0")
                 .licenseUrl("http://www.apache.org/licenses/LICENSE-2.0.html")
                 .termsOfServiceUrl("")
@@ -57,13 +56,15 @@ public class SwaggerConfig {
                 .contact(new Contact("xiaoyu", "", "549477611@qq.com"))
                 .build();
     }
+
     @Bean
     public Docket api() {
         return new Docket(DocumentationType.SWAGGER_2).apiInfo(apiInfo()).select().apis(RequestHandlerSelectors.withClassAnnotation(RestController.class))
                 // .paths(paths())
                 .build().pathMapping("/").directModelSubstitute(LocalDate.class, String.class)
                 .genericModelSubstitutes(ResponseEntity.class).useDefaultResponseMessages(false)
-                .globalResponseMessage(RequestMethod.GET, newArrayList(new ResponseMessageBuilder().code(500).message("500 message")
+                .globalResponseMessage(RequestMethod.GET,
+                        newArrayList(new ResponseMessageBuilder().code(500).message("500 message")
                         .responseModel(new ModelRef("Error")).build()));
     }
 

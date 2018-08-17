@@ -20,20 +20,16 @@ package com.hmily.tcc.admin.service;
 import java.util.List;
 
 /**
- * <p>Description: .</p>
- *
+ * ApplicationNameService.
  * @author xiaoyu(Myth)
- * @version 1.0
- * @date 2017/10/20 16:34
- * @since JDK 1.8
  */
+@FunctionalInterface
 public interface ApplicationNameService {
 
-
     /**
-     * 获取之前参与分布式事务项目的应用名称
+     * acquired app name.
      *
-     * @return List<String>
+     * @return  app name list.
      */
     List<String> list();
 }

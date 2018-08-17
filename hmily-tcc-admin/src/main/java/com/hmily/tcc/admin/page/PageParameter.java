@@ -22,36 +22,43 @@ import lombok.Data;
 import java.io.Serializable;
 
 /**
- * <p>Description: .</p>
- *
+ * PageParameter.
  * @author xiaoyu(Myth)
- * @version 1.0
- * @date 2017/10/18 15:51
- * @since JDK 1.8
  */
 @Data
 public class PageParameter implements Serializable {
+
     private static final long serialVersionUID = -8324693985921606090L;
-    public static final int DEFAULT_PAGE_SIZE = 10;
+
+    private static final int DEFAULT_PAGE_SIZE = 10;
+
     private int pageSize;
+
     private int currentPage;
+
     private int prePage;
+
     private int nextPage;
+
     private int totalPage;
+
     private int totalCount;
+
     public PageParameter() {
         this.currentPage = 1;
         this.pageSize = DEFAULT_PAGE_SIZE;
     }
+
     /**
-     *
-     * @param currentPage 当前页
-     * @param pageSize 每页大小
+     * PageParameter.
+     * @param currentPage current page.
+     * @param pageSize page size.
      */
-    public PageParameter(int currentPage, int pageSize) {
+    public PageParameter(final int currentPage, final int pageSize) {
         this.currentPage = currentPage;
         this.pageSize = pageSize;
     }
+
     public int getCurrentPage() {
         return currentPage;
     }

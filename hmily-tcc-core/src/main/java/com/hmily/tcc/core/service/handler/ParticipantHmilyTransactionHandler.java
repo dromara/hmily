@@ -29,17 +29,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Participant Handler.
+ *
  * @author xiaoyu
  */
 @Component
 public class ParticipantHmilyTransactionHandler implements HmilyTransactionHandler {
-
-    private static final Lock LOCK = new ReentrantLock();
 
     private final HmilyTransactionExecutor hmilyTransactionExecutor;
 
@@ -48,55 +45,39 @@ public class ParticipantHmilyTransactionHandler implements HmilyTransactionHandl
         this.hmilyTransactionExecutor = hmilyTransactionExecutor;
     }
 
-    /**
-     * 分布式事务提供者处理接口
-     * 根据tcc事务上下文的状态来执行相对应的方法.
-     *
-     * @param point   point 切点
-     * @param context context
-     * @return Object
-     * @throws Throwable 异常
-     */
     @Override
     public Object handler(final ProceedingJoinPoint point, final TccTransactionContext context) throws Throwable {
         TccTransaction tccTransaction = null;
         TccTransaction currentTransaction;
-        try {
-            LOCK.lock();
-            switch (TccActionEnum.acquireByCode(context.getAction())) {
-                case TRYING:
-                    try {
-                        //创建事务信息
-                        tccTransaction = hmilyTransactionExecutor.beginParticipant(context, point);
-                        //发起方法调用
-                        final Object proceed = point.proceed();
-                        tccTransaction.setStatus(TccActionEnum.TRYING.getCode());
-                        //更新日志状态为try 完成
-                        hmilyTransactionExecutor.updateStatus(tccTransaction);
-                        return proceed;
-                    } catch (Throwable throwable) {
-                        //删除事务日志
-                        hmilyTransactionExecutor.deleteTransaction(tccTransaction);
-                        throw throwable;
-                    }
-                case CONFIRMING:
-                    //如果是confirm 通过之前保存的事务信息 进行反射调用
-                    currentTransaction = TccTransactionCacheManager.getInstance().getTccTransaction(context.getTransId());
-                    hmilyTransactionExecutor.confirm(currentTransaction);
-                    break;
-                case CANCELING:
-                    //如果是调用CANCELING 通过之前保存的事务信息 进行反射调用
-                    currentTransaction = TccTransactionCacheManager.getInstance().getTccTransaction(context.getTransId());
-                    hmilyTransactionExecutor.cancel(currentTransaction);
-                    break;
-                default:
-                    break;
-            }
-            Method method = ((MethodSignature) (point.getSignature())).getMethod();
-            return getDefaultValue(method.getReturnType());
-        } finally {
-            LOCK.unlock();
+        switch (TccActionEnum.acquireByCode(context.getAction())) {
+            case TRYING:
+                try {
+                    tccTransaction = hmilyTransactionExecutor.beginParticipant(context, point);
+                    final Object proceed = point.proceed();
+                    tccTransaction.setStatus(TccActionEnum.TRYING.getCode());
+                    //update log status to try
+                    hmilyTransactionExecutor.updateStatus(tccTransaction);
+                    return proceed;
+                } catch (Throwable throwable) {
+                    //if exception ,delete log.
+                    hmilyTransactionExecutor.deleteTransaction(tccTransaction);
+                    assert tccTransaction != null;
+                    TccTransactionCacheManager.getInstance().removeByKey(tccTransaction.getTransId());
+                    throw throwable;
+                }
+            case CONFIRMING:
+                currentTransaction = TccTransactionCacheManager.getInstance().getTccTransaction(context.getTransId());
+                hmilyTransactionExecutor.confirm(currentTransaction);
+                break;
+            case CANCELING:
+                currentTransaction = TccTransactionCacheManager.getInstance().getTccTransaction(context.getTransId());
+                hmilyTransactionExecutor.cancel(currentTransaction);
+                break;
+            default:
+                break;
         }
+        Method method = ((MethodSignature) (point.getSignature())).getMethod();
+        return getDefaultValue(method.getReturnType());
     }
 
     private Object getDefaultValue(final Class type) {

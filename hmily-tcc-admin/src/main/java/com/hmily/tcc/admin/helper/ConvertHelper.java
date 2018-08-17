@@ -21,18 +21,13 @@ import com.hmily.tcc.admin.vo.TccCompensationVO;
 import com.hmily.tcc.common.bean.adapter.CoordinatorRepositoryAdapter;
 import com.hmily.tcc.common.utils.DateUtils;
 
-
 /**
- * <p>Description: .</p>
- *
+ * ConvertHelper.
  * @author xiaoyu(Myth)
- * @version 1.0
- * @date 2017/10/23 11:53
- * @since JDK 1.8
  */
 public class ConvertHelper {
 
-    public static TccCompensationVO buildVO(CoordinatorRepositoryAdapter adapter) {
+    public static TccCompensationVO buildVO(final CoordinatorRepositoryAdapter adapter) {
         TccCompensationVO vo = new TccCompensationVO();
         vo.setTransId(adapter.getTransId());
         vo.setCreateTime(DateUtils.parseDate(adapter.getCreateTime()));
@@ -44,7 +39,6 @@ public class ConvertHelper {
         vo.setConfirmMethod(adapter.getConfirmMethod());
         vo.setCancelMethod(adapter.getCancelMethod());
         return vo;
-
     }
 
 }

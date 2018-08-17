@@ -19,8 +19,15 @@ package com.hmily.tcc.common.config;
 
 import lombok.Data;
 
+import javax.sql.DataSource;
+import java.util.Map;
+
+import static java.util.concurrent.TimeUnit.MINUTES;
+import static java.util.concurrent.TimeUnit.SECONDS;
+
 /**
  * 采用数据库保存事务日志配置时,数据库配置信息.
+ *
  * @author xiaoyu
  */
 @Data
@@ -46,66 +53,71 @@ public class TccDbConfig {
      */
     private String password;
 
-    /**
-     * 初始化时建立物理连接的个数。初始化发生在显示调用init方法，或者第一次getConnection时.
-     */
-    private int initialSize = 10;
 
     /**
      * 最大连接池数量.
+     *
+     * https://github.com/brettwooldridge/HikariCP/wiki/About-Pool-Sizing
      */
-    private int maxActive = 100;
+    private int maxActive = 20;
 
     /**
      * 最小连接池数量.
      */
-    private int minIdle = 20;
+    private int minIdle = 10;
+
 
     /**
-     * 配置获取连接等待超时的时间.
+     * This property controls the maximum number of milliseconds that a client (that's you) will wait for a connection from the pool.
+     * If this time is exceeded without a connection becoming available, a SQLException will be thrown.
+     * Lowest acceptable connection timeout is 250 ms.
+     * Default: 30000 (30 seconds)
      */
-    private int maxWait = 60000;
+    private long connectionTimeout = SECONDS.toMillis(30);
+
 
     /**
-     * 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒.
+     * This property controls the maximum amount of time that a connection is allowed to sit idle in the pool.
+     * This setting only applies when minimumIdle is defined to be less than maximumPoolSize.
+     * Idle connections will not be retired once the pool reaches minimumIdle connections.
+     * Whether a connection is retired as idle or not is subject to a maximum variation of +30 seconds,
+     * and average variation of +15 seconds. A connection will never be retired as idle before this timeout.
+     * A value of 0 means that idle connections are never removed from the pool. The minimum allowed value is 10000ms (10 seconds).
+     * Default: 600000 (10 minutes)
      */
-    private int timeBetweenEvictionRunsMillis = 60000;
+    private long idleTimeout = MINUTES.toMillis(10);
+
 
     /**
-     * 配置一个连接在池中最小生存的时间，单位是毫秒.
+     * This property controls the maximum lifetime of a connection in the pool. An in-use connection will never be
+     * retired, only when it is closed will it then be removed. On a connection-by-connection basis, minor negative
+     * attenuation is applied to avoid mass-extinction in the pool. We strongly recommend setting this value, and it
+     * should be several seconds shorter than any database or infrastructure imposed connection time limit. A value of
+     * 0 indicates no maximum lifetime (infinite lifetime), subject of course to the idleTimeout setting.
+     * Default: 1800000 (30 minutes)
      */
-    private int minEvictableIdleTimeMillis = 300000;
+    private long maxLifetime = MINUTES.toMillis(30);
 
-    private String validationQuery = " SELECT 1 ";
-
-    /**
-     * 申请连接时执行validationQuery检测连接是否有效，做了这个配置会降低性能.
-     */
-    private Boolean testOnBorrow = false;
-
-    /**
-     * 归还连接时执行validationQuery检测连接是否有效，做了这个配置会降低性能.
-     */
-    private Boolean testOnReturn = false;
 
     /**
-     * 建议配置为true，不影响性能，并且保证安全性。申请连接的时候检测.
-     * 如果空闲时间大于timeBetweenEvictionRunsMillis.
-     * 执行validationQuery检测连接是否有效.
+     * If your driver supports JDBC4 we strongly recommend not setting this property. This is for "legacy" drivers that
+     * do not support the JDBC4 Connection.isValid() API. This is the query that will be executed just before a connection
+     * is given to you from the pool to validate that the connection to the database is still alive. Again, try running
+     * the pool without this property, HikariCP will log an error if your driver is not JDBC4 compliant to let you know.
+     * Default: none
      */
-    private Boolean testWhileIdle = true;
+    private String connectionTestQuery;
+
 
     /**
-     * 是否缓存preparedStatement，也就是PSCache.
-     * PSCache对支持游标的数据库性能提升巨大，比如说oracle在mysql下建议关闭.
+     * Add a property (name/value pair) that will be used to configure the {@link DataSource}/{@link java.sql.Driver}.
      */
-    private Boolean poolPreparedStatements = false;
+    private Map<String, Object> dataSourcePropertyMap;
+
 
     /**
-     * 要启用PSCache，必须配置大于0，当大于0时，poolPreparedStatements自动触发修改为true.
-     * 在Druid中.
-     * 不会存在Oracle下PSCache占用内存过多的问题，可以把这个数值配置大一些，比如说100.
+     * You can use a existing DataSource or generate a new DataSource based on the configuration.
      */
-    private int maxPoolPreparedStatementPerConnectionSize = 100;
+    private DataSource dataSource;
 
 }

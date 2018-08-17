@@ -1,0 +1,7 @@
+compensation:
+   redis:
+      cluster: false
+    # clusterUrl : 127.0.0.1:70001;127.0.1:7002
+      hostName : 192.168.1.68
+      port : 6379
+      password :

@@ -26,18 +26,20 @@ import com.hmily.tcc.common.constant.CommonConstant;
 public class DbTypeUtils {
 
     /**
-     * 判断是什么类型的数据库.
-     * @param driverClassName 驱动名称
-     * @return mysql sqlserver oracle .
+     *  check db type
+     * @param driverClassName driverClassName
+     * @return mysql sqlserver oracle postgresql.
      */
     public static String buildByDriverClassName(final String driverClassName) {
-        String dbType = "mysql";
+        String dbType = null;
         if (driverClassName.contains(CommonConstant.DB_MYSQL)) {
-            dbType = "mysql";
+            dbType = CommonConstant.DB_MYSQL;
         } else if (driverClassName.contains(CommonConstant.DB_SQLSERVER)) {
-            dbType = "sqlserver";
+            dbType = CommonConstant.DB_SQLSERVER;
         } else if (driverClassName.contains(CommonConstant.DB_ORACLE)) {
-            dbType = "oracle";
+            dbType = CommonConstant.DB_ORACLE;
+        }else if (driverClassName.contains(CommonConstant.DB_POSTGRESQL)) {
+            dbType = CommonConstant.DB_POSTGRESQL;
         }
         return dbType;
     }
