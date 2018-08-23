@@ -109,7 +109,7 @@ public class ZookeeperCoordinatorRepository implements CoordinatorRepository {
             if (content != null) {
                 final CoordinatorRepositoryAdapter adapter = objectSerializer.deSerialize(content, CoordinatorRepositoryAdapter.class);
                 adapter.setContents(objectSerializer.serialize(tccTransaction.getParticipants()));
-                zooKeeper.create(path, objectSerializer.serialize(adapter), ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
+                zooKeeper.setData(path, objectSerializer.serialize(adapter), -1);
             }
             return ROWS;
         } catch (Exception e) {
@@ -126,7 +126,7 @@ public class ZookeeperCoordinatorRepository implements CoordinatorRepository {
             if (content != null) {
                 final CoordinatorRepositoryAdapter adapter = objectSerializer.deSerialize(content, CoordinatorRepositoryAdapter.class);
                 adapter.setStatus(status);
-                zooKeeper.create(path, objectSerializer.serialize(adapter), ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
+                zooKeeper.setData(path, objectSerializer.serialize(adapter), -1);
             }
             return ROWS;
         } catch (Exception e) {
