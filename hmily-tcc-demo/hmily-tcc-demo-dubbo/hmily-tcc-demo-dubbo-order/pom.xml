@@ -45,7 +45,7 @@
 
         <dependency>
             <groupId>com.hmily.tcc</groupId>
-            <artifactId>hmily-tcc-dubbo</artifactId>
+            <artifactId>hmily-tcc-spring-boot-starter-dubbo</artifactId>
         </dependency>
 
         <!--spring boot的核心启动器-->

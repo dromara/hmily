@@ -52,6 +52,7 @@ import java.util.stream.Collectors;
 
 /**
  * this is transaction manager.
+ *
  * @author xiaoyu
  */
 @Component
@@ -73,6 +74,10 @@ public class HmilyTransactionExecutor {
     @Autowired
     public HmilyTransactionExecutor(final HmilyTransactionEventPublisher hmilyTransactionEventPublisher) {
         this.hmilyTransactionEventPublisher = hmilyTransactionEventPublisher;
+    }
+
+    public static ThreadLocal<TccTransaction> instance() {
+        return CURRENT;
     }
 
     /**
@@ -204,7 +209,6 @@ public class HmilyTransactionExecutor {
             return;
         }
         currentTransaction.setStatus(TccActionEnum.CONFIRMING.getCode());
-        //更新事务日志状态 为confirm
         updateStatus(currentTransaction);
         final List<Participant> participants = currentTransaction.getParticipants();
         List<Participant> failList = Lists.newArrayListWithCapacity(participants.size());

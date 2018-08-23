@@ -53,6 +53,7 @@ import java.util.stream.Collectors;
 
 /**
  * mongo impl.
+ *
  * @author xiaoyu
  */
 public class MongoCoordinatorRepository implements CoordinatorRepository {
@@ -164,29 +165,31 @@ public class MongoCoordinatorRepository implements CoordinatorRepository {
         Query query = new Query();
         query.addCriteria(new Criteria("transId").is(id));
         MongoAdapter cache = template.findOne(query, MongoAdapter.class, collectionName);
-        return buildByCache(cache);
+        return buildByCache(Objects.requireNonNull(cache));
     }
 
     @SuppressWarnings("unchecked")
     private TccTransaction buildByCache(final MongoAdapter cache) {
-        TccTransaction tccTransaction = new TccTransaction();
-        tccTransaction.setTransId(cache.getTransId());
-        tccTransaction.setCreateTime(cache.getCreateTime());
-        tccTransaction.setLastTime(cache.getLastTime());
-        tccTransaction.setRetriedCount(cache.getRetriedCount());
-        tccTransaction.setVersion(cache.getVersion());
-        tccTransaction.setStatus(cache.getStatus());
-        tccTransaction.setRole(cache.getRole());
-        tccTransaction.setPattern(cache.getPattern());
-        tccTransaction.setTargetClass(cache.getTargetClass());
-        tccTransaction.setTargetMethod(cache.getTargetMethod());
         try {
+            TccTransaction tccTransaction = new TccTransaction();
+            tccTransaction.setTransId(cache.getTransId());
+            tccTransaction.setCreateTime(cache.getCreateTime());
+            tccTransaction.setLastTime(cache.getLastTime());
+            tccTransaction.setRetriedCount(cache.getRetriedCount());
+            tccTransaction.setVersion(cache.getVersion());
+            tccTransaction.setStatus(cache.getStatus());
+            tccTransaction.setRole(cache.getRole());
+            tccTransaction.setPattern(cache.getPattern());
+            tccTransaction.setTargetClass(cache.getTargetClass());
+            tccTransaction.setTargetMethod(cache.getTargetMethod());
             List<Participant> participants = (List<Participant>) objectSerializer.deSerialize(cache.getContents(), CopyOnWriteArrayList.class);
             tccTransaction.setParticipants(participants);
+            return tccTransaction;
         } catch (TccException e) {
             LogUtil.error(LOGGER, "mongodb 反序列化异常:{}", e::getLocalizedMessage);
+            return null;
         }
-        return tccTransaction;
+
     }
 
     @Override
@@ -217,9 +220,10 @@ public class MongoCoordinatorRepository implements CoordinatorRepository {
         MongoClientFactoryBean clientFactoryBean = buildMongoClientFactoryBean(tccMongoConfig);
         try {
             clientFactoryBean.afterPropertiesSet();
-            template = new MongoTemplate(clientFactoryBean.getObject(), tccMongoConfig.getMongoDbName());
+            template = new MongoTemplate(Objects.requireNonNull(clientFactoryBean.getObject()), tccMongoConfig.getMongoDbName());
         } catch (Exception e) {
-            e.printStackTrace();
+            LogUtil.error(LOGGER, "mongo 初始化异常！请检查配置信息:{}", e::getMessage);
+            throw new TccRuntimeException(e);
         }
     }
 

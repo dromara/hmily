@@ -26,9 +26,9 @@ import com.hmily.tcc.common.config.TccConfig;
 public interface HmilyInitService {
 
     /**
-     * tcc分布式事务初始化方法
+     * hmily init.
      *
-     * @param tccConfig TCC配置
+     * @param tccConfig {@linkplain TccConfig}
      */
     void initialization(TccConfig tccConfig);
 }

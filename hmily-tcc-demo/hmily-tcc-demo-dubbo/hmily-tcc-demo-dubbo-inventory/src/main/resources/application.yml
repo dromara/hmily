@@ -1,14 +1,15 @@
 server:
   port: 8084
-  contextPath: /
   address: 0.0.0.0
+  servlet:
+    context-path: /
 
 spring:
     datasource:
         driver-class-name:  com.mysql.jdbc.Driver
-        url: jdbc:mysql://10.4.4.202:3306/tcc_stock?useUnicode=true&characterEncoding=utf8
+        url: jdbc:mysql://192.168.1.98:3306/tcc_stock?useUnicode=true&characterEncoding=utf8
         username: root
-        password: 123123
+        password: 123456
 
 
 mybatis:
@@ -20,10 +21,9 @@ logging:
         root: error
         org.springframework.web: info
         org.apache.ibatis: info
-        com.hmily.bonuspoint: info
-        com.hmily.lottery: debug
-        com.hmily: debug
+        com.hmily.tcc.bonuspoint: info
+        com.hmily.tcc.lottery: info
+        com.hmily.tcc: info
         io.netty: info
-
     path: "./logs"
 

@@ -42,7 +42,7 @@ public class HmilyAutoConfiguration {
 
     private final TccConfigProperties tccConfigProperties;
 
-    @Autowired
+    @Autowired(required = false)
     public HmilyAutoConfiguration(TccConfigProperties tccConfigProperties) {
         this.tccConfigProperties = tccConfigProperties;
     }
