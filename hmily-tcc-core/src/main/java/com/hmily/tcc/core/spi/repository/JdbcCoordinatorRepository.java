@@ -225,7 +225,7 @@ public class JdbcCoordinatorRepository implements CoordinatorRepository {
             this.currentDBType = DbTypeUtils.buildByDriverClassName(tccDbConfig.getDriverClassName());
             executeUpdate(SqlHelper.buildCreateTableSql(tccDbConfig.getDriverClassName(), tableName));
         } catch (Exception e) {
-            LogUtil.error(LOGGER, "jdbc 初始化异常！请检查配置信息:{}", e::getMessage);
+            LogUtil.error(LOGGER, "hmily jdbc log init exception please check config:{}", e::getMessage);
             throw new TccRuntimeException(e);
         }
     }

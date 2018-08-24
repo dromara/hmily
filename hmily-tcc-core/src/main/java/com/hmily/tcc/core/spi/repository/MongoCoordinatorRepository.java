@@ -125,7 +125,7 @@ public class MongoCoordinatorRepository implements CoordinatorRepository {
         final UpdateResult updateResult = template.updateFirst(query, update, MongoAdapter.class, collectionName);
 
         if (updateResult.getModifiedCount() <= 0) {
-            throw new TccRuntimeException("更新数据异常!");
+            throw new TccRuntimeException("update data exception!");
         }
         return ROWS;
     }
@@ -142,7 +142,7 @@ public class MongoCoordinatorRepository implements CoordinatorRepository {
         }
         final UpdateResult updateResult = template.updateFirst(query, update, MongoAdapter.class, collectionName);
         if (updateResult.getModifiedCount() <= 0) {
-            throw new TccRuntimeException("更新数据异常!");
+            throw new TccRuntimeException("update data exception!");
         }
         return ROWS;
     }
@@ -155,7 +155,7 @@ public class MongoCoordinatorRepository implements CoordinatorRepository {
         update.set("status", status);
         final UpdateResult updateResult = template.updateFirst(query, update, MongoAdapter.class, collectionName);
         if (updateResult.getModifiedCount() <= 0) {
-            throw new TccRuntimeException("更新数据异常!");
+            throw new TccRuntimeException("update data exception!");
         }
         return ROWS;
     }
@@ -186,7 +186,7 @@ public class MongoCoordinatorRepository implements CoordinatorRepository {
             tccTransaction.setParticipants(participants);
             return tccTransaction;
         } catch (TccException e) {
-            LogUtil.error(LOGGER, "mongodb 反序列化异常:{}", e::getLocalizedMessage);
+            LogUtil.error(LOGGER, "mongodb deSerialize exception:{}", e::getLocalizedMessage);
             return null;
         }
 
@@ -222,7 +222,7 @@ public class MongoCoordinatorRepository implements CoordinatorRepository {
             clientFactoryBean.afterPropertiesSet();
             template = new MongoTemplate(Objects.requireNonNull(clientFactoryBean.getObject()), tccMongoConfig.getMongoDbName());
         } catch (Exception e) {
-            LogUtil.error(LOGGER, "mongo 初始化异常！请检查配置信息:{}", e::getMessage);
+            LogUtil.error(LOGGER, "mongo init error please check you config:{}", e::getMessage);
             throw new TccRuntimeException(e);
         }
     }
