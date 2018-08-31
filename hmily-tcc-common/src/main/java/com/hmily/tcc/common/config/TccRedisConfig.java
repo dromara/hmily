@@ -21,6 +21,7 @@ import lombok.Data;
 
 /**
  * redis存储事务日志配置.
+ *
  * @author xiaoyu
  */
 @Data
@@ -28,10 +29,19 @@ public class TccRedisConfig {
 
     private Boolean cluster = false;
 
+    private Boolean sentinel = false;
+
     /**
-     * 集群url   example:ip:port;ip:port.
+     * clusterUrl   example:ip:port;ip:port.
      */
     private String clusterUrl;
+
+    /**
+     * sentinelUrl   example:ip:port;ip:port.
+     */
+    private String sentinelUrl;
+
+    private String masterName;
 
     private String hostName;
 

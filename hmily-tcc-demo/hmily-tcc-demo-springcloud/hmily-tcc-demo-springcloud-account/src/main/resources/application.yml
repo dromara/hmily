@@ -8,9 +8,9 @@ server:
 spring:
     datasource:
         driver-class-name:  com.mysql.jdbc.Driver
-        url: jdbc:mysql://192.168.1.68:3306/tcc_account?useUnicode=true&characterEncoding=utf8
-        username: xiaoyu
-        password: Wgj@555888
+        url: jdbc:mysql://192.168.1.98:3306/tcc_account?useUnicode=true&characterEncoding=utf8
+        username: root
+        password: 123456
     application:
       name: account-service
 
@@ -24,9 +24,9 @@ hmily:
         repositorySupport : db
         tccDbConfig :
                  driverClassName  : com.mysql.jdbc.Driver
-                 url :  jdbc:mysql://192.168.1.68:3306/tcc?useUnicode=true&amp;characterEncoding=utf8
-                 username : xiaoyu
-                 password : Wgj@555888
+                 url :  jdbc:mysql://192.168.1.98:3306/tcc?useUnicode=true&amp;characterEncoding=utf8
+                 username : root
+                 password : 123456
 
        # repositorySupport : redis
        #         hostName  : 192.168.1.68
@@ -66,6 +66,6 @@ account-service :
 logging:
             level:
                 root: info
-                com.hmily.tcc : debug
+                com.hmily.tcc : error
             path: "./logs"
 
