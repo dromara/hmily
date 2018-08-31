@@ -28,6 +28,7 @@ import com.hmily.tcc.common.exception.TccException;
 import com.hmily.tcc.common.exception.TccRuntimeException;
 import com.hmily.tcc.common.jedis.JedisClient;
 import com.hmily.tcc.common.jedis.JedisClientCluster;
+import com.hmily.tcc.common.jedis.JedisClientSentinel;
 import com.hmily.tcc.common.jedis.JedisClientSingle;
 import com.hmily.tcc.common.serializer.ObjectSerializer;
 import com.hmily.tcc.common.utils.LogUtil;
@@ -41,8 +42,10 @@ import redis.clients.jedis.HostAndPort;
 import redis.clients.jedis.JedisCluster;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
+import redis.clients.jedis.JedisSentinelPool;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -102,9 +105,9 @@ public class RedisCoordinatorRepository implements CoordinatorRepository {
 
     @Override
     public int updateParticipant(final TccTransaction tccTransaction) {
-        final String redisKey = RepositoryPathUtils.buildRedisKey(keyPrefix, tccTransaction.getTransId());
-        byte[] contents = jedisClient.get(redisKey.getBytes());
         try {
+            final String redisKey = RepositoryPathUtils.buildRedisKey(keyPrefix, tccTransaction.getTransId());
+            byte[] contents = jedisClient.get(redisKey.getBytes());
             CoordinatorRepositoryAdapter adapter = objectSerializer.deSerialize(contents, CoordinatorRepositoryAdapter.class);
             adapter.setContents(objectSerializer.serialize(tccTransaction.getParticipants()));
             jedisClient.set(redisKey, objectSerializer.serialize(adapter));
@@ -117,12 +120,14 @@ public class RedisCoordinatorRepository implements CoordinatorRepository {
 
     @Override
     public int updateStatus(final String id, final Integer status) {
-        final String redisKey = RepositoryPathUtils.buildRedisKey(keyPrefix, id);
-        byte[] contents = jedisClient.get(redisKey.getBytes());
         try {
-            CoordinatorRepositoryAdapter adapter = objectSerializer.deSerialize(contents, CoordinatorRepositoryAdapter.class);
-            adapter.setStatus(status);
-            jedisClient.set(redisKey, objectSerializer.serialize(adapter));
+            final String redisKey = RepositoryPathUtils.buildRedisKey(keyPrefix, id);
+            byte[] contents = jedisClient.get(redisKey.getBytes());
+            if (contents != null) {
+                CoordinatorRepositoryAdapter adapter = objectSerializer.deSerialize(contents, CoordinatorRepositoryAdapter.class);
+                adapter.setStatus(status);
+                jedisClient.set(redisKey, objectSerializer.serialize(adapter));
+            }
         } catch (TccException e) {
             e.printStackTrace();
             return FAIL_ROWS;
@@ -173,7 +178,8 @@ public class RedisCoordinatorRepository implements CoordinatorRepository {
         try {
             buildJedisPool(tccRedisConfig);
         } catch (Exception e) {
-            LogUtil.error(LOGGER, "redis 初始化异常！请检查配置信息:{}", e::getMessage);
+            LogUtil.error(LOGGER, "redis init error please check you config:{}", e::getMessage);
+            throw new TccRuntimeException(e);
         }
     }
 
@@ -188,42 +194,40 @@ public class RedisCoordinatorRepository implements CoordinatorRepository {
     }
 
     private void buildJedisPool(final TccRedisConfig tccRedisConfig) {
-        LogUtil.debug(LOGGER, () -> "开始构建redis配置信息");
         JedisPoolConfig config = new JedisPoolConfig();
         config.setMaxIdle(tccRedisConfig.getMaxIdle());
-        //最小空闲连接数, 默认0
         config.setMinIdle(tccRedisConfig.getMinIdle());
-        //最大连接数, 默认8个
         config.setMaxTotal(tccRedisConfig.getMaxTotal());
-        //获取连接时的最大等待毫秒数(如果设置为阻塞时BlockWhenExhausted),如果超时就抛异常, 小于零:阻塞不确定的时间,  默认-1
         config.setMaxWaitMillis(tccRedisConfig.getMaxWaitMillis());
-        //在获取连接的时候检查有效性, 默认false
         config.setTestOnBorrow(tccRedisConfig.getTestOnBorrow());
-        //返回一个jedis实例给连接池时，是否检查连接可用性（ping()）
         config.setTestOnReturn(tccRedisConfig.getTestOnReturn());
-        //在空闲时检查有效性, 默认false
         config.setTestWhileIdle(tccRedisConfig.getTestWhileIdle());
-        //逐出连接的最小空闲时间 默认1800000毫秒(30分钟 )
         config.setMinEvictableIdleTimeMillis(tccRedisConfig.getMinEvictableIdleTimeMillis());
-        //对象空闲多久后逐出, 当空闲时间>该值 ，且 空闲连接>最大空闲数 时直接逐出,不再根据MinEvictableIdleTimeMillis判断  (默认逐出策略)，默认30m
         config.setSoftMinEvictableIdleTimeMillis(tccRedisConfig.getSoftMinEvictableIdleTimeMillis());
-        //逐出扫描的时间间隔(毫秒) 如果为负数,则不运行逐出线程, 默认-1
         config.setTimeBetweenEvictionRunsMillis(tccRedisConfig.getTimeBetweenEvictionRunsMillis());
-        //每次逐出检查时 逐出的最大数目 如果为负数就是 : 1/abs(n), 默认3
         config.setNumTestsPerEvictionRun(tccRedisConfig.getNumTestsPerEvictionRun());
-
         JedisPool jedisPool;
-        //如果是集群模式
         if (tccRedisConfig.getCluster()) {
-            LogUtil.info(LOGGER, () -> "构造redis集群模式");
+            LogUtil.info(LOGGER, () -> "build redis cluster ............");
             final String clusterUrl = tccRedisConfig.getClusterUrl();
             final Set<HostAndPort> hostAndPorts =
-                    Splitter.on(clusterUrl)
-                            .splitToList(";")
+                    Splitter.on(";")
+                            .splitToList(clusterUrl)
                             .stream()
                             .map(HostAndPort::parseString).collect(Collectors.toSet());
             JedisCluster jedisCluster = new JedisCluster(hostAndPorts, config);
             jedisClient = new JedisClientCluster(jedisCluster);
+        } else if (tccRedisConfig.getSentinel()) {
+            LogUtil.info(LOGGER, () -> "build redis sentinel ............");
+            final String sentinelUrl = tccRedisConfig.getSentinelUrl();
+            final Set<String> hostAndPorts =
+                    new HashSet<>(Splitter.on(";")
+                            .splitToList(sentinelUrl));
+
+            JedisSentinelPool pool =
+                    new JedisSentinelPool(tccRedisConfig.getMasterName(), hostAndPorts,
+                            config, tccRedisConfig.getTimeOut(), tccRedisConfig.getPassword());
+            jedisClient = new JedisClientSentinel(pool);
         } else {
             if (StringUtils.isNoneBlank(tccRedisConfig.getPassword())) {
                 jedisPool = new JedisPool(config, tccRedisConfig.getHostName(), tccRedisConfig.getPort(), tccRedisConfig.getTimeOut(), tccRedisConfig.getPassword());
