@@ -79,7 +79,7 @@ public class FileCoordinatorRepository implements CoordinatorRepository {
         try {
             writeFile(tccTransaction);
         } catch (Exception e) {
-            throw new TccRuntimeException("更新数据异常！");
+            throw new TccRuntimeException("update data exception!");
         }
         return 1;
     }
@@ -95,7 +95,7 @@ public class FileCoordinatorRepository implements CoordinatorRepository {
             }
             FileUtils.writeFile(fullFileName, serializer.serialize(adapter));
         } catch (Exception e) {
-            throw new TccRuntimeException("更新数据异常！");
+            throw new TccRuntimeException("update data exception!");
         }
         return ROWS;
     }
@@ -111,7 +111,7 @@ public class FileCoordinatorRepository implements CoordinatorRepository {
             }
             FileUtils.writeFile(fullFileName, serializer.serialize(adapter));
         } catch (Exception e) {
-            throw new TccRuntimeException("更新数据异常！");
+            throw new TccRuntimeException("update data exception!");
         }
         return ROWS;
     }
