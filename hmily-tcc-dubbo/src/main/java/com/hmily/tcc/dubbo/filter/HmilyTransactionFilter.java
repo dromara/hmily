@@ -67,6 +67,7 @@ public class HmilyTransactionFilter implements Filter {
         Class clazz = invoker.getInterface();
         Class[] args = invocation.getParameterTypes();
         final Object[] arguments = invocation.getArguments();
+        converterParamsClass (args, arguments);
         Method method = null;
         Tcc tcc = null;
         try {
@@ -100,6 +101,24 @@ public class HmilyTransactionFilter implements Filter {
             }
         } else {
             return invoker.invoke(invocation);
+        }
+    }
+
+    /**
+     * params class converter
+     *
+     * @param args
+     * @param arguments
+     */
+    private void converterParamsClass(Class[] args, Object[] arguments) {
+        if (arguments == null || arguments.length < 1) {
+            return;
+        }
+        for (int i = 0; i < arguments.length; i++) {
+            if (arguments == null) {
+                continue;
+            }
+            args[i] = arguments[i].getClass ();
         }
     }
 
