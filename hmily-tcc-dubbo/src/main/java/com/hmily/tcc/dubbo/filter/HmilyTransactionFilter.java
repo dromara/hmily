@@ -70,7 +70,7 @@ public class HmilyTransactionFilter implements Filter {
         Method method = null;
         Tcc tcc = null;
         try {
-            method = clazz.getDeclaredMethod(methodName, args);
+            method = clazz.getMethod(methodName, args);
             tcc = method.getAnnotation(Tcc.class);
         } catch (NoSuchMethodException e) {
             e.printStackTrace();

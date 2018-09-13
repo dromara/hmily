@@ -18,6 +18,8 @@
 package com.hmily.tcc.core.helper;
 
 import com.hmily.tcc.common.utils.AssertUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeansException;
 import org.springframework.context.ConfigurableApplicationContext;
 
 /**
@@ -53,7 +55,55 @@ public final class SpringBeanUtils {
      */
     public <T> T getBean(final Class<T> type) {
         AssertUtils.notNull(type);
-        return cfgContext.getBean(type);
+        T bean = null;
+        try {
+            bean = cfgContext.getBean (type);
+        } catch (BeansException e) {
+            bean = getByName (type);
+        }
+        return bean;
+    }
+
+    /**
+     * 根据名称获取bean
+     *
+     * @param type
+     * @param <T>
+     * @return
+     */
+    private <T> T getByName(Class<T> type) {
+        T bean;
+        String className=type.getSimpleName ();
+        bean = cfgContext.getBean (firstLowercase (firstDelete (className)) ,type);
+        return bean;
+    }
+
+    /**
+     * 首字母小写
+     *
+     * @param target
+     * @return
+     */
+    private String firstLowercase(String target){
+        if(StringUtils.isEmpty (target)){
+            return target;
+        }
+        char[] targetChar = target.toCharArray ();
+        targetChar[0]+=32;
+        return String.valueOf (targetChar);
+    }
+
+    /**
+     * 去除首字母
+     *
+     * @param target
+     * @return
+     */
+    private static String firstDelete(String target){
+        if(StringUtils.isEmpty (target)){
+            return target;
+        }
+        return target.substring (1,target.length ());
     }
 
     /**
