@@ -20,6 +20,7 @@ package com.hmily.tcc.core.service.handler;
 import com.hmily.tcc.common.bean.context.TccTransactionContext;
 import com.hmily.tcc.common.bean.entity.TccTransaction;
 import com.hmily.tcc.common.enums.TccActionEnum;
+import com.hmily.tcc.common.utils.DefaultValueUtils;
 import com.hmily.tcc.core.cache.TccTransactionCacheManager;
 import com.hmily.tcc.core.service.HmilyTransactionHandler;
 import com.hmily.tcc.core.service.executor.HmilyTransactionExecutor;
@@ -77,25 +78,7 @@ public class ParticipantHmilyTransactionHandler implements HmilyTransactionHandl
                 break;
         }
         Method method = ((MethodSignature) (point.getSignature())).getMethod();
-        return getDefaultValue(method.getReturnType());
+        return DefaultValueUtils.getDefaultValue(method.getReturnType());
     }
 
-    private Object getDefaultValue(final Class type) {
-        if (boolean.class.equals(type)) {
-            return false;
-        } else if (byte.class.equals(type)) {
-            return 0;
-        } else if (short.class.equals(type)) {
-            return 0;
-        } else if (int.class.equals(type)) {
-            return 0;
-        } else if (long.class.equals(type)) {
-            return 0;
-        } else if (float.class.equals(type)) {
-            return 0;
-        } else if (double.class.equals(type)) {
-            return 0;
-        }
-        return null;
-    }
 }

@@ -25,6 +25,7 @@ import com.hmily.tcc.core.interceptor.TccTransactionInterceptor;
 import com.hmily.tcc.core.service.HmilyTransactionAspectService;
 import com.weibo.api.motan.rpc.Request;
 import com.weibo.api.motan.rpc.RpcContext;
+import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -34,6 +35,7 @@ import java.util.Objects;
 
 /**
  * MotanHmilyTransactionInterceptor.
+ *
  * @author xiaoyu
  */
 @Component
@@ -54,7 +56,12 @@ public class MotanHmilyTransactionInterceptor implements TccTransactionIntercept
             final Map<String, String> attachments = request.getAttachments();
             if (attachments != null && !attachments.isEmpty()) {
                 String context = attachments.get(CommonConstant.TCC_TRANSACTION_CONTEXT);
-                tccTransactionContext = GsonUtils.getInstance().fromJson(context, TccTransactionContext.class);
+                if (StringUtils.isNoneBlank(context)) {
+                    tccTransactionContext = GsonUtils.getInstance().fromJson(context, TccTransactionContext.class);
+                    request.getAttachments().remove(CommonConstant.TCC_TRANSACTION_CONTEXT);
+                } else {
+                    tccTransactionContext = TransactionContextLocal.getInstance().get();
+                }
             }
         } else {
             tccTransactionContext = TransactionContextLocal.getInstance().get();

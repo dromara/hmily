@@ -27,9 +27,9 @@ import com.hmily.tcc.common.constant.CommonConstant;
 import com.hmily.tcc.common.utils.DateUtils;
 import com.hmily.tcc.common.utils.DbTypeUtils;
 import com.hmily.tcc.common.utils.RepositoryPathUtils;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.util.List;
@@ -39,12 +39,13 @@ import java.util.stream.Collectors;
 
 /**
  * jdbc impl.
+ *
  * @author xiaoyu(Myth)
  */
+@RequiredArgsConstructor
 public class JdbcCompensationServiceImpl implements CompensationService {
 
-    @Autowired
-    private  JdbcTemplate jdbcTemplate;
+    private final JdbcTemplate jdbcTemplate;
 
     private String dbType;
 
@@ -70,7 +71,9 @@ public class JdbcCompensationServiceImpl implements CompensationService {
         }
         final Integer totalCount =
                 jdbcTemplate.queryForObject(String.format("select count(1) from %s", tableName), Integer.class);
-        pager.setPage(PageHelper.buildPage(pageParameter, totalCount));
+        if (Objects.nonNull(totalCount)) {
+            pager.setPage(PageHelper.buildPage(pageParameter, totalCount));
+        }
         return pager;
     }
 
@@ -113,6 +116,11 @@ public class JdbcCompensationServiceImpl implements CompensationService {
         return vo;
     }
 
+    /**
+     * set db type.
+     *
+     * @param dbType dbType
+     */
     public void setDbType(final String dbType) {
         this.dbType = DbTypeUtils.buildByDriverClassName(dbType);
     }

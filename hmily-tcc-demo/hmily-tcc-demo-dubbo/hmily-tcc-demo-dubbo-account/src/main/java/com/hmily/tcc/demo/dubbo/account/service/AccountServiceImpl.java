@@ -22,6 +22,7 @@ import com.hmily.tcc.demo.dubbo.account.api.dto.AccountDTO;
 import com.hmily.tcc.demo.dubbo.account.api.dto.AccountNestedDTO;
 import com.hmily.tcc.demo.dubbo.account.api.entity.AccountDO;
 import com.hmily.tcc.demo.dubbo.account.api.service.AccountService;
+import com.hmily.tcc.demo.dubbo.account.api.service.InlineService;
 import com.hmily.tcc.demo.dubbo.account.mapper.AccountMapper;
 import com.hmily.tcc.demo.dubbo.inventory.api.dto.InventoryDTO;
 import com.hmily.tcc.demo.dubbo.inventory.api.service.InventoryService;
@@ -37,6 +38,7 @@ import java.util.Date;
  * @author xiaoyu
  */
 @Service("accountService")
+@SuppressWarnings("all")
 public class AccountServiceImpl implements AccountService {
 
     /**
@@ -44,11 +46,13 @@ public class AccountServiceImpl implements AccountService {
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(AccountServiceImpl.class);
 
-
     private final AccountMapper accountMapper;
 
     @Autowired(required = false)
     private InventoryService inventoryService;
+
+    @Autowired(required = false)
+    private InlineService inlineService;
 
     @Autowired(required = false)
     public AccountServiceImpl(AccountMapper accountMapper) {
@@ -70,8 +74,10 @@ public class AccountServiceImpl implements AccountService {
         accountDO.setFreezeAmount(accountDO.getFreezeAmount().add(accountDTO.getAmount()));
         accountDO.setUpdateTime(new Date());
         accountMapper.update(accountDO);
+        inlineService.testInline();
         return Boolean.TRUE;
     }
+
 
     /**
      * 扣款支付

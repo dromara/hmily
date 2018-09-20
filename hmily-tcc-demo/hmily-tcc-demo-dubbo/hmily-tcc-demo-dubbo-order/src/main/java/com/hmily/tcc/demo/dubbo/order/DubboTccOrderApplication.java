@@ -22,15 +22,22 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ImportResource;
 
-
 /**
+ * DubboTccOrderApplication.
+ *
  * @author xiaoyu
  */
 @SpringBootApplication
 @ImportResource({"classpath:spring-dubbo.xml"})
 @MapperScan("com.hmily.tcc.demo.dubbo.order.mapper")
 public class DubboTccOrderApplication {
-    public static void main(String[] args) {
+
+    /**
+     * main.
+     *
+     * @param args args
+     */
+    public static void main(final String[] args) {
         SpringApplication.run(DubboTccOrderApplication.class, args);
     }
 

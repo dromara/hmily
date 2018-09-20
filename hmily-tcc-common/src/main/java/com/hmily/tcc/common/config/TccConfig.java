@@ -21,7 +21,8 @@ import com.hmily.tcc.common.enums.RepositorySupportEnum;
 import lombok.Data;
 
 /**
- * TccConfig tcc配置文件.
+ * hmily config.
+ *
  * @author xiaoyu
  */
 @Data
@@ -29,71 +30,84 @@ public class TccConfig {
 
 
     /**
-     * 资源后缀  此参数请填写  关于是事务存储路径.
-     * 1 如果是表存储 这个就是表名后缀，其他方式存储一样.
-     * 2 如果此参数不填写，那么会默认获取应用的applicationName.
+     * Resource suffix this parameter please fill in about is the transaction store path.
+     * If it's a table store this is a table suffix, it's stored the same way.
+     * If this parameter is not filled in, the applicationName of the application is retrieved by default
      */
     private String repositorySuffix;
 
     /**
-     * 提供不同的序列化对象.
+     * log serializer.
      * {@linkplain com.hmily.tcc.common.enums.SerializeEnum}
      */
     private String serializer = "kryo";
 
     /**
-     * 任务调度线程大小.
+     * scheduledPool Thread size.
      */
     private int scheduledThreadMax = Runtime.getRuntime().availableProcessors() << 1;
 
     /**
-     * 调度时间周期 单位秒.
+     * scheduledPool scheduledDelay unit SECONDS.
      */
     private int scheduledDelay = 60;
 
     /**
-     * 最大重试次数.
+     * retry max.
      */
     private int retryMax = 3;
 
     /**
-     * 事务恢复间隔时间 单位秒（注意 此时间表示本地事务创建的时间多少秒以后才会执行）.
+     * recoverDelayTime Unit seconds
+     * (note that this time represents how many seconds after the local transaction was created before execution).
      */
     private int recoverDelayTime = 60;
 
     /**
-     * 补偿存储类型.
+     * Parameters when participants perform their own recovery.
+     * 1.such as RPC calls time out
+     * 2.such as the starter down machine
+     */
+    private int loadFactor = 2;
+
+    /**
+     * repositorySupport.
      * {@linkplain RepositorySupportEnum}
      */
     private String repositorySupport = "db";
 
     /**
-     * disruptor  bufferSize.
+     * disruptor bufferSize.
      */
-    private int bufferSize = 1024;
+    private int bufferSize = 4096 * 2 * 2;
 
     /**
-     * db配置.
+     * this is disruptor consumerThreads.
+     */
+    private int consumerThreads = Runtime.getRuntime().availableProcessors() << 1;
+
+    /**
+     * db config.
      */
     private TccDbConfig tccDbConfig;
 
     /**
-     * mongo配置.
+     * mongo config.
      */
     private TccMongoConfig tccMongoConfig;
 
     /**
-     * redis配置.
+     * redis config.
      */
     private TccRedisConfig tccRedisConfig;
 
     /**
-     * zookeeper配置.
+     * zookeeper config.
      */
     private TccZookeeperConfig tccZookeeperConfig;
 
     /**
-     * file配置.
+     * file config.
      */
     private TccFileConfig tccFileConfig;
 

@@ -19,14 +19,18 @@ package com.hmily.tcc.springcloud.feign;
 
 import com.hmily.tcc.common.bean.context.TccTransactionContext;
 import com.hmily.tcc.common.constant.CommonConstant;
+import com.hmily.tcc.common.enums.TccRoleEnum;
 import com.hmily.tcc.common.utils.GsonUtils;
 import com.hmily.tcc.core.concurrent.threadlocal.TransactionContextLocal;
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.Objects;
+
 /**
  * HmilyRestTemplateInterceptor.
+ *
  * @author xiaoyu
  */
 @Configuration
@@ -35,6 +39,11 @@ public class HmilyRestTemplateInterceptor implements RequestInterceptor {
     @Override
     public void apply(final RequestTemplate requestTemplate) {
         final TccTransactionContext tccTransactionContext = TransactionContextLocal.getInstance().get();
+        if (Objects.nonNull(tccTransactionContext)) {
+            if (tccTransactionContext.getRole() == TccRoleEnum.LOCAL.getCode()) {
+                tccTransactionContext.setRole(TccRoleEnum.INLINE.getCode());
+            }
+        }
         requestTemplate.header(CommonConstant.TCC_TRANSACTION_CONTEXT, GsonUtils.getInstance().toJson(tccTransactionContext));
     }
 
