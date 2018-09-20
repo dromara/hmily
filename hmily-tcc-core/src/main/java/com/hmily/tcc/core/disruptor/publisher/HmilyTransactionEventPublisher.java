@@ -21,23 +21,17 @@ package com.hmily.tcc.core.disruptor.publisher;
 
 import com.hmily.tcc.common.bean.entity.TccTransaction;
 import com.hmily.tcc.common.enums.EventTypeEnum;
-import com.hmily.tcc.common.utils.LogUtil;
 import com.hmily.tcc.core.concurrent.threadpool.HmilyThreadFactory;
+import com.hmily.tcc.core.coordinator.CoordinatorService;
 import com.hmily.tcc.core.disruptor.event.HmilyTransactionEvent;
 import com.hmily.tcc.core.disruptor.factory.HmilyTransactionEventFactory;
-import com.hmily.tcc.core.disruptor.handler.CleanEventHandler;
-import com.hmily.tcc.core.disruptor.handler.DeleteEventHandler;
-import com.hmily.tcc.core.disruptor.handler.SaveEventHandler;
-import com.hmily.tcc.core.disruptor.handler.UpdateParticipantEventHandler;
-import com.hmily.tcc.core.disruptor.handler.UpdateStatusEventHandler;
+import com.hmily.tcc.core.disruptor.handler.HmilyConsumerDataHandler;
 import com.hmily.tcc.core.disruptor.translator.HmilyTransactionEventTranslator;
 import com.lmax.disruptor.BlockingWaitStrategy;
-import com.lmax.disruptor.ExceptionHandler;
+import com.lmax.disruptor.IgnoreExceptionHandler;
 import com.lmax.disruptor.RingBuffer;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.dsl.ProducerType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -56,75 +50,38 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Component
 public class HmilyTransactionEventPublisher implements DisposableBean {
 
-    /**
-     * logger.
-     */
-    private static final Logger LOGGER = LoggerFactory.getLogger(HmilyTransactionEventPublisher.class);
-
-    private static final int MAX_THREAD = Runtime.getRuntime().availableProcessors() << 1;
-
-    private Executor executor;
-
     private Disruptor<HmilyTransactionEvent> disruptor;
 
-    private final SaveEventHandler saveEventHandler;
-
-    private final UpdateParticipantEventHandler updateParticipantEventHandler;
-
-    private final UpdateStatusEventHandler updateStatusEventHandler;
-
-    private final DeleteEventHandler deleteEventHandler;
-
-    private final CleanEventHandler cleanEventHandler;
+    private final CoordinatorService coordinatorService;
 
     @Autowired
-    public HmilyTransactionEventPublisher(SaveEventHandler saveEventHandler, UpdateParticipantEventHandler updateParticipantEventHandler, UpdateStatusEventHandler updateStatusEventHandler, CleanEventHandler cleanEventHandler, DeleteEventHandler deleteEventHandler) {
-        this.saveEventHandler = saveEventHandler;
-        this.updateParticipantEventHandler = updateParticipantEventHandler;
-        this.updateStatusEventHandler = updateStatusEventHandler;
-        this.cleanEventHandler = cleanEventHandler;
-        this.deleteEventHandler = deleteEventHandler;
+    public HmilyTransactionEventPublisher(final CoordinatorService coordinatorService) {
+        this.coordinatorService = coordinatorService;
     }
 
     /**
      * disruptor start.
      *
      * @param bufferSize this is disruptor buffer size.
+     * @param threadSize this is disruptor consumer thread size.
      */
-    public void start(final int bufferSize) {
+    public void start(final int bufferSize, final int threadSize) {
         disruptor = new Disruptor<>(new HmilyTransactionEventFactory(), bufferSize, r -> {
             AtomicInteger index = new AtomicInteger(1);
             return new Thread(null, r, "disruptor-thread-" + index.getAndIncrement());
         }, ProducerType.MULTI, new BlockingWaitStrategy());
 
-        executor = new ThreadPoolExecutor(MAX_THREAD, MAX_THREAD, 0, TimeUnit.MILLISECONDS,
+        final Executor executor = new ThreadPoolExecutor(threadSize, threadSize, 0, TimeUnit.MILLISECONDS,
                 new LinkedBlockingQueue<>(),
                 HmilyThreadFactory.create("hmily-log-disruptor", false),
                 new ThreadPoolExecutor.AbortPolicy());
 
-        disruptor.handleEventsWith(saveEventHandler)
-                .then(updateParticipantEventHandler,updateStatusEventHandler)
-                .then(deleteEventHandler)
-                .then(cleanEventHandler);
-
-        disruptor.setDefaultExceptionHandler(new ExceptionHandler<HmilyTransactionEvent>() {
-            @Override
-            public void handleEventException(Throwable ex, long sequence, HmilyTransactionEvent event) {
-                LogUtil.error(LOGGER, () -> "Disruptor handleEventException:"
-                        + event.getType() + event.getTccTransaction().toString() + ex.getMessage());
-            }
-
-            @Override
-            public void handleOnStartException(Throwable ex) {
-                LogUtil.error(LOGGER, () -> "Disruptor start exception");
-            }
-
-            @Override
-            public void handleOnShutdownException(Throwable ex) {
-                LogUtil.error(LOGGER, () -> "Disruptor close Exception ");
-            }
-        });
-
+        HmilyConsumerDataHandler[] consumers = new HmilyConsumerDataHandler[threadSize];
+        for (int i = 0; i < threadSize; i++) {
+            consumers[i] = new HmilyConsumerDataHandler(executor, coordinatorService);
+        }
+        disruptor.handleEventsWithWorkerPool(consumers);
+        disruptor.setDefaultExceptionHandler(new IgnoreExceptionHandler());
         disruptor.start();
     }
 
@@ -135,10 +92,8 @@ public class HmilyTransactionEventPublisher implements DisposableBean {
      * @param type           {@linkplain EventTypeEnum}
      */
     public void publishEvent(final TccTransaction tccTransaction, final int type) {
-        executor.execute(() -> {
-            final RingBuffer<HmilyTransactionEvent> ringBuffer = disruptor.getRingBuffer();
-            ringBuffer.publishEvent(new HmilyTransactionEventTranslator(type), tccTransaction);
-        });
+        final RingBuffer<HmilyTransactionEvent> ringBuffer = disruptor.getRingBuffer();
+        ringBuffer.publishEvent(new HmilyTransactionEventTranslator(type), tccTransaction);
     }
 
     @Override

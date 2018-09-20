@@ -20,8 +20,10 @@ import com.hmily.tcc.common.bean.context.TccTransactionContext;
 import com.hmily.tcc.common.constant.CommonConstant;
 import com.hmily.tcc.common.utils.GsonUtils;
 import com.hmily.tcc.common.utils.LogUtil;
+import com.hmily.tcc.core.concurrent.threadlocal.TransactionContextLocal;
 import com.hmily.tcc.core.interceptor.TccTransactionInterceptor;
 import com.hmily.tcc.core.service.HmilyTransactionAspectService;
+import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,7 +69,12 @@ public class SpringCloudHmilyTransactionInterceptor implements TccTransactionInt
 
         HttpServletRequest request = requestAttributes == null ? null : ((ServletRequestAttributes) requestAttributes).getRequest();
         String context = request == null ? null : request.getHeader(CommonConstant.TCC_TRANSACTION_CONTEXT);
-        tccTransactionContext = GsonUtils.getInstance().fromJson(context, TccTransactionContext.class);
+        if (StringUtils.isNoneBlank(context)) {
+            tccTransactionContext = GsonUtils.getInstance().fromJson(context, TccTransactionContext.class);
+        } else {
+            tccTransactionContext = TransactionContextLocal.getInstance().get();
+        }
+
         return hmilyTransactionAspectService.invoke(tccTransactionContext, pjp);
     }
 

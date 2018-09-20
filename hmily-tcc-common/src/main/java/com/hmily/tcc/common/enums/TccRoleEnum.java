@@ -47,7 +47,12 @@ public enum TccRoleEnum {
     /**
      * Local tcc role enum.
      */
-    LOCAL(4, "本地调用");
+    LOCAL(4, "本地调用"),
+
+    /**
+     * Inline tcc role enum.
+     */
+    INLINE(5, "内嵌RPC调用");
 
     private final int code;
 

@@ -23,10 +23,17 @@ import com.hmily.tcc.common.utils.DateUtils;
 
 /**
  * ConvertHelper.
+ *
  * @author xiaoyu(Myth)
  */
 public class ConvertHelper {
 
+    /**
+     * build  TccCompensationVO.
+     *
+     * @param adapter {@linkplain CoordinatorRepositoryAdapter}
+     * @return {@linkplain TccCompensationVO}
+     */
     public static TccCompensationVO buildVO(final CoordinatorRepositoryAdapter adapter) {
         TccCompensationVO vo = new TccCompensationVO();
         vo.setTransId(adapter.getTransId());

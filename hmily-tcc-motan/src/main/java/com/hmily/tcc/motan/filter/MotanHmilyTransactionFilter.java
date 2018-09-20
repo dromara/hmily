@@ -50,7 +50,7 @@ import java.util.stream.Stream;
  * @author xiaoyu
  */
 @SpiMeta(name = "motanTccTransactionFilter")
-@Activation(key = { MotanConstants.NODE_TYPE_REFERER })
+@Activation(key = {MotanConstants.NODE_TYPE_REFERER})
 public class MotanHmilyTransactionFilter implements Filter {
 
     /**
@@ -78,7 +78,7 @@ public class MotanHmilyTransactionFilter implements Filter {
                     .filter(m -> m.getName().equals(methodName))
                     .findFirst()
                     .map(Method::getParameterTypes).get();
-            method = clazz.getDeclaredMethod(methodName, args);
+            method = clazz.getMethod(methodName, args);
             tcc = method.getAnnotation(Tcc.class);
         } catch (Exception e) {
             e.printStackTrace();
@@ -88,11 +88,14 @@ public class MotanHmilyTransactionFilter implements Filter {
                 final HmilyTransactionExecutor hmilyTransactionExecutor = SpringBeanUtils.getInstance().getBean(HmilyTransactionExecutor.class);
                 final TccTransactionContext tccTransactionContext = TransactionContextLocal.getInstance().get();
                 if (Objects.nonNull(tccTransactionContext)) {
+                    if (tccTransactionContext.getRole() == TccRoleEnum.LOCAL.getCode()) {
+                        tccTransactionContext.setRole(TccRoleEnum.INLINE.getCode());
+                    }
                     request.setAttachment(CommonConstant.TCC_TRANSACTION_CONTEXT, GsonUtils.getInstance().toJson(tccTransactionContext));
                 }
                 final Response response = caller.call(request);
                 final Participant participant = buildParticipant(tccTransactionContext, tcc, method, clazz, arguments, args);
-                if (tccTransactionContext.getRole() == TccRoleEnum.PROVIDER.getCode()) {
+                if (tccTransactionContext.getRole() == TccRoleEnum.INLINE.getCode()) {
                     hmilyTransactionExecutor.registerByNested(tccTransactionContext.getTransId(),
                             participant);
                 } else {

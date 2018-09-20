@@ -31,6 +31,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * DubboHmilyTransactionInterceptor.
+ *
  * @author xiaoyu
  */
 @Component
@@ -49,6 +50,7 @@ public class DubboHmilyTransactionInterceptor implements TccTransactionIntercept
         TccTransactionContext tccTransactionContext;
         if (StringUtils.isNoneBlank(context)) {
             tccTransactionContext = GsonUtils.getInstance().fromJson(context, TccTransactionContext.class);
+            RpcContext.getContext().getAttachments().remove(CommonConstant.TCC_TRANSACTION_CONTEXT);
         } else {
             tccTransactionContext = TransactionContextLocal.getInstance().get();
         }

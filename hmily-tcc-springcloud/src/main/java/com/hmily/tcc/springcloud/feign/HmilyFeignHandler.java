@@ -55,11 +55,16 @@ public class HmilyFeignHandler implements InvocationHandler {
             }
             try {
                 final TccTransactionContext tccTransactionContext = TransactionContextLocal.getInstance().get();
+                if (Objects.nonNull(tccTransactionContext)) {
+                    if (tccTransactionContext.getRole() == TccRoleEnum.LOCAL.getCode()) {
+                        tccTransactionContext.setRole(TccRoleEnum.INLINE.getCode());
+                    }
+                }
                 final HmilyTransactionExecutor hmilyTransactionExecutor =
                         SpringBeanUtils.getInstance().getBean(HmilyTransactionExecutor.class);
                 final Object invoke = this.handlers.get(method).invoke(args);
                 final Participant participant = buildParticipant(tcc, method, args, tccTransactionContext);
-                if (tccTransactionContext.getRole() == TccRoleEnum.PROVIDER.getCode()) {
+                if (tccTransactionContext.getRole() == TccRoleEnum.INLINE.getCode()) {
                     hmilyTransactionExecutor.registerByNested(tccTransactionContext.getTransId(),
                             participant);
                 } else {
@@ -74,7 +79,7 @@ public class HmilyFeignHandler implements InvocationHandler {
     }
 
     private Participant buildParticipant(final Tcc tcc, final Method method, final Object[] args,
-                                         final TccTransactionContext tccTransactionContext ) {
+                                         final TccTransactionContext tccTransactionContext) {
         if (Objects.isNull(tccTransactionContext)
                 || (TccActionEnum.TRYING.getCode() != tccTransactionContext.getAction())) {
             return null;
@@ -97,6 +102,7 @@ public class HmilyFeignHandler implements InvocationHandler {
 
     /**
      * set handlers.
+     *
      * @param handlers handlers
      */
     public void setHandlers(final Map<Method, MethodHandler> handlers) {

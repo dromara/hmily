@@ -43,10 +43,11 @@ import java.util.Objects;
 
 /**
  * impl dubbo filter.
+ *
  * @author xiaoyu
  */
 @Activate(group = {Constants.SERVER_KEY, Constants.CONSUMER})
-public class HmilyTransactionFilter implements Filter {
+public class DubboHmilyTransactionFilter implements Filter {
 
     private HmilyTransactionExecutor hmilyTransactionExecutor;
 
@@ -67,11 +68,11 @@ public class HmilyTransactionFilter implements Filter {
         Class clazz = invoker.getInterface();
         Class[] args = invocation.getParameterTypes();
         final Object[] arguments = invocation.getArguments();
-        converterParamsClass (args, arguments);
+        converterParamsClass(args, arguments);
         Method method = null;
         Tcc tcc = null;
         try {
-            method = clazz.getDeclaredMethod(methodName, args);
+            method = clazz.getMethod(methodName, args);
             tcc = method.getAnnotation(Tcc.class);
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
@@ -80,6 +81,9 @@ public class HmilyTransactionFilter implements Filter {
             try {
                 final TccTransactionContext tccTransactionContext = TransactionContextLocal.getInstance().get();
                 if (Objects.nonNull(tccTransactionContext)) {
+                    if (tccTransactionContext.getRole() == TccRoleEnum.LOCAL.getCode()) {
+                        tccTransactionContext.setRole(TccRoleEnum.INLINE.getCode());
+                    }
                     RpcContext.getContext()
                             .setAttachment(CommonConstant.TCC_TRANSACTION_CONTEXT, GsonUtils.getInstance().toJson(tccTransactionContext));
                 }
@@ -87,7 +91,7 @@ public class HmilyTransactionFilter implements Filter {
                 //如果result 没有异常就保存
                 if (!result.hasException()) {
                     final Participant participant = buildParticipant(tccTransactionContext, tcc, method, clazz, arguments, args);
-                    if (tccTransactionContext.getRole() == TccRoleEnum.PROVIDER.getCode()) {
+                    if (tccTransactionContext.getRole() == TccRoleEnum.INLINE.getCode()) {
                         hmilyTransactionExecutor.registerByNested(tccTransactionContext.getTransId(),
                                 participant);
                     } else {
@@ -101,24 +105,6 @@ public class HmilyTransactionFilter implements Filter {
             }
         } else {
             return invoker.invoke(invocation);
-        }
-    }
-
-    /**
-     * params class converter
-     *
-     * @param args
-     * @param arguments
-     */
-    private void converterParamsClass(Class[] args, Object[] arguments) {
-        if (arguments == null || arguments.length < 1) {
-            return;
-        }
-        for (int i = 0; i < arguments.length; i++) {
-            if (arguments == null) {
-                continue;
-            }
-            args[i] = arguments[i].getClass ();
         }
     }
 
@@ -145,5 +131,14 @@ public class HmilyTransactionFilter implements Filter {
         TccInvocation cancelInvocation = new TccInvocation(clazz, cancelMethodName, args, arguments);
         //封装调用点
         return new Participant(tccTransactionContext.getTransId(), confirmInvocation, cancelInvocation);
+    }
+
+    private void converterParamsClass(final Class[] args, final Object[] arguments) {
+        if (arguments == null || arguments.length < 1) {
+            return;
+        }
+        for (int i = 0; i < arguments.length; i++) {
+            args[i] = arguments[i].getClass();
+        }
     }
 }

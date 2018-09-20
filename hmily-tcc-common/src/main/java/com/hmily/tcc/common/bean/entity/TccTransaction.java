@@ -30,6 +30,7 @@ import java.util.List;
 
 /**
  * TccTransaction 实体日志对象.
+ *
  * @author xiaoyu
  */
 @Data
@@ -38,61 +39,76 @@ public class TccTransaction implements Serializable {
     private static final long serialVersionUID = -6792063780987394917L;
 
     /**
-     * 事务id.
+     * transaction id.
      */
     private String transId;
 
     /**
-     * 事务状态.
+     * nodeTransId Can be empty, node transaction id.
+     */
+    private String nodeTransId;
+
+    /**
+     * transaction status.
      * {@linkplain TccActionEnum}
      */
     private int status;
 
     /**
-     * 事务类型.
+     * transaction role .
      * {@linkplain TccRoleEnum}
      */
     private int role;
 
     /**
-     * 重试次数.
+     * retriedCount.
      */
     private volatile int retriedCount;
 
     /**
-     * 创建时间.
+     * createTime.
      */
     private Date createTime;
 
     /**
-     * 更新时间.
+     * lastTime.
      */
     private Date lastTime;
 
     /**
-     * 版本号 乐观锁控制.
+     * version number mysql optimistic lock control.
      */
     private Integer version = 1;
 
     /**
-     * 模式.
+     * pattern.
      */
     private Integer pattern;
 
 
     /**
-     * 调用接口名称.
+     * Call interface name.
      */
     private String targetClass;
 
 
     /**
-     * 调用方法名称.
+     * Call interface method name.
      */
     private String targetMethod;
 
     /**
-     * 参与协调的方法集合.
+     * confirm Method.
+     */
+    private String confirmMethod;
+
+    /**
+     * cancel Method.
+     */
+    private String cancelMethod;
+
+    /**
+     * A collection of methods that participate in coordination.
      */
     private List<Participant> participants;
 
@@ -112,8 +128,9 @@ public class TccTransaction implements Serializable {
     }
 
     /**
-     * 保存参与者.
-     * @param participant 参与者对象
+     * registerParticipant.
+     *
+     * @param participant {@linkplain Participant}
      */
     public void registerParticipant(final Participant participant) {
         participants.add(participant);

@@ -25,6 +25,7 @@ import com.hmily.tcc.demo.dubbo.account.api.entity.AccountDO;
 /**
  * @author xiaoyu
  */
+@SuppressWarnings("all")
 public interface AccountService {
 
 
@@ -36,7 +37,6 @@ public interface AccountService {
      */
     @Tcc
     boolean payment(AccountDTO accountDTO);
-
 
     /**
      * 扣款支付
@@ -50,6 +50,7 @@ public interface AccountService {
 
     /**
      * 获取用户账户信息
+     *
      * @param userId 用户id
      * @return AccountDO
      */

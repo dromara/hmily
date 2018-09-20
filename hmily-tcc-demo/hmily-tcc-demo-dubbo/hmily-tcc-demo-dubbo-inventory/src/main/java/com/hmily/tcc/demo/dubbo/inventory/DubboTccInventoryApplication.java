@@ -24,13 +24,21 @@ import org.springframework.context.annotation.ImportResource;
 
 
 /**
+ * DubboTccInventoryApplication.
+ *
  * @author xiaoyu
  */
 @SpringBootApplication
 @ImportResource({"classpath:applicationContext.xml"})
 @MapperScan("com.hmily.tcc.demo.dubbo.inventory.mapper")
 public class DubboTccInventoryApplication {
-    public static void main(String[] args) {
+
+    /**
+     * main.
+     *
+     * @param args args
+     */
+    public static void main(final String[] args) {
         SpringApplication.run(DubboTccInventoryApplication.class, args);
     }
 

@@ -18,46 +18,43 @@
 package com.hmily.tcc.core.service.impl;
 
 import com.hmily.tcc.common.bean.context.TccTransactionContext;
+import com.hmily.tcc.common.enums.TccRoleEnum;
 import com.hmily.tcc.core.service.HmilyTransactionFactoryService;
 import com.hmily.tcc.core.service.handler.ConsumeHmilyTransactionHandler;
+import com.hmily.tcc.core.service.handler.LocalHmilyTransactionHandler;
 import com.hmily.tcc.core.service.handler.ParticipantHmilyTransactionHandler;
 import com.hmily.tcc.core.service.handler.StarterHmilyTransactionHandler;
-import com.hmily.tcc.core.service.executor.HmilyTransactionExecutor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
 
 /**
  * HmilyTransactionFactoryServiceImpl.
+ *
  * @author xiaoyu
  */
 @Service("tccTransactionFactoryService")
 public class HmilyTransactionFactoryServiceImpl implements HmilyTransactionFactoryService {
 
-    private final HmilyTransactionExecutor hmilyTransactionExecutor;
-
-    @Autowired
-    public HmilyTransactionFactoryServiceImpl(final HmilyTransactionExecutor hmilyTransactionExecutor) {
-        this.hmilyTransactionExecutor = hmilyTransactionExecutor;
-    }
-
     /**
      * acquired HmilyTransactionHandler.
      *
-     * @param context tcc事务上下文
+     * @param context {@linkplain TccTransactionContext}
      * @return Class
      */
     @Override
     public Class factoryOf(final TccTransactionContext context) {
-        //如果事务还没开启或者 tcc事务上下文是空， 那么应该进入发起调用
-        if (!hmilyTransactionExecutor.isBegin() && Objects.isNull(context)) {
+        if (Objects.isNull(context)) {
             return StarterHmilyTransactionHandler.class;
-        } else if (hmilyTransactionExecutor.isBegin() && Objects.isNull(context)) {
+        } else {
+            // if context not null and role is inline  is ParticipantHmilyTransactionHandler.
+            if (context.getRole() == TccRoleEnum.LOCAL.getCode()) {
+                return LocalHmilyTransactionHandler.class;
+            } else if (context.getRole() == TccRoleEnum.START.getCode()
+                    || context.getRole() == TccRoleEnum.INLINE.getCode()) {
+                return ParticipantHmilyTransactionHandler.class;
+            }
             return ConsumeHmilyTransactionHandler.class;
-        } else if (Objects.nonNull(context)) {
-            return ParticipantHmilyTransactionHandler.class;
         }
-        return ConsumeHmilyTransactionHandler.class;
     }
 }
