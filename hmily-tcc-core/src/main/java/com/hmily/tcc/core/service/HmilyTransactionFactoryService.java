@@ -14,23 +14,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hmily.tcc.core.service;
 
+package com.hmily.tcc.core.service;
 
 import com.hmily.tcc.common.bean.context.TccTransactionContext;
 
 /**
+ * this is hmily handler factory.
  * @author xiaoyu
  */
 @FunctionalInterface
 public interface HmilyTransactionFactoryService<T> {
 
     /**
-     * 返回 实现TxTransactionHandler类的名称
+     * factory of handler role.
      *
-     * @param context
-     * @return Class<T>
-     * @throws Throwable 抛出异常
+     * @param context {@linkplain  TccTransactionContext}
+     * @return impl HmilyTransactionHandler
+     * @throws Throwable  Throwable
      */
     Class<T> factoryOf(TccTransactionContext context) throws Throwable;
 }
