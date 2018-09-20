@@ -39,6 +39,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.Environment;
 import org.springframework.data.mongodb.core.MongoClientFactoryBean;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.jdbc.core.JdbcTemplate;
 import redis.clients.jedis.HostAndPort;
 import redis.clients.jedis.JedisCluster;
 import redis.clients.jedis.JedisPool;
@@ -72,9 +73,12 @@ public class CompensationConfiguration {
 
         private final Environment env;
 
+        private final JdbcTemplate jdbcTemplate;
+
         @Autowired
-        JdbcRecoverConfiguration(final Environment env) {
+        JdbcRecoverConfiguration(final Environment env, final JdbcTemplate jdbcTemplate) {
             this.env = env;
+            this.jdbcTemplate = jdbcTemplate;
         }
 
         @Bean
@@ -94,7 +98,7 @@ public class CompensationConfiguration {
         @Bean
         @Qualifier("jdbcTransactionRecoverService")
         public CompensationService jdbcTransactionRecoverService() {
-            JdbcCompensationServiceImpl jdbcTransactionRecoverService = new JdbcCompensationServiceImpl();
+            JdbcCompensationServiceImpl jdbcTransactionRecoverService = new JdbcCompensationServiceImpl(jdbcTemplate);
             jdbcTransactionRecoverService.setDbType(env.getProperty("compensation.db.driver"));
             return jdbcTransactionRecoverService;
         }

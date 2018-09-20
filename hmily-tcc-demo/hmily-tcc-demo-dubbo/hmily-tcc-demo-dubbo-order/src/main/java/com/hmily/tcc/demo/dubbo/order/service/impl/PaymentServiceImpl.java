@@ -40,14 +40,13 @@ import org.springframework.stereotype.Service;
  * @author xiaoyu
  */
 @Service
+@SuppressWarnings("all")
 public class PaymentServiceImpl implements PaymentService {
 
-
     /**
-     * logger
+     * logger.
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(PaymentServiceImpl.class);
-
 
     private final OrderMapper orderMapper;
 
@@ -70,20 +69,16 @@ public class PaymentServiceImpl implements PaymentService {
     public void makePayment(Order order) {
         order.setStatus(OrderStatusEnum.PAYING.getCode());
         orderMapper.update(order);
-
         //做库存和资金账户的检验工作 这里只是demo 。。。
         final AccountDO accountDO = accountService.findByUserId(order.getUserId());
         if (accountDO.getBalance().compareTo(order.getTotalAmount()) <= 0) {
-            throw  new TccRuntimeException("余额不足！");
+            throw new TccRuntimeException("余额不足！");
         }
-
         final InventoryDO inventory = inventoryService.findByProductId(order.getProductId());
 
         if (inventory.getTotalInventory() < order.getCount()) {
-            throw  new TccRuntimeException("库存不足！");
+            throw new TccRuntimeException("库存不足！");
         }
-
-
         //扣除用户余额
         AccountDTO accountDTO = new AccountDTO();
         accountDTO.setAmount(order.getTotalAmount());
@@ -110,9 +105,8 @@ public class PaymentServiceImpl implements PaymentService {
         //做库存和资金账户的检验工作 这里只是demo 。。。
         final AccountDO accountDO = accountService.findByUserId(order.getUserId());
         if (accountDO.getBalance().compareTo(order.getTotalAmount()) <= 0) {
-            throw  new TccRuntimeException("余额不足！");
+            throw new TccRuntimeException("余额不足！");
         }
-
         //扣除用户余额
         AccountNestedDTO accountDTO = new AccountNestedDTO();
         accountDTO.setAmount(order.getTotalAmount());

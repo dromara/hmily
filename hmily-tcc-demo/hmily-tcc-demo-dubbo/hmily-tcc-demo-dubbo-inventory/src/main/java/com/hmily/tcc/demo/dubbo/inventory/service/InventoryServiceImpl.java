@@ -34,13 +34,13 @@ import org.springframework.transaction.annotation.Transactional;
  * @author xiaoyu
  */
 @Service("inventoryService")
+@SuppressWarnings("all")
 public class InventoryServiceImpl implements InventoryService {
 
     /**
-     * logger
+     * logger.
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(InventoryServiceImpl.class);
-
 
     private final InventoryMapper inventoryMapper;
 

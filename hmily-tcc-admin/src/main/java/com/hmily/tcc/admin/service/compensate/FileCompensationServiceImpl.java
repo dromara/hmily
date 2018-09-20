@@ -42,8 +42,10 @@ import java.util.stream.Collectors;
 
 /**
  * file impl.
+ *
  * @author xiaoyu(Myth)
  */
+@SuppressWarnings("all")
 public class FileCompensationServiceImpl implements CompensationService {
 
     private final ObjectSerializer objectSerializer;

@@ -44,9 +44,11 @@ import java.util.stream.Collectors;
 
 /**
  * zookeeper impl.
+ *
  * @author xiaoyu(Myth)
  */
 @RequiredArgsConstructor
+@SuppressWarnings("all")
 public class ZookeeperCompensationServiceImpl implements CompensationService {
 
     private final ZooKeeper zooKeeper;

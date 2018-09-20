@@ -76,10 +76,6 @@ public class HmilyTransactionExecutor {
         this.hmilyTransactionEventPublisher = hmilyTransactionEventPublisher;
     }
 
-    public static ThreadLocal<TccTransaction> instance() {
-        return CURRENT;
-    }
-
     /**
      * transaction begin.
      *
@@ -120,7 +116,7 @@ public class HmilyTransactionExecutor {
         //publishEvent
         hmilyTransactionEventPublisher.publishEvent(tccTransaction, EventTypeEnum.SAVE.getCode());
         //Nested transaction support
-        context.setRole(TccRoleEnum.PROVIDER.getCode());
+        context.setRole(TccRoleEnum.LOCAL.getCode());
         TransactionContextLocal.getInstance().set(context);
         return tccTransaction;
     }
@@ -184,7 +180,9 @@ public class HmilyTransactionExecutor {
      * @param participant {@linkplain Participant}
      */
     public void registerByNested(final String transId, final Participant participant) {
-        if (Objects.isNull(participant)) {
+        if (Objects.isNull(participant)
+                || Objects.isNull(participant.getCancelTccInvocation())
+                || Objects.isNull(participant.getConfirmTccInvocation())) {
             return;
         }
         final TccTransaction tccTransaction = TccTransactionCacheManager.getInstance().getTccTransaction(transId);
@@ -218,6 +216,7 @@ public class HmilyTransactionExecutor {
                 try {
                     TccTransactionContext context = new TccTransactionContext();
                     context.setAction(TccActionEnum.CONFIRMING.getCode());
+                    context.setRole(TccRoleEnum.START.getCode());
                     context.setTransId(participant.getTransId());
                     TransactionContextLocal.getInstance().set(context);
                     executeParticipantMethod(participant.getConfirmTccInvocation());
@@ -248,17 +247,18 @@ public class HmilyTransactionExecutor {
             return;
         }
         final List<Participant> participants = filterPoint(currentTransaction);
-        currentTransaction.setStatus(TccActionEnum.CANCELING.getCode());
-        //update cancel
-        updateStatus(currentTransaction);
         boolean success = true;
         List<Participant> failList = Lists.newArrayListWithCapacity(participants.size());
         if (CollectionUtils.isNotEmpty(participants)) {
+            currentTransaction.setStatus(TccActionEnum.CANCELING.getCode());
+            //update cancel
+            updateStatus(currentTransaction);
             for (Participant participant : participants) {
                 try {
                     TccTransactionContext context = new TccTransactionContext();
                     context.setAction(TccActionEnum.CANCELING.getCode());
                     context.setTransId(participant.getTransId());
+                    context.setRole(TccRoleEnum.START.getCode());
                     TransactionContextLocal.getInstance().set(context);
                     executeParticipantMethod(participant.getCancelTccInvocation());
                 } catch (Throwable e) {
@@ -308,14 +308,8 @@ public class HmilyTransactionExecutor {
     }
 
     /**
-     * jude transaction is running.
-     *
-     * @return true
+     * clean threadLocal help gc.
      */
-    public boolean isBegin() {
-        return CURRENT.get() != null;
-    }
-
     public void remove() {
         CURRENT.remove();
     }
@@ -342,10 +336,12 @@ public class HmilyTransactionExecutor {
         String confirmMethodName = tcc.confirmMethod();
         String cancelMethodName = tcc.cancelMethod();
         if (StringUtils.isNoneBlank(confirmMethodName)) {
+            tccTransaction.setConfirmMethod(confirmMethodName);
             confirmInvocation = new TccInvocation(clazz, confirmMethodName, method.getParameterTypes(), args);
         }
         TccInvocation cancelInvocation = null;
         if (StringUtils.isNoneBlank(cancelMethodName)) {
+            tccTransaction.setCancelMethod(cancelMethodName);
             cancelInvocation = new TccInvocation(clazz, cancelMethodName, method.getParameterTypes(), args);
         }
         final Participant participant = new Participant(tccTransaction.getTransId(), confirmInvocation, cancelInvocation);

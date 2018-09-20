@@ -82,8 +82,8 @@ public class MongoCoordinatorRepository implements CoordinatorRepository {
             mongoBean.setPattern(tccTransaction.getPattern());
             mongoBean.setTargetClass(tccTransaction.getTargetClass());
             mongoBean.setTargetMethod(tccTransaction.getTargetMethod());
-            mongoBean.setConfirmMethod("");
-            mongoBean.setCancelMethod("");
+            mongoBean.setConfirmMethod(tccTransaction.getConfirmMethod());
+            mongoBean.setCancelMethod(tccTransaction.getCancelMethod());
             final byte[] cache = objectSerializer.serialize(tccTransaction.getParticipants());
             mongoBean.setContents(cache);
             template.save(mongoBean, collectionName);
@@ -112,11 +112,6 @@ public class MongoCoordinatorRepository implements CoordinatorRepository {
         update.set("version", tccTransaction.getVersion() + 1);
         try {
             if (CollectionUtils.isNotEmpty(tccTransaction.getParticipants())) {
-                final Participant participant = tccTransaction.getParticipants().get(0);
-                if (Objects.nonNull(participant)) {
-                    update.set("confirmMethod", participant.getConfirmTccInvocation().getMethodName());
-                    update.set("cancelMethod", participant.getCancelTccInvocation().getMethodName());
-                }
                 update.set("contents", objectSerializer.serialize(tccTransaction.getParticipants()));
             }
         } catch (TccException e) {
