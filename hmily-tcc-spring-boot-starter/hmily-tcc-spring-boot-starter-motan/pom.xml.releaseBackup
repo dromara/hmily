@@ -24,11 +24,11 @@
     <parent>
         <artifactId>hmily-tcc-spring-boot-starter</artifactId>
         <groupId>com.hmily.tcc</groupId>
-        <version>1.2.1-RELEASE</version>
+        <version>1.1.1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>hmily-tcc-spring-boot-starter-dubbo</artifactId>
+    <artifactId>hmily-tcc-spring-boot-starter-motan</artifactId>
 
     <dependencies>
         <dependency>
@@ -37,8 +37,7 @@
         </dependency>
         <dependency>
             <groupId>com.hmily.tcc</groupId>
-            <artifactId>hmily-tcc-dubbo</artifactId>
+            <artifactId>hmily-tcc-motan</artifactId>
         </dependency>
     </dependencies>
-
 </project>
