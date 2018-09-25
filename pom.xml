@@ -7,7 +7,7 @@
     <groupId>com.hmily.tcc</groupId>
     <artifactId>hmily-tcc</artifactId>
     <packaging>pom</packaging>
-    <version>1.1.1-SNAPSHOT</version>
+    <version>1.2.1-RELEASE</version>
     <name>hmily-tcc</name>
     <modules>
         <module>hmily-tcc-common</module>
