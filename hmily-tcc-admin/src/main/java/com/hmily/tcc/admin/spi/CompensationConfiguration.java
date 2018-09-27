@@ -73,12 +73,9 @@ public class CompensationConfiguration {
 
         private final Environment env;
 
-        private final JdbcTemplate jdbcTemplate;
-
         @Autowired
-        JdbcRecoverConfiguration(final Environment env, final JdbcTemplate jdbcTemplate) {
+        JdbcRecoverConfiguration(final Environment env) {
             this.env = env;
-            this.jdbcTemplate = jdbcTemplate;
         }
 
         @Bean
@@ -98,7 +95,7 @@ public class CompensationConfiguration {
         @Bean
         @Qualifier("jdbcTransactionRecoverService")
         public CompensationService jdbcTransactionRecoverService() {
-            JdbcCompensationServiceImpl jdbcTransactionRecoverService = new JdbcCompensationServiceImpl(jdbcTemplate);
+            JdbcCompensationServiceImpl jdbcTransactionRecoverService = new JdbcCompensationServiceImpl();
             jdbcTransactionRecoverService.setDbType(env.getProperty("compensation.db.driver"));
             return jdbcTransactionRecoverService;
         }
