@@ -17,9 +17,7 @@
 
 package com.hmily.tcc.demo.springcloud.order.service.impl;
 
-
 import com.hmily.tcc.annotation.Tcc;
-import com.hmily.tcc.common.exception.TccRuntimeException;
 import com.hmily.tcc.demo.springcloud.order.client.AccountClient;
 import com.hmily.tcc.demo.springcloud.order.client.InventoryClient;
 import com.hmily.tcc.demo.springcloud.order.dto.AccountDTO;
@@ -33,22 +31,21 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
-
 /**
+ * PaymentServiceImpl.
+ *
  * @author xiaoyu
  */
 @Service
+@SuppressWarnings("all")
 public class PaymentServiceImpl implements PaymentService {
 
-
     /**
-     * logger
+     * logger.
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(PaymentServiceImpl.class);
 
     private final OrderMapper orderMapper;
-
 
     private final AccountClient accountClient;
 
@@ -63,36 +60,29 @@ public class PaymentServiceImpl implements PaymentService {
         this.inventoryClient = inventoryClient;
     }
 
-
     @Override
     @Tcc(confirmMethod = "confirmOrderStatus", cancelMethod = "cancelOrderStatus")
     public void makePayment(Order order) {
-
         order.setStatus(OrderStatusEnum.PAYING.getCode());
         orderMapper.update(order);
-        //检查数据
+      /*  //检查数据
         final BigDecimal accountInfo = accountClient.findByUserId(order.getUserId());
 
-        final Integer inventoryInfo= inventoryClient.findByProductId(order.getProductId());
+        final Integer inventoryInfo = inventoryClient.findByProductId(order.getProductId());
 
         if (accountInfo.compareTo(order.getTotalAmount()) < 0) {
-            throw  new TccRuntimeException("余额不足！");
+            throw new TccRuntimeException("余额不足！");
         }
 
         if (inventoryInfo < order.getCount()) {
-            throw  new TccRuntimeException("库存不足！");
-        }
-
-
+            throw new TccRuntimeException("库存不足！");
+        }*/
         //扣除用户余额
         AccountDTO accountDTO = new AccountDTO();
         accountDTO.setAmount(order.getTotalAmount());
         accountDTO.setUserId(order.getUserId());
-
         LOGGER.debug("===========执行springcloud扣减资金接口==========");
         accountClient.payment(accountDTO);
-
-
         //进入扣减库存操作
         InventoryDTO inventoryDTO = new InventoryDTO();
         inventoryDTO.setCount(order.getCount());
@@ -103,18 +93,14 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     @Tcc(confirmMethod = "confirmOrderStatus", cancelMethod = "cancelOrderStatus")
     public String mockPaymentInventoryWithTryException(Order order) {
-
         LOGGER.debug("===========执行springcloud  mockPaymentInventoryWithTryException 扣减资金接口==========");
         order.setStatus(OrderStatusEnum.PAYING.getCode());
         orderMapper.update(order);
-
         //扣除用户余额
         AccountDTO accountDTO = new AccountDTO();
         accountDTO.setAmount(order.getTotalAmount());
         accountDTO.setUserId(order.getUserId());
         accountClient.payment(accountDTO);
-
-
         InventoryDTO inventoryDTO = new InventoryDTO();
         inventoryDTO.setCount(order.getCount());
         inventoryDTO.setProductId(order.getProductId());
@@ -128,14 +114,11 @@ public class PaymentServiceImpl implements PaymentService {
         LOGGER.debug("===========执行springcloud  mockPaymentInventoryWithTryTimeout 扣减资金接口==========");
         order.setStatus(OrderStatusEnum.PAYING.getCode());
         orderMapper.update(order);
-
         //扣除用户余额
         AccountDTO accountDTO = new AccountDTO();
         accountDTO.setAmount(order.getTotalAmount());
         accountDTO.setUserId(order.getUserId());
         accountClient.payment(accountDTO);
-
-
         InventoryDTO inventoryDTO = new InventoryDTO();
         inventoryDTO.setCount(order.getCount());
         inventoryDTO.setProductId(order.getProductId());
@@ -143,20 +126,16 @@ public class PaymentServiceImpl implements PaymentService {
         return "success";
     }
 
-
     public void confirmOrderStatus(Order order) {
-
         order.setStatus(OrderStatusEnum.PAY_SUCCESS.getCode());
         orderMapper.update(order);
         LOGGER.info("=========进行订单confirm操作完成================");
-
-
     }
 
     public void cancelOrderStatus(Order order) {
-
         order.setStatus(OrderStatusEnum.PAY_FAIL.getCode());
         orderMapper.update(order);
         LOGGER.info("=========进行订单cancel操作完成================");
     }
+
 }
