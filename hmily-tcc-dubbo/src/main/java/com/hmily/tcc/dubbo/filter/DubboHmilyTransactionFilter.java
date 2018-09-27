@@ -97,6 +97,8 @@ public class DubboHmilyTransactionFilter implements Filter {
                     } else {
                         hmilyTransactionExecutor.enlistParticipant(participant);
                     }
+                } else {
+                    throw new TccRuntimeException("rpc invoke exception{}", result.getException());
                 }
                 return result;
             } catch (RpcException e) {
