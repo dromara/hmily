@@ -17,7 +17,6 @@
 
 package com.hmily.tcc.demo.springcloud.account.mapper;
 
-
 import com.hmily.tcc.demo.springcloud.account.entity.AccountDO;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
@@ -25,6 +24,7 @@ import org.apache.ibatis.annotations.Update;
 /**
  * @author xiaoyu
  */
+@SuppressWarnings("all")
 public interface AccountMapper {
 
     /**

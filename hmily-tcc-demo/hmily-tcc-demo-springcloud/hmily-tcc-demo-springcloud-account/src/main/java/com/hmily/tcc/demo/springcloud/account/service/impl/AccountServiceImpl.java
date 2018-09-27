@@ -24,19 +24,23 @@ import com.hmily.tcc.demo.springcloud.account.dto.AccountDTO;
 import com.hmily.tcc.demo.springcloud.account.entity.AccountDO;
 import com.hmily.tcc.demo.springcloud.account.mapper.AccountMapper;
 import com.hmily.tcc.demo.springcloud.account.service.AccountService;
+
 import java.util.concurrent.TimeUnit;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+
 import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author xiaoyu
  */
 @Service("accountService")
+@SuppressWarnings("all")
 public class AccountServiceImpl implements AccountService {
 
     /**
@@ -100,8 +104,8 @@ public class AccountServiceImpl implements AccountService {
         accountDO.setFreezeAmount(accountDO.getFreezeAmount().subtract(accountDTO.getAmount()));
         accountDO.setUpdateTime(new Date());
         final int rows = accountMapper.confirm(accountDO);
-        if(rows!=1){
-            throw  new TccRuntimeException("确认扣减账户异常！");
+        if (rows != 1) {
+            throw new TccRuntimeException("确认扣减账户异常！");
         }
         return Boolean.TRUE;
     }
@@ -115,8 +119,8 @@ public class AccountServiceImpl implements AccountService {
         accountDO.setFreezeAmount(accountDO.getFreezeAmount().subtract(accountDTO.getAmount()));
         accountDO.setUpdateTime(new Date());
         final int rows = accountMapper.cancel(accountDO);
-        if(rows!=1){
-            throw  new TccRuntimeException("取消扣减账户异常！");
+        if (rows != 1) {
+            throw new TccRuntimeException("取消扣减账户异常！");
         }
         return Boolean.TRUE;
     }
