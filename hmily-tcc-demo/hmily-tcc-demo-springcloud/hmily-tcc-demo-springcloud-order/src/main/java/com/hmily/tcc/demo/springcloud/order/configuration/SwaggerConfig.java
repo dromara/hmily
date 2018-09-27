@@ -41,6 +41,7 @@ import static com.google.common.collect.Lists.newArrayList;
  */
 @Configuration
 @EnableSwagger2
+@SuppressWarnings("all")
 public class SwaggerConfig {
 
     private static final String SWAGGER_SCAN_BASE_PACKAGE = "com.happylifeplat.tcc.demo.springcloud.order.controller";
