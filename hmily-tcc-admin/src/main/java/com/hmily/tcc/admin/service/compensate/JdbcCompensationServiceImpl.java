@@ -30,6 +30,7 @@ import com.hmily.tcc.common.utils.RepositoryPathUtils;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.util.List;
@@ -45,7 +46,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class JdbcCompensationServiceImpl implements CompensationService {
 
-    private final JdbcTemplate jdbcTemplate;
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     private String dbType;
 
