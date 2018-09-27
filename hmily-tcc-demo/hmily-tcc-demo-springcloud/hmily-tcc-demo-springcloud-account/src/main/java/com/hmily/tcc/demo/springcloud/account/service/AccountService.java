@@ -22,13 +22,14 @@ import com.hmily.tcc.demo.springcloud.account.dto.AccountDTO;
 import com.hmily.tcc.demo.springcloud.account.entity.AccountDO;
 
 /**
+ * AccountService.
  * @author xiaoyu
  */
+@SuppressWarnings("all")
 public interface AccountService {
 
-
     /**
-     * 扣款支付
+     * 扣款支付.
      *
      * @param accountDTO 参数dto
      * @return true
@@ -36,9 +37,8 @@ public interface AccountService {
     @Tcc
     boolean payment(AccountDTO accountDTO);
 
-
     /**
-     * 获取用户账户信息
+     * 获取用户账户信息.
      * @param userId 用户id
      * @return AccountDO
      */

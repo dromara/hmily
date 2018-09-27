@@ -32,8 +32,8 @@ import java.math.BigDecimal;
  */
 @RestController
 @RequestMapping("/order")
+@SuppressWarnings("all")
 public class OrderController {
-
 
     private final OrderService orderService;
 
@@ -42,12 +42,10 @@ public class OrderController {
         this.orderService = orderService;
     }
 
-
     @PostMapping(value = "/orderPay")
     @ApiOperation(value = "订单支付接口（注意这里模拟的是创建订单并进行支付扣减库存等操作）")
     public String orderPay(@RequestParam(value = "count") Integer count,
                            @RequestParam(value = "amount") BigDecimal amount) {
-
         return orderService.orderPay(count, amount);
 
     }
@@ -65,6 +63,5 @@ public class OrderController {
                                               @RequestParam(value = "amount") BigDecimal amount) {
         return orderService.mockInventoryWithTryTimeout(count, amount);
     }
-
 
 }
