@@ -52,7 +52,12 @@ public enum TccRoleEnum {
     /**
      * Inline tcc role enum.
      */
-    INLINE(5, "内嵌RPC调用");
+    INLINE(5, "内嵌RPC调用"),
+
+    /**
+     * Spring cloud tcc role enum.
+     */
+    SPRING_CLOUD(6, "SpringCloud");
 
     private final int code;
 

@@ -28,9 +28,11 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
 
 /**
+ * MyConfiguration.
  * @author xiaoyu
  */
 @Configuration
+@SuppressWarnings("all")
 public class MyConfiguration {
 
     @Bean

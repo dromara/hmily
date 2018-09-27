@@ -27,6 +27,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.ImportResource;
 
 /**
+ * SpringCloudTccOrderApplication.
  * @author xiaoyu
  */
 @SpringBootApplication(exclude = {MongoAutoConfiguration.class, MongoDataAutoConfiguration.class})
@@ -36,7 +37,12 @@ import org.springframework.context.annotation.ImportResource;
 @MapperScan("com.hmily.tcc.demo.springcloud.order.mapper")
 public class SpringCloudTccOrderApplication {
 
-    public static void main(String[] args) {
+    /**
+     * main.
+     *
+     * @param args args
+     */
+    public static void main(final String[] args) {
         SpringApplication.run(SpringCloudTccOrderApplication.class, args);
     }
 
