@@ -24,6 +24,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 /**
+ * AccountDO.
  * @author xiaoyu
  */
 @Data

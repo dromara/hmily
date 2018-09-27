@@ -36,16 +36,15 @@ import java.util.Date;
  * @author xiaoyu
  */
 @Service("orderService")
+@SuppressWarnings("all")
 public class OrderServiceImpl implements OrderService {
 
     /**
-     * logger
+     * logger.
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(OrderServiceImpl.class);
 
-
     private final OrderMapper orderMapper;
-
 
     private final PaymentService paymentService;
 
@@ -55,7 +54,6 @@ public class OrderServiceImpl implements OrderService {
         this.paymentService = paymentService;
     }
 
-
     @Override
     public String orderPay(Integer count, BigDecimal amount) {
         final Order order = buildOrder(count, amount);
@@ -64,8 +62,6 @@ public class OrderServiceImpl implements OrderService {
         if (rows > 0) {
             paymentService.makePayment(order);
         }
-
-
         return "success";
     }
 

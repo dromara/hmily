@@ -47,6 +47,11 @@ public class HmilyTransactionFactoryServiceImpl implements HmilyTransactionFacto
         if (Objects.isNull(context)) {
             return StarterHmilyTransactionHandler.class;
         } else {
+            //why this code?  because spring cloud invoke has proxy.
+            if (context.getRole() == TccRoleEnum.SPRING_CLOUD.getCode()) {
+                context.setRole(TccRoleEnum.START.getCode());
+                return ConsumeHmilyTransactionHandler.class;
+            }
             // if context not null and role is inline  is ParticipantHmilyTransactionHandler.
             if (context.getRole() == TccRoleEnum.LOCAL.getCode()) {
                 return LocalHmilyTransactionHandler.class;

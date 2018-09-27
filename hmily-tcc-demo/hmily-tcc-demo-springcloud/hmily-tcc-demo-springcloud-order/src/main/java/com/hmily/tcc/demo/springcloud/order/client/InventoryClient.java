@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestParam;
  * @author xiaoyu
  */
 @FeignClient(value = "inventory-service", configuration = MyConfiguration.class)
+@SuppressWarnings("all")
 public interface InventoryClient {
 
     /**
@@ -37,8 +38,8 @@ public interface InventoryClient {
      * @param inventoryDTO 实体对象
      * @return true 成功
      */
-    @Tcc
     @RequestMapping("/inventory-service/inventory/decrease")
+    @Tcc
     Boolean decrease(@RequestBody InventoryDTO inventoryDTO);
 
 
