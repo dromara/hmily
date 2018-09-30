@@ -1,7 +1,7 @@
 Hmily
 ================
 
-### 分布式事务方案之tcc开源框架。基于java语言来开发（JDK1.8），支持dubbo，springcloud等rpc框架进行分布式事务。
+### 高性能分布式事务tcc开源框架。基于java语言来开发（JDK1.8），支持dubbo，springcloud,motan等rpc框架进行分布式事务。
 
  # Features
 
@@ -23,7 +23,10 @@ Hmily
 
      * ##### 内置经典的分布式事务场景demo工程，并有swagger-ui可视化界面可以快速体验。
 
-
+#  为什么高性能？
+  
+  * ## https://mp.weixin.qq.com/s/Eh9CKTU0nwLZ1rl3xmaZGA
+  
 #  源码解析博客
 
   * ## https://yu199195.github.io/categories/hmily-tcc/
