@@ -37,6 +37,7 @@ import java.util.Date;
  * @author xiaoyu
  */
 @Service("orderService")
+@SuppressWarnings("all")
 public class OrderServiceImpl implements OrderService {
 
     /**
@@ -44,9 +45,7 @@ public class OrderServiceImpl implements OrderService {
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(OrderServiceImpl.class);
 
-
     private final OrderMapper orderMapper;
-
 
     private final PaymentService paymentService;
 
@@ -57,7 +56,6 @@ public class OrderServiceImpl implements OrderService {
         this.paymentService = paymentService;
     }
 
-
     @Override
     public String orderPay(Integer count, BigDecimal amount) {
         final Order order = buildOrder(count, amount);
@@ -66,7 +64,6 @@ public class OrderServiceImpl implements OrderService {
         if (rows > 0) {
             paymentService.makePayment(order);
         }
-
         return "success";
     }
 
@@ -82,11 +79,9 @@ public class OrderServiceImpl implements OrderService {
     public String orderPayWithNested(Integer count, BigDecimal amount) {
         final Order order = buildOrder(count, amount);
         final int rows = orderMapper.save(order);
-
         if (rows > 0) {
             paymentService.makePaymentWithNested(order);
         }
-
         return "success";
     }
 
@@ -101,12 +96,9 @@ public class OrderServiceImpl implements OrderService {
     public String mockInventoryWithTryException(Integer count, BigDecimal amount) {
         final Order order = buildOrder(count, amount);
         final int rows = orderMapper.save(order);
-
         if (rows > 0) {
             paymentService.mockPaymentInventoryWithTryException(order);
         }
-
-
         return "success";
     }
 
@@ -122,12 +114,9 @@ public class OrderServiceImpl implements OrderService {
     public String mockInventoryWithTryTimeout(Integer count, BigDecimal amount) {
         final Order order = buildOrder(count, amount);
         final int rows = orderMapper.save(order);
-
         if (rows > 0) {
             paymentService.mockPaymentInventoryWithTryTimeout(order);
         }
-
-
         return "success";
     }
 
@@ -142,12 +131,9 @@ public class OrderServiceImpl implements OrderService {
     public String mockInventoryWithConfirmException(Integer count, BigDecimal amount) {
         final Order order = buildOrder(count, amount);
         final int rows = orderMapper.save(order);
-
         if (rows > 0) {
             paymentService.mockPaymentInventoryWithConfirmException(order);
         }
-
-
         return "success";
     }
 
@@ -162,15 +148,11 @@ public class OrderServiceImpl implements OrderService {
     public String mockInventoryWithConfirmTimeout(Integer count, BigDecimal amount) {
         final Order order = buildOrder(count, amount);
         final int rows = orderMapper.save(order);
-
         if (rows > 0) {
             paymentService.mockPaymentInventoryWithConfirmTimeout(order);
         }
-
-
         return "success";
     }
-
 
     @Override
     public void updateOrderStatus(Order order) {

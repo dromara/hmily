@@ -196,29 +196,17 @@ public class RedisCoordinatorRepository implements CoordinatorRepository {
     private void buildJedisPool(final TccRedisConfig tccRedisConfig) {
         JedisPoolConfig config = new JedisPoolConfig();
         config.setMaxIdle(tccRedisConfig.getMaxIdle());
-        //最小空闲连接数, 默认0
         config.setMinIdle(tccRedisConfig.getMinIdle());
-        //最大连接数, 默认8个
         config.setMaxTotal(tccRedisConfig.getMaxTotal());
-        //获取连接时的最大等待毫秒数(如果设置为阻塞时BlockWhenExhausted),如果超时就抛异常, 小于零:阻塞不确定的时间,  默认-1
         config.setMaxWaitMillis(tccRedisConfig.getMaxWaitMillis());
-        //在获取连接的时候检查有效性, 默认false
         config.setTestOnBorrow(tccRedisConfig.getTestOnBorrow());
-        //返回一个jedis实例给连接池时，是否检查连接可用性（ping()）
         config.setTestOnReturn(tccRedisConfig.getTestOnReturn());
-        //在空闲时检查有效性, 默认false
         config.setTestWhileIdle(tccRedisConfig.getTestWhileIdle());
-        //逐出连接的最小空闲时间 默认1800000毫秒(30分钟 )
         config.setMinEvictableIdleTimeMillis(tccRedisConfig.getMinEvictableIdleTimeMillis());
-        //对象空闲多久后逐出, 当空闲时间>该值 ，且 空闲连接>最大空闲数 时直接逐出,不再根据MinEvictableIdleTimeMillis判断  (默认逐出策略)，默认30m
         config.setSoftMinEvictableIdleTimeMillis(tccRedisConfig.getSoftMinEvictableIdleTimeMillis());
-        //逐出扫描的时间间隔(毫秒) 如果为负数,则不运行逐出线程, 默认-1
         config.setTimeBetweenEvictionRunsMillis(tccRedisConfig.getTimeBetweenEvictionRunsMillis());
-        //每次逐出检查时 逐出的最大数目 如果为负数就是 : 1/abs(n), 默认3
         config.setNumTestsPerEvictionRun(tccRedisConfig.getNumTestsPerEvictionRun());
-
         JedisPool jedisPool;
-        //如果是集群模式
         if (tccRedisConfig.getCluster()) {
             LogUtil.info(LOGGER, () -> "build redis cluster ............");
             final String clusterUrl = tccRedisConfig.getClusterUrl();

@@ -14,14 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.hmily.tcc.springcloud.interceptor;
 
 import com.hmily.tcc.common.bean.context.TccTransactionContext;
 import com.hmily.tcc.common.constant.CommonConstant;
+import com.hmily.tcc.common.enums.TccRoleEnum;
 import com.hmily.tcc.common.utils.GsonUtils;
 import com.hmily.tcc.common.utils.LogUtil;
+import com.hmily.tcc.core.concurrent.threadlocal.TransactionContextLocal;
 import com.hmily.tcc.core.interceptor.TccTransactionInterceptor;
 import com.hmily.tcc.core.service.HmilyTransactionAspectService;
+import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +36,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Objects;
 
 
 /**
@@ -67,7 +72,14 @@ public class SpringCloudHmilyTransactionInterceptor implements TccTransactionInt
 
         HttpServletRequest request = requestAttributes == null ? null : ((ServletRequestAttributes) requestAttributes).getRequest();
         String context = request == null ? null : request.getHeader(CommonConstant.TCC_TRANSACTION_CONTEXT);
-        tccTransactionContext = GsonUtils.getInstance().fromJson(context, TccTransactionContext.class);
+        if (StringUtils.isNoneBlank(context)) {
+            tccTransactionContext = GsonUtils.getInstance().fromJson(context, TccTransactionContext.class);
+        } else {
+            tccTransactionContext = TransactionContextLocal.getInstance().get();
+            if (Objects.nonNull(tccTransactionContext)) {
+                tccTransactionContext.setRole(TccRoleEnum.SPRING_CLOUD.getCode());
+            }
+        }
         return hmilyTransactionAspectService.invoke(tccTransactionContext, pjp);
     }
 

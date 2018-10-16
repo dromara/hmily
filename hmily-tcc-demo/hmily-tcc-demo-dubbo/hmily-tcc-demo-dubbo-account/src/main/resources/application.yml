@@ -15,7 +15,7 @@ hmily:
     tcc :
         serializer : kryo
         recoverDelayTime : 128
-        retryMax : 30
+        retryMax : 3
         scheduledDelay : 128
         scheduledThreadMax :  10
         repositorySupport : db
@@ -58,9 +58,9 @@ logging:
         root: error
         org.springframework.web: info
         org.apache.ibatis: info
-        com.hmily.tcc.bonuspoint: info
-        com.hmily.tcc.lottery: info
-        com.hmily.tcc: info
+        com.hmily.tcc.bonuspoint: debug
+        com.hmily.tcc.lottery: debug
+        com.hmily.tcc: debug
         io.netty: info
     path: "./logs"
 

@@ -32,7 +32,6 @@ import com.hmily.tcc.common.utils.LogUtil;
 import com.hmily.tcc.core.concurrent.threadlocal.TransactionContextLocal;
 import com.hmily.tcc.core.concurrent.threadpool.HmilyThreadFactory;
 import com.hmily.tcc.core.helper.SpringBeanUtils;
-import com.hmily.tcc.core.service.executor.HmilyTransactionExecutor;
 import com.hmily.tcc.core.spi.CoordinatorRepository;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.reflect.MethodUtils;
@@ -50,6 +49,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * this is scheduled execute transaction log.
+ *
  * @author xiaoyu(Myth)
  */
 public class ScheduledService {
@@ -84,45 +84,40 @@ public class ScheduledService {
                             return;
                         }
                         for (TccTransaction tccTransaction : tccTransactions) {
-                                //如果try未执行完成，那么就不进行补偿 （防止在try阶段的各种异常情况）
+                            // if the try is not completed, no compensation will be provided (to prevent various exceptions in the try phase)
                             if (tccTransaction.getRole() == TccRoleEnum.PROVIDER.getCode() && tccTransaction.getStatus() == TccActionEnum.PRE_TRY.getCode()) {
                                 continue;
                             }
                             if (tccTransaction.getRetriedCount() > tccConfig.getRetryMax()) {
-                                LogUtil.error(LOGGER, "此事务超过了最大重试次数，不再进行重试：{}", () -> tccTransaction);
+                                LogUtil.error(LOGGER, "This transaction exceeds the maximum number of retries and no retries will occur：{}", () -> tccTransaction);
                                 continue;
                             }
                             if (Objects.equals(tccTransaction.getPattern(), TccPatternEnum.CC.getCode())
                                     && tccTransaction.getStatus() == TccActionEnum.TRYING.getCode()) {
                                 continue;
                             }
-                                //如果事务角色是提供者的话，并且在重试的次数范围类是不能执行的，只能由发起者执行
+                            // if the transaction role is the provider, and the number of retries in the scope class cannot be executed, only by the initiator
                             if (tccTransaction.getRole() == TccRoleEnum.PROVIDER.getCode()
                                     && (tccTransaction.getCreateTime().getTime()
-                                    + tccConfig.getRetryMax() * tccConfig.getRecoverDelayTime() * 1000 > System.currentTimeMillis())) {
+                                    + tccConfig.getRecoverDelayTime() * tccConfig.getLoadFactor() * 1000 > System.currentTimeMillis())) {
                                 continue;
                             }
                             try {
-                                // 先更新数据，然后执行
                                 tccTransaction.setRetriedCount(tccTransaction.getRetriedCount() + 1);
                                 final int rows = coordinatorRepository.update(tccTransaction);
-                                    //判断当rows>0 才执行，为了防止业务方为集群模式时候的并发
+                                // determine that rows>0 is executed to prevent concurrency when the business side is in cluster mode
                                 if (rows > 0) {
-                                        //如果是以下3种状态
                                     if (tccTransaction.getStatus() == TccActionEnum.TRYING.getCode()
-                                                || tccTransaction.getStatus() == TccActionEnum.PRE_TRY.getCode()
+                                            || tccTransaction.getStatus() == TccActionEnum.PRE_TRY.getCode()
                                             || tccTransaction.getStatus() == TccActionEnum.CANCELING.getCode()) {
-                                        HmilyTransactionExecutor.instance().set(tccTransaction);
                                         cancel(tccTransaction);
                                     } else if (tccTransaction.getStatus() == TccActionEnum.CONFIRMING.getCode()) {
-                                            //执行confirm操作
-                                        HmilyTransactionExecutor.instance().set(tccTransaction);
                                         confirm(tccTransaction);
                                     }
                                 }
                             } catch (Exception e) {
                                 e.printStackTrace();
-                                LogUtil.error(LOGGER, "执行事务补偿异常:{}", e::getMessage);
+                                LogUtil.error(LOGGER, "execute recover exception:{}", e::getMessage);
                             }
                         }
                     } catch (Exception e) {
@@ -142,12 +137,15 @@ public class ScheduledService {
                     TccTransactionContext context = new TccTransactionContext();
                     context.setAction(TccActionEnum.CANCELING.getCode());
                     context.setTransId(tccTransaction.getTransId());
+                    context.setRole(TccRoleEnum.START.getCode());
                     TransactionContextLocal.getInstance().set(context);
                     executeCoordinator(participant.getCancelTccInvocation());
                 } catch (Exception e) {
-                    LogUtil.error(LOGGER, "执行cancel方法异常:{}", () -> e);
+                    LogUtil.error(LOGGER, "execute cancel exception:{}", () -> e);
                     success = false;
                     failList.add(participant);
+                } finally {
+                    TransactionContextLocal.getInstance().remove();
                 }
             }
             executeHandler(success, tccTransaction, failList);
@@ -164,14 +162,16 @@ public class ScheduledService {
                 try {
                     TccTransactionContext context = new TccTransactionContext();
                     context.setAction(TccActionEnum.CONFIRMING.getCode());
+                    context.setRole(TccRoleEnum.START.getCode());
                     context.setTransId(tccTransaction.getTransId());
                     TransactionContextLocal.getInstance().set(context);
-
                     executeCoordinator(participant.getConfirmTccInvocation());
                 } catch (Exception e) {
-                    LogUtil.error(LOGGER, "执行confirm方法异常:{}", () -> e);
+                    LogUtil.error(LOGGER, "execute confirm exception:{}", () -> e);
                     success = false;
                     failList.add(participant);
+                } finally {
+                    TransactionContextLocal.getInstance().remove();
                 }
             }
             executeHandler(success, tccTransaction, failList);
@@ -196,7 +196,7 @@ public class ScheduledService {
             final Class[] parameterTypes = tccInvocation.getParameterTypes();
             final Object bean = SpringBeanUtils.getInstance().getBean(clazz);
             MethodUtils.invokeMethod(bean, method, args, parameterTypes);
-            LogUtil.debug(LOGGER, "执行本地协调事务:{}", () -> tccInvocation.getTargetClass() + ":" + tccInvocation.getMethodName());
+            LogUtil.debug(LOGGER, "Scheduled tasks execute transaction compensation:{}", () -> tccInvocation.getTargetClass() + ":" + tccInvocation.getMethodName());
         }
     }
 

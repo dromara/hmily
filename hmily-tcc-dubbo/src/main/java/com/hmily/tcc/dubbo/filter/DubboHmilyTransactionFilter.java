@@ -15,10 +15,17 @@
  * limitations under the License.
  */
 
-package com.hmily.tcc.motan.filter;
+package com.hmily.tcc.dubbo.filter;
 
+import com.alibaba.dubbo.common.Constants;
+import com.alibaba.dubbo.common.extension.Activate;
+import com.alibaba.dubbo.rpc.Filter;
+import com.alibaba.dubbo.rpc.Invocation;
+import com.alibaba.dubbo.rpc.Invoker;
+import com.alibaba.dubbo.rpc.Result;
+import com.alibaba.dubbo.rpc.RpcContext;
+import com.alibaba.dubbo.rpc.RpcException;
 import com.hmily.tcc.annotation.Tcc;
-import com.hmily.tcc.annotation.TccPatternEnum;
 import com.hmily.tcc.common.bean.context.TccTransactionContext;
 import com.hmily.tcc.common.bean.entity.Participant;
 import com.hmily.tcc.common.bean.entity.TccInvocation;
@@ -28,93 +35,87 @@ import com.hmily.tcc.common.enums.TccRoleEnum;
 import com.hmily.tcc.common.exception.TccRuntimeException;
 import com.hmily.tcc.common.utils.GsonUtils;
 import com.hmily.tcc.core.concurrent.threadlocal.TransactionContextLocal;
-import com.hmily.tcc.core.helper.SpringBeanUtils;
 import com.hmily.tcc.core.service.executor.HmilyTransactionExecutor;
-import com.weibo.api.motan.common.MotanConstants;
-import com.weibo.api.motan.core.extension.Activation;
-import com.weibo.api.motan.core.extension.SpiMeta;
-import com.weibo.api.motan.filter.Filter;
-import com.weibo.api.motan.rpc.Caller;
-import com.weibo.api.motan.rpc.Request;
-import com.weibo.api.motan.rpc.Response;
-import com.weibo.api.motan.util.ReflectUtil;
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.Method;
 import java.util.Objects;
-import java.util.stream.Stream;
 
 /**
- * MotanHmilyTransactionFilter.
+ * impl dubbo filter.
  *
  * @author xiaoyu
  */
-@SpiMeta(name = "motanTccTransactionFilter")
-@Activation(key = {MotanConstants.NODE_TYPE_REFERER})
-public class MotanHmilyTransactionFilter implements Filter {
+@Activate(group = {Constants.SERVER_KEY, Constants.CONSUMER})
+public class DubboHmilyTransactionFilter implements Filter {
+
+    private HmilyTransactionExecutor hmilyTransactionExecutor;
 
     /**
-     * 实现新浪的filter接口 rpc传参数.
+     * this is init by dubbo spi
+     * set hmilyTransactionExecutor.
      *
-     * @param caller  caller
-     * @param request 请求
-     * @return Response
+     * @param hmilyTransactionExecutor {@linkplain HmilyTransactionExecutor }
      */
+    public void setHmilyTransactionExecutor(final HmilyTransactionExecutor hmilyTransactionExecutor) {
+        this.hmilyTransactionExecutor = hmilyTransactionExecutor;
+    }
+
     @Override
     @SuppressWarnings("unchecked")
-    public Response filter(final Caller<?> caller, final Request request) {
-        final String interfaceName = request.getInterfaceName();
-        final String methodName = request.getMethodName();
-        final Object[] arguments = request.getArguments();
-        Class[] args = null;
+    public Result invoke(final Invoker<?> invoker, final Invocation invocation) throws RpcException {
+        String methodName = invocation.getMethodName();
+        Class clazz = invoker.getInterface();
+        Class[] args = invocation.getParameterTypes();
+        final Object[] arguments = invocation.getArguments();
+        converterParamsClass(args, arguments);
         Method method = null;
         Tcc tcc = null;
-        Class clazz = null;
         try {
-            //他妈的 这里还要拿方法参数类型
-            clazz = ReflectUtil.forName(interfaceName);
-            final Method[] methods = clazz.getMethods();
-            args = Stream.of(methods)
-                    .filter(m -> m.getName().equals(methodName))
-                    .findFirst()
-                    .map(Method::getParameterTypes).get();
             method = clazz.getMethod(methodName, args);
             tcc = method.getAnnotation(Tcc.class);
-        } catch (Exception e) {
+        } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }
         if (Objects.nonNull(tcc)) {
             try {
-                final HmilyTransactionExecutor hmilyTransactionExecutor = SpringBeanUtils.getInstance().getBean(HmilyTransactionExecutor.class);
                 final TccTransactionContext tccTransactionContext = TransactionContextLocal.getInstance().get();
                 if (Objects.nonNull(tccTransactionContext)) {
                     if (tccTransactionContext.getRole() == TccRoleEnum.LOCAL.getCode()) {
                         tccTransactionContext.setRole(TccRoleEnum.INLINE.getCode());
                     }
-                    request.setAttachment(CommonConstant.TCC_TRANSACTION_CONTEXT, GsonUtils.getInstance().toJson(tccTransactionContext));
+                    RpcContext.getContext()
+                            .setAttachment(CommonConstant.TCC_TRANSACTION_CONTEXT, GsonUtils.getInstance().toJson(tccTransactionContext));
                 }
-                final Response response = caller.call(request);
-                final Participant participant = buildParticipant(tccTransactionContext, tcc, method, clazz, arguments, args);
-                if (tccTransactionContext.getRole() == TccRoleEnum.INLINE.getCode()) {
-                    hmilyTransactionExecutor.registerByNested(tccTransactionContext.getTransId(),
-                            participant);
+                final Result result = invoker.invoke(invocation);
+                //如果result 没有异常就保存
+                if (!result.hasException()) {
+                    final Participant participant = buildParticipant(tccTransactionContext, tcc, method, clazz, arguments, args);
+                    if (tccTransactionContext.getRole() == TccRoleEnum.INLINE.getCode()) {
+                        hmilyTransactionExecutor.registerByNested(tccTransactionContext.getTransId(),
+                                participant);
+                    } else {
+                        hmilyTransactionExecutor.enlistParticipant(participant);
+                    }
                 } else {
-                    hmilyTransactionExecutor.enlistParticipant(participant);
+                    throw new TccRuntimeException("rpc invoke exception{}", result.getException());
                 }
-                return response;
-            } catch (Exception e) {
+                return result;
+            } catch (RpcException e) {
                 e.printStackTrace();
                 throw e;
             }
         } else {
-            return caller.call(request);
+            return invoker.invoke(invocation);
         }
     }
 
     @SuppressWarnings("unchecked")
     private Participant buildParticipant(final TccTransactionContext tccTransactionContext,
-                                         final Tcc tcc, final Method method, final Class clazz,
+                                         final Tcc tcc,
+                                         final Method method, final Class clazz,
                                          final Object[] arguments, final Class... args) throws TccRuntimeException {
+
         if (Objects.isNull(tccTransactionContext)
                 || (TccActionEnum.TRYING.getCode() != tccTransactionContext.getAction())) {
             return null;
@@ -128,13 +129,18 @@ public class MotanHmilyTransactionFilter implements Filter {
         if (StringUtils.isBlank(cancelMethodName)) {
             cancelMethodName = method.getName();
         }
-        //设置模式
-        final TccPatternEnum pattern = tcc.pattern();
-        SpringBeanUtils.getInstance().getBean(HmilyTransactionExecutor.class)
-                .getCurrentTransaction().setPattern(pattern.getCode());
         TccInvocation confirmInvocation = new TccInvocation(clazz, confirmMethodName, args, arguments);
         TccInvocation cancelInvocation = new TccInvocation(clazz, cancelMethodName, args, arguments);
         //封装调用点
         return new Participant(tccTransactionContext.getTransId(), confirmInvocation, cancelInvocation);
+    }
+
+    private void converterParamsClass(final Class[] args, final Object[] arguments) {
+        if (arguments == null || arguments.length < 1) {
+            return;
+        }
+        for (int i = 0; i < arguments.length; i++) {
+            args[i] = arguments[i].getClass();
+        }
     }
 }

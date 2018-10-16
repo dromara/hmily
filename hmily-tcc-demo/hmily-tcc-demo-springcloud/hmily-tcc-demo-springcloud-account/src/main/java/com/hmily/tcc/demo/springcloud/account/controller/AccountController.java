@@ -17,7 +17,6 @@
 
 package com.hmily.tcc.demo.springcloud.account.controller;
 
-
 import com.hmily.tcc.demo.springcloud.account.dto.AccountDTO;
 import com.hmily.tcc.demo.springcloud.account.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,12 +28,13 @@ import org.springframework.web.bind.annotation.RestController;
 import java.math.BigDecimal;
 
 /**
+ * AccountController.
  * @author xiaoyu
  */
 @RestController
 @RequestMapping("/account")
+@SuppressWarnings("all")
 public class AccountController {
-
 
     private final AccountService accountService;
 
@@ -47,7 +47,6 @@ public class AccountController {
     public Boolean save(@RequestBody AccountDTO accountDO) {
         return accountService.payment(accountDO);
     }
-
 
     @RequestMapping("/findByUserId")
     public BigDecimal findByUserId(@RequestParam("userId") String userId) {

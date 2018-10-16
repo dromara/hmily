@@ -17,7 +17,6 @@
 
 package com.hmily.tcc.demo.springcloud.inventory.controller;
 
-
 import com.hmily.tcc.demo.springcloud.inventory.dto.InventoryDTO;
 import com.hmily.tcc.demo.springcloud.inventory.service.InventoryService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,8 +30,8 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/inventory")
+@SuppressWarnings("all")
 public class InventoryController {
-
 
     private final InventoryService inventoryService;
 
@@ -46,13 +45,10 @@ public class InventoryController {
         return inventoryService.decrease(inventoryDTO);
     }
 
-
-
     @RequestMapping("/findByProductId")
     public Integer findByProductId(@RequestParam("productId") String productId) {
         return inventoryService.findByProductId(productId).getTotalInventory();
     }
-
 
     @RequestMapping("/mockWithTryException")
     public Boolean mockWithTryException(@RequestBody InventoryDTO inventoryDTO) {
@@ -63,6 +59,5 @@ public class InventoryController {
     public Boolean mockWithTryTimeout(@RequestBody InventoryDTO inventoryDTO) {
         return inventoryService.mockWithTryTimeout(inventoryDTO);
     }
-
 
 }

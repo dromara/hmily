@@ -53,11 +53,13 @@ import java.util.stream.Collectors;
  *
  * @author xiaoyu
  */
-@SuppressWarnings("unchecked")
+@SuppressWarnings("all")
 public class JdbcCoordinatorRepository implements CoordinatorRepository {
 
-   /** logger */
-   private static final Logger LOGGER = LoggerFactory.getLogger(JdbcCoordinatorRepository.class);
+    /**
+     * logger.
+     */
+    private static final Logger LOGGER = LoggerFactory.getLogger(JdbcCoordinatorRepository.class);
 
     private DataSource dataSource;
 
@@ -74,13 +76,15 @@ public class JdbcCoordinatorRepository implements CoordinatorRepository {
 
     @Override
     public int create(final TccTransaction tccTransaction) {
-        String sql = "insert into " + tableName + "(trans_id,target_class,target_method,retried_count,create_time,last_time,version,status,invocation,role,pattern)"
-                + " values(?,?,?,?,?,?,?,?,?,?,?)";
+        String sql = "insert into " + tableName + "(trans_id,target_class,target_method,retried_count,"
+                + "create_time,last_time,version,status,invocation,role,pattern,confirm_method,cancel_method)"
+                + " values(?,?,?,?,?,?,?,?,?,?,?,?,?)";
         try {
             final byte[] serialize = serializer.serialize(tccTransaction.getParticipants());
             return executeUpdate(sql, tccTransaction.getTransId(), tccTransaction.getTargetClass(), tccTransaction.getTargetMethod(),
                     tccTransaction.getRetriedCount(), tccTransaction.getCreateTime(), tccTransaction.getLastTime(),
-                    tccTransaction.getVersion(), tccTransaction.getStatus(), serialize, tccTransaction.getRole(), tccTransaction.getPattern());
+                    tccTransaction.getVersion(), tccTransaction.getStatus(), serialize, tccTransaction.getRole(),
+                    tccTransaction.getPattern(), tccTransaction.getConfirmMethod(), tccTransaction.getCancelMethod());
         } catch (TccException e) {
             e.printStackTrace();
             return FAIL_ROWS;
@@ -99,19 +103,12 @@ public class JdbcCoordinatorRepository implements CoordinatorRepository {
         tccTransaction.setLastTime(new Date());
         tccTransaction.setVersion(tccTransaction.getVersion() + 1);
         String sql = "update " + tableName
-                + " set last_time = ?,version =?,retried_count =?,invocation=?,status=? ,confirm_method=?,cancel_method=? ,pattern=? where trans_id = ? and version=? ";
-        String confirmMethod = "";
-        String cancelMethod = "";
+                + " set last_time = ?,version =?,retried_count =?,invocation=?,status=? ,pattern=? where trans_id = ? and version=? ";
         try {
             final byte[] serialize = serializer.serialize(tccTransaction.getParticipants());
-            if (CollectionUtils.isNotEmpty(tccTransaction.getParticipants())) {
-                final Participant participant = tccTransaction.getParticipants().get(0);
-                confirmMethod = participant.getConfirmTccInvocation().getMethodName();
-                cancelMethod = participant.getCancelTccInvocation().getMethodName();
-            }
             return executeUpdate(sql, tccTransaction.getLastTime(),
                     tccTransaction.getVersion(), tccTransaction.getRetriedCount(), serialize,
-                    tccTransaction.getStatus(), confirmMethod, cancelMethod, tccTransaction.getPattern(),
+                    tccTransaction.getStatus(), tccTransaction.getPattern(),
                     tccTransaction.getTransId(), currentVersion);
         } catch (TccException e) {
             e.printStackTrace();
@@ -225,7 +222,7 @@ public class JdbcCoordinatorRepository implements CoordinatorRepository {
             this.currentDBType = DbTypeUtils.buildByDriverClassName(tccDbConfig.getDriverClassName());
             executeUpdate(SqlHelper.buildCreateTableSql(tccDbConfig.getDriverClassName(), tableName));
         } catch (Exception e) {
-            LogUtil.error(LOGGER, "jdbc 初始化异常！请检查配置信息:{}", e::getMessage);
+            LogUtil.error(LOGGER, "hmily jdbc log init exception please check config:{}", e::getMessage);
             throw new TccRuntimeException(e);
         }
     }
@@ -256,14 +253,13 @@ public class JdbcCoordinatorRepository implements CoordinatorRepository {
 
     }
 
-    private Object convertDataTypeToDB(Object params) {
+    private Object convertDataTypeToDB(final Object params) {
         //https://jdbc.postgresql.org/documentation/head/8-date-time.html
         if (CommonConstant.DB_POSTGRESQL.equals(currentDBType) && params instanceof java.util.Date) {
             return LocalDateTime.ofInstant(Instant.ofEpochMilli(((Date) params).getTime()), ZoneId.systemDefault());
         }
         return params;
     }
-
 
     private List<Map<String, Object>> executeQuery(final String sql, final Object... params) {
         Connection connection = null;

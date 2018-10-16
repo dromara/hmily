@@ -38,7 +38,7 @@ public class TccTransactionContext implements Serializable {
     private String transId;
 
     /**
-     * 事务执行动作. {@linkplain TccActionEnum}
+     * this hmily action. {@linkplain TccActionEnum}
      */
     private int action;
 

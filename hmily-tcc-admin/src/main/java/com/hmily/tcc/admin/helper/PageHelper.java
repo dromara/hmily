@@ -24,6 +24,7 @@ import com.hmily.tcc.admin.page.PageParameter;
  * @author xiaoyu(Myth)
  * @version 1.0
  */
+@SuppressWarnings("ALL")
 public class PageHelper {
 
     /**

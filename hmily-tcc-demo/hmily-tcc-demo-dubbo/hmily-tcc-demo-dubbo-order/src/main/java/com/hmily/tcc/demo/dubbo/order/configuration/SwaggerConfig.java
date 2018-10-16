@@ -37,19 +37,25 @@ import java.time.LocalDate;
 import static com.google.common.collect.Lists.newArrayList;
 
 /**
+ * The type Swagger config.
+ *
  * @author xiaoyu
  */
 @Configuration
 @EnableSwagger2
 public class SwaggerConfig {
 
-    private static final String SWAGGER_SCAN_BASE_PACKAGE = "com.happylifeplat.tcc.demo.dubbo.order.controller";
     private static final String VERSION = "1.0.0";
 
-    ApiInfo apiInfo() {
+    /**
+     * Api info api info.
+     *
+     * @return the api info
+     */
+    private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
                 .title("Swagger API")
-                .description("dubbo分布式事务解决方案之TCC测试体验")
+                .description("dubbo分布式事务解决方案之Hmily测试体验")
                 .license("Apache 2.0")
                 .licenseUrl("http://www.apache.org/licenses/LICENSE-2.0.html")
                 .termsOfServiceUrl("")
@@ -58,6 +64,11 @@ public class SwaggerConfig {
                 .build();
     }
 
+    /**
+     * Api docket.
+     *
+     * @return the docket
+     */
     @Bean
     public Docket api() {
         return new Docket(DocumentationType.SWAGGER_2).apiInfo(apiInfo()).select().apis(RequestHandlerSelectors.withClassAnnotation(RestController.class))

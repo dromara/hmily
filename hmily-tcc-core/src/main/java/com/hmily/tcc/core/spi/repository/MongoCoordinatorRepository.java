@@ -82,8 +82,8 @@ public class MongoCoordinatorRepository implements CoordinatorRepository {
             mongoBean.setPattern(tccTransaction.getPattern());
             mongoBean.setTargetClass(tccTransaction.getTargetClass());
             mongoBean.setTargetMethod(tccTransaction.getTargetMethod());
-            mongoBean.setConfirmMethod("");
-            mongoBean.setCancelMethod("");
+            mongoBean.setConfirmMethod(tccTransaction.getConfirmMethod());
+            mongoBean.setCancelMethod(tccTransaction.getCancelMethod());
             final byte[] cache = objectSerializer.serialize(tccTransaction.getParticipants());
             mongoBean.setContents(cache);
             template.save(mongoBean, collectionName);
@@ -112,11 +112,6 @@ public class MongoCoordinatorRepository implements CoordinatorRepository {
         update.set("version", tccTransaction.getVersion() + 1);
         try {
             if (CollectionUtils.isNotEmpty(tccTransaction.getParticipants())) {
-                final Participant participant = tccTransaction.getParticipants().get(0);
-                if (Objects.nonNull(participant)) {
-                    update.set("confirmMethod", participant.getConfirmTccInvocation().getMethodName());
-                    update.set("cancelMethod", participant.getCancelTccInvocation().getMethodName());
-                }
                 update.set("contents", objectSerializer.serialize(tccTransaction.getParticipants()));
             }
         } catch (TccException e) {
@@ -125,7 +120,7 @@ public class MongoCoordinatorRepository implements CoordinatorRepository {
         final UpdateResult updateResult = template.updateFirst(query, update, MongoAdapter.class, collectionName);
 
         if (updateResult.getModifiedCount() <= 0) {
-            throw new TccRuntimeException("更新数据异常!");
+            throw new TccRuntimeException("update data exception!");
         }
         return ROWS;
     }
@@ -142,7 +137,7 @@ public class MongoCoordinatorRepository implements CoordinatorRepository {
         }
         final UpdateResult updateResult = template.updateFirst(query, update, MongoAdapter.class, collectionName);
         if (updateResult.getModifiedCount() <= 0) {
-            throw new TccRuntimeException("更新数据异常!");
+            throw new TccRuntimeException("update data exception!");
         }
         return ROWS;
     }
@@ -155,7 +150,7 @@ public class MongoCoordinatorRepository implements CoordinatorRepository {
         update.set("status", status);
         final UpdateResult updateResult = template.updateFirst(query, update, MongoAdapter.class, collectionName);
         if (updateResult.getModifiedCount() <= 0) {
-            throw new TccRuntimeException("更新数据异常!");
+            throw new TccRuntimeException("update data exception!");
         }
         return ROWS;
     }
@@ -186,7 +181,7 @@ public class MongoCoordinatorRepository implements CoordinatorRepository {
             tccTransaction.setParticipants(participants);
             return tccTransaction;
         } catch (TccException e) {
-            LogUtil.error(LOGGER, "mongodb 反序列化异常:{}", e::getLocalizedMessage);
+            LogUtil.error(LOGGER, "mongodb deSerialize exception:{}", e::getLocalizedMessage);
             return null;
         }
 
@@ -222,7 +217,7 @@ public class MongoCoordinatorRepository implements CoordinatorRepository {
             clientFactoryBean.afterPropertiesSet();
             template = new MongoTemplate(Objects.requireNonNull(clientFactoryBean.getObject()), tccMongoConfig.getMongoDbName());
         } catch (Exception e) {
-            LogUtil.error(LOGGER, "mongo 初始化异常！请检查配置信息:{}", e::getMessage);
+            LogUtil.error(LOGGER, "mongo init error please check you config:{}", e::getMessage);
             throw new TccRuntimeException(e);
         }
     }

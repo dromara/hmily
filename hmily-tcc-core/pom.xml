@@ -5,7 +5,7 @@
     <parent>
         <artifactId>hmily-tcc</artifactId>
         <groupId>com.hmily.tcc</groupId>
-        <version>1.1.1-SNAPSHOT</version>
+        <version>1.2.1-RELEASE</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -21,12 +21,6 @@
             <groupId>com.hmily.tcc</groupId>
             <artifactId>hmily-tcc-annotation</artifactId>
         </dependency>
-
-        <dependency>
-            <groupId>com.lmax</groupId>
-            <artifactId>disruptor</artifactId>
-        </dependency>
-
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -52,18 +46,21 @@
             <groupId>org.springframework.data</groupId>
             <artifactId>spring-data-mongodb</artifactId>
         </dependency>
+
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-all</artifactId>
             <version>1.10.8</version>
             <scope>test</scope>
         </dependency>
+
         <dependency>
             <groupId>org.powermock</groupId>
             <artifactId>powermock-api-mockito</artifactId>
             <version>1.6.1</version>
             <scope>test</scope>
         </dependency>
+
         <dependency>
             <groupId>org.powermock</groupId>
             <artifactId>powermock-module-junit4</artifactId>
