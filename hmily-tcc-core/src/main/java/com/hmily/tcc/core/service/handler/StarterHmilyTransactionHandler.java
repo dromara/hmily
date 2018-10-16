@@ -76,6 +76,7 @@ public class StarterHmilyTransactionHandler implements HmilyTransactionHandler {
             final TccTransaction currentTransaction = hmilyTransactionExecutor.getCurrentTransaction();
             executor.execute(() -> hmilyTransactionExecutor.confirm(currentTransaction));
         } finally {
+            TransactionContextLocal.getInstance().remove();
             hmilyTransactionExecutor.remove();
         }
         return returnValue;
