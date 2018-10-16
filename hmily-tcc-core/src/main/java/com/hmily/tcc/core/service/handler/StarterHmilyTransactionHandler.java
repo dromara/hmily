@@ -17,20 +17,22 @@
 
 package com.hmily.tcc.core.service.handler;
 
-import com.hmily.tcc.common.bean.context.TccTransactionContext;
-import com.hmily.tcc.common.bean.entity.TccTransaction;
-import com.hmily.tcc.common.enums.TccActionEnum;
-import com.hmily.tcc.core.concurrent.threadpool.HmilyThreadFactory;
-import com.hmily.tcc.core.service.HmilyTransactionHandler;
-import com.hmily.tcc.core.service.executor.HmilyTransactionExecutor;
-import org.aspectj.lang.ProceedingJoinPoint;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import java.util.concurrent.Executor;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import com.hmily.tcc.common.bean.context.TccTransactionContext;
+import com.hmily.tcc.common.bean.entity.TccTransaction;
+import com.hmily.tcc.common.enums.TccActionEnum;
+import com.hmily.tcc.core.concurrent.threadlocal.TransactionContextLocal;
+import com.hmily.tcc.core.concurrent.threadpool.HmilyThreadFactory;
+import com.hmily.tcc.core.service.HmilyTransactionHandler;
+import com.hmily.tcc.core.service.executor.HmilyTransactionExecutor;
 
 /**
  * this is transaction starter.
@@ -76,6 +78,7 @@ public class StarterHmilyTransactionHandler implements HmilyTransactionHandler {
             final TccTransaction currentTransaction = hmilyTransactionExecutor.getCurrentTransaction();
             executor.execute(() -> hmilyTransactionExecutor.confirm(currentTransaction));
         } finally {
+        	TransactionContextLocal.getInstance().remove();
             hmilyTransactionExecutor.remove();
         }
         return returnValue;
