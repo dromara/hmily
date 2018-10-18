@@ -276,7 +276,6 @@ public class HmilyTransactionExecutor {
     }
 
     private void executeHandler(final boolean success, final TccTransaction currentTransaction, final List<Participant> failList) {
-        //TransactionContextLocal.getInstance().remove();
         TccTransactionCacheManager.getInstance().removeByKey(currentTransaction.getTransId());
         if (success) {
             deleteTransaction(currentTransaction);
