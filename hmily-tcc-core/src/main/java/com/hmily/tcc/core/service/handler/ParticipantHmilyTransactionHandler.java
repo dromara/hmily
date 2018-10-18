@@ -17,19 +17,21 @@
 
 package com.hmily.tcc.core.service.handler;
 
-import com.hmily.tcc.common.bean.context.TccTransactionContext;
-import com.hmily.tcc.common.bean.entity.TccTransaction;
-import com.hmily.tcc.common.enums.TccActionEnum;
-import com.hmily.tcc.common.utils.DefaultValueUtils;
-import com.hmily.tcc.core.cache.TccTransactionCacheManager;
-import com.hmily.tcc.core.service.HmilyTransactionHandler;
-import com.hmily.tcc.core.service.executor.HmilyTransactionExecutor;
+import java.lang.reflect.Method;
+
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.lang.reflect.Method;
+import com.hmily.tcc.common.bean.context.TccTransactionContext;
+import com.hmily.tcc.common.bean.entity.TccTransaction;
+import com.hmily.tcc.common.enums.TccActionEnum;
+import com.hmily.tcc.common.utils.DefaultValueUtils;
+import com.hmily.tcc.core.cache.TccTransactionCacheManager;
+import com.hmily.tcc.core.concurrent.threadlocal.TransactionContextLocal;
+import com.hmily.tcc.core.service.HmilyTransactionHandler;
+import com.hmily.tcc.core.service.executor.HmilyTransactionExecutor;
 
 /**
  * Participant Handler.
@@ -62,9 +64,9 @@ public class ParticipantHmilyTransactionHandler implements HmilyTransactionHandl
                 } catch (Throwable throwable) {
                     //if exception ,delete log.
                     hmilyTransactionExecutor.deleteTransaction(tccTransaction);
-                    assert tccTransaction != null;
-                    TccTransactionCacheManager.getInstance().removeByKey(tccTransaction.getTransId());
                     throw throwable;
+                } finally {
+                	TransactionContextLocal.getInstance().remove();
                 }
             case CONFIRMING:
                 currentTransaction = TccTransactionCacheManager.getInstance().getTccTransaction(context.getTransId());
