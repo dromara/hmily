@@ -142,7 +142,7 @@ public class JdbcCoordinatorRepository implements CoordinatorRepository {
             return list.stream()
                     .filter(Objects::nonNull)
                     .map(this::buildByResultMap)
-                    .collect(Collectors.toList()).get(0);
+                    .findFirst().orElse(null);
         }
         return null;
     }
@@ -218,7 +218,7 @@ public class JdbcCoordinatorRepository implements CoordinatorRepository {
                 dataSource = hikariDataSource;
             }
             this.tableName = RepositoryPathUtils.buildDbTableName(modelName);
-//        //save current database type
+            //save current database type
             this.currentDBType = DbTypeUtils.buildByDriverClassName(tccDbConfig.getDriverClassName());
             executeUpdate(SqlHelper.buildCreateTableSql(tccDbConfig.getDriverClassName(), tableName));
         } catch (Exception e) {

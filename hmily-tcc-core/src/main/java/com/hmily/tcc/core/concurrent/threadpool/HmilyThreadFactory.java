@@ -22,6 +22,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * custom thread factory.
+ *
  * @author xiaoyu
  */
 public final class HmilyThreadFactory implements ThreadFactory {
@@ -30,13 +31,13 @@ public final class HmilyThreadFactory implements ThreadFactory {
 
     private static final ThreadGroup THREAD_GROUP = new ThreadGroup("hmilyTransaction");
 
-    private static volatile boolean daemon;
+    private boolean daemon;
 
     private final String namePrefix;
 
     private HmilyThreadFactory(final String namePrefix, final boolean daemon) {
         this.namePrefix = namePrefix;
-        HmilyThreadFactory.daemon = daemon;
+        this.daemon = daemon;
     }
 
     /**
