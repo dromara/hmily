@@ -67,8 +67,6 @@ public class ParticipantHmilyTransactionHandler implements HmilyTransactionHandl
                     throw throwable;
                 } finally {
                 	TransactionContextLocal.getInstance().remove();
-                	assert tccTransaction != null;
-                	TccTransactionCacheManager.getInstance().removeByKey(tccTransaction.getTransId());
                 }
             case CONFIRMING:
                 currentTransaction = TccTransactionCacheManager.getInstance().getTccTransaction(context.getTransId());
