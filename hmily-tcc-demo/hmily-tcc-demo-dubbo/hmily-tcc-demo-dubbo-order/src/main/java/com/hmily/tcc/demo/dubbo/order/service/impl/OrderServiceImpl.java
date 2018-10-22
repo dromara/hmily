@@ -67,6 +67,16 @@ public class OrderServiceImpl implements OrderService {
         return "success";
     }
 
+    @Override
+    public String testOrderPay(Integer count, BigDecimal amount) {
+        final Order order = buildTestOrder(count, amount);
+        final int rows = orderMapper.save(order);
+        if (rows > 0) {
+            paymentService.testMakePayment(order);
+        }
+        return "success";
+    }
+
     /**
      * 创建订单并且进行扣除账户余额支付，并进行库存扣减操作
      * in this  Inventory nested in account.
@@ -166,6 +176,20 @@ public class OrderServiceImpl implements OrderService {
         //demo中的表里只有商品id为1的数据
         order.setProductId("1");
         order.setStatus(OrderStatusEnum.NOT_PAY.getCode());
+        order.setTotalAmount(amount);
+        order.setCount(count);
+        //demo中 表里面存的用户id为10000
+        order.setUserId("10000");
+        return order;
+    }
+
+    private Order buildTestOrder(Integer count, BigDecimal amount) {
+        Order order = new Order();
+        order.setCreateTime(new Date());
+        order.setNumber(IdWorkerUtils.getInstance().buildPartNumber());
+        //demo中的表里只有商品id为1的数据
+        order.setProductId("1");
+        order.setStatus(OrderStatusEnum.PAY_SUCCESS.getCode());
         order.setTotalAmount(amount);
         order.setCount(count);
         //demo中 表里面存的用户id为10000

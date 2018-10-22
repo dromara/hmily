@@ -67,6 +67,15 @@ public class InventoryServiceImpl implements InventoryService {
         return true;
     }
 
+    @Override
+    public Boolean testDecrease(InventoryDTO inventoryDTO) {
+        final InventoryDO entity = inventoryMapper.findByProductId(inventoryDTO.getProductId());
+        entity.setTotalInventory(entity.getTotalInventory() - inventoryDTO.getCount());
+        entity.setLockInventory(0);
+        inventoryMapper.decrease(entity);
+        return true;
+    }
+
     /**
      * 获取商品库存信息
      *
