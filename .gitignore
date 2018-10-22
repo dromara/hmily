@@ -10,7 +10,7 @@
 hs_err_pid*
 
 *~
-
+node_modules
 # eclipse ignore
 .settings
 .project
