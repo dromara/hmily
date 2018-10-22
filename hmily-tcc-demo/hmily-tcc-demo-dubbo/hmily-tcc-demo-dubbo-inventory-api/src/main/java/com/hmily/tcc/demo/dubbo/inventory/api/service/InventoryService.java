@@ -22,6 +22,8 @@ import com.hmily.tcc.demo.dubbo.inventory.api.dto.InventoryDTO;
 import com.hmily.tcc.demo.dubbo.inventory.api.entity.InventoryDO;
 
 /**
+ * The interface Inventory service.
+ *
  * @author xiaoyu
  */
 public interface InventoryService {
@@ -32,16 +34,25 @@ public interface InventoryService {
      * 这一个tcc接口
      *
      * @param inventoryDTO 库存DTO对象
-     * @return true
+     * @return true boolean
      */
     @Tcc
     Boolean decrease(InventoryDTO inventoryDTO);
 
 
     /**
+     * Test decrease boolean.
+     *
+     * @param inventoryDTO the inventory dto
+     * @return the boolean
+     */
+    Boolean testDecrease(InventoryDTO inventoryDTO);
+
+    /**
      * 获取商品库存信息
+     *
      * @param productId 商品id
-     * @return InventoryDO
+     * @return InventoryDO inventory do
      */
     InventoryDO findByProductId(String productId);
 
@@ -50,7 +61,7 @@ public interface InventoryService {
      * mock扣减库存异常
      *
      * @param inventoryDTO dto对象
-     * @return String
+     * @return String string
      */
     @Tcc
     String mockWithTryException(InventoryDTO inventoryDTO);
@@ -60,7 +71,7 @@ public interface InventoryService {
      * mock扣减库存超时
      *
      * @param inventoryDTO dto对象
-     * @return String
+     * @return String boolean
      */
     @Tcc
     Boolean mockWithTryTimeout(InventoryDTO inventoryDTO);
@@ -70,7 +81,7 @@ public interface InventoryService {
      * mock 扣减库存confirm异常
      *
      * @param inventoryDTO dto对象
-     * @return String
+     * @return String string
      */
     @Tcc
     String mockWithConfirmException(InventoryDTO inventoryDTO);
@@ -80,7 +91,7 @@ public interface InventoryService {
      * mock 扣减库存confirm超时
      *
      * @param inventoryDTO dto对象
-     * @return True
+     * @return True boolean
      */
     @Tcc
     Boolean mockWithConfirmTimeout(InventoryDTO inventoryDTO);

@@ -27,6 +27,7 @@ import com.hmily.tcc.common.utils.ServiceBootstrap;
 import com.hmily.tcc.core.coordinator.CoordinatorService;
 import com.hmily.tcc.core.disruptor.publisher.HmilyTransactionEventPublisher;
 import com.hmily.tcc.core.helper.SpringBeanUtils;
+import com.hmily.tcc.core.logo.HmilyLogo;
 import com.hmily.tcc.core.service.HmilyInitService;
 import com.hmily.tcc.core.spi.CoordinatorRepository;
 import com.hmily.tcc.core.spi.repository.JdbcCoordinatorRepository;
@@ -78,7 +79,7 @@ public class HmilyInitServiceImpl implements HmilyInitService {
             LogUtil.error(LOGGER, " hmily init exception:{}", ex::getMessage);
             System.exit(1);
         }
-        LogUtil.info(LOGGER, () -> "hmily init success!");
+        new HmilyLogo().logo();
     }
 
     /**

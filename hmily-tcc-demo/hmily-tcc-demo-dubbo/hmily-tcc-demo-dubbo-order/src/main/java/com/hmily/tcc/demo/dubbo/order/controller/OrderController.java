@@ -52,6 +52,15 @@ public class OrderController {
 
     }
 
+    @PostMapping(value = "/testOrderPay")
+    @ApiOperation(value = "测试订单支付接口(这里是压测接口不添加分布式事务)")
+    public String testOrderPay(@RequestParam(value = "count") Integer count,
+                               @RequestParam(value = "amount") BigDecimal amount) {
+
+        return orderService.testOrderPay(count, amount);
+
+    }
+
     @PostMapping(value = "/mockInventoryWithTryException")
     @ApiOperation(value = "模拟下单付款操作在try阶段异常，此时账户系统和订单状态会回滚，达到数据的一致性（注意:这里模拟的是系统异常，或者rpc异常）")
     public String mockInventoryWithTryException(@RequestParam(value = "count") Integer count,
@@ -70,7 +79,7 @@ public class OrderController {
     @PostMapping(value = "/orderPayWithNested")
     @ApiOperation(value = "订单支付接口（注意这里模拟的是创建订单并进行支付扣减库存等操作）")
     public String orderPayWithNested(@RequestParam(value = "count") Integer count,
-                           @RequestParam(value = "amount") BigDecimal amount) {
+                                     @RequestParam(value = "amount") BigDecimal amount) {
 
         return orderService.orderPayWithNested(count, amount);
 

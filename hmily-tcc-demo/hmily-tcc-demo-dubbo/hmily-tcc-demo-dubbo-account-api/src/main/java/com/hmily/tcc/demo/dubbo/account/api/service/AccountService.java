@@ -38,6 +38,8 @@ public interface AccountService {
     @Tcc
     boolean payment(AccountDTO accountDTO);
 
+    boolean testPayment(AccountDTO accountDTO);
+
     /**
      * 扣款支付
      *

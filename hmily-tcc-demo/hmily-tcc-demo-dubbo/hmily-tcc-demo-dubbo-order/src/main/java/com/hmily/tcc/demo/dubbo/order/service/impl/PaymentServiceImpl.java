@@ -91,6 +91,31 @@ public class PaymentServiceImpl implements PaymentService {
         inventoryService.decrease(inventoryDTO);
     }
 
+    @Override
+    public void testMakePayment(Order order) {
+        orderMapper.update(order);
+        //做库存和资金账户的检验工作 这里只是demo 。。。
+        final AccountDO accountDO = accountService.findByUserId(order.getUserId());
+        if (accountDO.getBalance().compareTo(order.getTotalAmount()) <= 0) {
+            throw new TccRuntimeException("余额不足！");
+        }
+        final InventoryDO inventory = inventoryService.findByProductId(order.getProductId());
+
+        if (inventory.getTotalInventory() < order.getCount()) {
+            throw new TccRuntimeException("库存不足！");
+        }
+        //扣除用户余额
+        AccountDTO accountDTO = new AccountDTO();
+        accountDTO.setAmount(order.getTotalAmount());
+        accountDTO.setUserId(order.getUserId());
+        accountService.testPayment(accountDTO);
+        //进入扣减库存操作
+        InventoryDTO inventoryDTO = new InventoryDTO();
+        inventoryDTO.setCount(order.getCount());
+        inventoryDTO.setProductId(order.getProductId());
+        inventoryService.testDecrease(inventoryDTO);
+    }
+
     /**
      * 订单支付
      *
