@@ -77,7 +77,7 @@ public class ScheduledService {
     public void scheduledRollBack() {
         scheduledExecutorService
                 .scheduleWithFixedDelay(() -> {
-                    LogUtil.debug(LOGGER, "rollback execute delayTime:{}", () -> tccConfig.getScheduledDelay());
+                    LogUtil.info(LOGGER, "rollback execute delayTime:{}", () -> tccConfig.getScheduledDelay());
                     try {
                         final List<TccTransaction> tccTransactions = coordinatorRepository.listAllByDelay(acquireData());
                         if (CollectionUtils.isEmpty(tccTransactions)) {
@@ -86,6 +86,7 @@ public class ScheduledService {
                         for (TccTransaction tccTransaction : tccTransactions) {
                             // if the try is not completed, no compensation will be provided (to prevent various exceptions in the try phase)
                             if (tccTransaction.getRole() == TccRoleEnum.PROVIDER.getCode() && tccTransaction.getStatus() == TccActionEnum.PRE_TRY.getCode()) {
+                                coordinatorRepository.remove(tccTransaction.getTransId());
                                 continue;
                             }
                             if (tccTransaction.getRetriedCount() > tccConfig.getRetryMax()) {
