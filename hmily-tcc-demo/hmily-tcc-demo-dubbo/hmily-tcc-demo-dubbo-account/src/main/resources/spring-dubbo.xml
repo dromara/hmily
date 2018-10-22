@@ -9,7 +9,7 @@
 
     <dubbo:application name="account_service"/>
 
-    <dubbo:registry protocol="zookeeper" address="localhost:2181"/>
+    <dubbo:registry protocol="zookeeper" address="192.168.1.84:2181"/>
 
     <dubbo:protocol accesslog="true" name="dubbo" port="20884"/>
 

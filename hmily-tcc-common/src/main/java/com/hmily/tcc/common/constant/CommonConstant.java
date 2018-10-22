@@ -43,4 +43,9 @@ public final class CommonConstant {
 
     public final static String TCC_TRANSACTION_CONTEXT = "TCC_TRANSACTION_CONTEXT";
 
+    /**
+     * The constant LINE_SEPARATOR.
+     */
+    public final static String LINE_SEPARATOR = System.getProperty("line.separator");
+
 }

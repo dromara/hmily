@@ -20,6 +20,8 @@ package com.hmily.tcc.demo.dubbo.order.service;
 import com.hmily.tcc.demo.dubbo.order.entity.Order;
 
 /**
+ * The interface Payment service.
+ *
  * @author xiaoyu
  */
 public interface PaymentService {
@@ -30,6 +32,13 @@ public interface PaymentService {
      * @param order 订单实体
      */
     void makePayment(Order order);
+
+    /**
+     * Test make payment.
+     *
+     * @param order the order
+     */
+    void testMakePayment(Order order);
 
 
     /**
@@ -43,7 +52,7 @@ public interface PaymentService {
      * mock订单支付的时候库存异常
      *
      * @param order 订单实体
-     * @return String
+     * @return String string
      */
     String mockPaymentInventoryWithTryException(Order order);
 
@@ -52,7 +61,7 @@ public interface PaymentService {
      * mock订单支付的时候库存超时
      *
      * @param order 订单实体
-     * @return String
+     * @return String string
      */
     String mockPaymentInventoryWithTryTimeout(Order order);
 
@@ -61,7 +70,7 @@ public interface PaymentService {
      * mock订单支付的时候库存确认异常
      *
      * @param order 订单实体
-     * @return String
+     * @return String string
      */
     String mockPaymentInventoryWithConfirmException(Order order);
 
@@ -70,7 +79,7 @@ public interface PaymentService {
      * mock订单支付的时候库存确认超时
      *
      * @param order 订单实体
-     * @return String
+     * @return String string
      */
     String mockPaymentInventoryWithConfirmTimeout(Order order);
 

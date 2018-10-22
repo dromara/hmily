@@ -36,9 +36,13 @@ public interface OrderService {
     String orderPay(Integer count, BigDecimal amount);
 
 
+    String testOrderPay(Integer count, BigDecimal amount);
+
+
     /**
      * 创建订单并且进行扣除账户余额支付，并进行库存扣减操作
-     *  in this  Inventory nested in account.
+     * in this  Inventory nested in account.
+     *
      * @param count  购买数量
      * @param amount 支付金额
      * @return string

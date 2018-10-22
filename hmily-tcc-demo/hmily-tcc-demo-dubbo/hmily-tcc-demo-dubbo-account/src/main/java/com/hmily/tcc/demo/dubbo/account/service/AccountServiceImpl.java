@@ -32,6 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -75,6 +76,16 @@ public class AccountServiceImpl implements AccountService {
         accountDO.setUpdateTime(new Date());
         accountMapper.update(accountDO);
         inlineService.testInline();
+        return Boolean.TRUE;
+    }
+
+    @Override
+    public boolean testPayment(AccountDTO accountDTO) {
+        final AccountDO accountDO = accountMapper.findByUserId(accountDTO.getUserId());
+        accountDO.setBalance(accountDO.getBalance().subtract(accountDTO.getAmount()));
+        accountDO.setUpdateTime(new Date());
+        accountDO.setFreezeAmount(new BigDecimal(0));
+        accountMapper.update(accountDO);
         return Boolean.TRUE;
     }
 
