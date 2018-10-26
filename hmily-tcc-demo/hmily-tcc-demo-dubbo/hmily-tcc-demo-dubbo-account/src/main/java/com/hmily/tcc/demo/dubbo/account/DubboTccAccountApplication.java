@@ -19,6 +19,7 @@ package com.hmily.tcc.demo.dubbo.account;
 
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ImportResource;
 
@@ -38,7 +39,9 @@ public class DubboTccAccountApplication {
      * @param args args.
      */
     public static void main(final String[] args) {
-        SpringApplication.run(DubboTccAccountApplication.class, args);
+        SpringApplication springApplication = new SpringApplication(DubboTccAccountApplication.class);
+        springApplication.setWebApplicationType(WebApplicationType.NONE);
+        springApplication.run(args);
     }
 
 

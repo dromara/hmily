@@ -20,6 +20,7 @@
 package com.hmily.tcc.spring.boot.starter.parent.config;
 
 import com.hmily.tcc.common.config.TccConfig;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
@@ -28,7 +29,7 @@ import org.springframework.stereotype.Component;
  *
  * @author xiaoyu(Myth)
  */
-@Component
+@Component("tccConfig")
 @ConfigurationProperties(prefix = "hmily.tcc")
 public class TccConfigProperties extends TccConfig {
 }
