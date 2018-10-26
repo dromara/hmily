@@ -87,6 +87,16 @@ public class TccConfig {
     private int consumerThreads = Runtime.getRuntime().availableProcessors() << 1;
 
     /**
+     * this is hmily async execute cancel or confirm thread size.
+     */
+    private int asyncThreads = Runtime.getRuntime().availableProcessors() << 1;
+
+    /**
+     * when start this set true  actor set false.
+     */
+    private Boolean started = true;
+
+    /**
      * db config.
      */
     private TccDbConfig tccDbConfig;

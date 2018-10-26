@@ -23,6 +23,7 @@ import com.hmily.tcc.core.bootstrap.HmilyTransactionBootstrap;
 import com.hmily.tcc.core.service.HmilyInitService;
 import com.hmily.tcc.spring.boot.starter.parent.config.TccConfigProperties;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -31,6 +32,7 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
 
 /**
  * HmilyAutoConfiguration is spring boot starter handler.
+ *
  * @author xiaoyu(Myth)
  */
 @Configuration
@@ -48,7 +50,8 @@ public class HmilyAutoConfiguration {
     }
 
     @Bean
-    public HmilyTransactionBootstrap tccTransactionBootstrap(HmilyInitService hmilyInitService) {
+    @Qualifier("hmilyTransactionBootstrap")
+    public HmilyTransactionBootstrap hmilyTransactionBootstrap(HmilyInitService hmilyInitService) {
         final HmilyTransactionBootstrap hmilyTransactionBootstrap = new HmilyTransactionBootstrap(hmilyInitService);
         hmilyTransactionBootstrap.setBufferSize(tccConfigProperties.getBufferSize());
         hmilyTransactionBootstrap.setRetryMax(tccConfigProperties.getRetryMax());
@@ -63,6 +66,9 @@ public class HmilyAutoConfiguration {
         hmilyTransactionBootstrap.setTccRedisConfig(tccConfigProperties.getTccRedisConfig());
         hmilyTransactionBootstrap.setTccZookeeperConfig(tccConfigProperties.getTccZookeeperConfig());
         hmilyTransactionBootstrap.setTccMongoConfig(tccConfigProperties.getTccMongoConfig());
+        hmilyTransactionBootstrap.setConsumerThreads(tccConfigProperties.getConsumerThreads());
+        hmilyTransactionBootstrap.setLoadFactor(tccConfigProperties.getLoadFactor());
+        hmilyTransactionBootstrap.setAsyncThreads(tccConfigProperties.getAsyncThreads());
         return hmilyTransactionBootstrap;
     }
 }

@@ -19,6 +19,7 @@ package com.hmily.tcc.demo.dubbo.inventory;
 
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ImportResource;
 
@@ -39,7 +40,9 @@ public class DubboTccInventoryApplication {
      * @param args args
      */
     public static void main(final String[] args) {
-        SpringApplication.run(DubboTccInventoryApplication.class, args);
+        SpringApplication springApplication = new SpringApplication(DubboTccInventoryApplication.class);
+        springApplication.setWebApplicationType(WebApplicationType.NONE);
+        springApplication.run(args);
     }
 
 

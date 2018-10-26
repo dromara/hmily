@@ -14,11 +14,12 @@ spring:
 hmily:
     tcc :
         serializer : kryo
-        recoverDelayTime : 128
-        retryMax : 3
-        scheduledDelay : 128
+        recoverDelayTime : 100
+        retryMax : 5
+        scheduledDelay : 100
         scheduledThreadMax :  10
         repositorySupport : db
+        started : false
         tccDbConfig :
                  driverClassName  : com.mysql.jdbc.Driver
                  url :  jdbc:mysql://192.168.1.98:3306/tcc?useUnicode=true&amp;characterEncoding=utf8

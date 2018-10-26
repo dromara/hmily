@@ -17,44 +17,45 @@
 
 package com.hmily.tcc.core.service.handler;
 
-import java.util.concurrent.Executor;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-
-import org.aspectj.lang.ProceedingJoinPoint;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import com.hmily.tcc.common.bean.context.TccTransactionContext;
 import com.hmily.tcc.common.bean.entity.TccTransaction;
+import com.hmily.tcc.common.config.TccConfig;
 import com.hmily.tcc.common.enums.TccActionEnum;
 import com.hmily.tcc.core.concurrent.threadlocal.TransactionContextLocal;
 import com.hmily.tcc.core.concurrent.threadpool.HmilyThreadFactory;
 import com.hmily.tcc.core.service.HmilyTransactionHandler;
 import com.hmily.tcc.core.service.executor.HmilyTransactionExecutor;
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.stereotype.Component;
+
+import java.util.concurrent.Executor;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
- * this is transaction starter.
+ * this is hmily transaction starter.
  *
  * @author xiaoyu
  */
 @Component
-public class StarterHmilyTransactionHandler implements HmilyTransactionHandler {
-
-    private static final int MAX_THREAD = Runtime.getRuntime().availableProcessors() << 1;
+public class StarterHmilyTransactionHandler implements HmilyTransactionHandler, ApplicationListener<ContextRefreshedEvent> {
 
     private final HmilyTransactionExecutor hmilyTransactionExecutor;
 
-    private final Executor executor = new ThreadPoolExecutor(MAX_THREAD, MAX_THREAD, 0, TimeUnit.MILLISECONDS,
-            new LinkedBlockingQueue<>(),
-            HmilyThreadFactory.create("hmily-execute", false),
-            new ThreadPoolExecutor.AbortPolicy());
+    private Executor executor;
+
+    private final TccConfig tccConfig;
 
     @Autowired
-    public StarterHmilyTransactionHandler(final HmilyTransactionExecutor hmilyTransactionExecutor) {
+    public StarterHmilyTransactionHandler(final HmilyTransactionExecutor hmilyTransactionExecutor, TccConfig tccConfig) {
         this.hmilyTransactionExecutor = hmilyTransactionExecutor;
+        this.tccConfig = tccConfig;
     }
+
 
     @Override
     public Object handler(final ProceedingJoinPoint point, final TccTransactionContext context)
@@ -78,9 +79,21 @@ public class StarterHmilyTransactionHandler implements HmilyTransactionHandler {
             final TccTransaction currentTransaction = hmilyTransactionExecutor.getCurrentTransaction();
             executor.execute(() -> hmilyTransactionExecutor.confirm(currentTransaction));
         } finally {
-        	TransactionContextLocal.getInstance().remove();
+            TransactionContextLocal.getInstance().remove();
             hmilyTransactionExecutor.remove();
         }
         return returnValue;
+    }
+
+    @Override
+    public void onApplicationEvent(ContextRefreshedEvent event) {
+        if (tccConfig.getStarted()) {
+            executor = new ThreadPoolExecutor(tccConfig.getAsyncThreads(),
+                    tccConfig.getAsyncThreads(), 0, TimeUnit.MILLISECONDS,
+                    new LinkedBlockingQueue<>(),
+                    HmilyThreadFactory.create("hmily-execute", false),
+                    new ThreadPoolExecutor.AbortPolicy());
+        }
+
     }
 }
