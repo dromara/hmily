@@ -1,5 +1,8 @@
 package com.hmily.tcc.common.utils;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+
 /**
  * DefaultValueUtils.
  *
@@ -13,28 +16,41 @@ public class DefaultValueUtils {
     /**
      * return default object.
      *
-     * @param type class
+     * @param clazz class
      * @return Object
      */
-    public static Object getDefaultValue(final Class type) {
-        if (boolean.class.equals(type) || Boolean.class.equals(type)) {
+    public static Object getDefaultValue(final Class clazz) throws IllegalAccessException, InvocationTargetException, InstantiationException {
+        if (boolean.class.equals(clazz) || Boolean.class.equals(clazz)) {
             return false;
-        } else if (byte.class.equals(type) || Byte.class.equals(type)) {
+        } else if (byte.class.equals(clazz) || Byte.class.equals(clazz)) {
             return ZERO;
-        } else if (short.class.equals(type) || Short.class.equals(type)) {
+        } else if (short.class.equals(clazz) || Short.class.equals(clazz)) {
             return ZERO;
-        } else if (int.class.equals(type) || Integer.class.equals(type)) {
+        } else if (int.class.equals(clazz) || Integer.class.equals(clazz)) {
             return ZERO;
-        } else if (long.class.equals(type) || Long.class.equals(type)) {
+        } else if (long.class.equals(clazz) || Long.class.equals(clazz)) {
             return 0L;
-        } else if (float.class.equals(type) || Float.class.equals(type)) {
+        } else if (float.class.equals(clazz) || Float.class.equals(clazz)) {
             return 0.0f;
-        } else if (double.class.equals(type) || Double.class.equals(type)) {
+        } else if (double.class.equals(clazz) || Double.class.equals(clazz)) {
             return 0.0d;
-        } else if (String.class.equals(type)) {
+        } else if (String.class.equals(clazz)) {
             return "";
         }
-        return new Object();
+        final Constructor[] constructors = clazz.getDeclaredConstructors();
+        Constructor constructor = constructors[constructors.length - 1];
+        constructor.setAccessible(true);
+        final Class[] parameClasses = constructor.getParameterTypes();
+        Object[] args = new Object[parameClasses.length];
+        for (int i = 0; i < parameClasses.length; i++) {
+            Class clazzes = parameClasses[i];
+            if (clazzes.isPrimitive()) {
+                args[i] = 0;
+            } else {
+                args[i] = null;
+            }
+        }
+        return constructor.newInstance(args);
     }
 
 }

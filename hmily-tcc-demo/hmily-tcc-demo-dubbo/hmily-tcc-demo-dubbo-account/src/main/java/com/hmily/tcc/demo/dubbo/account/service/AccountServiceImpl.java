@@ -69,14 +69,14 @@ public class AccountServiceImpl implements AccountService {
     @Override
     @Tcc(confirmMethod = "confirm", cancelMethod = "cancel")
     @Transactional
-    public boolean payment(AccountDTO accountDTO) {
+    public AccountDO payment(AccountDTO accountDTO) {
         final AccountDO accountDO = accountMapper.findByUserId(accountDTO.getUserId());
         accountDO.setBalance(accountDO.getBalance().subtract(accountDTO.getAmount()));
         accountDO.setFreezeAmount(accountDO.getFreezeAmount().add(accountDTO.getAmount()));
         accountDO.setUpdateTime(new Date());
         accountMapper.update(accountDO);
         inlineService.testInline();
-        return Boolean.TRUE;
+        return accountDO;
     }
 
     @Override
