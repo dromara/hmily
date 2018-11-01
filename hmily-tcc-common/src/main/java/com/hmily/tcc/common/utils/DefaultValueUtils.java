@@ -36,7 +36,10 @@ public class DefaultValueUtils {
             return 0.0d;
         } else if (String.class.equals(clazz)) {
             return "";
+        } else if (Void.TYPE.equals(clazz)) {
+            return "";
         }
+
         final Constructor[] constructors = clazz.getDeclaredConstructors();
         Constructor constructor = constructors[constructors.length - 1];
         constructor.setAccessible(true);

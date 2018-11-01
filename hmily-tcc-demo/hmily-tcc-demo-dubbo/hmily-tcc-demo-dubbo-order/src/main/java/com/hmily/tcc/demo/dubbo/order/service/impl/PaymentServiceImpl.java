@@ -83,7 +83,7 @@ public class PaymentServiceImpl implements PaymentService {
         AccountDTO accountDTO = new AccountDTO();
         accountDTO.setAmount(order.getTotalAmount());
         accountDTO.setUserId(order.getUserId());
-        final AccountDO payment = accountService.payment(accountDTO);
+        accountService.payment(accountDTO);
         //进入扣减库存操作
         InventoryDTO inventoryDTO = new InventoryDTO();
         inventoryDTO.setCount(order.getCount());
