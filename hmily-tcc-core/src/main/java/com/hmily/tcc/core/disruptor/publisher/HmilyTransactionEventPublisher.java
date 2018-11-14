@@ -21,7 +21,8 @@ package com.hmily.tcc.core.disruptor.publisher;
 
 import com.hmily.tcc.common.bean.entity.TccTransaction;
 import com.hmily.tcc.common.enums.EventTypeEnum;
-import com.hmily.tcc.core.concurrent.threadpool.HmilyThreadFactory;
+import com.hmily.tcc.core.concurrent.ConsistentHashSelector;
+import com.hmily.tcc.core.concurrent.SingletonExecutor;
 import com.hmily.tcc.core.coordinator.CoordinatorService;
 import com.hmily.tcc.core.disruptor.event.HmilyTransactionEvent;
 import com.hmily.tcc.core.disruptor.factory.HmilyTransactionEventFactory;
@@ -36,10 +37,8 @@ import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.concurrent.Executor;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -71,15 +70,13 @@ public class HmilyTransactionEventPublisher implements DisposableBean {
             return new Thread(null, r, "disruptor-thread-" + index.getAndIncrement());
         }, ProducerType.MULTI, new BlockingWaitStrategy());
 
-        final Executor executor = new ThreadPoolExecutor(threadSize, threadSize, 0, TimeUnit.MILLISECONDS,
-                new LinkedBlockingQueue<>(),
-                HmilyThreadFactory.create("hmily-log-disruptor", false),
-                new ThreadPoolExecutor.AbortPolicy());
-
-        HmilyConsumerDataHandler[] consumers = new HmilyConsumerDataHandler[threadSize];
+        HmilyConsumerDataHandler[] consumers = new HmilyConsumerDataHandler[1];
+        List<SingletonExecutor> selects = new ArrayList<>();
         for (int i = 0; i < threadSize; i++) {
-            consumers[i] = new HmilyConsumerDataHandler(executor, coordinatorService);
+            selects.add(new SingletonExecutor("hmily-log-disruptor" + i));
         }
+        ConsistentHashSelector selector = new ConsistentHashSelector(selects);
+        consumers[0] = new HmilyConsumerDataHandler(selector, coordinatorService);
         disruptor.handleEventsWithWorkerPool(consumers);
         disruptor.setDefaultExceptionHandler(new IgnoreExceptionHandler());
         disruptor.start();

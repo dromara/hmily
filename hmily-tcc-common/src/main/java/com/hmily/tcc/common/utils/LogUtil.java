@@ -24,6 +24,7 @@ import java.util.function.Supplier;
 
 /**
  * LogUtil.
+ *
  * @author xiaoyu
  */
 public final class LogUtil {
@@ -63,6 +64,8 @@ public final class LogUtil {
             logger.info(format, supplier.get());
         }
     }
+
+
 
     public static void info(Logger logger, Supplier<Object> supplier) {
         if (logger.isInfoEnabled()) {
