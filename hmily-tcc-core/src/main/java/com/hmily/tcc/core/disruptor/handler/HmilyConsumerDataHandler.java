@@ -2,6 +2,7 @@ package com.hmily.tcc.core.disruptor.handler;
 
 import com.hmily.tcc.common.bean.entity.TccTransaction;
 import com.hmily.tcc.common.enums.EventTypeEnum;
+import com.hmily.tcc.core.concurrent.ConsistentHashSelector;
 import com.hmily.tcc.core.coordinator.CoordinatorService;
 import com.hmily.tcc.core.disruptor.event.HmilyTransactionEvent;
 import com.lmax.disruptor.WorkHandler;
@@ -10,22 +11,24 @@ import java.util.concurrent.Executor;
 
 /**
  * this is disruptor consumer.
+ *
  * @author xiaoyu(Myth)
  */
 public class HmilyConsumerDataHandler implements WorkHandler<HmilyTransactionEvent> {
 
-    private Executor executor;
+    private ConsistentHashSelector executor;
 
     private final CoordinatorService coordinatorService;
 
-    public HmilyConsumerDataHandler(final Executor executor, final CoordinatorService coordinatorService) {
+    public HmilyConsumerDataHandler(final ConsistentHashSelector executor, final CoordinatorService coordinatorService) {
         this.executor = executor;
         this.coordinatorService = coordinatorService;
     }
 
     @Override
     public void onEvent(final HmilyTransactionEvent event) {
-        executor.execute(() -> {
+        String transId = event.getTccTransaction().getTransId();
+        executor.select(transId).execute(() -> {
             if (event.getType() == EventTypeEnum.SAVE.getCode()) {
                 coordinatorService.save(event.getTccTransaction());
             } else if (event.getType() == EventTypeEnum.UPDATE_PARTICIPANT.getCode()) {
