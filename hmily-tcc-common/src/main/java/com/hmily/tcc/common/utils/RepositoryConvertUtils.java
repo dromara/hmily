@@ -29,10 +29,19 @@ import java.util.List;
 
 /**
  * RepositoryConvertUtils.
+ *
  * @author xiaoyu(Myth)
  */
 public class RepositoryConvertUtils {
 
+    /**
+     * Convert byte [ ].
+     *
+     * @param tccTransaction   the tcc transaction
+     * @param objectSerializer the object serializer
+     * @return the byte [ ]
+     * @throws TccException the tcc exception
+     */
     public static byte[] convert(final TccTransaction tccTransaction, final ObjectSerializer objectSerializer) throws TccException {
         CoordinatorRepositoryAdapter adapter = new CoordinatorRepositoryAdapter();
         adapter.setTransId(tccTransaction.getTransId());
@@ -54,6 +63,14 @@ public class RepositoryConvertUtils {
         return objectSerializer.serialize(adapter);
     }
 
+    /**
+     * Transform bean tcc transaction.
+     *
+     * @param contents         the contents
+     * @param objectSerializer the object serializer
+     * @return the tcc transaction
+     * @throws TccException the tcc exception
+     */
     @SuppressWarnings("unchecked")
     public static TccTransaction transformBean(final byte[] contents, final ObjectSerializer objectSerializer) throws TccException {
         TccTransaction tccTransaction = new TccTransaction();

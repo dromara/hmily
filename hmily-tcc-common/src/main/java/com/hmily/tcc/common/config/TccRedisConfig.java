@@ -32,12 +32,12 @@ public class TccRedisConfig {
     private Boolean sentinel = false;
 
     /**
-     * clusterUrl   example:ip:port;ip:port.
+     * cluster url example:ip:port;ip:port.
      */
     private String clusterUrl;
 
     /**
-     * sentinelUrl   example:ip:port;ip:port.
+     * sentinel url example:ip:port;ip:port.
      */
     private String sentinelUrl;
 

@@ -20,29 +20,30 @@ package com.hmily.tcc.common.config;
 import lombok.Data;
 
 /**
- * mongo 保存事务日志配置.
+ * The mongo config.
+ *
  * @author xiaoyu
  */
 @Data
 public class TccMongoConfig {
 
     /**
-     * mongo数据库设置.
+     * mongo db name .
      */
     private String mongoDbName;
 
     /**
-     * mongo数据库URL.
+     * mongo url.
      */
     private String mongoDbUrl;
 
     /**
-     * mongo数据库用户名.
+     * mongo user name .
      */
     private String mongoUserName;
 
     /**
-     * mongo数据库密码.
+     * mongo password.
      */
     private String mongoUserPwd;
 

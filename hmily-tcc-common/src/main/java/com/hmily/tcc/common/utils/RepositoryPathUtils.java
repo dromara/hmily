@@ -20,39 +20,91 @@ package com.hmily.tcc.common.utils;
 import com.hmily.tcc.common.constant.CommonConstant;
 
 /**
- * 获取资源路径的工具类.
+ * The RepositoryPathUtils.
+ *
  * @author xiaoyu(Myth)
  */
 public class RepositoryPathUtils {
 
+    /**
+     * Build redis key string.
+     *
+     * @param keyPrefix the key prefix
+     * @param id        the id
+     * @return the string
+     */
     public static String buildRedisKey(final String keyPrefix, final String id) {
         return String.join(":", keyPrefix, id);
     }
 
+    /**
+     * Build file path string.
+     *
+     * @param applicationName the application name
+     * @return the string
+     */
     public static String buildFilePath(final String applicationName) {
         return String.join("/", CommonConstant.PATH_SUFFIX, applicationName.replaceAll("-", "_"));
     }
 
+    /**
+     * Gets full file name.
+     *
+     * @param filePath the file path
+     * @param id       the id
+     * @return the full file name
+     */
     public static String getFullFileName(final String filePath, final String id) {
         return String.format("%s/%s", filePath, id);
     }
 
+    /**
+     * Build db table name string.
+     *
+     * @param applicationName the application name
+     * @return the string
+     */
     public static String buildDbTableName(final String applicationName) {
         return CommonConstant.DB_SUFFIX + applicationName.replaceAll("-", "_");
     }
 
+    /**
+     * Build mongo table name string.
+     *
+     * @param applicationName the application name
+     * @return the string
+     */
     public static String buildMongoTableName(final String applicationName) {
         return CommonConstant.DB_SUFFIX + applicationName.replaceAll("-", "_");
     }
 
+    /**
+     * Build redis key prefix string.
+     *
+     * @param applicationName the application name
+     * @return the string
+     */
     public static String buildRedisKeyPrefix(final String applicationName) {
         return String.format(CommonConstant.RECOVER_REDIS_KEY_PRE, applicationName);
     }
 
+    /**
+     * Build zookeeper path prefix string.
+     *
+     * @param applicationName the application name
+     * @return the string
+     */
     public static String buildZookeeperPathPrefix(final String applicationName) {
         return String.join("-", CommonConstant.PATH_SUFFIX, applicationName);
     }
 
+    /**
+     * Build zookeeper root path string.
+     *
+     * @param prefix the prefix
+     * @param id     the id
+     * @return the string
+     */
     public static String buildZookeeperRootPath(final String prefix, final String id) {
         return String.join("/", prefix, id);
     }
