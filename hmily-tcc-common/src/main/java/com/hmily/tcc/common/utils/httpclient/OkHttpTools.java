@@ -31,10 +31,14 @@ import java.util.Map;
 
 /**
  * OkHttpTools.
+ *
  * @author xiaoyu
  */
 public final class OkHttpTools {
 
+    /**
+     * The constant JSON.
+     */
     public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 
     private static final OkHttpTools OK_HTTP_TOOLS = new OkHttpTools();
@@ -45,11 +49,23 @@ public final class OkHttpTools {
 
     }
 
+    /**
+     * Gets instance.
+     *
+     * @return the instance
+     */
     public static OkHttpTools getInstance() {
         return OK_HTTP_TOOLS;
     }
 
-    public Request buildPost(String url, Map<String, String> params) {
+    /**
+     * Build post request.
+     *
+     * @param url    the url
+     * @param params the params
+     * @return the request
+     */
+    private Request buildPost(final String url, final Map<String, String> params) {
         FormBody.Builder formBuilder = new FormBody.Builder();
         if (params != null) {
             for (String key : params.keySet()) {
@@ -63,7 +79,15 @@ public final class OkHttpTools {
                 .build();
     }
 
-    public String post(String url,String json) throws IOException {
+    /**
+     * Post string.
+     *
+     * @param url  the url
+     * @param json the json
+     * @return the string
+     * @throws IOException the io exception
+     */
+    public String post(final String url, final String json) throws IOException {
         OkHttpClient client = new OkHttpClient();
         RequestBody body = RequestBody.create(JSON, json);
         Request request = new Request.Builder()
@@ -75,27 +99,48 @@ public final class OkHttpTools {
 
     }
 
-    public <T> T get(String url, Map<String, String> params, Class<T> classOfT) throws IOException {
+    /**
+     * Get t.
+     *
+     * @param <T>      the type parameter
+     * @param url      the url
+     * @param params   the params
+     * @param classOfT the class of t
+     * @return the t
+     * @throws IOException the io exception
+     */
+    public <T> T get(final String url, final Map<String, String> params, final Class<T> classOfT) throws IOException {
         return execute(buildPost(url, params), classOfT);
     }
 
-    public <T> T get(String url, Type type) throws IOException {
+    /**
+     * Get t.
+     *
+     * @param <T>  the type parameter
+     * @param url  the url
+     * @param type the type
+     * @return the t
+     * @throws IOException the io exception
+     */
+    public <T> T get(final String url, final Type type) throws IOException {
         return execute(buildPost(url, null), type);
     }
 
-
-    private <T> T execute(Request request, Class<T> classOfT) throws IOException {
+    private <T> T execute(final Request request, final Class<T> classOfT) throws IOException {
         OkHttpClient client = new OkHttpClient();
         Response response = client.newCall(request).execute();
         return GOSN.fromJson(response.body().string(), classOfT);
     }
 
-    private String execute(Request request) throws IOException {
-        OkHttpClient client = new OkHttpClient();
-        Response response = client.newCall(request).execute();
-        return response.body().string();
-    }
-
+    /**
+     * Execute t.
+     *
+     * @param <T>     the type parameter
+     * @param request the request
+     * @param type    the type
+     * @return the t
+     * @throws IOException the io exception
+     */
     public <T> T execute(Request request, Type type) throws IOException {
         OkHttpClient client = new OkHttpClient();
         Response response = client.newCall(request).execute();

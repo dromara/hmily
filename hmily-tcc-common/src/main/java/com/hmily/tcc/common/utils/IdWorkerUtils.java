@@ -20,7 +20,8 @@ package com.hmily.tcc.common.utils;
 import java.util.UUID;
 
 /**
- * snow .
+ * snow flow .
+ *
  * @author xiaoyu
  */
 public final class IdWorkerUtils {
@@ -55,6 +56,11 @@ public final class IdWorkerUtils {
 
     private long lastTimestamp = -1L;
 
+    /**
+     * Gets instance.
+     *
+     * @return the instance
+     */
     public static IdWorkerUtils getInstance() {
         return ID_WORKER_UTILS;
     }
@@ -105,10 +111,20 @@ public final class IdWorkerUtils {
         return System.currentTimeMillis();
     }
 
+    /**
+     * Build part number string.
+     *
+     * @return the string
+     */
     public String buildPartNumber() {
         return String.valueOf(ID_WORKER_UTILS.nextId());
     }
 
+    /**
+     * Create uuid string.
+     *
+     * @return the string
+     */
     public String createUUID() {
         return String.valueOf(UUID.randomUUID().hashCode() & 0x7fffffff);
     }

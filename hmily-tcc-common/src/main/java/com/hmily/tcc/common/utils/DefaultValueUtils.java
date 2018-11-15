@@ -14,10 +14,13 @@ public class DefaultValueUtils {
     private static final int ZERO = 0;
 
     /**
-     * return default object.
+     * Gets default value.
      *
-     * @param clazz class
-     * @return Object
+     * @param clazz the clazz
+     * @return the default value
+     * @throws IllegalAccessException    the illegal access exception
+     * @throws InvocationTargetException the invocation target exception
+     * @throws InstantiationException    the instantiation exception
      */
     public static Object getDefaultValue(final Class clazz) throws IllegalAccessException, InvocationTargetException, InstantiationException {
         if (boolean.class.equals(clazz) || Boolean.class.equals(clazz)) {

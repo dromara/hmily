@@ -20,7 +20,8 @@ package com.hmily.tcc.common.config;
 import lombok.Data;
 
 /**
- * zookeeper 保存事务日志配置.
+ * zookeeper config.
+ *
  * @author xiaoyu
  */
 @Data

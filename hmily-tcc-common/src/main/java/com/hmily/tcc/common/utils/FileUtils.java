@@ -24,14 +24,16 @@ import java.nio.channels.FileChannel;
 
 /**
  * FileUtils.
+ *
  * @author xiaoyu(Myth)
  */
 public class FileUtils {
 
     /**
-     * 写入文件.
-     * @param fullFileName 文件路径全称
-     * @param contents 内容
+     * Write file.
+     *
+     * @param fullFileName the full file name
+     * @param contents     the contents
      */
     public static void writeFile(final String fullFileName, final byte[] contents) {
         try {

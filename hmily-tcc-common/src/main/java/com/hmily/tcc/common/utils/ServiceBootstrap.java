@@ -22,10 +22,18 @@ import java.util.ServiceLoader;
 
 /**
  * ServiceBootstrap.
+ *
  * @author xiaoyu
  */
 public class ServiceBootstrap {
 
+    /**
+     * Load first s.
+     *
+     * @param <S>   the type parameter
+     * @param clazz the clazz
+     * @return the s
+     */
     public static <S> S loadFirst(final Class<S> clazz) {
         final ServiceLoader<S> loader = loadAll(clazz);
         final Iterator<S> iterator = loader.iterator();
@@ -37,6 +45,13 @@ public class ServiceBootstrap {
         return iterator.next();
     }
 
+    /**
+     * Load all service loader.
+     *
+     * @param <S>   the type parameter
+     * @param clazz the clazz
+     * @return the service loader
+     */
     public static <S> ServiceLoader<S> loadAll(final Class<S> clazz) {
         return ServiceLoader.load(clazz);
     }

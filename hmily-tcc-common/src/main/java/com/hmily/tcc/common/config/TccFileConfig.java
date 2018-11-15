@@ -20,19 +20,19 @@ package com.hmily.tcc.common.config;
 import lombok.Data;
 
 /**
- * 文件保存事务日志配置.
+ * TccFileConfig.
  * @author xiaoyu
  */
 @Data
 public class TccFileConfig {
 
     /**
-     * 文件保存路径.
+     * path.
      */
     private String path;
 
     /**
-     * 文件前缀.
+     * prefix.
      */
     private String prefix;
 

@@ -21,6 +21,7 @@ import com.hmily.tcc.common.exception.TccRuntimeException;
 
 /**
  * AssertUtils.
+ *
  * @author xiaoyu
  */
 public final class AssertUtils {
@@ -29,6 +30,11 @@ public final class AssertUtils {
 
     }
 
+    /**
+     * Not null.
+     *
+     * @param obj the obj
+     */
     public static void notNull(final Object obj) {
         if (obj == null) {
             throw new TccRuntimeException("argument invalid,Please check");
