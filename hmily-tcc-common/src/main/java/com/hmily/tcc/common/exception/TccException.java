@@ -19,23 +19,43 @@ package com.hmily.tcc.common.exception;
 
 /**
  * TccException.
+ *
  * @author xiaoyu
  */
 public class TccException extends Exception {
 
     private static final long serialVersionUID = -948934144333391208L;
 
+    /**
+     * Instantiates a new Tcc exception.
+     */
     public TccException() {
     }
 
+    /**
+     * Instantiates a new Tcc exception.
+     *
+     * @param message the message
+     */
     public TccException(final String message) {
         super(message);
     }
 
+    /**
+     * Instantiates a new Tcc exception.
+     *
+     * @param message the message
+     * @param cause   the cause
+     */
     public TccException(final String message, final Throwable cause) {
         super(message, cause);
     }
 
+    /**
+     * Instantiates a new Tcc exception.
+     *
+     * @param cause the cause
+     */
     public TccException(final Throwable cause) {
         super(cause);
     }

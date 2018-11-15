@@ -27,20 +27,44 @@ public final class CommonConstant {
     private CommonConstant() {
     }
 
+    /**
+     * The constant DB_MYSQL.
+     */
     public final static String DB_MYSQL = "mysql";
 
+    /**
+     * The constant DB_SQLSERVER.
+     */
     public final static String DB_SQLSERVER = "sqlserver";
 
+    /**
+     * The constant DB_ORACLE.
+     */
     public final static String DB_ORACLE = "oracle";
 
+    /**
+     * The constant DB_POSTGRESQL.
+     */
     public final static String DB_POSTGRESQL = "postgresql";
 
+    /**
+     * The constant PATH_SUFFIX.
+     */
     public final static String PATH_SUFFIX = "/tcc";
 
+    /**
+     * The constant DB_SUFFIX.
+     */
     public final static String DB_SUFFIX = "tcc_";
 
+    /**
+     * The constant RECOVER_REDIS_KEY_PRE.
+     */
     public final static String RECOVER_REDIS_KEY_PRE = "tcc:transaction:%s";
 
+    /**
+     * The constant TCC_TRANSACTION_CONTEXT.
+     */
     public final static String TCC_TRANSACTION_CONTEXT = "TCC_TRANSACTION_CONTEXT";
 
     /**

@@ -21,116 +21,129 @@ import java.util.Set;
 
 /**
  * JedisClient.
+ *
  * @author xiaoyu(Myth)
  */
 public interface JedisClient {
 
     /**
-     * set 操作.
-     * @param key key
-     * @param value key
-     * @return String
+     * Set string.
+     *
+     * @param key   the key
+     * @param value the value
+     * @return the string
      */
     String set(String key, String value);
 
     /**
-     * set 操作.
-     * @param key key
-     * @param value key
-     * @return String
+     * Set string.
+     *
+     * @param key   the key
+     * @param value the value
+     * @return the string
      */
     String set(String key, byte[] value);
 
     /**
-     * 批量删除key.
-     * @param keys key集合
-     * @return 数量
+     * Del long.
+     *
+     * @param keys the keys
+     * @return the long
      */
     Long del(String... keys);
 
     /**
-     * 根据key获取.
-     * @param key redis key
-     * @return String
+     * Get string.
+     *
+     * @param key the key
+     * @return the string
      */
     String get(String key);
 
     /**
-     * 根据key获取.
-     * @param key redis key
-     * @return  byte[]
+     * Get byte [ ].
+     *
+     * @param key the key
+     * @return the byte [ ]
      */
     byte[] get(byte[] key);
 
-
     /**
-     * 根据key 模糊匹配.
-     * @param pattern redis key
-     * @return  Set byte[]
+     * Keys set.
+     *
+     * @param pattern the pattern
+     * @return the set
      */
     Set<byte[]> keys(byte[] pattern);
 
     /**
-     * 根据key 模糊匹配.
-     * @param key redis key
-     * @return      Set String
+     * Keys set.
+     *
+     * @param key the key
+     * @return the set
      */
     Set<String> keys(String key);
 
     /**
-     * hash set值.
-     * @param key redis key
-     * @param item hash key
-     * @param value 值
-     * @return 条数
+     * Hset long.
+     *
+     * @param key   the key
+     * @param item  the item
+     * @param value the value
+     * @return the long
      */
     Long hset(String key, String item, String value);
 
     /**
-     * hash get 值.
-     * @param key key
-     * @param item hash key
-     * @return value
+     * Hget string.
+     *
+     * @param key  the key
+     * @param item the item
+     * @return the string
      */
     String hget(String key, String item);
 
     /**
-     * hash del 值.
-     * @param key key
-     * @param item hash key
-     * @return 数量
+     * Hdel long.
+     *
+     * @param key  the key
+     * @param item the item
+     * @return the long
      */
     Long hdel(String key, String item);
 
     /**
-     * 增加.
-     * @param key key
-     * @return Long
+     * Incr long.
+     *
+     * @param key the key
+     * @return the long
      */
     Long incr(String key);
 
     /**
-     * 减少.
-     * @param key key
-     * @return Long
+     * Decr long.
+     *
+     * @param key the key
+     * @return the long
      */
     Long decr(String key);
 
-
     /**
-     * 设置key的过期时间.
-     * @param key key
-     * @param second 过期时间 秒
-     * @return  Long
+     * Expire long.
+     *
+     * @param key    the key
+     * @param second the second
+     * @return the long
      */
     Long expire(String key, int second);
 
     /**
-     * 分页获取zsort.
-     * @param key key
-     * @param start 开始
-     * @param end 结束
-     * @return Set String
+     * Zrange set.
+     *
+     * @param key   the key
+     * @param start the start
+     * @param end   the end
+     * @return the set
      */
     Set<String> zrange(String key, long start, long end);
 

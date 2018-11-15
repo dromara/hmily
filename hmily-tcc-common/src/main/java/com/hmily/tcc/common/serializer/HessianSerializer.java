@@ -28,6 +28,7 @@ import java.io.IOException;
 
 /**
  * HessianSerializer.
+ *
  * @author xiaoyu
  */
 @SuppressWarnings("unchecked")

@@ -26,7 +26,7 @@ import com.hmily.tcc.common.constant.CommonConstant;
 public class DbTypeUtils {
 
     /**
-     *  check db type
+     *  check db type.
      * @param driverClassName driverClassName
      * @return mysql sqlserver oracle postgresql.
      */
@@ -38,7 +38,7 @@ public class DbTypeUtils {
             dbType = CommonConstant.DB_SQLSERVER;
         } else if (driverClassName.contains(CommonConstant.DB_ORACLE)) {
             dbType = CommonConstant.DB_ORACLE;
-        }else if (driverClassName.contains(CommonConstant.DB_POSTGRESQL)) {
+        } else if (driverClassName.contains(CommonConstant.DB_POSTGRESQL)) {
             dbType = CommonConstant.DB_POSTGRESQL;
         }
         return dbType;

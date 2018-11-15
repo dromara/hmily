@@ -36,7 +36,7 @@ public interface AccountService {
      * @return true
      */
     @Tcc
-    AccountDO payment(AccountDTO accountDTO);
+    void payment(AccountDTO accountDTO);
 
     boolean testPayment(AccountDTO accountDTO);
 
