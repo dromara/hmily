@@ -32,6 +32,6 @@ public class CommonErrorCode {
     /**
      * success code.
      */
-    private static final int SUCCESSFUL = 200;
+    public static final int SUCCESSFUL = 200;
 
 }
