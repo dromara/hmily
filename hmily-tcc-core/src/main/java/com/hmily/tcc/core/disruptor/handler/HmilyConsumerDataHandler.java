@@ -7,8 +7,6 @@ import com.hmily.tcc.core.coordinator.CoordinatorService;
 import com.hmily.tcc.core.disruptor.event.HmilyTransactionEvent;
 import com.lmax.disruptor.WorkHandler;
 
-import java.util.concurrent.Executor;
-
 /**
  * this is disruptor consumer.
  *
