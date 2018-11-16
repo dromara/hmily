@@ -1,0 +1,5 @@
+com.hmily.hmily.core.spi.repository.JdbcCoordinatorRepository
+com.hmily.hmily.core.spi.repository.FileCoordinatorRepository
+com.hmily.hmily.core.spi.repository.MongoCoordinatorRepository
+com.hmily.hmily.core.spi.repository.RedisCoordinatorRepository
+com.hmily.hmily.core.spi.repository.ZookeeperCoordinatorRepository

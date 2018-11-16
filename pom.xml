@@ -3,22 +3,21 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
-    <groupId>com.hmily.tcc</groupId>
-    <artifactId>hmily-tcc</artifactId>
+    <groupId>org.dromara</groupId>
+    <artifactId>hmily</artifactId>
     <packaging>pom</packaging>
     <version>1.2.1-RELEASE</version>
-    <name>hmily-tcc</name>
+    <name>hmily</name>
     <modules>
-        <module>hmily-tcc-common</module>
-        <module>hmily-tcc-core</module>
-        <module>hmily-tcc-demo</module>
-        <module>hmily-tcc-dubbo</module>
-        <module>hmily-tcc-springcloud</module>
-        <module>hmily-tcc-annotation</module>
-        <module>hmily-tcc-admin</module>
-        <module>hmily-tcc-motan</module>
-        <module>hmily-tcc-spring-boot-starter</module>
+        <module>hmily-common</module>
+        <module>hmily-core</module>
+        <module>hmily-demo</module>
+        <module>hmily-dubbo</module>
+        <module>hmily-springcloud</module>
+        <module>hmily-annotation</module>
+        <module>hmily-admin</module>
+        <module>hmily-motan</module>
+        <module>hmily-spring-boot-starter</module>
     </modules>
 
     <licenses>
@@ -93,65 +92,65 @@
             </dependency>
 
             <dependency>
-                <groupId>com.hmily.tcc</groupId>
-                <artifactId>hmily-tcc-admin</artifactId>
+                <groupId>org.dromara</groupId>
+                <artifactId>hmily-admin</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.hmily.tcc</groupId>
-                <artifactId>hmily-tcc-common</artifactId>
+                <groupId>org.dromara</groupId>
+                <artifactId>hmily-common</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.hmily.tcc</groupId>
-                <artifactId>hmily-tcc-core</artifactId>
+                <groupId>org.dromara</groupId>
+                <artifactId>hmily-core</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.hmily.tcc</groupId>
-                <artifactId>hmily-tcc-dubbo</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.hmily.tcc</groupId>
-                <artifactId>hmily-tcc-springcloud</artifactId>
+                <groupId>org.dromara</groupId>
+                <artifactId>hmily-dubbo</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>com.hmily.tcc</groupId>
-                <artifactId>hmily-tcc-motan</artifactId>
+                <groupId>org.dromara</groupId>
+                <artifactId>hmily-springcloud</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>com.hmily.tcc</groupId>
-                <artifactId>hmily-tcc-annotation</artifactId>
+                <groupId>org.dromara</groupId>
+                <artifactId>hmily-motan</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>com.hmily.tcc</groupId>
-                <artifactId>hmily-tcc-spring-boot-starter-parent</artifactId>
+                <groupId>org.dromara</groupId>
+                <artifactId>hmily-annotation</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>com.hmily.tcc</groupId>
-                <artifactId>hmily-tcc-spring-boot-starter-dubbo</artifactId>
+                <groupId>org.dromara</groupId>
+                <artifactId>hmily-spring-boot-starter-parent</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>com.hmily.tcc</groupId>
-                <artifactId>hmily-tcc-spring-boot-starter-springcloud</artifactId>
+                <groupId>org.dromara</groupId>
+                <artifactId>hmily-spring-boot-starter-dubbo</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>com.hmily.tcc</groupId>
-                <artifactId>hmily-tcc-spring-boot-starter-motan</artifactId>
+                <groupId>org.dromara</groupId>
+                <artifactId>hmily-spring-boot-starter-springcloud</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.dromara</groupId>
+                <artifactId>hmily-spring-boot-starter-motan</artifactId>
                 <version>${project.version}</version>
             </dependency>
 

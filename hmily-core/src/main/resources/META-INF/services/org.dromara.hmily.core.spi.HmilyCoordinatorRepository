@@ -1,0 +1,5 @@
+org.dromara.hmily.core.spi.repository.JdbcCoordinatorRepository
+org.dromara.hmily.core.spi.repository.FileCoordinatorRepository
+org.dromara.hmily.core.spi.repository.MongoCoordinatorRepository
+org.dromara.hmily.core.spi.repository.RedisCoordinatorRepository
+org.dromara.hmily.core.spi.repository.ZookeeperCoordinatorRepository
