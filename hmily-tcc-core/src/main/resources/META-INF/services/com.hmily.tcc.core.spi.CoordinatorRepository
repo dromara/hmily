@@ -1,5 +1,0 @@
-com.hmily.tcc.core.spi.repository.JdbcCoordinatorRepository
-com.hmily.tcc.core.spi.repository.FileCoordinatorRepository
-com.hmily.tcc.core.spi.repository.MongoCoordinatorRepository
-com.hmily.tcc.core.spi.repository.RedisCoordinatorRepository
-com.hmily.tcc.core.spi.repository.ZookeeperCoordinatorRepository
