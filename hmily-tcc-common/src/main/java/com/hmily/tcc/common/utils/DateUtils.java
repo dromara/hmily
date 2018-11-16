@@ -66,6 +66,23 @@ public class DateUtils {
     }
 
     /**
+     * Parse date string.
+     *
+     * @param date the date
+     * @return the string
+     */
+    public static String parseDate(Date date) {
+        Instant instant = date.toInstant();
+        ZoneId zone = ZoneId.systemDefault();
+        LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, zone);
+        return formatLocalDateTime(localDateTime);
+    }
+
+    private static String formatLocalDateTime(final LocalDateTime dateTime) {
+        return dateTime.format(DateTimeFormatter.ofPattern(DATE_FORMAT_DATETIME));
+    }
+
+    /**
      * Gets current date time.
      *
      * @return the current date time
