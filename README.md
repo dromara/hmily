@@ -29,7 +29,7 @@ Hmily
   
 #  源码解析博客
 
-  * ## https://yu199195.github.io/categories/hmily-tcc/
+  * ## https://yu199195.github.io/categories/hmily-hmily/
 
 
 #  视频详解
@@ -75,10 +75,10 @@ Hmily
    ```
 
 * #### execute this sql       
-    https://github.com/yu199195/hmily/blob/master/hmily-tcc-demo/sql/tcc-demo.sql
+    https://github.com/yu199195/hmily/blob/master/hmily-hmily-demo/sql/hmily-demo.sql
 
 * #### Find the RPC framework that works for you
-    https://github.com/yu199195/hmily/tree/master/hmily-tcc-demo
+    https://github.com/yu199195/hmily/tree/master/hmily-hmily-demo
 * ### [Dubbo-Quick-Start](https://github.com/yu199195/hmily/wiki/Dubbo-Quick-Start)
 
 * ### [SpringCloud-Quick-Start](https://github.com/yu199195/hmily/wiki/SpringCloud-Quick-Start)
