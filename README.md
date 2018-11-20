@@ -1,14 +1,9 @@
 Hmily
 ================
 
-### 高性能分布式事务tcc开源框架。基于java语言来开发（JDK1.8），支持dubbo，springcloud,motan等rpc框架进行分布式事务。
-
-# 官网
-
- ### http://dromara.org
+### 高性能分布式事务tcc方案开源框架。基于java语言来开发（JDK1.8）,支持dubbo，springcloud,motan等rpc框架进行分布式事务。
  
-
- # Features
+# Features
 
  * **框架特性**
  
@@ -28,6 +23,13 @@ Hmily
 
      * ##### 内置经典的分布式事务场景demo工程，并有swagger-ui可视化界面可以快速体验。
 
+
+# 官网
+
+ ## http://dromara.org  或者 https://dromara.org 有时候https打不开。
+ 
+ ## [文档](http://dromara.org/website/zh-cn/docs/hmily/index.html)
+
 #  为什么高性能？
   
   * ## https://mp.weixin.qq.com/s/Eh9CKTU0nwLZ1rl3xmaZGA
@@ -40,74 +42,8 @@ Hmily
 #  视频详解
 
   * ## 环境搭建以及运行 : http://www.iqiyi.com/w_19rwkrfu69.html#vfrm=16-1-1-1
+ 
   * ## 源码详解以及调试 : http://www.iqiyi.com/w_19rwkreutt.html
-
-
-# Prerequisite
-
-  *   #### JDK 1.8+
-
-  *   #### Maven 3.2.x
-
-  *   #### Git
-
-  *   ####  RPC framework dubbo or motan or springcloud。
-
-
-# Spring-Boot-Starter-Support
-
-   * ### [Spring-Boot-Starter](https://github.com/yu199195/hmily/wiki/Spring-Boot-Starter)
-
-
-# TCC原理介绍
-
-  * ###  https://github.com/yu199195/hmily/wiki/Theory
-
-#   Configuration
-
-  * ###  https://github.com/yu199195/hmily/wiki/Configuration
-
-
-# Quick Start
-
- * #### Clone & Build
-   ```
-   > git clone https://github.com/yu199195/hmily.git
-
-   > cd hmily
-
-   > mvn -DskipTests clean install -U
-   ```
-
-* #### execute this sql       
-    https://github.com/yu199195/hmily/blob/master/hmily-hmily-demo/sql/hmily-demo.sql
-
-* #### Find the RPC framework that works for you
-    https://github.com/yu199195/hmily/tree/master/hmily-hmily-demo
-* ### [Dubbo-Quick-Start](https://github.com/yu199195/hmily/wiki/Dubbo-Quick-Start)
-
-* ### [SpringCloud-Quick-Start](https://github.com/yu199195/hmily/wiki/SpringCloud-Quick-Start)
-
-
-
-
-
-# User Guide
-
-* #### 关于jar包引用问题，现在jar包还未上传到maven的中央仓库，所以使用者需要自行获取代码，然后打包上传到自己maven私服
-
-   ```
-   > git clone https://github.com/yu199195/hmily.git
-
-   > mvn -DskipTests clean deploy -U
-   ```
-* #### 关于jar包版本问题 ，现在因为没有传到中央仓库，如果引用的话，请自行设置相应的版本。
-
-
-*  ## [Dubbo User Guide](https://github.com/yu199195/hmily/wiki/Dubbo-User-Guide)
-
-*  ## [SpringCloud User Guide](https://github.com/yu199195/hmily/wiki/SpringCloud-User-Gruid)
-
 
 
 # FAQ
@@ -118,9 +54,8 @@ Hmily
 * ### 为什么我运行demo工程，找不到applicationContent.xml呢？
   ##### 答：请设置项目的资源文件夹。
 
-* ### 为什么我启动tcc-admin项目的时候，会报mongo 集群连接错误呢？
+* ### 为什么我启动hmily-admin项目的时候，会报mongo 集群连接错误呢？
   ##### 答：这是因为项目里面有mongo代码，spring boot会自动配置，该错误没有关系，只要admin项目能正常启动就行。
-
 
 
 # Support
