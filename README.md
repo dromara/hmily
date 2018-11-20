@@ -28,16 +28,15 @@ Hmily
 
  ## http://dromara.org  或者 https://dromara.org 有时候https打不开。
  
- ## [文档](http://dromara.org/website/zh-cn/docs/hmily/index.html)
+
+# 文档 
+ 
+ ##  http://dromara.org/website/zh-cn/docs/hmily/index.html
 
 #  为什么高性能？
   
   * ## https://mp.weixin.qq.com/s/Eh9CKTU0nwLZ1rl3xmaZGA
   
-#  源码解析博客
-
-  * ## https://yu199195.github.io/categories/hmily-hmily/
-
 
 #  视频详解
 
