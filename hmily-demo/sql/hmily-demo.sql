@@ -3,7 +3,7 @@ SQLyog Ultimate v12.2.6 (64 bit)
 MySQL - 5.7.19-0ubuntu0.16.04.1 : Database - account
 *********************************************************************
 */
-CREATE DATABASE `hmily` ;
+CREATE DATABASE `tcc` ;
 
 CREATE DATABASE /*!32312 IF NOT EXISTS*/`tcc_account` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin */;
 
