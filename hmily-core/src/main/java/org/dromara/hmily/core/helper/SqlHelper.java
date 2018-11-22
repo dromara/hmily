@@ -35,93 +35,100 @@ public class SqlHelper {
      * @return sql.
      */
     public static String buildCreateTableSql(final String driverClassName, final String tableName) {
-        StringBuilder createTableSql = new StringBuilder();
         String dbType = DbTypeUtils.buildByDriverClassName(driverClassName);
         switch (dbType) {
             case CommonConstant.DB_MYSQL:
-                createTableSql
-                        .append("CREATE TABLE IF NOT EXISTS `")
-                        .append(tableName)
-                        .append("` (")
-                        .append("  `trans_id` varchar(64) NOT NULL,")
-                        .append("  `target_class` varchar(256) ,")
-                        .append("  `target_method` varchar(128) ,")
-                        .append("  `confirm_method` varchar(128) ,")
-                        .append("  `cancel_method` varchar(128) ,")
-                        .append("  `retried_count` tinyint NOT NULL,")
-                        .append("  `create_time` datetime NOT NULL,")
-                        .append("  `last_time` datetime NOT NULL,")
-                        .append("  `version` tinyint NOT NULL,")
-                        .append("  `status` tinyint NOT NULL,")
-                        .append("  `invocation` longblob,")
-                        .append("  `role` tinyint NOT NULL,")
-                        .append("  `pattern` tinyint,")
-                        .append("  PRIMARY KEY (`trans_id`))");
-                break;
+                return buildMysql(tableName);
             case CommonConstant.DB_ORACLE:
-                createTableSql
-                        .append("CREATE TABLE IF NOT EXISTS `")
-                        .append(tableName)
-                        .append("` (")
-                        .append("  `trans_id` varchar(64) NOT NULL,")
-                        .append("  `target_class` varchar(256) ,")
-                        .append("  `target_method` varchar(128) ,")
-                        .append("  `confirm_method` varchar(128) ,")
-                        .append("  `cancel_method` varchar(128) ,")
-                        .append("  `retried_count` int(3) NOT NULL,")
-                        .append("  `create_time` date NOT NULL,")
-                        .append("  `last_time` date NOT NULL,")
-                        .append("  `version` int(6) NOT NULL,")
-                        .append("  `status` int(2) NOT NULL,")
-                        .append("  `invocation` BLOB ,")
-                        .append("  `role` int(2) NOT NULL,")
-                        .append("  `pattern` int(2),")
-                        .append("  PRIMARY KEY (`trans_id`))");
-                break;
+                return buildOracle(tableName);
             case CommonConstant.DB_SQLSERVER:
-                createTableSql
-                        .append("CREATE TABLE IF NOT EXISTS `")
-                        .append(tableName)
-                        .append("` (")
-                        .append("  `trans_id` varchar(64) NOT NULL,")
-                        .append("  `target_class` varchar(256) ,")
-                        .append("  `target_method` varchar(128) ,")
-                        .append("  `confirm_method` varchar(128) ,")
-                        .append("  `cancel_method` varchar(128) ,")
-                        .append("  `retried_count` int(3) NOT NULL,")
-                        .append("  `create_time` datetime NOT NULL,")
-                        .append("  `last_time` datetime NOT NULL,")
-                        .append("  `version` int(6) NOT NULL,")
-                        .append("  `status` int(2) NOT NULL,")
-                        .append("  `invocation` varbinary ,")
-                        .append("  `role` int(2) NOT NULL,")
-                        .append("  `pattern` int(2),")
-                        .append("  PRIMARY KEY (`trans_id`))");
-                break;
+                return buildSqlServer(tableName);
             case CommonConstant.DB_POSTGRESQL:
-                createTableSql
-                        .append(" CREATE TABLE IF NOT EXISTS ")
-                        .append(tableName)
-                        .append("(")
-                        .append("  trans_id       VARCHAR(64) PRIMARY KEY,")
-                        .append("  target_class   VARCHAR(256),")
-                        .append("  target_method  VARCHAR(128),")
-                        .append("  confirm_method VARCHAR(128),")
-                        .append("  cancel_method  VARCHAR(128),")
-                        .append("  retried_count  SMALLINT    NOT NULL,")
-                        .append("  create_time    TIMESTAMP   NOT NULL,")
-                        .append("  last_time      TIMESTAMP   NOT NULL,")
-                        .append("  version        SMALLINT    NOT NULL,")
-                        .append("  status         SMALLINT    NOT NULL,")
-                        .append("  invocation     BYTEA,")
-                        .append("  role           SMALLINT    NOT NULL,")
-                        .append("  pattern        SMALLINT    NOT NULL")
-                        .append(");");
-                break;
+                return buildPostgresql(tableName);
             default:
                 throw new RuntimeException("dbType not support ! The current support mysql oracle sqlserver postgresql.");
         }
-        return createTableSql.toString();
+    }
+
+    private static String buildMysql(final String tableName) {
+        return "CREATE TABLE IF NOT EXISTS `" +
+                tableName +
+                "` (" +
+                "  `trans_id` varchar(64) NOT NULL," +
+                "  `target_class` varchar(256) ," +
+                "  `target_method` varchar(128) ," +
+                "  `confirm_method` varchar(128) ," +
+                "  `cancel_method` varchar(128) ," +
+                "  `retried_count` tinyint NOT NULL," +
+                "  `create_time` datetime NOT NULL," +
+                "  `last_time` datetime NOT NULL," +
+                "  `version` tinyint NOT NULL," +
+                "  `status` tinyint NOT NULL," +
+                "  `invocation` longblob," +
+                "  `role` tinyint NOT NULL," +
+                "  `pattern` tinyint," +
+                "  PRIMARY KEY (`trans_id`))";
+    }
+
+    private static String buildOracle(final String tableName) {
+        return "CREATE TABLE IF NOT EXISTS `" +
+                tableName +
+                "` (" +
+                "  `trans_id` varchar(64) NOT NULL," +
+                "  `target_class` varchar(256) ," +
+                "  `target_method` varchar(128) ," +
+                "  `confirm_method` varchar(128) ," +
+                "  `cancel_method` varchar(128) ," +
+                "  `retried_count` int(3) NOT NULL," +
+                "  `create_time` date NOT NULL," +
+                "  `last_time` date NOT NULL," +
+                "  `version` int(6) NOT NULL," +
+                "  `status` int(2) NOT NULL," +
+                "  `invocation` BLOB ," +
+                "  `role` int(2) NOT NULL," +
+                "  `pattern` int(2)," +
+                "  PRIMARY KEY (`trans_id`))";
+    }
+
+    private static String buildSqlServer(final String tableName) {
+        return "CREATE TABLE IF NOT EXISTS `" +
+                tableName +
+                "` (" +
+                "  `trans_id` varchar(64) NOT NULL," +
+                "  `target_class` varchar(256) ," +
+                "  `target_method` varchar(128) ," +
+                "  `confirm_method` varchar(128) ," +
+                "  `cancel_method` varchar(128) ," +
+                "  `retried_count` int(3) NOT NULL," +
+                "  `create_time` datetime NOT NULL," +
+                "  `last_time` datetime NOT NULL," +
+                "  `version` int(6) NOT NULL," +
+                "  `status` int(2) NOT NULL," +
+                "  `invocation` varbinary ," +
+                "  `role` int(2) NOT NULL," +
+                "  `pattern` int(2)," +
+                "  PRIMARY KEY (`trans_id`))";
+    }
+
+    private static String buildPostgresql(final String tableName) {
+        return " CREATE TABLE IF NOT EXISTS " +
+                tableName +
+                "(" +
+                "  trans_id       VARCHAR(64) PRIMARY KEY," +
+                "  target_class   VARCHAR(256)," +
+                "  target_method  VARCHAR(128)," +
+                "  confirm_method VARCHAR(128)," +
+                "  cancel_method  VARCHAR(128)," +
+                "  retried_count  SMALLINT    NOT NULL," +
+                "  create_time    TIMESTAMP   NOT NULL," +
+                "  last_time      TIMESTAMP   NOT NULL," +
+                "  version        SMALLINT    NOT NULL," +
+                "  status         SMALLINT    NOT NULL," +
+                "  invocation     BYTEA," +
+                "  role           SMALLINT    NOT NULL," +
+                "  pattern        SMALLINT    NOT NULL" +
+                ");";
+
     }
 
 }
