@@ -1,5 +1,6 @@
 Hmily
 ================
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/2f0a0191b02448e6919aca6ce12a1584)](https://app.codacy.com/app/yu199195/hmily?utm_source=github.com&utm_medium=referral&utm_content=yu199195/hmily&utm_campaign=Badge_Grade_Dashboard)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/b25b3402352c4dd587682dc13feb3edb)](https://app.codacy.com/app/yu199195/hmily?utm_source=github.com&utm_medium=referral&utm_content=yu199195/hmily&utm_campaign=Badge_Grade_Dashboard)
 [![Total lines](https://tokei.rs/b1/github/yu199195/hmily?category=lines)](https://github.com/yu199195/hmily)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg?label=license)](https://github.com/yu199195/hmily/blob/master/LICENSE)
