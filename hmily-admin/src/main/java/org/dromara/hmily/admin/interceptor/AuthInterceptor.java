@@ -29,6 +29,7 @@ import java.util.Objects;
 
 /**
  * AuthInterceptor.
+ *
  * @author xiaoyu(Myth)
  */
 public class AuthInterceptor extends HandlerInterceptorAdapter {
@@ -45,13 +46,11 @@ public class AuthInterceptor extends HandlerInterceptorAdapter {
                 return Boolean.TRUE;
             }
             final boolean login = annotation.isLogin();
-            if (login) {
-                if (!LoginServiceImpl.LOGIN_SUCCESS) {
-                    request.setAttribute("code", "404");
-                    request.setAttribute("msg", "请您先登录！");
-                    request.getRequestDispatcher("/").forward(request, response);
-                    return Boolean.FALSE;
-                }
+            if (login && !LoginServiceImpl.LOGIN_SUCCESS) {
+                request.setAttribute("code", "404");
+                request.setAttribute("msg", "请您先登录！");
+                request.getRequestDispatcher("/").forward(request, response);
+                return Boolean.FALSE;
             }
         }
         return super.preHandle(request, response, handler);
