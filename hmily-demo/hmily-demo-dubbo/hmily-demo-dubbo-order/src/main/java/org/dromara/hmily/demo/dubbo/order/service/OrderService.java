@@ -22,6 +22,8 @@ import org.dromara.hmily.demo.dubbo.order.entity.Order;
 import java.math.BigDecimal;
 
 /**
+ * The interface Order service.
+ *
  * @author xiaoyu
  */
 public interface OrderService {
@@ -31,11 +33,18 @@ public interface OrderService {
      *
      * @param count  购买数量
      * @param amount 支付金额
-     * @return string
+     * @return string string
      */
     String orderPay(Integer count, BigDecimal amount);
 
 
+    /**
+     * Test order pay string.
+     *
+     * @param count  the count
+     * @param amount the amount
+     * @return the string
+     */
     String testOrderPay(Integer count, BigDecimal amount);
 
 
@@ -45,7 +54,7 @@ public interface OrderService {
      *
      * @param count  购买数量
      * @param amount 支付金额
-     * @return string
+     * @return string string
      */
     String orderPayWithNested(Integer count, BigDecimal amount);
 
@@ -55,7 +64,7 @@ public interface OrderService {
      *
      * @param count  购买数量
      * @param amount 支付金额
-     * @return string
+     * @return string string
      */
     String mockInventoryWithTryException(Integer count, BigDecimal amount);
 
@@ -65,7 +74,7 @@ public interface OrderService {
      *
      * @param count  购买数量
      * @param amount 支付金额
-     * @return string
+     * @return string string
      */
     String mockInventoryWithTryTimeout(Integer count, BigDecimal amount);
 
@@ -75,7 +84,7 @@ public interface OrderService {
      *
      * @param count  购买数量
      * @param amount 支付金额
-     * @return string
+     * @return string string
      */
     String mockInventoryWithConfirmException(Integer count, BigDecimal amount);
 
@@ -85,7 +94,7 @@ public interface OrderService {
      *
      * @param count  购买数量
      * @param amount 支付金额
-     * @return string
+     * @return string string
      */
     String mockInventoryWithConfirmTimeout(Integer count, BigDecimal amount);
 
