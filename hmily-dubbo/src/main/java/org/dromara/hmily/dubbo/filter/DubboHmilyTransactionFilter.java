@@ -140,7 +140,9 @@ public class DubboHmilyTransactionFilter implements Filter {
             return;
         }
         for (int i = 0; i < arguments.length; i++) {
-            args[i] = arguments[i].getClass();
+            if (arguments[i] != null) {
+                args[i] = arguments[i].getClass();
+            }
         }
     }
 }
