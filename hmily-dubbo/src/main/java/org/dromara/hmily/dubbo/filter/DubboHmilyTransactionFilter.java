@@ -19,12 +19,7 @@ package org.dromara.hmily.dubbo.filter;
 
 import com.alibaba.dubbo.common.Constants;
 import com.alibaba.dubbo.common.extension.Activate;
-import com.alibaba.dubbo.rpc.Filter;
-import com.alibaba.dubbo.rpc.Invocation;
-import com.alibaba.dubbo.rpc.Invoker;
-import com.alibaba.dubbo.rpc.Result;
-import com.alibaba.dubbo.rpc.RpcContext;
-import com.alibaba.dubbo.rpc.RpcException;
+import com.alibaba.dubbo.rpc.*;
 import org.apache.commons.lang3.StringUtils;
 import org.dromara.hmily.annotation.Hmily;
 import org.dromara.hmily.common.bean.context.HmilyTransactionContext;
@@ -35,8 +30,11 @@ import org.dromara.hmily.common.enums.HmilyActionEnum;
 import org.dromara.hmily.common.enums.HmilyRoleEnum;
 import org.dromara.hmily.common.exception.HmilyRuntimeException;
 import org.dromara.hmily.common.utils.GsonUtils;
+import org.dromara.hmily.common.utils.LogUtil;
 import org.dromara.hmily.core.concurrent.threadlocal.HmilyTransactionContextLocal;
 import org.dromara.hmily.core.service.executor.HmilyTransactionExecutor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Method;
 import java.util.Objects;
@@ -48,6 +46,8 @@ import java.util.Objects;
  */
 @Activate(group = {Constants.SERVER_KEY, Constants.CONSUMER})
 public class DubboHmilyTransactionFilter implements Filter {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(DubboHmilyTransactionFilter.class);
 
     private HmilyTransactionExecutor hmilyTransactionExecutor;
 
@@ -68,14 +68,17 @@ public class DubboHmilyTransactionFilter implements Filter {
         Class clazz = invoker.getInterface();
         Class[] args = invocation.getParameterTypes();
         final Object[] arguments = invocation.getArguments();
-        converterParamsClass(args, arguments);
         Method method = null;
         Hmily hmily = null;
         try {
+            converterParamsClass(args, arguments);
             method = clazz.getMethod(methodName, args);
             hmily = method.getAnnotation(Hmily.class);
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            LogUtil.error(LOGGER, "hmily find method error {} ", ex::getMessage);
         }
         if (Objects.nonNull(hmily)) {
             try {
