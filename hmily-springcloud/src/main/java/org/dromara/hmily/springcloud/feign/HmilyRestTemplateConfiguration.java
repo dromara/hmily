@@ -17,32 +17,32 @@
 
 package org.dromara.hmily.springcloud.feign;
 
-import feign.Feign;
 import feign.InvocationHandlerFactory;
+import feign.RequestInterceptor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Scope;
 
 /**
  * HmilyRestTemplateConfiguration.
+ *
  * @author xiaoyu
  */
 @Configuration
 public class HmilyRestTemplateConfiguration {
 
     /**
-     * build feign.
+     * Hmily rest template interceptor request interceptor.
      *
-     * @return Feign.Builder
+     * @return the request interceptor
      */
     @Bean
-    @Scope("prototype")
-    public Feign.Builder feignBuilder() {
-        return Feign.builder().requestInterceptor(new HmilyRestTemplateInterceptor()).invocationHandlerFactory(invocationHandlerFactory());
+    public RequestInterceptor hmilyRestTemplateInterceptor() {
+        return new HmilyRestTemplateInterceptor();
     }
 
     /**
      * build InvocationHandlerFactory.
+     *
      * @return InvocationHandlerFactory
      */
     @Bean
