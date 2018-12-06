@@ -1,20 +1,18 @@
 /*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
  *
- *  * Licensed to the Apache Software Foundation (ASF) under one or more
- *  * contributor license agreements.  See the NOTICE file distributed with
- *  * this work for additional information regarding copyright ownership.
- *  * The ASF licenses this file to You under the Apache License, Version 2.0
- *  * (the "License"); you may not use this file except in compliance with
- *  * the License.  You may obtain a copy of the License at
- *  *
- *  *     http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an "AS IS" BASIS,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the License for the specific language governing permissions and
- *  * limitations under the License.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.dromara.hmily.core.schedule;
@@ -31,55 +29,70 @@ import org.dromara.hmily.common.config.HmilyConfig;
 import org.dromara.hmily.common.enums.HmilyActionEnum;
 import org.dromara.hmily.common.enums.HmilyRoleEnum;
 import org.dromara.hmily.common.utils.LogUtil;
+import org.dromara.hmily.core.cache.HmilyTransactionMapDbCacheManager;
 import org.dromara.hmily.core.concurrent.threadlocal.HmilyTransactionContextLocal;
 import org.dromara.hmily.core.concurrent.threadpool.HmilyThreadFactory;
 import org.dromara.hmily.core.helper.SpringBeanUtils;
 import org.dromara.hmily.core.spi.HmilyCoordinatorRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
- * this is scheduled execute transaction log.
+ * The type Hmily transaction self recovery scheduled.
  *
  * @author xiaoyu(Myth)
  */
-public class ScheduledService {
+@Component
+public class HmilyTransactionSelfRecoveryScheduled implements ApplicationListener<ContextRefreshedEvent> {
 
     /**
      * logger.
      */
-    private static final Logger LOGGER = LoggerFactory.getLogger(ScheduledService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(HmilyTransactionSelfRecoveryScheduled.class);
+
+    @Autowired
+    private HmilyConfig hmilyConfig;
+
+    @Autowired
+    private HmilyTransactionMapDbCacheManager cacheManager;
 
     private ScheduledExecutorService scheduledExecutorService;
 
-    private HmilyConfig hmilyConfig;
-
     private HmilyCoordinatorRepository hmilyCoordinatorRepository;
 
-    public ScheduledService(final HmilyConfig hmilyConfig, final HmilyCoordinatorRepository hmilyCoordinatorRepository) {
-        this.hmilyConfig = hmilyConfig;
-        this.hmilyCoordinatorRepository = hmilyCoordinatorRepository;
-        this.scheduledExecutorService = new ScheduledThreadPoolExecutor(1, HmilyThreadFactory.create("tccRollBackService", true));
+    @Override
+    public void onApplicationEvent(ContextRefreshedEvent event) {
+        hmilyCoordinatorRepository = SpringBeanUtils.getInstance().getBean(HmilyCoordinatorRepository.class);
+        this.scheduledExecutorService =
+                new ScheduledThreadPoolExecutor(1,
+                        HmilyThreadFactory.create("hmily-transaction-self-recovery", true));
+        selfRecovery();
     }
 
     /**
-     * if have some exception by schedule execute tcc transaction log.
+     * if have some exception by schedule execute hmily transaction log.
      */
-    public void scheduledRollBack() {
+    private void selfRecovery() {
         scheduledExecutorService
                 .scheduleWithFixedDelay(() -> {
-                    LogUtil.info(LOGGER, "rollback execute delayTime:{}", () -> hmilyConfig.getScheduledDelay());
+                    LogUtil.info(LOGGER, "self recovery execute delayTime:{}", () -> hmilyConfig.getScheduledDelay());
                     try {
-                        final List<HmilyTransaction> hmilyTransactions = hmilyCoordinatorRepository.listAllByDelay(acquireData());
+                        final List<HmilyTransaction> hmilyTransactions = buildHmilyTransactionList();
                         if (CollectionUtils.isEmpty(hmilyTransactions)) {
                             return;
                         }
@@ -87,6 +100,7 @@ public class ScheduledService {
                             // if the try is not completed, no compensation will be provided (to prevent various exceptions in the try phase)
                             if (hmilyTransaction.getRole() == HmilyRoleEnum.PROVIDER.getCode() && hmilyTransaction.getStatus() == HmilyActionEnum.PRE_TRY.getCode()) {
                                 hmilyCoordinatorRepository.remove(hmilyTransaction.getTransId());
+                                cacheManager.remove(hmilyTransaction.getTransId());
                                 continue;
                             }
                             if (hmilyTransaction.getRetriedCount() > hmilyConfig.getRetryMax()) {
@@ -100,7 +114,8 @@ public class ScheduledService {
                             // if the transaction role is the provider, and the number of retries in the scope class cannot be executed, only by the initiator
                             if (hmilyTransaction.getRole() == HmilyRoleEnum.PROVIDER.getCode()
                                     && (hmilyTransaction.getCreateTime().getTime()
-                                    + hmilyConfig.getRecoverDelayTime() * hmilyConfig.getLoadFactor() * 1000 > System.currentTimeMillis())) {
+                                    + hmilyConfig.getRecoverDelayTime() * hmilyConfig.getLoadFactor() * 1000
+                                    > System.currentTimeMillis())) {
                                 continue;
                             }
                             try {
@@ -126,6 +141,16 @@ public class ScheduledService {
                     }
                 }, 30, hmilyConfig.getScheduledDelay(), TimeUnit.SECONDS);
 
+    }
+
+    private List<HmilyTransaction> buildHmilyTransactionList() {
+        final List<HmilyTransaction> hmilyTransactions = cacheManager.readAll();
+        if (CollectionUtils.isEmpty(hmilyTransactions)) {
+            return new ArrayList<>();
+        }
+        return hmilyTransactions.stream()
+                .filter(transaction -> transaction.getLastTime().compareTo(acquireData()) < 0)
+                .collect(Collectors.toList());
     }
 
     private void cancel(final HmilyTransaction hmilyTransaction) {
@@ -205,5 +230,6 @@ public class ScheduledService {
         return new Date(LocalDateTime.now().atZone(ZoneId.systemDefault())
                 .toInstant().toEpochMilli() - (hmilyConfig.getRecoverDelayTime() * 1000));
     }
+
 
 }
