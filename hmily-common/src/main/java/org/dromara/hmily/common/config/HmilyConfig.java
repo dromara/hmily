@@ -17,8 +17,8 @@
 
 package org.dromara.hmily.common.config;
 
-import org.dromara.hmily.common.enums.RepositorySupportEnum;
 import lombok.Data;
+import org.dromara.hmily.common.enums.RepositorySupportEnum;
 import org.dromara.hmily.common.enums.SerializeEnum;
 
 /**
@@ -35,6 +35,16 @@ public class HmilyConfig {
      * If this parameter is not filled in, the applicationName of the application is retrieved by default
      */
     private String repositorySuffix;
+
+    /**
+     * Whether recovery logs need to be maintained .
+     */
+    private Boolean hasRecovery = true;
+
+    /**
+     * this is map db concurrencyScale.
+     */
+    private Integer concurrencyScale = 256;
 
     /**
      * log serializer.

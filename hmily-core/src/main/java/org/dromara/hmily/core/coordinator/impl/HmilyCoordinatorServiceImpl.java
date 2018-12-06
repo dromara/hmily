@@ -17,12 +17,11 @@
 
 package org.dromara.hmily.core.coordinator.impl;
 
+import org.apache.commons.lang3.StringUtils;
 import org.dromara.hmily.common.bean.entity.HmilyTransaction;
 import org.dromara.hmily.common.config.HmilyConfig;
-import org.apache.commons.lang3.StringUtils;
 import org.dromara.hmily.core.coordinator.HmilyCoordinatorService;
 import org.dromara.hmily.core.helper.SpringBeanUtils;
-import org.dromara.hmily.core.schedule.ScheduledService;
 import org.dromara.hmily.core.service.HmilyApplicationService;
 import org.dromara.hmily.core.spi.HmilyCoordinatorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +29,7 @@ import org.springframework.stereotype.Service;
 
 /**
  * impl hmilyCoordinatorService.
+ *
  * @author xiaoyu
  */
 @Service("hmilyCoordinatorService")
@@ -48,8 +48,9 @@ public class HmilyCoordinatorServiceImpl implements HmilyCoordinatorService {
     public void start(final HmilyConfig hmilyConfig) {
         final String repositorySuffix = buildRepositorySuffix(hmilyConfig.getRepositorySuffix());
         coordinatorRepository = SpringBeanUtils.getInstance().getBean(HmilyCoordinatorRepository.class);
-        coordinatorRepository.init(repositorySuffix, hmilyConfig);
-        new ScheduledService(hmilyConfig, coordinatorRepository).scheduledRollBack();
+        if (hmilyConfig.getHasRecovery()) {
+            coordinatorRepository.init(repositorySuffix, hmilyConfig);
+        }
     }
 
     @Override
