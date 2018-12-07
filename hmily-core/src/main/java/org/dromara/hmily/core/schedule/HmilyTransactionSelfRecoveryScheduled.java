@@ -130,6 +130,8 @@ public class HmilyTransactionSelfRecoveryScheduled implements ApplicationListene
                                     } else if (hmilyTransaction.getStatus() == HmilyActionEnum.CONFIRMING.getCode()) {
                                         confirm(hmilyTransaction);
                                     }
+                                } else {
+                                    deleteTransaction(hmilyTransaction.getTransId());
                                 }
                             } catch (Exception e) {
                                 e.printStackTrace();
@@ -206,11 +208,17 @@ public class HmilyTransactionSelfRecoveryScheduled implements ApplicationListene
 
     private void executeHandler(final boolean success, final HmilyTransaction currentTransaction, final List<HmilyParticipant> failList) {
         if (success) {
-            hmilyCoordinatorRepository.remove(currentTransaction.getTransId());
+            deleteTransaction(currentTransaction.getTransId());
         } else {
             currentTransaction.setHmilyParticipants(failList);
             hmilyCoordinatorRepository.updateParticipant(currentTransaction);
+            cacheManager.put(currentTransaction);
         }
+    }
+
+    private void deleteTransaction(String transId) {
+        cacheManager.remove(transId);
+        hmilyCoordinatorRepository.remove(transId);
     }
 
     @SuppressWarnings("unchecked")

@@ -17,15 +17,14 @@
 
 package org.dromara.hmily.demo.dubbo.inventory.mapper;
 
-import org.dromara.hmily.demo.dubbo.inventory.api.entity.InventoryDO;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
+import org.dromara.hmily.demo.dubbo.inventory.api.entity.InventoryDO;
 
 /**
  * @author xiaoyu
  */
 public interface InventoryMapper {
-
 
 
     /**
@@ -69,6 +68,6 @@ public interface InventoryMapper {
      * @param productId 商品id
      * @return Inventory
      */
-    @Select("select * from inventory where product_id =#{productId} for update")
+    @Select("select id,product_id,total_inventory ,lock_inventory from inventory where product_id =#{productId}")
     InventoryDO findByProductId(String productId);
 }

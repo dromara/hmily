@@ -34,6 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author xiaoyu
@@ -60,6 +61,11 @@ public class AccountServiceImpl implements AccountService {
         this.accountMapper = accountMapper;
     }
 
+
+    static AtomicInteger trycount = new AtomicInteger(0);
+
+    static AtomicInteger confrimCount = new AtomicInteger(0);
+
     /**
      * 扣款支付
      *
@@ -75,7 +81,8 @@ public class AccountServiceImpl implements AccountService {
         accountDO.setFreezeAmount(accountDO.getFreezeAmount().add(accountDTO.getAmount()));
         accountDO.setUpdateTime(new Date());
         accountMapper.update(accountDO);
-        inlineService.testInline();
+        final int i = trycount.incrementAndGet();
+        System.out.println("调用了account try " + i + " 次");
     }
 
     @Override
@@ -152,6 +159,8 @@ public class AccountServiceImpl implements AccountService {
         accountDO.setFreezeAmount(accountDO.getFreezeAmount().subtract(accountDTO.getAmount()));
         accountDO.setUpdateTime(new Date());
         accountMapper.confirm(accountDO);
+        final int i = confrimCount.incrementAndGet();
+        System.out.println("调用了account confrim " + i + " 次");
         return Boolean.TRUE;
     }
 

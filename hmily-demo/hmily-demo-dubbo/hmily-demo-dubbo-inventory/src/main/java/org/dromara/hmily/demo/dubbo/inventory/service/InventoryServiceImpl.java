@@ -29,6 +29,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 
 /**
  * @author xiaoyu
@@ -42,12 +44,17 @@ public class InventoryServiceImpl implements InventoryService {
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(InventoryServiceImpl.class);
 
+    static AtomicInteger trycount = new AtomicInteger(0);
+
+    static AtomicInteger confrimCount = new AtomicInteger(0);
+
     private final InventoryMapper inventoryMapper;
 
     @Autowired(required = false)
     public InventoryServiceImpl(InventoryMapper inventoryMapper) {
         this.inventoryMapper = inventoryMapper;
     }
+
 
     /**
      * 扣减库存操作
@@ -64,6 +71,8 @@ public class InventoryServiceImpl implements InventoryService {
         entity.setTotalInventory(entity.getTotalInventory() - inventoryDTO.getCount());
         entity.setLockInventory(entity.getLockInventory() + inventoryDTO.getCount());
         inventoryMapper.decrease(entity);
+        final int i = trycount.incrementAndGet();
+        System.out.println("调用了inventory  try " + i + " 次");
         return true;
     }
 
@@ -187,6 +196,8 @@ public class InventoryServiceImpl implements InventoryService {
         final InventoryDO entity = inventoryMapper.findByProductId(inventoryDTO.getProductId());
         entity.setLockInventory(entity.getLockInventory() - inventoryDTO.getCount());
         inventoryMapper.confirm(entity);
+        final int i = confrimCount.incrementAndGet();
+        System.out.println("调用了inventory confirm " + i + " 次");
         return true;
     }
 
