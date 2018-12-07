@@ -70,7 +70,7 @@ public class PaymentServiceImpl implements PaymentService {
         order.setStatus(OrderStatusEnum.PAYING.getCode());
         orderMapper.update(order);
         //做库存和资金账户的检验工作 这里只是demo 。。。
-        final AccountDO accountDO = accountService.findByUserId(order.getUserId());
+        /*final AccountDO accountDO = accountService.findByUserId(order.getUserId());
         if (accountDO.getBalance().compareTo(order.getTotalAmount()) <= 0) {
             throw new HmilyRuntimeException("余额不足！");
         }
@@ -78,7 +78,7 @@ public class PaymentServiceImpl implements PaymentService {
 
         if (inventory.getTotalInventory() < order.getCount()) {
             throw new HmilyRuntimeException("库存不足！");
-        }
+        }*/
         //扣除用户余额
         AccountDTO accountDTO = new AccountDTO();
         accountDTO.setAmount(order.getTotalAmount());
