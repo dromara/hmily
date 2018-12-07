@@ -20,10 +20,10 @@ logging:
     level:
         root: error
         org.springframework.web: info
-        org.apache.ibatis: debug
-        org.dromara.hmily.bonuspoint: debug
-        org.dromara.hmily.lottery: debug
-        org.dromara.hmily: debug
+        org.apache.ibatis: info
+        org.dromara.hmily.bonuspoint: info
+        org.dromara.hmily.lottery: info
+        org.dromara.hmily: info
         io.netty: info
     path: "./logs"
 

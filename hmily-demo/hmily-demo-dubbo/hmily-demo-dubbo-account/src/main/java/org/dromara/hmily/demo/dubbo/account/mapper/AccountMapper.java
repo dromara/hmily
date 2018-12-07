@@ -45,7 +45,7 @@ public interface AccountMapper {
      * @return rows
      */
     @Update("update account set " +
-            " freeze_amount= #{freezeAmount} ,update_time = #{updateTime}" +
+            " freeze_amount= #{freezeAmount}" +
             " where user_id =#{userId}  and freeze_amount >0 ")
     int confirm(AccountDO accountDO);
 
@@ -57,7 +57,7 @@ public interface AccountMapper {
      * @return rows
      */
     @Update("update account set balance =#{balance}," +
-            " freeze_amount= #{freezeAmount} ,update_time = #{updateTime}" +
+            " freeze_amount= #{freezeAmount} " +
             " where user_id =#{userId}  and freeze_amount >0")
     int cancel(AccountDO accountDO);
 
@@ -68,6 +68,6 @@ public interface AccountMapper {
      * @param userId 用户id
      * @return AccountDO
      */
-    @Select("select * from account where user_id =#{userId} for update")
+    @Select("select id,user_id,balance, freeze_amount from account where user_id =#{userId} limit 1")
     AccountDO findByUserId(String userId);
 }

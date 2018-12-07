@@ -34,7 +34,6 @@ import org.dromara.hmily.common.enums.HmilyActionEnum;
 import org.dromara.hmily.common.enums.HmilyRoleEnum;
 import org.dromara.hmily.common.exception.HmilyRuntimeException;
 import org.dromara.hmily.common.utils.LogUtil;
-import org.dromara.hmily.core.cache.HmilyTransactionCacheManager;
 import org.dromara.hmily.core.cache.HmilyTransactionMapDbCacheManager;
 import org.dromara.hmily.core.concurrent.threadlocal.HmilyTransactionContextLocal;
 import org.dromara.hmily.core.disruptor.publisher.HmilyTransactionEventPublisher;
@@ -83,15 +82,15 @@ public class HmilyTransactionExecutor {
     }
 
     /**
-     * transaction begin.
+     * transaction preTry.
      *
      * @param point cut point.
      * @return TccTransaction
      */
-    public HmilyTransaction begin(final ProceedingJoinPoint point) {
+    public HmilyTransaction preTry(final ProceedingJoinPoint point) {
         LogUtil.debug(LOGGER, () -> "......hmily transaction starter....");
         //build tccTransaction
-        final HmilyTransaction hmilyTransaction = buildTccTransaction(point, HmilyRoleEnum.START.getCode(), null);
+        final HmilyTransaction hmilyTransaction = buildHmilyTransaction(point, HmilyRoleEnum.START.getCode(), null);
         //save tccTransaction in threadLocal
         CURRENT.set(hmilyTransaction);
         //save to mapDb
@@ -108,17 +107,16 @@ public class HmilyTransactionExecutor {
         return hmilyTransaction;
     }
 
-
     /**
-     * this is Participant transaction begin.
+     * this is Participant transaction preTry.
      *
      * @param context transaction context.
      * @param point   cut point
      * @return TccTransaction
      */
-    public HmilyTransaction beginParticipant(final HmilyTransactionContext context, final ProceedingJoinPoint point) {
+    public HmilyTransaction preTryParticipant(final HmilyTransactionContext context, final ProceedingJoinPoint point) {
         LogUtil.debug(LOGGER, "...Participant hmily transaction ！start..：{}", context::toString);
-        final HmilyTransaction hmilyTransaction = buildTccTransaction(point, HmilyRoleEnum.PROVIDER.getCode(), context.getTransId());
+        final HmilyTransaction hmilyTransaction = buildHmilyTransaction(point, HmilyRoleEnum.PROVIDER.getCode(), context.getTransId());
        /* //cache by guava
         HmilyTransactionCacheManager.getInstance().cacheTccTransaction(hmilyTransaction);*/
         //cache by mapDB
@@ -129,81 +127,6 @@ public class HmilyTransactionExecutor {
         context.setRole(HmilyRoleEnum.LOCAL.getCode());
         HmilyTransactionContextLocal.getInstance().set(context);
         return hmilyTransaction;
-    }
-
-    /**
-     * update transaction status by disruptor.
-     *
-     * @param hmilyTransaction {@linkplain HmilyTransaction}
-     */
-    public void updateStatus(final HmilyTransaction hmilyTransaction) {
-        cacheManager.put(hmilyTransaction);
-        hmilyTransactionEventPublisher.publishEvent(hmilyTransaction, EventTypeEnum.UPDATE_STATUS.getCode());
-    }
-
-    /**
-     * delete transaction by disruptor.
-     *
-     * @param hmilyTransaction {@linkplain HmilyTransaction}
-     */
-    public void deleteTransaction(final HmilyTransaction hmilyTransaction) {
-        cacheManager.remove(hmilyTransaction.getTransId());
-        hmilyTransactionEventPublisher.publishEvent(hmilyTransaction, EventTypeEnum.DELETE.getCode());
-    }
-
-    /**
-     * update Participant in transaction by disruptor.
-     *
-     * @param hmilyTransaction {@linkplain HmilyTransaction}
-     */
-    public void updateParticipant(final HmilyTransaction hmilyTransaction) {
-        cacheManager.put(hmilyTransaction);
-        hmilyTransactionEventPublisher.publishEvent(hmilyTransaction, EventTypeEnum.UPDATE_PARTICIPANT.getCode());
-    }
-
-    /**
-     * acquired by threadLocal.
-     *
-     * @return {@linkplain HmilyTransaction}
-     */
-    public HmilyTransaction getCurrentTransaction() {
-        return CURRENT.get();
-    }
-
-    /**
-     * add participant.
-     *
-     * @param hmilyParticipant {@linkplain HmilyParticipant}
-     */
-    public void enlistParticipant(final HmilyParticipant hmilyParticipant) {
-        if (Objects.isNull(hmilyParticipant)) {
-            return;
-        }
-        Optional.ofNullable(getCurrentTransaction())
-                .ifPresent(c -> {
-                    c.registerParticipant(hmilyParticipant);
-                    updateParticipant(c);
-                });
-    }
-
-    /**
-     * when nested transaction add participant.
-     *
-     * @param transId          key
-     * @param hmilyParticipant {@linkplain HmilyParticipant}
-     */
-    public void registerByNested(final String transId, final HmilyParticipant hmilyParticipant) {
-        if (Objects.isNull(hmilyParticipant)
-                || Objects.isNull(hmilyParticipant.getCancelHmilyInvocation())
-                || Objects.isNull(hmilyParticipant.getConfirmHmilyInvocation())) {
-            return;
-        }
-        final HmilyTransaction hmilyTransaction = cacheManager.get(transId);
-        Optional.ofNullable(hmilyTransaction)
-                .ifPresent(c -> {
-                    c.registerParticipant(hmilyParticipant);
-                    updateParticipant(c);
-                });
     }
 
     /**
@@ -288,6 +211,81 @@ public class HmilyTransactionExecutor {
         }
     }
 
+    /**
+     * update transaction status by disruptor.
+     *
+     * @param hmilyTransaction {@linkplain HmilyTransaction}
+     */
+    public void updateStatus(final HmilyTransaction hmilyTransaction) {
+        cacheManager.put(hmilyTransaction);
+        hmilyTransactionEventPublisher.publishEvent(hmilyTransaction, EventTypeEnum.UPDATE_STATUS.getCode());
+    }
+
+    /**
+     * delete transaction by disruptor.
+     *
+     * @param hmilyTransaction {@linkplain HmilyTransaction}
+     */
+    public void deleteTransaction(final HmilyTransaction hmilyTransaction) {
+        cacheManager.remove(hmilyTransaction.getTransId());
+        hmilyTransactionEventPublisher.publishEvent(hmilyTransaction, EventTypeEnum.DELETE.getCode());
+    }
+
+    /**
+     * update Participant in transaction by disruptor.
+     *
+     * @param hmilyTransaction {@linkplain HmilyTransaction}
+     */
+    public void updateParticipant(final HmilyTransaction hmilyTransaction) {
+        cacheManager.put(hmilyTransaction);
+        hmilyTransactionEventPublisher.publishEvent(hmilyTransaction, EventTypeEnum.UPDATE_PARTICIPANT.getCode());
+    }
+
+    /**
+     * acquired by threadLocal.
+     *
+     * @return {@linkplain HmilyTransaction}
+     */
+    public HmilyTransaction getCurrentTransaction() {
+        return CURRENT.get();
+    }
+
+    /**
+     * add participant.
+     *
+     * @param hmilyParticipant {@linkplain HmilyParticipant}
+     */
+    public void enlistParticipant(final HmilyParticipant hmilyParticipant) {
+        if (Objects.isNull(hmilyParticipant)) {
+            return;
+        }
+        Optional.ofNullable(getCurrentTransaction())
+                .ifPresent(c -> {
+                    c.registerParticipant(hmilyParticipant);
+                    updateParticipant(c);
+                });
+    }
+
+    /**
+     * when nested transaction add participant.
+     *
+     * @param transId          key
+     * @param hmilyParticipant {@linkplain HmilyParticipant}
+     */
+    public void registerByNested(final String transId, final HmilyParticipant hmilyParticipant) {
+        if (Objects.isNull(hmilyParticipant)
+                || Objects.isNull(hmilyParticipant.getCancelHmilyInvocation())
+                || Objects.isNull(hmilyParticipant.getConfirmHmilyInvocation())) {
+            return;
+        }
+        final HmilyTransaction hmilyTransaction = cacheManager.get(transId);
+        Optional.ofNullable(hmilyTransaction)
+                .ifPresent(c -> {
+                    c.registerParticipant(hmilyParticipant);
+                    updateParticipant(c);
+                });
+    }
+
     private void executeHandler(final boolean success, final HmilyTransaction currentTransaction, final List<HmilyParticipant> failList) {
         if (success) {
             deleteTransaction(currentTransaction);
@@ -333,7 +331,7 @@ public class HmilyTransactionExecutor {
         return cacheManager.get(id);
     }
 
-    private HmilyTransaction buildTccTransaction(final ProceedingJoinPoint point, final int role, final String transId) {
+    private HmilyTransaction buildHmilyTransaction(final ProceedingJoinPoint point, final int role, final String transId) {
         HmilyTransaction hmilyTransaction;
         if (StringUtils.isNoneBlank(transId)) {
             hmilyTransaction = new HmilyTransaction(transId);

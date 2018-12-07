@@ -53,7 +53,7 @@ public class ParticipantHmilyTransactionHandler implements HmilyTransactionHandl
         switch (HmilyActionEnum.acquireByCode(context.getAction())) {
             case TRYING:
                 try {
-                    hmilyTransaction = hmilyTransactionExecutor.beginParticipant(context, point);
+                    hmilyTransaction = hmilyTransactionExecutor.preTryParticipant(context, point);
                     final Object proceed = point.proceed();
                     hmilyTransaction.setStatus(HmilyActionEnum.TRYING.getCode());
                     //update log status to try

@@ -41,7 +41,7 @@ import java.util.Date;
 public class OrderServiceImpl implements OrderService {
 
     /**
-     * logger
+     * logger.
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(OrderServiceImpl.class);
 
