@@ -17,8 +17,8 @@
 
 package org.dromara.hmily.common.config;
 
-import org.dromara.hmily.common.enums.RepositorySupportEnum;
 import lombok.Data;
+import org.dromara.hmily.common.enums.RepositorySupportEnum;
 import org.dromara.hmily.common.enums.SerializeEnum;
 
 /**
@@ -37,6 +37,11 @@ public class HmilyConfig {
     private String repositorySuffix;
 
     /**
+     * this is map db concurrencyScale.
+     */
+    private Integer concurrencyScale = 512;
+
+    /**
      * log serializer.
      * {@linkplain SerializeEnum}
      */
@@ -51,6 +56,11 @@ public class HmilyConfig {
      * scheduledPool scheduledDelay unit SECONDS.
      */
     private int scheduledDelay = 60;
+
+    /**
+     * scheduledPool scheduledInitDelay unit SECONDS.
+     */
+    private int scheduledInitDelay = 120;
 
     /**
      * retry max.

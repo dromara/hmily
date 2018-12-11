@@ -18,6 +18,7 @@
 package org.dromara.hmily.dubbo.service;
 
 import com.alibaba.dubbo.config.ApplicationConfig;
+import org.apache.commons.lang3.RandomUtils;
 import org.dromara.hmily.core.service.HmilyApplicationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,10 +27,13 @@ import java.util.Optional;
 
 /**
  * The dubbo impl HmilyApplicationService.
+ *
  * @author xiaoyu
  */
 @Service("hmilyApplicationService")
 public class DubboHmilyApplicationServiceImpl implements HmilyApplicationService {
+
+    private static final String DEFAULT_APPLICATION_NAME = "hmilyDubbo";
 
     /**
      * dubbo ApplicationConfig.
@@ -43,6 +47,11 @@ public class DubboHmilyApplicationServiceImpl implements HmilyApplicationService
 
     @Override
     public String acquireName() {
-        return Optional.ofNullable(applicationConfig).orElse(new ApplicationConfig("hmily-dubbo")).getName();
+        return Optional.ofNullable(applicationConfig).orElse(new ApplicationConfig(buildDefaultApplicationName())).getName();
     }
+
+    private String buildDefaultApplicationName() {
+        return DEFAULT_APPLICATION_NAME + RandomUtils.nextInt(1, 10);
+    }
+
 }
