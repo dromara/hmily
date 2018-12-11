@@ -19,7 +19,6 @@ package org.dromara.hmily.demo.springcloud.inventory.service.impl;
 
 import org.dromara.hmily.annotation.Hmily;
 import org.dromara.hmily.common.exception.HmilyRuntimeException;
-
 import org.dromara.hmily.demo.springcloud.inventory.dto.InventoryDTO;
 import org.dromara.hmily.demo.springcloud.inventory.entity.InventoryDO;
 import org.dromara.hmily.demo.springcloud.inventory.mapper.InventoryMapper;
@@ -36,7 +35,6 @@ import org.springframework.transaction.annotation.Transactional;
  * @author xiaoyu
  */
 @Service("inventoryService")
-@SuppressWarnings("all")
 public class InventoryServiceImpl implements InventoryService {
 
     /**
@@ -60,17 +58,9 @@ public class InventoryServiceImpl implements InventoryService {
      */
     @Override
     @Hmily(confirmMethod = "confirmMethod", cancelMethod = "cancelMethod")
-    @Transactional
     public Boolean decrease(InventoryDTO inventoryDTO) {
         LOGGER.info("==========springcloud调用扣减库存decrease===========");
-        final InventoryDO entity = inventoryMapper.findByProductId(inventoryDTO.getProductId());
-        entity.setTotalInventory(entity.getTotalInventory() - inventoryDTO.getCount());
-        entity.setLockInventory(entity.getLockInventory() + inventoryDTO.getCount());
-        final int decrease = inventoryMapper.decrease(entity);
-        if (decrease != 1) {
-            throw new HmilyRuntimeException("库存不足");
-        }
-//        throw new RuntimeException("测试");
+        inventoryMapper.decrease(inventoryDTO);
         return true;
     }
 
@@ -104,10 +94,7 @@ public class InventoryServiceImpl implements InventoryService {
             e.printStackTrace();
         }
         LOGGER.info("==========springcloud调用扣减库存mockWithTryTimeout===========");
-        final InventoryDO entity = inventoryMapper.findByProductId(inventoryDTO.getProductId());
-        entity.setTotalInventory(entity.getTotalInventory() - inventoryDTO.getCount());
-        entity.setLockInventory(entity.getLockInventory() + inventoryDTO.getCount());
-        final int decrease = inventoryMapper.decrease(entity);
+        final int decrease = inventoryMapper.decrease(inventoryDTO);
         if (decrease != 1) {
             throw new HmilyRuntimeException("库存不足");
         }
@@ -123,18 +110,14 @@ public class InventoryServiceImpl implements InventoryService {
             e.printStackTrace();
         }
         LOGGER.info("==========Springcloud调用扣减库存确认方法===========");
-        final InventoryDO entity = inventoryMapper.findByProductId(inventoryDTO.getProductId());
-        entity.setLockInventory(entity.getLockInventory() - inventoryDTO.getCount());
-        inventoryMapper.decrease(entity);
+        inventoryMapper.decrease(inventoryDTO);
         return true;
     }
 
     @Transactional(rollbackFor = Exception.class)
     public Boolean confirmMethodException(InventoryDTO inventoryDTO) {
         LOGGER.info("==========Springcloud调用扣减库存确认方法===========");
-        final InventoryDO entity = inventoryMapper.findByProductId(inventoryDTO.getProductId());
-        entity.setLockInventory(entity.getLockInventory() - inventoryDTO.getCount());
-        final int decrease = inventoryMapper.decrease(entity);
+        final int decrease = inventoryMapper.decrease(inventoryDTO);
         if (decrease != 1) {
             throw new HmilyRuntimeException("库存不足");
         }
@@ -145,24 +128,13 @@ public class InventoryServiceImpl implements InventoryService {
 
     public Boolean confirmMethod(InventoryDTO inventoryDTO) {
         LOGGER.info("==========Springcloud调用扣减库存确认方法===========");
-        final InventoryDO entity = inventoryMapper.findByProductId(inventoryDTO.getProductId());
-        entity.setLockInventory(entity.getLockInventory() - inventoryDTO.getCount());
-        final int rows = inventoryMapper.confirm(entity);
-        if (rows != 1) {
-            throw new HmilyRuntimeException("确认库存操作失败！");
-        }
+        final int rows = inventoryMapper.confirm(inventoryDTO);
         return true;
     }
 
     public Boolean cancelMethod(InventoryDTO inventoryDTO) {
         LOGGER.info("==========Springcloud调用扣减库存取消方法===========");
-        final InventoryDO entity = inventoryMapper.findByProductId(inventoryDTO.getProductId());
-        entity.setTotalInventory(entity.getTotalInventory() + inventoryDTO.getCount());
-        entity.setLockInventory(entity.getLockInventory() - inventoryDTO.getCount());
-        int rows = inventoryMapper.cancel(entity);
-        if (rows != 1) {
-            throw new HmilyRuntimeException("取消库存操作失败！");
-        }
+        int rows = inventoryMapper.cancel(inventoryDTO);
         return true;
     }
 

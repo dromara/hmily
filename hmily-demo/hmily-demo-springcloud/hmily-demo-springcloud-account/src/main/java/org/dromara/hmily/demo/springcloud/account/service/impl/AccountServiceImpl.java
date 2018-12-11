@@ -19,22 +19,16 @@ package org.dromara.hmily.demo.springcloud.account.service.impl;
 
 import org.dromara.hmily.annotation.Hmily;
 import org.dromara.hmily.common.exception.HmilyRuntimeException;
-
 import org.dromara.hmily.demo.springcloud.account.dto.AccountDTO;
 import org.dromara.hmily.demo.springcloud.account.entity.AccountDO;
 import org.dromara.hmily.demo.springcloud.account.mapper.AccountMapper;
 import org.dromara.hmily.demo.springcloud.account.service.AccountService;
-
-import java.util.concurrent.TimeUnit;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
-
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author xiaoyu
@@ -64,23 +58,9 @@ public class AccountServiceImpl implements AccountService {
      */
     @Override
     @Hmily(confirmMethod = "confirm", cancelMethod = "cancel")
-    @Transactional
     public boolean payment(AccountDTO accountDTO) {
         LOGGER.debug("============springcloud执行try付款接口===============");
-        final AccountDO accountDO = accountMapper.findByUserId(accountDTO.getUserId());
-        accountDO.setBalance(accountDO.getBalance().subtract(accountDTO.getAmount()));
-        accountDO.setFreezeAmount(accountDO.getFreezeAmount().add(accountDTO.getAmount()));
-        accountDO.setUpdateTime(new Date());
-
-        final int update = accountMapper.update(accountDO);
-        if (update != 1) {
-            throw new HmilyRuntimeException("资金不足！");
-        }
-        try {
-            TimeUnit.SECONDS.sleep(1);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        accountMapper.update(accountDTO);
 //        throw new RuntimeException("");
         return Boolean.TRUE;
     }
@@ -97,28 +77,13 @@ public class AccountServiceImpl implements AccountService {
     }
 
     public boolean confirm(AccountDTO accountDTO) {
-
-        LOGGER.debug("============springcloud tcc 执行确认付款接口===============");
-
-        final AccountDO accountDO = accountMapper.findByUserId(accountDTO.getUserId());
-        accountDO.setFreezeAmount(accountDO.getFreezeAmount().subtract(accountDTO.getAmount()));
-        accountDO.setUpdateTime(new Date());
-        final int rows = accountMapper.confirm(accountDO);
-        if (rows != 1) {
-            throw new HmilyRuntimeException("确认扣减账户异常！");
-        }
+        final int rows = accountMapper.confirm(accountDTO);
         return Boolean.TRUE;
     }
 
 
     public boolean cancel(AccountDTO accountDTO) {
-
-        LOGGER.debug("============springcloud tcc 执行取消付款接口===============");
-        final AccountDO accountDO = accountMapper.findByUserId(accountDTO.getUserId());
-        accountDO.setBalance(accountDO.getBalance().add(accountDTO.getAmount()));
-        accountDO.setFreezeAmount(accountDO.getFreezeAmount().subtract(accountDTO.getAmount()));
-        accountDO.setUpdateTime(new Date());
-        final int rows = accountMapper.cancel(accountDO);
+        final int rows = accountMapper.cancel(accountDTO);
         if (rows != 1) {
             throw new HmilyRuntimeException("取消扣减账户异常！");
         }

@@ -58,16 +58,16 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public String orderPay(Integer count, BigDecimal amount) {
-       /* final Order order = buildTestOrder(count, amount);
+        final Order order = buildOrder(count, amount);
         final int rows = orderMapper.save(order);
         if (rows > 0) {
             final long start = System.currentTimeMillis();
             paymentService.makePayment(order);
             System.out.println("切面耗时：" + (System.currentTimeMillis() - start));
-        }*/
-        final long start = System.currentTimeMillis();
+        }
+       /* final long start = System.currentTimeMillis();
         paymentService.makePayment(new Order());
-        System.out.println("切面耗时：" + (System.currentTimeMillis() - start));
+        System.out.println("切面耗时：" + (System.currentTimeMillis() - start));*/
         return "success";
     }
 

@@ -71,15 +71,15 @@ public class InventoryServiceImpl implements InventoryService {
     @Override
     @Hmily(confirmMethod = "confirmMethod", cancelMethod = "cancelMethod")
     public Boolean decrease(InventoryDTO inventoryDTO) {
-        //inventoryMapper.decrease(inventoryDTO);
-       /* final int i = tryCount.incrementAndGet();
-        System.out.println("调用了inventory  try " + i + " 次");*/
+        inventoryMapper.decrease(inventoryDTO);
+        final int i = tryCount.incrementAndGet();
+        System.out.println("调用了inventory  try " + i + " 次");
         return true;
     }
 
     @Override
     public Boolean testDecrease(InventoryDTO inventoryDTO) {
-        //inventoryMapper.decrease(inventoryDTO);
+        inventoryMapper.decrease(inventoryDTO);
         return true;
     }
 
@@ -182,7 +182,6 @@ public class InventoryServiceImpl implements InventoryService {
      * @param inventoryDTO the inventory dto
      * @return the boolean
      */
-    @Transactional(rollbackFor = Exception.class)
     public Boolean confirmMethod(InventoryDTO inventoryDTO) {
         inventoryMapper.confirm(inventoryDTO);
         final int i = confirmCount.incrementAndGet();
@@ -196,7 +195,6 @@ public class InventoryServiceImpl implements InventoryService {
      * @param inventoryDTO the inventory dto
      * @return the boolean
      */
-    @Transactional(rollbackFor = Exception.class)
     public Boolean cancelMethod(InventoryDTO inventoryDTO) {
         LOGGER.info("==========调用扣减库存取消方法===========");
         inventoryMapper.cancel(inventoryDTO);
