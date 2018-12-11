@@ -96,10 +96,8 @@ public class HmilyTransactionEventPublisher implements DisposableBean, Applicati
      * @param type             {@linkplain EventTypeEnum}
      */
     public void publishEvent(final HmilyTransaction hmilyTransaction, final int type) {
-        if (hmilyConfig.getHasRecovery()) {
-            final RingBuffer<HmilyTransactionEvent> ringBuffer = disruptor.getRingBuffer();
-            ringBuffer.publishEvent(new HmilyTransactionEventTranslator(type), hmilyTransaction);
-        }
+        final RingBuffer<HmilyTransactionEvent> ringBuffer = disruptor.getRingBuffer();
+        ringBuffer.publishEvent(new HmilyTransactionEventTranslator(type), hmilyTransaction);
     }
 
     @Override

@@ -56,7 +56,6 @@ public class StarterHmilyTransactionHandler implements HmilyTransactionHandler, 
         this.hmilyConfig = hmilyConfig;
     }
 
-
     @Override
     public Object handler(final ProceedingJoinPoint point, final HmilyTransactionContext context)
             throws Throwable {

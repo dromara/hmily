@@ -57,6 +57,7 @@ public class HmilyAutoConfiguration {
         hmilyTransactionBootstrap.setRepositorySuffix(tccConfigProperties.getRepositorySuffix());
         hmilyTransactionBootstrap.setRepositorySupport(tccConfigProperties.getRepositorySupport());
         hmilyTransactionBootstrap.setScheduledDelay(tccConfigProperties.getScheduledDelay());
+        hmilyTransactionBootstrap.setScheduledInitDelay(tccConfigProperties.getScheduledInitDelay());
         hmilyTransactionBootstrap.setScheduledThreadMax(tccConfigProperties.getScheduledThreadMax());
         hmilyTransactionBootstrap.setSerializer(tccConfigProperties.getSerializer());
         hmilyTransactionBootstrap.setHmilyFileConfig(tccConfigProperties.getHmilyFileConfig());
@@ -67,7 +68,6 @@ public class HmilyAutoConfiguration {
         hmilyTransactionBootstrap.setConsumerThreads(tccConfigProperties.getConsumerThreads());
         hmilyTransactionBootstrap.setLoadFactor(tccConfigProperties.getLoadFactor());
         hmilyTransactionBootstrap.setAsyncThreads(tccConfigProperties.getAsyncThreads());
-        hmilyTransactionBootstrap.setHasRecovery(tccConfigProperties.getHasRecovery());
         hmilyTransactionBootstrap.setConcurrencyScale(tccConfigProperties.getConcurrencyScale());
         return hmilyTransactionBootstrap;
     }

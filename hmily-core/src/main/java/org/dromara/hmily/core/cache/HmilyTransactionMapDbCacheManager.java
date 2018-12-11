@@ -20,9 +20,13 @@ package org.dromara.hmily.core.cache;
 import org.apache.commons.collections.CollectionUtils;
 import org.dromara.hmily.common.bean.entity.HmilyTransaction;
 import org.dromara.hmily.common.config.HmilyConfig;
-import org.dromara.hmily.core.coordinator.HmilyCoordinatorService;
+import org.dromara.hmily.common.enums.HmilyActionEnum;
+import org.dromara.hmily.common.enums.HmilyRoleEnum;
+import org.dromara.hmily.core.concurrent.threadpool.HmilyThreadFactory;
 import org.dromara.hmily.core.helper.SpringBeanUtils;
 import org.dromara.hmily.core.service.HmilyApplicationService;
+import org.dromara.hmily.core.service.recovery.HmilyTransactionRecoveryService;
+import org.dromara.hmily.core.spi.HmilyCoordinatorRepository;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
 import org.mapdb.Serializer;
@@ -33,10 +37,13 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.Executor;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * The type Hmily transaction map db cache manager.
@@ -60,7 +67,9 @@ public class HmilyTransactionMapDbCacheManager implements DisposableBean, Applic
 
     private ConcurrentMap<String, HmilyTransaction> transactionMap;
 
-    private HmilyCoordinatorService coordinatorService;
+    private HmilyCoordinatorRepository hmilyCoordinatorRepository;
+
+    private HmilyTransactionRecoveryService hmilyTransactionRecoveryService;
 
     /**
      * Put.
@@ -69,7 +78,7 @@ public class HmilyTransactionMapDbCacheManager implements DisposableBean, Applic
      */
     public void put(final HmilyTransaction hmilyTransaction) {
         transactionMap.put(hmilyTransaction.getTransId(), hmilyTransaction);
-        db.commit();
+        // db.commit();
     }
 
     /**
@@ -90,20 +99,7 @@ public class HmilyTransactionMapDbCacheManager implements DisposableBean, Applic
      */
     public HmilyTransaction get(final String id) {
         return Optional.ofNullable(transactionMap.get(id))
-                .orElse(coordinatorService.findByTransId(id));
-    }
-
-    /**
-     * Read all list.
-     *
-     * @return the list
-     */
-    public List<HmilyTransaction> readAll() {
-        final Collection<HmilyTransaction> values = transactionMap.values();
-        if (CollectionUtils.isNotEmpty(values)) {
-            return new ArrayList<>(values);
-        }
-        return new ArrayList<>();
+                .orElse(hmilyCoordinatorRepository.findById(id));
     }
 
     @Override
@@ -119,7 +115,8 @@ public class HmilyTransactionMapDbCacheManager implements DisposableBean, Applic
                 .fileMmapPreclearDisable()
                 .cleanerHackEnable()
                 .closeOnJvmShutdown()
-                .transactionEnable()
+                .closeOnJvmShutdownWeakReference()
+                .checksumHeaderBypass()
                 .concurrencyScale(hmilyConfig.getConcurrencyScale())
                 .make();
 
@@ -127,7 +124,36 @@ public class HmilyTransactionMapDbCacheManager implements DisposableBean, Applic
                 .keySerializer(Serializer.STRING)
                 .valueSerializer(Serializer.JAVA)
                 .createOrOpen();
-        coordinatorService = SpringBeanUtils.getInstance().getBean(HmilyCoordinatorService.class);
+        hmilyCoordinatorRepository = SpringBeanUtils.getInstance().getBean(HmilyCoordinatorRepository.class);
+
+        hmilyTransactionRecoveryService = new HmilyTransactionRecoveryService(hmilyCoordinatorRepository);
+
+
+        handler(new ArrayList<>(transactionMap.values()));
+    }
+
+    private void handler(final List<HmilyTransaction> recoveryList) {
+        if (CollectionUtils.isNotEmpty(recoveryList)) {
+            Executor executor = new ThreadPoolExecutor(1,
+                    1, 0, TimeUnit.MILLISECONDS,
+                    new LinkedBlockingQueue<>(),
+                    HmilyThreadFactory.create("hmily-mapDb-execute",
+                            false),
+                    new ThreadPoolExecutor.AbortPolicy());
+            executor.execute(() -> {
+                for (HmilyTransaction hmilyTransaction : recoveryList) {
+                    if (hmilyTransaction.getRole() == HmilyRoleEnum.START.getCode()) {
+                        if (hmilyTransaction.getStatus() == HmilyActionEnum.TRYING.getCode()
+                                || hmilyTransaction.getStatus() == HmilyActionEnum.CANCELING.getCode()) {
+                            hmilyTransactionRecoveryService.cancel(hmilyTransaction);
+                        } else if (hmilyTransaction.getStatus() == HmilyActionEnum.CONFIRMING.getCode()) {
+                            hmilyTransactionRecoveryService.confirm(hmilyTransaction);
+                        }
+                    }
+                    remove(hmilyTransaction.getTransId());
+                }
+            });
+        }
     }
 
     private String buildFileName() {
