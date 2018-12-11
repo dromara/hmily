@@ -13,7 +13,8 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ *//*
+
 
 package org.dromara.hmily.core.cache;
 
@@ -34,7 +35,6 @@ import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
-import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,22 +45,21 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+*/
 /**
  * The type Hmily transaction map db cache manager.
  *
  * @author xiaoyu(Myth)
- */
-@Component
+ *//*
+
 public class HmilyTransactionMapDbCacheManager implements DisposableBean, ApplicationListener<ContextRefreshedEvent> {
 
     private static final String FILE_NAME_SUFFIX = "-hmilyTransaction.db";
 
     private static final String MAP_NAME_SUFFIX = "HmilyTransactionMap";
 
-    @Autowired
     private HmilyConfig hmilyConfig;
 
-    @Autowired
     private HmilyApplicationService hmilyApplicationService;
 
     private DB db;
@@ -71,32 +70,38 @@ public class HmilyTransactionMapDbCacheManager implements DisposableBean, Applic
 
     private HmilyTransactionRecoveryService hmilyTransactionRecoveryService;
 
-    /**
+    */
+/**
      * Put.
      *
      * @param hmilyTransaction the hmily transaction
-     */
+     *//*
+
     public void put(final HmilyTransaction hmilyTransaction) {
         transactionMap.put(hmilyTransaction.getTransId(), hmilyTransaction);
         // db.commit();
     }
 
-    /**
+    */
+/**
      * Remove.
      *
      * @param id the id
-     */
+     *//*
+
     public void remove(final String id) {
         transactionMap.remove(id);
-        db.commit();
+        //db.commit();
     }
 
-    /**
+    */
+/**
      * Get hmily transaction.
      *
      * @param id the id
      * @return the hmily transaction
-     */
+     *//*
+
     public HmilyTransaction get(final String id) {
         return Optional.ofNullable(transactionMap.get(id))
                 .orElse(hmilyCoordinatorRepository.findById(id));
@@ -165,3 +170,4 @@ public class HmilyTransactionMapDbCacheManager implements DisposableBean, Applic
     }
 
 }
+*/

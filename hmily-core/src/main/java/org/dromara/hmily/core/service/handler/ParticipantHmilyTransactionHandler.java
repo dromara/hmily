@@ -23,6 +23,7 @@ import org.dromara.hmily.common.bean.context.HmilyTransactionContext;
 import org.dromara.hmily.common.bean.entity.HmilyTransaction;
 import org.dromara.hmily.common.enums.HmilyActionEnum;
 import org.dromara.hmily.common.utils.DefaultValueUtils;
+import org.dromara.hmily.core.cache.HmilyTransactionGuavaCacheManager;
 import org.dromara.hmily.core.concurrent.threadlocal.HmilyTransactionContextLocal;
 import org.dromara.hmily.core.service.HmilyTransactionHandler;
 import org.dromara.hmily.core.service.executor.HmilyTransactionExecutor;
@@ -67,11 +68,13 @@ public class ParticipantHmilyTransactionHandler implements HmilyTransactionHandl
                     HmilyTransactionContextLocal.getInstance().remove();
                 }
             case CONFIRMING:
-                currentTransaction = hmilyTransactionExecutor.cacheByMapDB(context.getTransId());
+                currentTransaction = HmilyTransactionGuavaCacheManager
+                        .getInstance().getHmilyTransaction(context.getTransId());
                 hmilyTransactionExecutor.confirm(currentTransaction);
                 break;
             case CANCELING:
-                currentTransaction = hmilyTransactionExecutor.cacheByMapDB(context.getTransId());
+                currentTransaction = HmilyTransactionGuavaCacheManager
+                        .getInstance().getHmilyTransaction(context.getTransId());
                 hmilyTransactionExecutor.cancel(currentTransaction);
                 break;
             default:
