@@ -25,7 +25,8 @@ import java.io.Serializable;
 
 
 /**
- * Participant 参与者.
+ * this hmily transaction participant .
+ *
  * @author xiaoyu
  */
 @Data
@@ -37,8 +38,19 @@ public class HmilyParticipant implements Serializable {
 
     private String transId;
 
+    private Integer status;
+
     private HmilyInvocation confirmHmilyInvocation;
 
     private HmilyInvocation cancelHmilyInvocation;
+
+    public HmilyParticipant(final String transId,
+                            final HmilyInvocation confirmHmilyInvocation,
+                            final HmilyInvocation cancelHmilyInvocation) {
+        this.transId = transId;
+        this.confirmHmilyInvocation = confirmHmilyInvocation;
+        this.cancelHmilyInvocation = cancelHmilyInvocation;
+
+    }
 
 }

@@ -25,6 +25,7 @@ import com.lmax.disruptor.RingBuffer;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.dsl.ProducerType;
 import org.dromara.hmily.common.bean.entity.HmilyTransaction;
+import org.dromara.hmily.common.config.HmilyConfig;
 import org.dromara.hmily.common.enums.EventTypeEnum;
 import org.dromara.hmily.core.concurrent.ConsistentHashSelector;
 import org.dromara.hmily.core.concurrent.SingletonExecutor;
@@ -35,6 +36,8 @@ import org.dromara.hmily.core.disruptor.handler.HmilyConsumerDataHandler;
 import org.dromara.hmily.core.disruptor.translator.HmilyTransactionEventTranslator;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -47,15 +50,19 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author xiaoyu(Myth)
  */
 @Component
-public class HmilyTransactionEventPublisher implements DisposableBean {
+public class HmilyTransactionEventPublisher implements DisposableBean, ApplicationListener<ContextRefreshedEvent> {
 
     private Disruptor<HmilyTransactionEvent> disruptor;
 
     private final HmilyCoordinatorService coordinatorService;
 
+    private final HmilyConfig hmilyConfig;
+
     @Autowired
-    public HmilyTransactionEventPublisher(final HmilyCoordinatorService coordinatorService) {
+    public HmilyTransactionEventPublisher(final HmilyCoordinatorService coordinatorService,
+                                          final HmilyConfig hmilyConfig) {
         this.coordinatorService = coordinatorService;
+        this.hmilyConfig = hmilyConfig;
     }
 
     /**
@@ -64,7 +71,7 @@ public class HmilyTransactionEventPublisher implements DisposableBean {
      * @param bufferSize this is disruptor buffer size.
      * @param threadSize this is disruptor consumer thread size.
      */
-    public void start(final int bufferSize, final int threadSize) {
+    private void start(final int bufferSize, final int threadSize) {
         disruptor = new Disruptor<>(new HmilyTransactionEventFactory(), bufferSize, r -> {
             AtomicInteger index = new AtomicInteger(1);
             return new Thread(null, r, "disruptor-thread-" + index.getAndIncrement());
@@ -86,7 +93,7 @@ public class HmilyTransactionEventPublisher implements DisposableBean {
      * publish disruptor event.
      *
      * @param hmilyTransaction {@linkplain HmilyTransaction }
-     * @param type           {@linkplain EventTypeEnum}
+     * @param type             {@linkplain EventTypeEnum}
      */
     public void publishEvent(final HmilyTransaction hmilyTransaction, final int type) {
         final RingBuffer<HmilyTransactionEvent> ringBuffer = disruptor.getRingBuffer();
@@ -98,4 +105,8 @@ public class HmilyTransactionEventPublisher implements DisposableBean {
         disruptor.shutdown();
     }
 
+    @Override
+    public void onApplicationEvent(ContextRefreshedEvent event) {
+        start(hmilyConfig.getBufferSize(), hmilyConfig.getConsumerThreads());
+    }
 }

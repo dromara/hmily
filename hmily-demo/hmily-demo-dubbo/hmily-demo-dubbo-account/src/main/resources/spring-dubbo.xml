@@ -11,12 +11,15 @@
 
     <dubbo:registry protocol="zookeeper" address="192.168.1.84:2181"/>
 
-    <dubbo:protocol accesslog="true" name="dubbo" port="20884"/>
+    <dubbo:protocol name="dubbo" port="20884"
+                    server="netty" client="netty"
+                    charset="UTF-8" threadpool="fixed" threads="500"
+                    queues="0" buffer="8192" accepts="0" payload="8388608" />
 
     <dubbo:service interface="org.dromara.hmily.demo.dubbo.account.api.service.AccountService"
-                   ref="accountService"/>
+                   ref="accountService" executes="20"/>
 
-    <dubbo:reference timeout="10000"
+    <dubbo:reference timeout="20000"
                      interface="org.dromara.hmily.demo.dubbo.inventory.api.service.InventoryService"
                      id="inventoryService"
                      retries="0" check="false"/>

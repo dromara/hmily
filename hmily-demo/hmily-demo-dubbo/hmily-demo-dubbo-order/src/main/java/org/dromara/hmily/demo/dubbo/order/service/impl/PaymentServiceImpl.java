@@ -25,7 +25,6 @@ import org.dromara.hmily.demo.dubbo.account.api.dto.AccountNestedDTO;
 import org.dromara.hmily.demo.dubbo.account.api.entity.AccountDO;
 import org.dromara.hmily.demo.dubbo.account.api.service.AccountService;
 import org.dromara.hmily.demo.dubbo.inventory.api.dto.InventoryDTO;
-import org.dromara.hmily.demo.dubbo.inventory.api.entity.InventoryDO;
 import org.dromara.hmily.demo.dubbo.inventory.api.service.InventoryService;
 import org.dromara.hmily.demo.dubbo.order.entity.Order;
 import org.dromara.hmily.demo.dubbo.order.enums.OrderStatusEnum;
@@ -67,10 +66,10 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     @Hmily(confirmMethod = "confirmOrderStatus", cancelMethod = "cancelOrderStatus")
     public void makePayment(Order order) {
-        order.setStatus(OrderStatusEnum.PAYING.getCode());
-        orderMapper.update(order);
+       /* order.setStatus(OrderStatusEnum.PAYING.getCode());
+        orderMapper.update(order);*/
         //做库存和资金账户的检验工作 这里只是demo 。。。
-        final AccountDO accountDO = accountService.findByUserId(order.getUserId());
+       /* final AccountDO accountDO = accountService.findByUserId(order.getUserId());
         if (accountDO.getBalance().compareTo(order.getTotalAmount()) <= 0) {
             throw new HmilyRuntimeException("余额不足！");
         }
@@ -78,7 +77,7 @@ public class PaymentServiceImpl implements PaymentService {
 
         if (inventory.getTotalInventory() < order.getCount()) {
             throw new HmilyRuntimeException("库存不足！");
-        }
+        }*/
         //扣除用户余额
         AccountDTO accountDTO = new AccountDTO();
         accountDTO.setAmount(order.getTotalAmount());
@@ -93,9 +92,9 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public void testMakePayment(Order order) {
-        orderMapper.update(order);
+        //orderMapper.update(order);
         //做库存和资金账户的检验工作 这里只是demo 。。。
-        final AccountDO accountDO = accountService.findByUserId(order.getUserId());
+       /* final AccountDO accountDO = accountService.findByUserId(order.getUserId());
         if (accountDO.getBalance().compareTo(order.getTotalAmount()) <= 0) {
             throw new HmilyRuntimeException("余额不足！");
         }
@@ -103,7 +102,7 @@ public class PaymentServiceImpl implements PaymentService {
 
         if (inventory.getTotalInventory() < order.getCount()) {
             throw new HmilyRuntimeException("库存不足！");
-        }
+        }*/
         //扣除用户余额
         AccountDTO accountDTO = new AccountDTO();
         accountDTO.setAmount(order.getTotalAmount());

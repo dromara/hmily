@@ -19,7 +19,12 @@ package org.dromara.hmily.dubbo.filter;
 
 import com.alibaba.dubbo.common.Constants;
 import com.alibaba.dubbo.common.extension.Activate;
-import com.alibaba.dubbo.rpc.*;
+import com.alibaba.dubbo.rpc.Filter;
+import com.alibaba.dubbo.rpc.Invocation;
+import com.alibaba.dubbo.rpc.Invoker;
+import com.alibaba.dubbo.rpc.Result;
+import com.alibaba.dubbo.rpc.RpcContext;
+import com.alibaba.dubbo.rpc.RpcException;
 import org.apache.commons.lang3.StringUtils;
 import org.dromara.hmily.annotation.Hmily;
 import org.dromara.hmily.common.bean.context.HmilyTransactionContext;
@@ -89,21 +94,22 @@ public class DubboHmilyTransactionFilter implements Filter {
                     }
                     RpcContext.getContext()
                             .setAttachment(CommonConstant.HMILY_TRANSACTION_CONTEXT, GsonUtils.getInstance().toJson(hmilyTransactionContext));
-                }
-                final Result result = invoker.invoke(invocation);
-                //if result has not exception
-                if (!result.hasException()) {
-                    final HmilyParticipant hmilyParticipant = buildParticipant(hmilyTransactionContext, hmily, method, clazz, arguments, args);
-                    if (hmilyTransactionContext.getRole() == HmilyRoleEnum.INLINE.getCode()) {
-                        hmilyTransactionExecutor.registerByNested(hmilyTransactionContext.getTransId(),
-                                hmilyParticipant);
+                    final Result result = invoker.invoke(invocation);
+                    //if result has not exception
+                    if (!result.hasException()) {
+                        final HmilyParticipant hmilyParticipant = buildParticipant(hmilyTransactionContext, hmily, method, clazz, arguments, args);
+                        if (hmilyTransactionContext.getRole() == HmilyRoleEnum.INLINE.getCode()) {
+                            hmilyTransactionExecutor.registerByNested(hmilyTransactionContext.getTransId(),
+                                    hmilyParticipant);
+                        } else {
+                            hmilyTransactionExecutor.enlistParticipant(hmilyParticipant);
+                        }
                     } else {
-                        hmilyTransactionExecutor.enlistParticipant(hmilyParticipant);
+                        throw new HmilyRuntimeException("rpc invoke exception{}", result.getException());
                     }
-                } else {
-                    throw new HmilyRuntimeException("rpc invoke exception{}", result.getException());
+                    return result;
                 }
-                return result;
+                return invoker.invoke(invocation);
             } catch (RpcException e) {
                 e.printStackTrace();
                 throw e;
