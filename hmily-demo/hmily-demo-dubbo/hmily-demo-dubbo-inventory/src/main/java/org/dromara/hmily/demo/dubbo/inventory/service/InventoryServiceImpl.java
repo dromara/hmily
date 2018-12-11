@@ -29,12 +29,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
+ * The type Inventory service.
+ *
  * @author xiaoyu
  */
 @Service("inventoryService")
-@SuppressWarnings("all")
 public class InventoryServiceImpl implements InventoryService {
 
     /**
@@ -42,12 +44,22 @@ public class InventoryServiceImpl implements InventoryService {
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(InventoryServiceImpl.class);
 
+    private static AtomicInteger tryCount = new AtomicInteger(0);
+
+    private static AtomicInteger confirmCount = new AtomicInteger(0);
+
     private final InventoryMapper inventoryMapper;
 
+    /**
+     * Instantiates a new Inventory service.
+     *
+     * @param inventoryMapper the inventory mapper
+     */
     @Autowired(required = false)
     public InventoryServiceImpl(InventoryMapper inventoryMapper) {
         this.inventoryMapper = inventoryMapper;
     }
+
 
     /**
      * 扣减库存操作
@@ -58,21 +70,16 @@ public class InventoryServiceImpl implements InventoryService {
      */
     @Override
     @Hmily(confirmMethod = "confirmMethod", cancelMethod = "cancelMethod")
-    @Transactional
     public Boolean decrease(InventoryDTO inventoryDTO) {
-        final InventoryDO entity = inventoryMapper.findByProductId(inventoryDTO.getProductId());
-        entity.setTotalInventory(entity.getTotalInventory() - inventoryDTO.getCount());
-        entity.setLockInventory(entity.getLockInventory() + inventoryDTO.getCount());
-        inventoryMapper.decrease(entity);
+        //inventoryMapper.decrease(inventoryDTO);
+       /* final int i = tryCount.incrementAndGet();
+        System.out.println("调用了inventory  try " + i + " 次");*/
         return true;
     }
 
     @Override
     public Boolean testDecrease(InventoryDTO inventoryDTO) {
-        final InventoryDO entity = inventoryMapper.findByProductId(inventoryDTO.getProductId());
-        entity.setTotalInventory(entity.getTotalInventory() - inventoryDTO.getCount());
-        entity.setLockInventory(0);
-        inventoryMapper.decrease(entity);
+        //inventoryMapper.decrease(inventoryDTO);
         return true;
     }
 
@@ -92,7 +99,6 @@ public class InventoryServiceImpl implements InventoryService {
     public String mockWithTryException(InventoryDTO inventoryDTO) {
         //这里是模拟异常所以就直接抛出异常了
         throw new HmilyRuntimeException("库存扣减异常！");
-
     }
 
     @Override
@@ -105,10 +111,7 @@ public class InventoryServiceImpl implements InventoryService {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        final InventoryDO entity = inventoryMapper.findByProductId(inventoryDTO.getProductId());
-        entity.setTotalInventory(entity.getTotalInventory() - inventoryDTO.getCount());
-        entity.setLockInventory(entity.getLockInventory() + inventoryDTO.getCount());
-        final int decrease = inventoryMapper.decrease(entity);
+        final int decrease = inventoryMapper.decrease(inventoryDTO);
         if (decrease != 1) {
             throw new HmilyRuntimeException("库存不足");
         }
@@ -119,36 +122,33 @@ public class InventoryServiceImpl implements InventoryService {
     @Hmily(confirmMethod = "confirmMethodException", cancelMethod = "cancelMethod")
     @Transactional(rollbackFor = Exception.class)
     public String mockWithConfirmException(InventoryDTO inventoryDTO) {
-        final InventoryDO entity = inventoryMapper.findByProductId(inventoryDTO.getProductId());
-        entity.setTotalInventory(entity.getTotalInventory() - inventoryDTO.getCount());
-        entity.setLockInventory(entity.getLockInventory() + inventoryDTO.getCount());
-        final int decrease = inventoryMapper.decrease(entity);
+        final int decrease = inventoryMapper.decrease(inventoryDTO);
         if (decrease != 1) {
             throw new HmilyRuntimeException("库存不足");
         }
         return "success";
     }
 
-
     @Override
     @Hmily(confirmMethod = "confirmMethodTimeout", cancelMethod = "cancelMethod")
     @Transactional(rollbackFor = Exception.class)
     public Boolean mockWithConfirmTimeout(InventoryDTO inventoryDTO) {
         LOGGER.info("==========调用扣减库存确认方法mockWithConfirmTimeout===========");
-        final InventoryDO entity = inventoryMapper.findByProductId(inventoryDTO.getProductId());
-        entity.setTotalInventory(entity.getTotalInventory() - inventoryDTO.getCount());
-        entity.setLockInventory(entity.getLockInventory() + inventoryDTO.getCount());
-        final int decrease = inventoryMapper.decrease(entity);
+        final int decrease = inventoryMapper.decrease(inventoryDTO);
         if (decrease != 1) {
             throw new HmilyRuntimeException("库存不足");
         }
         return true;
     }
 
-
+    /**
+     * Confirm method timeout boolean.
+     *
+     * @param inventoryDTO the inventory dto
+     * @return the boolean
+     */
     @Transactional(rollbackFor = Exception.class)
     public Boolean confirmMethodTimeout(InventoryDTO inventoryDTO) {
-
         try {
             //模拟延迟 当前线程暂停11秒
             Thread.sleep(11000);
@@ -156,54 +156,51 @@ public class InventoryServiceImpl implements InventoryService {
             e.printStackTrace();
         }
         LOGGER.info("==========调用扣减库存确认方法===========");
-
-        final InventoryDO entity = inventoryMapper.findByProductId(inventoryDTO.getProductId());
-
-        entity.setLockInventory(entity.getLockInventory() - inventoryDTO.getCount());
-        inventoryMapper.decrease(entity);
-
+        inventoryMapper.decrease(inventoryDTO);
         return true;
-
     }
 
-
+    /**
+     * Confirm method exception boolean.
+     *
+     * @param inventoryDTO the inventory dto
+     * @return the boolean
+     */
     @Transactional(rollbackFor = Exception.class)
     public Boolean confirmMethodException(InventoryDTO inventoryDTO) {
         LOGGER.info("==========调用扣减库存确认方法===========");
-        final InventoryDO entity = inventoryMapper.findByProductId(inventoryDTO.getProductId());
-        entity.setLockInventory(entity.getLockInventory() - inventoryDTO.getCount());
-        final int decrease = inventoryMapper.decrease(entity);
-
+        final int decrease = inventoryMapper.decrease(inventoryDTO);
         if (decrease != 1) {
             throw new HmilyRuntimeException("库存不足");
         }
         return true;
     }
 
-
+    /**
+     * Confirm method boolean.
+     *
+     * @param inventoryDTO the inventory dto
+     * @return the boolean
+     */
     @Transactional(rollbackFor = Exception.class)
     public Boolean confirmMethod(InventoryDTO inventoryDTO) {
-        LOGGER.info("==========调用扣减库存确认方法===========");
-        final InventoryDO entity = inventoryMapper.findByProductId(inventoryDTO.getProductId());
-        entity.setLockInventory(entity.getLockInventory() - inventoryDTO.getCount());
-        inventoryMapper.confirm(entity);
+        inventoryMapper.confirm(inventoryDTO);
+        final int i = confirmCount.incrementAndGet();
+        System.out.println("调用了inventory confirm " + i + " 次");
         return true;
     }
 
+    /**
+     * Cancel method boolean.
+     *
+     * @param inventoryDTO the inventory dto
+     * @return the boolean
+     */
     @Transactional(rollbackFor = Exception.class)
     public Boolean cancelMethod(InventoryDTO inventoryDTO) {
-
         LOGGER.info("==========调用扣减库存取消方法===========");
-
-        final InventoryDO entity = inventoryMapper.findByProductId(inventoryDTO.getProductId());
-
-        entity.setTotalInventory(entity.getTotalInventory() + inventoryDTO.getCount());
-
-        entity.setLockInventory(entity.getLockInventory() - inventoryDTO.getCount());
-        inventoryMapper.cancel(entity);
-
+        inventoryMapper.cancel(inventoryDTO);
         return true;
-
     }
 
 }

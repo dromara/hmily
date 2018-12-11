@@ -25,7 +25,6 @@ import org.dromara.hmily.common.serializer.ObjectSerializer;
 import org.dromara.hmily.common.utils.LogUtil;
 import org.dromara.hmily.common.utils.ServiceBootstrap;
 import org.dromara.hmily.core.coordinator.HmilyCoordinatorService;
-import org.dromara.hmily.core.disruptor.publisher.HmilyTransactionEventPublisher;
 import org.dromara.hmily.core.helper.SpringBeanUtils;
 import org.dromara.hmily.core.logo.HmilyLogo;
 import org.dromara.hmily.core.service.HmilyInitService;
@@ -55,12 +54,9 @@ public class HmilyInitServiceImpl implements HmilyInitService {
 
     private final HmilyCoordinatorService hmilyCoordinatorService;
 
-    private final HmilyTransactionEventPublisher hmilyTransactionEventPublisher;
-
     @Autowired
-    public HmilyInitServiceImpl(final HmilyCoordinatorService hmilyCoordinatorService, final HmilyTransactionEventPublisher hmilyTransactionEventPublisher) {
+    public HmilyInitServiceImpl(final HmilyCoordinatorService hmilyCoordinatorService) {
         this.hmilyCoordinatorService = hmilyCoordinatorService;
-        this.hmilyTransactionEventPublisher = hmilyTransactionEventPublisher;
     }
 
     /**
@@ -73,7 +69,6 @@ public class HmilyInitServiceImpl implements HmilyInitService {
         Runtime.getRuntime().addShutdownHook(new Thread(() -> LOGGER.info("hmily shutdown now")));
         try {
             loadSpiSupport(hmilyConfig);
-            hmilyTransactionEventPublisher.start(hmilyConfig.getBufferSize(), hmilyConfig.getConsumerThreads());
             hmilyCoordinatorService.start(hmilyConfig);
         } catch (Exception ex) {
             LogUtil.error(LOGGER, " hmily init exception:{}", ex::getMessage);

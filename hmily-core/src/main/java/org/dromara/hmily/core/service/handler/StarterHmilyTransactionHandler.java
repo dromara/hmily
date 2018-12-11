@@ -56,13 +56,12 @@ public class StarterHmilyTransactionHandler implements HmilyTransactionHandler, 
         this.hmilyConfig = hmilyConfig;
     }
 
-
     @Override
     public Object handler(final ProceedingJoinPoint point, final HmilyTransactionContext context)
             throws Throwable {
         Object returnValue;
         try {
-            HmilyTransaction hmilyTransaction = hmilyTransactionExecutor.begin(point);
+            HmilyTransaction hmilyTransaction = hmilyTransactionExecutor.preTry(point);
             try {
                 //execute try
                 returnValue = point.proceed();

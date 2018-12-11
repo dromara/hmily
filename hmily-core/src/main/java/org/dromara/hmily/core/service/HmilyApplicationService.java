@@ -19,13 +19,14 @@ package org.dromara.hmily.core.service;
 
 /**
  * RpcApplicationService.
+ *
  * @author xiaoyu
  */
 @FunctionalInterface
 public interface HmilyApplicationService {
 
     /**
-     * 获取applicationName.
+     * acquire rpc application name.
      *
      * @return applicationName
      */

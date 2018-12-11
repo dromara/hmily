@@ -17,8 +17,8 @@
 
 package org.dromara.hmily.core.service.impl;
 
-import org.dromara.hmily.common.bean.context.HmilyTransactionContext;
 import org.aspectj.lang.ProceedingJoinPoint;
+import org.dromara.hmily.common.bean.context.HmilyTransactionContext;
 import org.dromara.hmily.core.helper.SpringBeanUtils;
 import org.dromara.hmily.core.service.HmilyTransactionAspectService;
 import org.dromara.hmily.core.service.HmilyTransactionFactoryService;
@@ -47,9 +47,9 @@ public class HmilyTransactionAspectServiceImpl implements HmilyTransactionAspect
      * hmily transaction aspect.
      *
      * @param hmilyTransactionContext {@linkplain  HmilyTransactionContext}
-     * @param point                {@linkplain ProceedingJoinPoint}
+     * @param point                   {@linkplain ProceedingJoinPoint}
      * @return object  return value
-     * @throws Throwable  exception
+     * @throws Throwable exception
      */
     @Override
     public Object invoke(final HmilyTransactionContext hmilyTransactionContext, final ProceedingJoinPoint point) throws Throwable {
