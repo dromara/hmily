@@ -138,7 +138,7 @@ public class HmilyTransactionExecutor {
      * @throws HmilyRuntimeException ex
      */
     public void confirm(final HmilyTransaction currentTransaction) throws HmilyRuntimeException {
-        LogUtil.debug(LOGGER, () -> "tcc confirm .......！start");
+        LogUtil.debug(LOGGER, () -> "hmily transaction confirm .......！start");
         if (Objects.isNull(currentTransaction) || CollectionUtils.isEmpty(currentTransaction.getHmilyParticipants())) {
             return;
         }

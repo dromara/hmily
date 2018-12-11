@@ -37,14 +37,9 @@ public class HmilyConfig {
     private String repositorySuffix;
 
     /**
-     * Whether recovery logs need to be maintained .
-     */
-    private Boolean hasRecovery = true;
-
-    /**
      * this is map db concurrencyScale.
      */
-    private Integer concurrencyScale = 256;
+    private Integer concurrencyScale = 512;
 
     /**
      * log serializer.
@@ -61,6 +56,11 @@ public class HmilyConfig {
      * scheduledPool scheduledDelay unit SECONDS.
      */
     private int scheduledDelay = 60;
+
+    /**
+     * scheduledPool scheduledInitDelay unit SECONDS.
+     */
+    private int scheduledInitDelay = 120;
 
     /**
      * retry max.
