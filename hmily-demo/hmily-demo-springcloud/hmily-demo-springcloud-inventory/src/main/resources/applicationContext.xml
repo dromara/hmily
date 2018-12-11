@@ -39,6 +39,7 @@
         <property name="scheduledDelay" value="120"/>
         <property name="scheduledThreadMax" value="4"/>
         <property name="repositorySupport" value="db"/>
+        <property name="started" value="false"/>
         <property name="hmilyDbConfig">
             <bean class="org.dromara.hmily.common.config.HmilyDbConfig">
                 <property name="url"

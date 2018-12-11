@@ -73,14 +73,14 @@ public class AccountServiceImpl implements AccountService {
     @Override
     @Hmily(confirmMethod = "confirm", cancelMethod = "cancel")
     public void payment(AccountDTO accountDTO) {
-        //accountMapper.update(accountDTO);
+        accountMapper.update(accountDTO);
         /*final int i = trycount.incrementAndGet();
         System.out.println("调用了account try " + i + " 次");*/
     }
 
     @Override
     public boolean testPayment(AccountDTO accountDTO) {
-        //accountMapper.update(accountDTO);
+        accountMapper.update(accountDTO);
         return Boolean.TRUE;
     }
 
