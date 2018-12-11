@@ -17,58 +17,60 @@
 
 package org.dromara.hmily.demo.springcloud.account.mapper;
 
-import org.dromara.hmily.demo.springcloud.account.entity.AccountDO;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
+import org.dromara.hmily.demo.springcloud.account.dto.AccountDTO;
+import org.dromara.hmily.demo.springcloud.account.entity.AccountDO;
 
 /**
+ * The interface Account mapper.
+ *
  * @author xiaoyu
  */
 @SuppressWarnings("all")
 public interface AccountMapper {
 
     /**
-     * 扣减账户余额
+     * Update int.
      *
-     * @param accountDO 实体类
-     * @return rows
+     * @param accountDTO the account dto
+     * @return the int
      */
-    @Update("update account set balance =#{balance}," +
-            " freeze_amount= #{freezeAmount} ,update_time = #{updateTime}" +
-            " where user_id =#{userId}  and  balance > 0 ")
-    int update(AccountDO accountDO);
+    @Update("update account set balance = balance - #{amount}," +
+            " freeze_amount= freeze_amount + #{amount} ,update_time = now()" +
+            " where user_id =#{userId}  and  balance > 0  ")
+    int update(AccountDTO accountDTO);
 
 
     /**
-     * 确认扣减账户余额
+     * Confirm int.
      *
-     * @param accountDO 实体类
-     * @return rows
+     * @param accountDTO the account dto
+     * @return the int
      */
     @Update("update account set " +
-            " freeze_amount= #{freezeAmount} ,update_time = #{updateTime}" +
+            " freeze_amount= freeze_amount - #{amount}" +
             " where user_id =#{userId}  and freeze_amount >0 ")
-    int confirm(AccountDO accountDO);
+    int confirm(AccountDTO accountDTO);
 
 
     /**
-     * 取消扣减账户余额
+     * Cancel int.
      *
-     * @param accountDO 实体类
-     * @return rows
+     * @param accountDO the account do
+     * @return the int
      */
-    @Update("update account set balance =#{balance}," +
-            " freeze_amount= #{freezeAmount} ,update_time = #{updateTime}" +
+    @Update("update account set balance = balance + #{amount}," +
+            " freeze_amount= freeze_amount -  #{amount} " +
             " where user_id =#{userId}  and freeze_amount >0")
-    int cancel(AccountDO accountDO);
-
+    int cancel(AccountDTO accountDTO);
 
     /**
-     * 根据userId获取用户账户信息
+     * Find by user id account do.
      *
-     * @param userId 用户id
-     * @return AccountDO
+     * @param userId the user id
+     * @return the account do
      */
-    @Select("select * from account where user_id =#{userId}")
+    @Select("select id,user_id,balance, freeze_amount from account where user_id =#{userId} limit 1")
     AccountDO findByUserId(String userId);
 }

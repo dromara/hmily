@@ -21,7 +21,7 @@ org:
             scheduledThreadMax :  10
             repositorySupport : db
             started: true
-            async-threads: 500
+            async-threads: 200
             hmilyDbConfig :
                  driverClassName  : com.mysql.jdbc.Driver
                  url :  jdbc:mysql://192.168.1.98:3306/tcc?useUnicode=true&amp;characterEncoding=utf8

@@ -17,6 +17,7 @@
 
 package org.dromara.hmily.demo.springcloud.inventory.mapper;
 
+import org.dromara.hmily.demo.springcloud.inventory.dto.InventoryDTO;
 import org.dromara.hmily.demo.springcloud.inventory.entity.InventoryDO;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
@@ -27,46 +28,49 @@ import org.apache.ibatis.annotations.Update;
 @SuppressWarnings("all")
 public interface InventoryMapper {
 
-    /**
-     * 库存扣减.
-     *
-     * @param inventory 实体对象
-     * @return rows
-     */
-    @Update("update inventory set total_inventory =#{totalInventory}," +
-            " lock_inventory= #{lockInventory} " +
-            " where product_id =#{productId}  and  total_inventory >0  ")
-    int decrease(InventoryDO inventory);
 
     /**
-     * 库存扣减confirm.
+     * Decrease int.
      *
-     * @param inventory 实体对象
-     * @return rows
+     * @param inventoryDTO the inventory dto
+     * @return the int
+     */
+    @Update("update inventory set total_inventory = total_inventory - #{count}," +
+            " lock_inventory= lock_inventory + #{count} " +
+            " where product_id =#{productId}  and  total_inventory >0  ")
+    int decrease(InventoryDTO inventoryDTO);
+
+
+    /**
+     * Confirm int.
+     *
+     * @param inventoryDTO the inventory dto
+     * @return the int
      */
     @Update("update inventory set " +
-            " lock_inventory= #{lockInventory} " +
+            " lock_inventory=  lock_inventory - #{count} " +
             " where product_id =#{productId}  and lock_inventory >0 ")
-    int confirm(InventoryDO inventory);
+    int confirm(InventoryDTO inventoryDTO);
+
 
     /**
-     * 库存扣减 cancel.
+     * Cancel int.
      *
-     * @param inventory 实体对象
-     * @return rows
+     * @param inventoryDTO the inventory dto
+     * @return the int
      */
-    @Update("update inventory set total_inventory =#{totalInventory}," +
-            " lock_inventory= #{lockInventory} " +
+    @Update("update inventory set total_inventory = total_inventory + #{count}," +
+            " lock_inventory= lock_inventory - #{count} " +
             " where product_id =#{productId}  and lock_inventory >0 ")
-    int cancel(InventoryDO inventory);
+    int cancel(InventoryDTO inventoryDTO);
 
     /**
-     * 根据商品id找到库存信息.
+     * Find by product id inventory do.
      *
-     * @param productId 商品id
-     * @return Inventory
+     * @param productId the product id
+     * @return the inventory do
      */
-    @Select("select * from inventory where product_id =#{productId}")
+    @Select("select id,product_id,total_inventory ,lock_inventory from inventory where product_id =#{productId}")
     InventoryDO findByProductId(String productId);
 
 }

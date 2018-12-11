@@ -66,8 +66,8 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     @Hmily(confirmMethod = "confirmOrderStatus", cancelMethod = "cancelOrderStatus")
     public void makePayment(Order order) {
-       /* order.setStatus(OrderStatusEnum.PAYING.getCode());
-        orderMapper.update(order);*/
+        order.setStatus(OrderStatusEnum.PAYING.getCode());
+        orderMapper.update(order);
         //做库存和资金账户的检验工作 这里只是demo 。。。
        /* final AccountDO accountDO = accountService.findByUserId(order.getUserId());
         if (accountDO.getBalance().compareTo(order.getTotalAmount()) <= 0) {
