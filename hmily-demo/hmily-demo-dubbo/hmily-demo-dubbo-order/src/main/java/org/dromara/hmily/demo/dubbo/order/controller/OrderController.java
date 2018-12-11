@@ -17,8 +17,8 @@
 
 package org.dromara.hmily.demo.dubbo.order.controller;
 
-import org.dromara.hmily.demo.dubbo.order.service.OrderService;
 import io.swagger.annotations.ApiOperation;
+import org.dromara.hmily.demo.dubbo.order.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -48,7 +48,10 @@ public class OrderController {
     public String orderPay(@RequestParam(value = "count") Integer count,
                            @RequestParam(value = "amount") BigDecimal amount) {
 
-        return orderService.orderPay(count, amount);
+        final long start = System.currentTimeMillis();
+        orderService.orderPay(count, amount);
+        System.out.println("消耗时间为:" + (System.currentTimeMillis() - start));
+        return "";
 
     }
 
@@ -56,8 +59,10 @@ public class OrderController {
     @ApiOperation(value = "测试订单支付接口(这里是压测接口不添加分布式事务)")
     public String testOrderPay(@RequestParam(value = "count") Integer count,
                                @RequestParam(value = "amount") BigDecimal amount) {
-
-        return orderService.testOrderPay(count, amount);
+        final long start = System.currentTimeMillis();
+        orderService.testOrderPay(count, amount);
+        System.out.println("消耗时间为:" + (System.currentTimeMillis() - start));
+        return "";
 
     }
 

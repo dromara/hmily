@@ -48,9 +48,7 @@ public class HmilyCoordinatorServiceImpl implements HmilyCoordinatorService {
     public void start(final HmilyConfig hmilyConfig) {
         final String repositorySuffix = buildRepositorySuffix(hmilyConfig.getRepositorySuffix());
         coordinatorRepository = SpringBeanUtils.getInstance().getBean(HmilyCoordinatorRepository.class);
-        if (hmilyConfig.getHasRecovery()) {
-            coordinatorRepository.init(repositorySuffix, hmilyConfig);
-        }
+        coordinatorRepository.init(repositorySuffix, hmilyConfig);
     }
 
     @Override

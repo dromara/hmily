@@ -17,22 +17,16 @@
 
 package org.dromara.hmily.core.schedule;
 
-import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.reflect.MethodUtils;
 import org.dromara.hmily.annotation.PatternEnum;
-import org.dromara.hmily.common.bean.context.HmilyTransactionContext;
-import org.dromara.hmily.common.bean.entity.HmilyInvocation;
-import org.dromara.hmily.common.bean.entity.HmilyParticipant;
 import org.dromara.hmily.common.bean.entity.HmilyTransaction;
 import org.dromara.hmily.common.config.HmilyConfig;
 import org.dromara.hmily.common.enums.HmilyActionEnum;
 import org.dromara.hmily.common.enums.HmilyRoleEnum;
 import org.dromara.hmily.common.utils.LogUtil;
-import org.dromara.hmily.core.cache.HmilyTransactionMapDbCacheManager;
-import org.dromara.hmily.core.concurrent.threadlocal.HmilyTransactionContextLocal;
 import org.dromara.hmily.core.concurrent.threadpool.HmilyThreadFactory;
 import org.dromara.hmily.core.helper.SpringBeanUtils;
+import org.dromara.hmily.core.service.recovery.HmilyTransactionRecoveryService;
 import org.dromara.hmily.core.spi.HmilyCoordinatorRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,14 +37,12 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 /**
  * The type Hmily transaction self recovery scheduled.
@@ -68,19 +60,19 @@ public class HmilyTransactionSelfRecoveryScheduled implements ApplicationListene
     @Autowired
     private HmilyConfig hmilyConfig;
 
-    @Autowired
-    private HmilyTransactionMapDbCacheManager cacheManager;
-
     private ScheduledExecutorService scheduledExecutorService;
 
     private HmilyCoordinatorRepository hmilyCoordinatorRepository;
 
+    private HmilyTransactionRecoveryService hmilyTransactionRecoveryService;
+
     @Override
-    public void onApplicationEvent(ContextRefreshedEvent event) {
+    public void onApplicationEvent(final ContextRefreshedEvent event) {
         hmilyCoordinatorRepository = SpringBeanUtils.getInstance().getBean(HmilyCoordinatorRepository.class);
         this.scheduledExecutorService =
                 new ScheduledThreadPoolExecutor(1,
                         HmilyThreadFactory.create("hmily-transaction-self-recovery", true));
+        hmilyTransactionRecoveryService = new HmilyTransactionRecoveryService(hmilyCoordinatorRepository);
         selfRecovery();
     }
 
@@ -92,15 +84,15 @@ public class HmilyTransactionSelfRecoveryScheduled implements ApplicationListene
                 .scheduleWithFixedDelay(() -> {
                     LogUtil.info(LOGGER, "self recovery execute delayTime:{}", () -> hmilyConfig.getScheduledDelay());
                     try {
-                        final List<HmilyTransaction> hmilyTransactions = buildHmilyTransactionList();
+                        final List<HmilyTransaction> hmilyTransactions = hmilyCoordinatorRepository.listAllByDelay(acquireData());
                         if (CollectionUtils.isEmpty(hmilyTransactions)) {
                             return;
                         }
                         for (HmilyTransaction hmilyTransaction : hmilyTransactions) {
                             // if the try is not completed, no compensation will be provided (to prevent various exceptions in the try phase)
-                            if (hmilyTransaction.getRole() == HmilyRoleEnum.PROVIDER.getCode() && hmilyTransaction.getStatus() == HmilyActionEnum.PRE_TRY.getCode()) {
+                            if (hmilyTransaction.getRole() == HmilyRoleEnum.PROVIDER.getCode()
+                                    && hmilyTransaction.getStatus() == HmilyActionEnum.PRE_TRY.getCode()) {
                                 hmilyCoordinatorRepository.remove(hmilyTransaction.getTransId());
-                                cacheManager.remove(hmilyTransaction.getTransId());
                                 continue;
                             }
                             if (hmilyTransaction.getRetriedCount() > hmilyConfig.getRetryMax()) {
@@ -126,12 +118,10 @@ public class HmilyTransactionSelfRecoveryScheduled implements ApplicationListene
                                     if (hmilyTransaction.getStatus() == HmilyActionEnum.TRYING.getCode()
                                             || hmilyTransaction.getStatus() == HmilyActionEnum.PRE_TRY.getCode()
                                             || hmilyTransaction.getStatus() == HmilyActionEnum.CANCELING.getCode()) {
-                                        cancel(hmilyTransaction);
+                                        hmilyTransactionRecoveryService.cancel(hmilyTransaction);
                                     } else if (hmilyTransaction.getStatus() == HmilyActionEnum.CONFIRMING.getCode()) {
-                                        confirm(hmilyTransaction);
+                                        hmilyTransactionRecoveryService.confirm(hmilyTransaction);
                                     }
-                                } else {
-                                    deleteTransaction(hmilyTransaction.getTransId());
                                 }
                             } catch (Exception e) {
                                 e.printStackTrace();
@@ -141,103 +131,13 @@ public class HmilyTransactionSelfRecoveryScheduled implements ApplicationListene
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                }, 30, hmilyConfig.getScheduledDelay(), TimeUnit.SECONDS);
+                }, hmilyConfig.getScheduledInitDelay(), hmilyConfig.getScheduledDelay(), TimeUnit.SECONDS);
 
-    }
-
-    private List<HmilyTransaction> buildHmilyTransactionList() {
-        final List<HmilyTransaction> hmilyTransactions = cacheManager.readAll();
-        if (CollectionUtils.isEmpty(hmilyTransactions)) {
-            return new ArrayList<>();
-        }
-        return hmilyTransactions.stream()
-                .filter(transaction -> transaction.getLastTime().compareTo(acquireData()) < 0)
-                .collect(Collectors.toList());
-    }
-
-    private void cancel(final HmilyTransaction hmilyTransaction) {
-        final List<HmilyParticipant> hmilyParticipants = hmilyTransaction.getHmilyParticipants();
-        List<HmilyParticipant> failList = Lists.newArrayListWithCapacity(hmilyParticipants.size());
-        boolean success = true;
-        if (CollectionUtils.isNotEmpty(hmilyParticipants)) {
-            for (HmilyParticipant hmilyParticipant : hmilyParticipants) {
-                try {
-                    HmilyTransactionContext context = new HmilyTransactionContext();
-                    context.setAction(HmilyActionEnum.CANCELING.getCode());
-                    context.setTransId(hmilyTransaction.getTransId());
-                    context.setRole(HmilyRoleEnum.START.getCode());
-                    HmilyTransactionContextLocal.getInstance().set(context);
-                    executeCoordinator(hmilyParticipant.getCancelHmilyInvocation());
-                } catch (Exception e) {
-                    LogUtil.error(LOGGER, "execute cancel exception:{}", () -> e);
-                    success = false;
-                    failList.add(hmilyParticipant);
-                } finally {
-                    HmilyTransactionContextLocal.getInstance().remove();
-                }
-            }
-            executeHandler(success, hmilyTransaction, failList);
-        }
-
-    }
-
-    private void confirm(final HmilyTransaction hmilyTransaction) {
-        final List<HmilyParticipant> hmilyParticipants = hmilyTransaction.getHmilyParticipants();
-        List<HmilyParticipant> failList = Lists.newArrayListWithCapacity(hmilyParticipants.size());
-        boolean success = true;
-        if (CollectionUtils.isNotEmpty(hmilyParticipants)) {
-            for (HmilyParticipant hmilyParticipant : hmilyParticipants) {
-                try {
-                    HmilyTransactionContext context = new HmilyTransactionContext();
-                    context.setAction(HmilyActionEnum.CONFIRMING.getCode());
-                    context.setRole(HmilyRoleEnum.START.getCode());
-                    context.setTransId(hmilyTransaction.getTransId());
-                    HmilyTransactionContextLocal.getInstance().set(context);
-                    executeCoordinator(hmilyParticipant.getConfirmHmilyInvocation());
-                } catch (Exception e) {
-                    LogUtil.error(LOGGER, "execute confirm exception:{}", () -> e);
-                    success = false;
-                    failList.add(hmilyParticipant);
-                } finally {
-                    HmilyTransactionContextLocal.getInstance().remove();
-                }
-            }
-            executeHandler(success, hmilyTransaction, failList);
-        }
-    }
-
-    private void executeHandler(final boolean success, final HmilyTransaction currentTransaction, final List<HmilyParticipant> failList) {
-        if (success) {
-            deleteTransaction(currentTransaction.getTransId());
-        } else {
-            currentTransaction.setHmilyParticipants(failList);
-            hmilyCoordinatorRepository.updateParticipant(currentTransaction);
-            cacheManager.put(currentTransaction);
-        }
-    }
-
-    private void deleteTransaction(String transId) {
-        cacheManager.remove(transId);
-        hmilyCoordinatorRepository.remove(transId);
-    }
-
-    @SuppressWarnings("unchecked")
-    private void executeCoordinator(final HmilyInvocation hmilyInvocation) throws Exception {
-        if (Objects.nonNull(hmilyInvocation)) {
-            final Class clazz = hmilyInvocation.getTargetClass();
-            final String method = hmilyInvocation.getMethodName();
-            final Object[] args = hmilyInvocation.getArgs();
-            final Class[] parameterTypes = hmilyInvocation.getParameterTypes();
-            final Object bean = SpringBeanUtils.getInstance().getBean(clazz);
-            MethodUtils.invokeMethod(bean, method, args, parameterTypes);
-            LogUtil.debug(LOGGER, "Scheduled tasks execute transaction compensation:{}", () -> hmilyInvocation.getTargetClass() + ":" + hmilyInvocation.getMethodName());
-        }
     }
 
     private Date acquireData() {
         return new Date(LocalDateTime.now().atZone(ZoneId.systemDefault())
                 .toInstant().toEpochMilli() - (hmilyConfig.getRecoverDelayTime() * 1000));
     }
-
 
 }
