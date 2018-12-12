@@ -42,6 +42,11 @@ public class ParticipantHmilyTransactionHandler implements HmilyTransactionHandl
 
     private final HmilyTransactionExecutor hmilyTransactionExecutor;
 
+    /**
+     * Instantiates a new Participant hmily transaction handler.
+     *
+     * @param hmilyTransactionExecutor the hmily transaction executor
+     */
     @Autowired
     public ParticipantHmilyTransactionHandler(final HmilyTransactionExecutor hmilyTransactionExecutor) {
         this.hmilyTransactionExecutor = hmilyTransactionExecutor;

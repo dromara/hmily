@@ -43,6 +43,11 @@ public class LocalHmilyTransactionHandler implements HmilyTransactionHandler {
 
     private final HmilyTransactionExecutor hmilyTransactionExecutor;
 
+    /**
+     * Instantiates a new Local hmily transaction handler.
+     *
+     * @param hmilyTransactionExecutor the hmily transaction executor
+     */
     @Autowired
     public LocalHmilyTransactionHandler(final HmilyTransactionExecutor hmilyTransactionExecutor) {
         this.hmilyTransactionExecutor = hmilyTransactionExecutor;

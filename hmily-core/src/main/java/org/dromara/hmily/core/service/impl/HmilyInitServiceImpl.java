@@ -54,6 +54,11 @@ public class HmilyInitServiceImpl implements HmilyInitService {
 
     private final HmilyCoordinatorService hmilyCoordinatorService;
 
+    /**
+     * Instantiates a new Hmily init service.
+     *
+     * @param hmilyCoordinatorService the hmily coordinator service
+     */
     @Autowired
     public HmilyInitServiceImpl(final HmilyCoordinatorService hmilyCoordinatorService) {
         this.hmilyCoordinatorService = hmilyCoordinatorService;

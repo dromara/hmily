@@ -18,18 +18,17 @@
 package org.dromara.hmily.common.bean.entity;
 
 import com.google.common.collect.Lists;
-import org.dromara.hmily.common.utils.IdWorkerUtils;
+import lombok.Data;
 import org.dromara.hmily.common.enums.HmilyActionEnum;
 import org.dromara.hmily.common.enums.HmilyRoleEnum;
-import lombok.Data;
+import org.dromara.hmily.common.utils.IdWorkerUtils;
 
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
-
 /**
- * TccTransaction 实体日志对象.
+ * The HmilyTransaction.
  *
  * @author xiaoyu
  */
@@ -85,12 +84,10 @@ public class HmilyTransaction implements Serializable {
      */
     private Integer pattern;
 
-
     /**
      * Call interface name.
      */
     private String targetClass;
-
 
     /**
      * Call interface method name.

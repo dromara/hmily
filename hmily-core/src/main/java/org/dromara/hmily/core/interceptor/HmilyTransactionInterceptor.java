@@ -21,6 +21,7 @@ import org.aspectj.lang.ProceedingJoinPoint;
 
 /**
  * The HmilyTransactionInterceptor.
+ *
  * @author xiaoyu
  */
 @FunctionalInterface
@@ -31,7 +32,7 @@ public interface HmilyTransactionInterceptor {
      * hmily interceptor handler.
      *
      * @param pjp tcc point cut.
-     * @return Object
+     * @return Object object
      * @throws Throwable Throwable
      */
     Object interceptor(ProceedingJoinPoint pjp) throws Throwable;
