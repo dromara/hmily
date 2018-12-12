@@ -56,7 +56,6 @@ import java.util.stream.Collectors;
  * @author xiaoyu
  */
 @Component
-@SuppressWarnings("unchecked")
 public class HmilyTransactionExecutor {
 
     /**
@@ -108,7 +107,7 @@ public class HmilyTransactionExecutor {
      * @return TccTransaction
      */
     public HmilyTransaction preTryParticipant(final HmilyTransactionContext context, final ProceedingJoinPoint point) {
-        LogUtil.debug(LOGGER, "...Participant hmily transaction ！start..：{}", context::toString);
+        LogUtil.debug(LOGGER, "participant hmily transaction start..：{}", context::toString);
         final HmilyTransaction hmilyTransaction = buildHmilyTransaction(point, HmilyRoleEnum.PROVIDER.getCode(), context.getTransId());
         //cache by guava
         HmilyTransactionGuavaCacheManager.getInstance().cacheHmilyTransaction(hmilyTransaction);
@@ -299,6 +298,7 @@ public class HmilyTransactionExecutor {
         return hmilyParticipants;
     }
 
+    @SuppressWarnings("unchecked")
     private void executeParticipantMethod(final HmilyInvocation hmilyInvocation) throws Exception {
         if (Objects.nonNull(hmilyInvocation)) {
             final Class clazz = hmilyInvocation.getTargetClass();

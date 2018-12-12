@@ -25,6 +25,7 @@ import org.dromara.hmily.annotation.Hmily;
 
 /**
  * this is {@linkplain Hmily} aspect handler.
+ *
  * @author xiaoyu
  */
 @Aspect
@@ -32,6 +33,11 @@ public abstract class AbstractHmilyTransactionAspect {
 
     private HmilyTransactionInterceptor hmilyTransactionInterceptor;
 
+    /**
+     * Sets hmily transaction interceptor.
+     *
+     * @param hmilyTransactionInterceptor the hmily transaction interceptor
+     */
     protected void setHmilyTransactionInterceptor(final HmilyTransactionInterceptor hmilyTransactionInterceptor) {
         this.hmilyTransactionInterceptor = hmilyTransactionInterceptor;
     }
@@ -45,9 +51,10 @@ public abstract class AbstractHmilyTransactionAspect {
 
     /**
      * this is around in {@linkplain Hmily }.
+     *
      * @param proceedingJoinPoint proceedingJoinPoint
-     * @return Object
-     * @throws Throwable  Throwable
+     * @return Object object
+     * @throws Throwable Throwable
      */
     @Around("hmilyInterceptor()")
     public Object interceptTccMethod(final ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
@@ -57,7 +64,7 @@ public abstract class AbstractHmilyTransactionAspect {
     /**
      * spring Order.
      *
-     * @return int
+     * @return int order
      */
     public abstract int getOrder();
 }
