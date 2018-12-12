@@ -26,7 +26,6 @@ import org.dromara.hmily.core.service.HmilyTransactionHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-
 /**
  * HmilyTransactionAspectServiceImpl.
  *
@@ -38,6 +37,11 @@ public class HmilyTransactionAspectServiceImpl implements HmilyTransactionAspect
 
     private final HmilyTransactionFactoryService hmilyTransactionFactoryService;
 
+    /**
+     * Instantiates a new Hmily transaction aspect service.
+     *
+     * @param hmilyTransactionFactoryService the hmily transaction factory service
+     */
     @Autowired
     public HmilyTransactionAspectServiceImpl(final HmilyTransactionFactoryService hmilyTransactionFactoryService) {
         this.hmilyTransactionFactoryService = hmilyTransactionFactoryService;

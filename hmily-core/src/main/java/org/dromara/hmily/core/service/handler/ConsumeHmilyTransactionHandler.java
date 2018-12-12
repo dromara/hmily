@@ -24,6 +24,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * ConsumeHmilyTransactionHandler.
+ *
  * @author xiaoyu
  */
 @Component

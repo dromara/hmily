@@ -28,7 +28,7 @@ public interface HmilyApplicationService {
     /**
      * acquire rpc application name.
      *
-     * @return applicationName
+     * @return applicationName string
      */
     String acquireName();
 }

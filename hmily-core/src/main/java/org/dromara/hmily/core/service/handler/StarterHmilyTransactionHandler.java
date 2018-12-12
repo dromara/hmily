@@ -50,6 +50,12 @@ public class StarterHmilyTransactionHandler implements HmilyTransactionHandler, 
 
     private final HmilyConfig hmilyConfig;
 
+    /**
+     * Instantiates a new Starter hmily transaction handler.
+     *
+     * @param hmilyTransactionExecutor the hmily transaction executor
+     * @param hmilyConfig              the hmily config
+     */
     @Autowired
     public StarterHmilyTransactionHandler(final HmilyTransactionExecutor hmilyTransactionExecutor, HmilyConfig hmilyConfig) {
         this.hmilyTransactionExecutor = hmilyTransactionExecutor;
