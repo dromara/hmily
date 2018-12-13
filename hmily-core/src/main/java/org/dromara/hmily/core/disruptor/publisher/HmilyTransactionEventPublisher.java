@@ -72,8 +72,8 @@ public class HmilyTransactionEventPublisher implements DisposableBean, Applicati
      * @param threadSize this is disruptor consumer thread size.
      */
     private void start(final int bufferSize, final int threadSize) {
+        AtomicInteger index = new AtomicInteger(1);
         disruptor = new Disruptor<>(new HmilyTransactionEventFactory(), bufferSize, r -> {
-            AtomicInteger index = new AtomicInteger(1);
             return new Thread(null, r, "disruptor-thread-" + index.getAndIncrement());
         }, ProducerType.MULTI, new BlockingWaitStrategy());
 
