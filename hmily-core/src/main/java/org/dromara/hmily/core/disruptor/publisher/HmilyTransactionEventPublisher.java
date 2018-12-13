@@ -42,7 +42,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * event publisher.
@@ -51,6 +51,8 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 @Component
 public class HmilyTransactionEventPublisher implements DisposableBean, ApplicationListener<ContextRefreshedEvent> {
+
+    private static final AtomicLong INDEX = new AtomicLong(1);
 
     private Disruptor<HmilyTransactionEvent> disruptor;
 
@@ -72,11 +74,10 @@ public class HmilyTransactionEventPublisher implements DisposableBean, Applicati
      * @param threadSize this is disruptor consumer thread size.
      */
     private void start(final int bufferSize, final int threadSize) {
-        disruptor = new Disruptor<>(new HmilyTransactionEventFactory(), bufferSize, r -> {
-            AtomicInteger index = new AtomicInteger(1);
-            return new Thread(null, r, "disruptor-thread-" + index.getAndIncrement());
+        disruptor = new Disruptor<>(new HmilyTransactionEventFactory(), bufferSize, runnable -> {
+            return new Thread(new ThreadGroup("hmily-disruptor"), runnable,
+                    "disruptor-thread-" + INDEX.getAndIncrement());
         }, ProducerType.MULTI, new BlockingWaitStrategy());
-
         HmilyConsumerDataHandler[] consumers = new HmilyConsumerDataHandler[1];
         List<SingletonExecutor> selects = new ArrayList<>();
         for (int i = 0; i < threadSize; i++) {
@@ -106,7 +107,7 @@ public class HmilyTransactionEventPublisher implements DisposableBean, Applicati
     }
 
     @Override
-    public void onApplicationEvent(ContextRefreshedEvent event) {
+    public void onApplicationEvent(final ContextRefreshedEvent event) {
         start(hmilyConfig.getBufferSize(), hmilyConfig.getConsumerThreads());
     }
 }
