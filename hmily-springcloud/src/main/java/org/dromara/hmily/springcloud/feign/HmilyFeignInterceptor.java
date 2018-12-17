@@ -34,7 +34,7 @@ import java.util.Objects;
  * @author xiaoyu
  */
 @Configuration
-public class HmilyRestTemplateInterceptor implements RequestInterceptor {
+public class HmilyFeignInterceptor implements RequestInterceptor {
 
     @Override
     public void apply(final RequestTemplate requestTemplate) {

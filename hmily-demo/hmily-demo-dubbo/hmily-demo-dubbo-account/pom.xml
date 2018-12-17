@@ -23,7 +23,7 @@
     <parent>
         <artifactId>hmily-demo-dubbo</artifactId>
         <groupId>org.dromara</groupId>
-        <version>1.2.1-RELEASE</version>
+        <version>2.0.1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>hmily-demo-dubbo-account</artifactId>
@@ -98,12 +98,19 @@
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>dubbo</artifactId>
+            <version>2.6.2</version>
             <exclusions>
                 <exclusion>
                     <groupId>log4j</groupId>
                     <artifactId>log4j</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>com.101tec</groupId>
+            <artifactId>zkclient</artifactId>
+            <version>0.10</version>
         </dependency>
 
         <!-- zkclient  -->

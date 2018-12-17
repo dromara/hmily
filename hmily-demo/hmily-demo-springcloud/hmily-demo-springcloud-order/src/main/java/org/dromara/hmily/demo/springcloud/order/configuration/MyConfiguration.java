@@ -17,15 +17,7 @@
 
 package org.dromara.hmily.demo.springcloud.order.configuration;
 
-import feign.Feign;
-import feign.InvocationHandlerFactory;
-import feign.Request;
-import feign.Retryer;
-import org.dromara.hmily.springcloud.feign.HmilyFeignHandler;
-import org.dromara.hmily.springcloud.feign.HmilyRestTemplateInterceptor;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Scope;
 
 /**
  * MyConfiguration.
@@ -35,11 +27,11 @@ import org.springframework.context.annotation.Scope;
 @SuppressWarnings("all")
 public class MyConfiguration {
 
-    @Bean
+   /* @Bean
     @Scope("prototype")
     public Feign.Builder feignBuilder() {
         return Feign.builder()
-                .requestInterceptor(new HmilyRestTemplateInterceptor())
+                .requestInterceptor(new HmilyFeignInterceptor())
                 .invocationHandlerFactory(invocationHandlerFactory());
     }
 
@@ -61,5 +53,5 @@ public class MyConfiguration {
     @Bean
     Retryer feignRetryer() {
         return Retryer.NEVER_RETRY;
-    }
+    }*/
 }

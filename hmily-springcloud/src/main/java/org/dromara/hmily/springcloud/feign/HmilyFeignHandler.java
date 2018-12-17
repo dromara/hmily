@@ -17,7 +17,6 @@
 
 package org.dromara.hmily.springcloud.feign;
 
-import feign.InvocationHandlerFactory.MethodHandler;
 import org.apache.commons.lang3.StringUtils;
 import org.dromara.hmily.annotation.Hmily;
 import org.dromara.hmily.common.bean.context.HmilyTransactionContext;
@@ -31,7 +30,6 @@ import org.dromara.hmily.core.service.executor.HmilyTransactionExecutor;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
-import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -41,7 +39,7 @@ import java.util.Objects;
  */
 public class HmilyFeignHandler implements InvocationHandler {
 
-    private Map<Method, MethodHandler> handlers;
+    private InvocationHandler delegate;
 
     @Override
     public Object invoke(final Object proxy, final Method method, final Object[] args) throws Throwable {
@@ -50,7 +48,7 @@ public class HmilyFeignHandler implements InvocationHandler {
         } else {
             final Hmily hmily = method.getAnnotation(Hmily.class);
             if (Objects.isNull(hmily)) {
-                return this.handlers.get(method).invoke(args);
+                return this.delegate.invoke(proxy, method, args);
             }
             try {
                 final HmilyTransactionContext hmilyTransactionContext = HmilyTransactionContextLocal.getInstance().get();
@@ -61,7 +59,7 @@ public class HmilyFeignHandler implements InvocationHandler {
                 }
                 final HmilyTransactionExecutor hmilyTransactionExecutor =
                         SpringBeanUtils.getInstance().getBean(HmilyTransactionExecutor.class);
-                final Object invoke = this.handlers.get(method).invoke(args);
+                final Object invoke = delegate.invoke(proxy, method, args);
                 final HmilyParticipant hmilyParticipant = buildParticipant(hmily, method, args, hmilyTransactionContext);
                 if (hmilyTransactionContext.getRole() == HmilyRoleEnum.INLINE.getCode()) {
                     hmilyTransactionExecutor.registerByNested(hmilyTransactionContext.getTransId(),
@@ -97,13 +95,8 @@ public class HmilyFeignHandler implements InvocationHandler {
         return new HmilyParticipant(hmilyTransactionContext.getTransId(), confirmInvocation, cancelInvocation);
     }
 
-    /**
-     * set handlers.
-     *
-     * @param handlers handlers
-     */
-    public void setHandlers(final Map<Method, MethodHandler> handlers) {
-        this.handlers = handlers;
+    void setDelegate(InvocationHandler delegate) {
+        this.delegate = delegate;
     }
 
 }
