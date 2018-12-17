@@ -5,7 +5,7 @@
     <parent>
         <artifactId>hmily</artifactId>
         <groupId>org.dromara</groupId>
-        <version>1.2.1-RELEASE</version>
+        <version>2.0.1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <packaging>jar</packaging>
@@ -24,30 +24,24 @@
         </dependency>
 
         <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-eureka</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-aop</artifactId>
+            <groupId>io.github.openfeign</groupId>
+            <artifactId>feign-core</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.springframework</groupId>
-            <artifactId>spring-tx</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-openfeign</artifactId>
+            <artifactId>spring-web</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.apache.tomcat.embed</groupId>
             <artifactId>tomcat-embed-core</artifactId>
             <version>RELEASE</version>
+            <scope>provided</scope>
         </dependency>
+
 
     </dependencies>
 
