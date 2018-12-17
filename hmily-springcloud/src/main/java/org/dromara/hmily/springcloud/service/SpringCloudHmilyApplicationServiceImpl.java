@@ -17,22 +17,32 @@
 
 package org.dromara.hmily.springcloud.service;
 
+import org.apache.commons.lang3.RandomUtils;
 import org.dromara.hmily.core.service.HmilyApplicationService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 /**
  * SpringCloudRpcApplicationServiceImpl.
+ *
  * @author xiaoyu
  */
 @Service("applicationService")
 public class SpringCloudHmilyApplicationServiceImpl implements HmilyApplicationService {
 
-    @Value("${spring.application.name:hmily-springcloud}")
+    private static final String DEFAULT_APPLICATION_NAME = "hmilySpringCloud";
+
+    @Value("${spring.application.name}")
     private String appName;
 
     @Override
     public String acquireName() {
-        return appName;
+        return Optional.ofNullable(appName).orElse(buildDefaultApplicationName());
+    }
+
+    private String buildDefaultApplicationName() {
+        return DEFAULT_APPLICATION_NAME + RandomUtils.nextInt(1, 10);
     }
 }

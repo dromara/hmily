@@ -17,18 +17,19 @@
 
 package org.dromara.hmily.springcloud.feign;
 
-import feign.InvocationHandlerFactory;
 import feign.RequestInterceptor;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 
 /**
- * HmilyRestTemplateConfiguration.
+ * The HmilyFeignConfiguration.
  *
  * @author xiaoyu
  */
 @Configuration
-public class HmilyRestTemplateConfiguration {
+public class HmilyFeignConfiguration {
 
     /**
      * Hmily rest template interceptor request interceptor.
@@ -36,22 +37,13 @@ public class HmilyRestTemplateConfiguration {
      * @return the request interceptor
      */
     @Bean
-    public RequestInterceptor hmilyRestTemplateInterceptor() {
-        return new HmilyRestTemplateInterceptor();
+    public RequestInterceptor hmilyFeignInterceptor() {
+        return new HmilyFeignInterceptor();
     }
 
-    /**
-     * build InvocationHandlerFactory.
-     *
-     * @return InvocationHandlerFactory
-     */
     @Bean
-    public InvocationHandlerFactory invocationHandlerFactory() {
-        return (target, dispatch) -> {
-            HmilyFeignHandler handler = new HmilyFeignHandler();
-            handler.setHandlers(dispatch);
-            return handler;
-        };
+    public HmilyFeignBeanPostProcessor feignPostProcessor() {
+        return new HmilyFeignBeanPostProcessor();
     }
 
 }
