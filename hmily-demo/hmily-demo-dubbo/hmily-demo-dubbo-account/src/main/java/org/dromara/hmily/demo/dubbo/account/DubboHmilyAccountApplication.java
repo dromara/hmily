@@ -24,7 +24,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ImportResource;
 
 /**
- * DubboTccAccountApplication.
+ * The DubboHmilyAccountApplication.
  *
  * @author xiaoyu
  */
