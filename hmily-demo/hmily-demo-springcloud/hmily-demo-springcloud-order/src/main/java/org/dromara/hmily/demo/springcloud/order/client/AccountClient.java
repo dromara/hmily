@@ -18,9 +18,7 @@
 package org.dromara.hmily.demo.springcloud.order.client;
 
 import org.dromara.hmily.annotation.Hmily;
-import org.dromara.hmily.demo.springcloud.order.configuration.MyConfiguration;
 import org.dromara.hmily.demo.springcloud.order.dto.AccountDTO;
-import org.dromara.hmily.springcloud.feign.HmilyFeignConfiguration;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;

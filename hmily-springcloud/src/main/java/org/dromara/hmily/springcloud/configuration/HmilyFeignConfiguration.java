@@ -15,18 +15,18 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.springcloud.feign;
+package org.dromara.hmily.springcloud.configuration;
 
 import feign.RequestInterceptor;
+import org.dromara.hmily.springcloud.feign.HmilyFeignBeanPostProcessor;
+import org.dromara.hmily.springcloud.feign.HmilyFeignInterceptor;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.EnableAspectJAutoProxy;
 
 /**
- * The HmilyFeignConfiguration.
+ * The type Hmily spring cloud configuration.
  *
- * @author xiaoyu
+ * @author xiaoyu(Myth)
  */
 @Configuration
 public class HmilyFeignConfiguration {
@@ -41,9 +41,13 @@ public class HmilyFeignConfiguration {
         return new HmilyFeignInterceptor();
     }
 
+    /**
+     * Feign post processor hmily feign bean post processor.
+     *
+     * @return the hmily feign bean post processor
+     */
     @Bean
     public HmilyFeignBeanPostProcessor feignPostProcessor() {
         return new HmilyFeignBeanPostProcessor();
     }
-
 }
