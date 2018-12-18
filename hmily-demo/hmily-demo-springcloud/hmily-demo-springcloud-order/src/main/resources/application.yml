@@ -25,6 +25,11 @@ eureka:
  instance:
    prefer-ip-address: true
 
+#Ribbon的负载均衡策略
+hmilyOrder :
+     ribbon:
+        NFLoadBalancerRuleClassName:  com.netflix.loadbalancer.RandomRule
+        MaxAutoRetriesNextServer : 0
 logging:
     level:
         root: error
