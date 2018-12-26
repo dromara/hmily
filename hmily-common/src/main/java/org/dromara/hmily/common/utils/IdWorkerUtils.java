@@ -26,8 +26,6 @@ import java.util.Random;
  */
 public final class IdWorkerUtils {
 
-    private static final IdWorkerUtils ID_WORKER_UTILS = new IdWorkerUtils();
-
     private static final Random RANDOM = new Random();
 
     private static final long WORKER_ID_BITS = 5L;
@@ -48,24 +46,17 @@ public final class IdWorkerUtils {
 
     private static final long SEQUENCE_MASK = ~(-1L << SEQUENCE_BITS);
 
+    private static final IdWorkerUtils ID_WORKER_UTILS = new IdWorkerUtils();
+
     private long workerId;
 
     private long datacenterId;
 
     private long idepoch;
 
-    private long sequence = 0L;
+    private long sequence = '0';
 
     private long lastTimestamp = -1L;
-
-    /**
-     * Gets instance.
-     *
-     * @return the instance
-     */
-    public static IdWorkerUtils getInstance() {
-        return ID_WORKER_UTILS;
-    }
 
     private IdWorkerUtils() {
         this(RANDOM.nextInt((int) MAX_WORKER_ID), RANDOM.nextInt((int) MAX_DATACENTER_ID), 1288834974657L);
@@ -81,6 +72,15 @@ public final class IdWorkerUtils {
         this.workerId = workerId;
         this.datacenterId = datacenterId;
         this.idepoch = idepoch;
+    }
+
+    /**
+     * Gets instance.
+     *
+     * @return the instance
+     */
+    public static IdWorkerUtils getInstance() {
+        return ID_WORKER_UTILS;
     }
 
     private synchronized long nextId() {
@@ -104,7 +104,7 @@ public final class IdWorkerUtils {
                 | (workerId << WORKER_ID_SHIFT) | sequence;
     }
 
-    private long tilNextMillis(long lastTimestamp) {
+    private long tilNextMillis(final long lastTimestamp) {
         long timestamp = timeGen();
         while (timestamp <= lastTimestamp) {
             timestamp = timeGen();
@@ -133,4 +133,5 @@ public final class IdWorkerUtils {
     public String createUUID() {
         return String.valueOf(ID_WORKER_UTILS.nextId());
     }
+
 }
