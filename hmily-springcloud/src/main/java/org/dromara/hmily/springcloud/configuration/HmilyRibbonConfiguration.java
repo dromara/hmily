@@ -21,12 +21,12 @@ import org.springframework.cloud.netflix.ribbon.RibbonClients;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * The type Hmily ribbon configruation.
+ * The type Hmily ribbon configuration.
  *
  * @author xiaoyu(Myth)
  */
 @Configuration
 @RibbonClients(defaultConfiguration = HmilyLoadBalancerConfiguration.class)
-public class HmilyRibbonConfigruation {
+public class HmilyRibbonConfiguration {
 
 }
