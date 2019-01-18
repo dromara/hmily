@@ -35,7 +35,7 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * The type Hmily zone aware loadbalancer.
+ * The type Hmily zone aware LoadBalancer.
  *
  * @author xiaoyu
  */
