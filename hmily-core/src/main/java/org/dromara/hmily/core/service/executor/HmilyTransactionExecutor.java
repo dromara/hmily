@@ -268,9 +268,9 @@ public class HmilyTransactionExecutor {
         final HmilyTransaction hmilyTransaction =
                 HmilyTransactionGuavaCacheManager.getInstance().getHmilyTransaction(transId);
         Optional.ofNullable(hmilyTransaction)
-                .ifPresent(c -> {
-                    c.registerParticipant(hmilyParticipant);
-                    updateParticipant(c);
+                .ifPresent(transaction -> {
+                    transaction.registerParticipant(hmilyParticipant);
+                    updateParticipant(transaction);
                 });
     }
 
