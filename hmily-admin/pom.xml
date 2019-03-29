@@ -156,7 +156,7 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <mainClass>com.hmily.hmily.admin.AdminApplication</mainClass>
+                    <mainClass>org.dromara.hmily.admin.AdminApplication</mainClass>
                     <executable>true</executable>
                 </configuration>
             </plugin>

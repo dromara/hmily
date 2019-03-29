@@ -31,14 +31,13 @@ import org.dromara.hmily.annotation.PatternEnum;
 import org.dromara.hmily.common.bean.context.HmilyTransactionContext;
 import org.dromara.hmily.common.bean.entity.HmilyInvocation;
 import org.dromara.hmily.common.bean.entity.HmilyParticipant;
-import org.dromara.hmily.common.constant.CommonConstant;
 import org.dromara.hmily.common.enums.HmilyActionEnum;
 import org.dromara.hmily.common.enums.HmilyRoleEnum;
 import org.dromara.hmily.common.exception.HmilyRuntimeException;
-import org.dromara.hmily.common.utils.GsonUtils;
 import org.dromara.hmily.core.concurrent.threadlocal.HmilyTransactionContextLocal;
 import org.dromara.hmily.core.helper.SpringBeanUtils;
 import org.dromara.hmily.core.service.executor.HmilyTransactionExecutor;
+import org.dromara.hmily.core.transmit.Transmiter;
 
 import java.lang.reflect.Method;
 import java.util.Objects;
@@ -81,10 +80,7 @@ public class MotanHmilyTransactionFilter implements Filter {
                 final HmilyTransactionExecutor hmilyTransactionExecutor = SpringBeanUtils.getInstance().getBean(HmilyTransactionExecutor.class);
                 final HmilyTransactionContext hmilyTransactionContext = HmilyTransactionContextLocal.getInstance().get();
                 if (Objects.nonNull(hmilyTransactionContext)) {
-                    if (hmilyTransactionContext.getRole() == HmilyRoleEnum.LOCAL.getCode()) {
-                        hmilyTransactionContext.setRole(HmilyRoleEnum.INLINE.getCode());
-                    }
-                    request.setAttachment(CommonConstant.HMILY_TRANSACTION_CONTEXT, GsonUtils.getInstance().toJson(hmilyTransactionContext));
+                    Transmiter.getInstance().transmit(request::setAttachment);
                 }
                 final Response response = caller.call(request);
                 final HmilyParticipant hmilyParticipant = buildParticipant(hmilyTransactionContext, hmily, method, clazz, arguments, args);
