@@ -15,24 +15,20 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.springcloud.feign;
-
-import feign.RequestInterceptor;
-import feign.RequestTemplate;
-import org.dromara.hmily.core.transmit.Transmiter;
-import org.springframework.context.annotation.Configuration;
+package org.dromara.hmily.core.transmit;
 
 /**
- * HmilyRestTemplateInterceptor.
+ * The interface Rpc transmit.
  *
- * @author xiaoyu
+ * @author xiaoyu(Myth)
  */
-@Configuration
-public class HmilyFeignInterceptor implements RequestInterceptor {
+public interface RpcTransmit {
 
-    @Override
-    public void apply(final RequestTemplate requestTemplate) {
-        Transmiter.getInstance().transmit(requestTemplate::header);
-    }
-
+    /**
+     * Transmit.
+     *
+     * @param key   the key
+     * @param value the value
+     */
+    void transmit(String key, String value);
 }
