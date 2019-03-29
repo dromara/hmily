@@ -17,11 +17,14 @@
 
 package org.dromara.hmily.core.helper;
 
+import org.apache.commons.lang3.StringUtils;
 import org.dromara.hmily.common.utils.AssertUtils;
+import org.springframework.beans.BeansException;
 import org.springframework.context.ConfigurableApplicationContext;
 
 /**
  * SpringBeanUtils.
+ *
  * @author xiaoyu
  */
 public final class SpringBeanUtils {
@@ -38,6 +41,7 @@ public final class SpringBeanUtils {
 
     /**
      * get SpringBeanUtils.
+     *
      * @return SpringBeanUtils
      */
     public static SpringBeanUtils getInstance() {
@@ -53,13 +57,44 @@ public final class SpringBeanUtils {
      */
     public <T> T getBean(final Class<T> type) {
         AssertUtils.notNull(type);
-        return cfgContext.getBean(type);
+        T bean;
+        try {
+            bean = cfgContext.getBean(type);
+        } catch (BeansException e) {
+            bean = getByName(type);
+        }
+        return bean;
     }
+
+    private <T> T getByName(Class<T> type) {
+        T bean;
+        String className = type.getSimpleName();
+        bean = cfgContext.getBean(firstLowercase(firstDelete(className)), type);
+        return bean;
+    }
+
+    private String firstLowercase(String target) {
+        if (StringUtils.isEmpty(target)) {
+            return target;
+        }
+        char[] targetChar = target.toCharArray();
+        targetChar[0] += 32;
+        return String.valueOf(targetChar);
+    }
+
+    private static String firstDelete(String target) {
+        if (StringUtils.isEmpty(target)) {
+            return target;
+        }
+        return target.substring(1, target.length());
+    }
+
 
     /**
      * register bean in spring ioc.
+     *
      * @param beanName bean name
-     * @param obj bean
+     * @param obj      bean
      */
     public void registerBean(final String beanName, final Object obj) {
         AssertUtils.notNull(beanName);
@@ -69,6 +104,7 @@ public final class SpringBeanUtils {
 
     /**
      * set application context.
+     *
      * @param cfgContext application context
      */
     public void setCfgContext(final ConfigurableApplicationContext cfgContext) {
