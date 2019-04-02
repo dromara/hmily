@@ -11,7 +11,7 @@
     <dubbo:application name="order_service"/>
 
 
-    <dubbo:registry protocol="zookeeper" address="192.168.1.84:2181"/>
+    <dubbo:registry protocol="zookeeper" address="localhost:2181"/>
 
     <dubbo:protocol name="dubbo" port="20886"
                     server="netty" client="netty"
@@ -21,9 +21,9 @@
     <dubbo:reference timeout="50000"
                      interface="org.dromara.hmily.demo.dubbo.inventory.api.service.InventoryService"
                      id="inventoryService"
-                     retries="0" check="false" actives="20"/>
+                     retries="0" check="false" actives="20" loadbalance="hmily"/>
     <dubbo:reference timeout="50000"
                      interface="org.dromara.hmily.demo.dubbo.account.api.service.AccountService"
                      id="accountService"
-                     retries="0" check="false" actives="20"/>
+                     retries="0" check="false" actives="20" loadbalance="hmily"/>
 </beans>

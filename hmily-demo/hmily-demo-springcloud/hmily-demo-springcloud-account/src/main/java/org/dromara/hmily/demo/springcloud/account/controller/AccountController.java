@@ -33,7 +33,6 @@ import java.math.BigDecimal;
  */
 @RestController
 @RequestMapping("/account")
-@SuppressWarnings("all")
 public class AccountController {
 
     private final AccountService accountService;

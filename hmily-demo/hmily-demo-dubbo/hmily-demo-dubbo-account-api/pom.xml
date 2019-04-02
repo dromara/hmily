@@ -23,14 +23,13 @@
     <parent>
         <artifactId>hmily-demo-dubbo</artifactId>
         <groupId>org.dromara</groupId>
-        <version>2.0.2-SNAPSHOT</version>
+        <version>2.0.2-RELEASE</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>hmily-demo-dubbo-account-api</artifactId>
 
     <dependencies>
-
         <dependency>
             <groupId>org.dromara</groupId>
             <artifactId>hmily-annotation</artifactId>

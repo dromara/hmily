@@ -15,18 +15,21 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.springcloud.configuration;
 
-import org.springframework.cloud.netflix.ribbon.RibbonClients;
-import org.springframework.context.annotation.Configuration;
+package org.dromara.hmily.demo.springcloud.account.service;
+
+import org.dromara.hmily.annotation.Hmily;
 
 /**
- * The type Hmily ribbon configuration.
+ * The interface In line service.
  *
  * @author xiaoyu(Myth)
  */
-@Configuration
-@RibbonClients(defaultConfiguration = HmilyLoadBalancerConfiguration.class)
-public class HmilyRibbonConfiguration {
+public interface InLineService {
 
+    /**
+     * Test.
+     */
+    @Hmily
+    void test();
 }

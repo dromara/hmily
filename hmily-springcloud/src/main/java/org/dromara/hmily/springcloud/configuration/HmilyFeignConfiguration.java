@@ -17,9 +17,14 @@
 
 package org.dromara.hmily.springcloud.configuration;
 
+import com.netflix.hystrix.strategy.concurrency.HystrixConcurrencyStrategy;
 import feign.RequestInterceptor;
 import org.dromara.hmily.springcloud.feign.HmilyFeignBeanPostProcessor;
 import org.dromara.hmily.springcloud.feign.HmilyFeignInterceptor;
+import org.dromara.hmily.springcloud.hystrix.HmilyHystrixConcurrencyStrategy;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -37,6 +42,7 @@ public class HmilyFeignConfiguration {
      * @return the request interceptor
      */
     @Bean
+    @Qualifier("hmilyFeignInterceptor")
     public RequestInterceptor hmilyFeignInterceptor() {
         return new HmilyFeignInterceptor();
     }
@@ -49,5 +55,16 @@ public class HmilyFeignConfiguration {
     @Bean
     public HmilyFeignBeanPostProcessor feignPostProcessor() {
         return new HmilyFeignBeanPostProcessor();
+    }
+
+    /**
+     * Hystrix concurrency strategy hystrix concurrency strategy.
+     *
+     * @return the hystrix concurrency strategy
+     */
+    @Bean
+    @ConditionalOnProperty(name = "feign.hystrix.enabled")
+    public HystrixConcurrencyStrategy hystrixConcurrencyStrategy() {
+        return new HmilyHystrixConcurrencyStrategy();
     }
 }

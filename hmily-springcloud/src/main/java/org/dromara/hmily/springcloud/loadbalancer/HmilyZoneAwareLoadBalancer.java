@@ -18,14 +18,8 @@
 package org.dromara.hmily.springcloud.loadbalancer;
 
 import com.google.common.collect.Maps;
-import com.netflix.client.config.IClientConfig;
-import com.netflix.loadbalancer.IPing;
-import com.netflix.loadbalancer.IRule;
 import com.netflix.loadbalancer.Server;
-import com.netflix.loadbalancer.ServerList;
-import com.netflix.loadbalancer.ServerListFilter;
-import com.netflix.loadbalancer.ServerListUpdater;
-import com.netflix.loadbalancer.ZoneAwareLoadBalancer;
+import com.netflix.loadbalancer.ZoneAvoidanceRule;
 import org.dromara.hmily.common.bean.context.HmilyTransactionContext;
 import org.dromara.hmily.common.enums.HmilyActionEnum;
 import org.dromara.hmily.core.concurrent.threadlocal.HmilyTransactionContextLocal;
@@ -39,38 +33,20 @@ import java.util.Objects;
  *
  * @author xiaoyu
  */
-public class HmilyZoneAwareLoadBalancer extends ZoneAwareLoadBalancer<Server> {
+public class HmilyZoneAwareLoadBalancer extends ZoneAvoidanceRule {
 
     private static final Map<String, Server> SERVER_MAP = Maps.newConcurrentMap();
 
-    /**
-     * Instantiates a new Hmily zone aware loadbalancer.
-     *
-     * @param clientConfig      the client config
-     * @param rule              the rule
-     * @param ping              the ping
-     * @param serverList        the server list
-     * @param filter            the filter
-     * @param serverListUpdater the server list updater
-     */
-    public HmilyZoneAwareLoadBalancer(final IClientConfig clientConfig,
-                                      final IRule rule,
-                                      final IPing ping,
-                                      final ServerList<Server> serverList,
-                                      final ServerListFilter<Server> filter,
-                                      final ServerListUpdater serverListUpdater) {
-        super(clientConfig, rule, ping, serverList, filter, serverListUpdater);
+    public HmilyZoneAwareLoadBalancer() {
     }
 
     @Override
-    public Server chooseServer(final Object key) {
-        List<Server> serverList;
-        serverList = super.getServerListImpl().getUpdatedListOfServers();
-        serverList = super.getFilter().getFilteredListOfServers(serverList);
+    public Server choose(final Object key) {
+        List<Server> serverList = getLoadBalancer().getAllServers();
         if (null == serverList || serverList.isEmpty() || serverList.size() == 1) {
-            return super.chooseServer(key);
+            return super.choose(key);
         }
-        final Server server = super.chooseServer(key);
+        final Server server = super.choose(key);
 
         final HmilyTransactionContext hmilyTransactionContext = HmilyTransactionContextLocal.getInstance().get();
 

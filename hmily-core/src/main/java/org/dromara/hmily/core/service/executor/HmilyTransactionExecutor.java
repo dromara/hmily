@@ -18,8 +18,8 @@
 package org.dromara.hmily.core.service.executor;
 
 import com.google.common.collect.Lists;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.dromara.hmily.common.utils.CollectionUtils;
+import org.dromara.hmily.common.utils.StringUtils;
 import org.apache.commons.lang3.reflect.MethodUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
@@ -127,17 +127,18 @@ public class HmilyTransactionExecutor {
      * @param currentTransaction {@linkplain HmilyTransaction}
      * @throws HmilyRuntimeException ex
      */
-    public void confirm(final HmilyTransaction currentTransaction) throws HmilyRuntimeException {
+    public Object confirm(final HmilyTransaction currentTransaction) throws HmilyRuntimeException {
         LogUtil.debug(LOGGER, () -> "hmily transaction confirm .......！start");
         if (Objects.isNull(currentTransaction) || CollectionUtils.isEmpty(currentTransaction.getHmilyParticipants())) {
-            return;
+            return null;
         }
         currentTransaction.setStatus(HmilyActionEnum.CONFIRMING.getCode());
         updateStatus(currentTransaction);
         final List<HmilyParticipant> hmilyParticipants = currentTransaction.getHmilyParticipants();
-        List<HmilyParticipant> failList = Lists.newArrayListWithCapacity(hmilyParticipants.size());
         boolean success = true;
         if (CollectionUtils.isNotEmpty(hmilyParticipants)) {
+            List<HmilyParticipant> failList = Lists.newArrayListWithCapacity(hmilyParticipants.size());
+            List<Object> results = Lists.newArrayListWithCapacity(hmilyParticipants.size());
             for (HmilyParticipant hmilyParticipant : hmilyParticipants) {
                 try {
                     HmilyTransactionContext context = new HmilyTransactionContext();
@@ -145,7 +146,8 @@ public class HmilyTransactionExecutor {
                     context.setRole(HmilyRoleEnum.START.getCode());
                     context.setTransId(hmilyParticipant.getTransId());
                     HmilyTransactionContextLocal.getInstance().set(context);
-                    executeParticipantMethod(hmilyParticipant.getConfirmHmilyInvocation());
+                    final Object result = executeParticipantMethod(hmilyParticipant.getConfirmHmilyInvocation());
+                    results.add(result);
                 } catch (Exception e) {
                     LogUtil.error(LOGGER, "execute confirm :{}", () -> e);
                     success = false;
@@ -155,7 +157,9 @@ public class HmilyTransactionExecutor {
                 }
             }
             executeHandler(success, currentTransaction, failList);
+            return results.get(0);
         }
+        return null;
     }
 
     /**
@@ -163,24 +167,25 @@ public class HmilyTransactionExecutor {
      *
      * @param currentTransaction {@linkplain HmilyTransaction}
      */
-    public void cancel(final HmilyTransaction currentTransaction) {
+    public Object cancel(final HmilyTransaction currentTransaction) {
         LogUtil.debug(LOGGER, () -> "tcc cancel ...........start!");
         if (Objects.isNull(currentTransaction) || CollectionUtils.isEmpty(currentTransaction.getHmilyParticipants())) {
-            return;
+            return null;
         }
         //if cc pattern，can not execute cancel
         if (currentTransaction.getStatus() == HmilyActionEnum.TRYING.getCode()
                 && Objects.equals(currentTransaction.getPattern(), PatternEnum.CC.getCode())) {
             deleteTransaction(currentTransaction);
-            return;
+            return null;
         }
+        currentTransaction.setStatus(HmilyActionEnum.CANCELING.getCode());
+        //update cancel
+        updateStatus(currentTransaction);
         final List<HmilyParticipant> hmilyParticipants = filterPoint(currentTransaction);
         boolean success = true;
-        List<HmilyParticipant> failList = Lists.newArrayListWithCapacity(hmilyParticipants.size());
         if (CollectionUtils.isNotEmpty(hmilyParticipants)) {
-            currentTransaction.setStatus(HmilyActionEnum.CANCELING.getCode());
-            //update cancel
-            updateStatus(currentTransaction);
+            List<HmilyParticipant> failList = Lists.newArrayListWithCapacity(hmilyParticipants.size());
+            List<Object> results = Lists.newArrayListWithCapacity(hmilyParticipants.size());
             for (HmilyParticipant hmilyParticipant : hmilyParticipants) {
                 try {
                     HmilyTransactionContext context = new HmilyTransactionContext();
@@ -188,7 +193,8 @@ public class HmilyTransactionExecutor {
                     context.setTransId(hmilyParticipant.getTransId());
                     context.setRole(HmilyRoleEnum.START.getCode());
                     HmilyTransactionContextLocal.getInstance().set(context);
-                    executeParticipantMethod(hmilyParticipant.getCancelHmilyInvocation());
+                    final Object result = executeParticipantMethod(hmilyParticipant.getCancelHmilyInvocation());
+                    results.add(result);
                 } catch (Throwable e) {
                     LogUtil.error(LOGGER, "execute cancel ex:{}", () -> e);
                     success = false;
@@ -198,7 +204,9 @@ public class HmilyTransactionExecutor {
                 }
             }
             executeHandler(success, currentTransaction, failList);
+            return results.get(0);
         }
+        return null;
     }
 
     /**
@@ -299,15 +307,16 @@ public class HmilyTransactionExecutor {
     }
 
     @SuppressWarnings("unchecked")
-    private void executeParticipantMethod(final HmilyInvocation hmilyInvocation) throws Exception {
+    private Object executeParticipantMethod(final HmilyInvocation hmilyInvocation) throws Exception {
         if (Objects.nonNull(hmilyInvocation)) {
             final Class clazz = hmilyInvocation.getTargetClass();
             final String method = hmilyInvocation.getMethodName();
             final Object[] args = hmilyInvocation.getArgs();
             final Class[] parameterTypes = hmilyInvocation.getParameterTypes();
             final Object bean = SpringBeanUtils.getInstance().getBean(clazz);
-            MethodUtils.invokeMethod(bean, method, args, parameterTypes);
+            return MethodUtils.invokeMethod(bean, method, args, parameterTypes);
         }
+        return null;
     }
 
     /**

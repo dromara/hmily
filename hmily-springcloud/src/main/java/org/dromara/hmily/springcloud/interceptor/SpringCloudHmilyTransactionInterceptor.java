@@ -17,7 +17,7 @@
 
 package org.dromara.hmily.springcloud.interceptor;
 
-import org.apache.commons.lang3.StringUtils;
+import org.dromara.hmily.common.utils.StringUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.dromara.hmily.common.bean.context.HmilyTransactionContext;
 import org.dromara.hmily.common.constant.CommonConstant;
@@ -63,20 +63,22 @@ public class SpringCloudHmilyTransactionInterceptor implements HmilyTransactionI
     public Object interceptor(final ProceedingJoinPoint pjp) throws Throwable {
         HmilyTransactionContext hmilyTransactionContext;
         RequestAttributes requestAttributes = null;
-        try {
-            requestAttributes = RequestContextHolder.currentRequestAttributes();
-        } catch (Throwable ex) {
-            LogUtil.warn(LOGGER, () -> "can not acquire request info:" + ex.getLocalizedMessage());
-        }
-
-        HttpServletRequest request = requestAttributes == null ? null : ((ServletRequestAttributes) requestAttributes).getRequest();
-        String context = request == null ? null : request.getHeader(CommonConstant.HMILY_TRANSACTION_CONTEXT);
-        if (StringUtils.isNoneBlank(context)) {
-            hmilyTransactionContext = GsonUtils.getInstance().fromJson(context, HmilyTransactionContext.class);
-        } else {
-            hmilyTransactionContext = HmilyTransactionContextLocal.getInstance().get();
-            if (Objects.nonNull(hmilyTransactionContext)) {
+        hmilyTransactionContext = HmilyTransactionContextLocal.getInstance().get();
+        if (Objects.nonNull(hmilyTransactionContext)) {
+            if (HmilyRoleEnum.START.getCode() == hmilyTransactionContext.getRole()) {
                 hmilyTransactionContext.setRole(HmilyRoleEnum.SPRING_CLOUD.getCode());
+            }
+        } else {
+            try {
+                requestAttributes = RequestContextHolder.currentRequestAttributes();
+            } catch (Throwable ex) {
+                LogUtil.warn(LOGGER, () -> "can not acquire request info:" + ex.getLocalizedMessage());
+            }
+
+            HttpServletRequest request = requestAttributes == null ? null : ((ServletRequestAttributes) requestAttributes).getRequest();
+            String context = request == null ? null : request.getHeader(CommonConstant.HMILY_TRANSACTION_CONTEXT);
+            if (StringUtils.isNoneBlank(context)) {
+                hmilyTransactionContext = GsonUtils.getInstance().fromJson(context, HmilyTransactionContext.class);
             }
         }
         return hmilyTransactionAspectService.invoke(hmilyTransactionContext, pjp);
