@@ -23,7 +23,7 @@
     <parent>
         <artifactId>hmily-demo</artifactId>
         <groupId>org.dromara</groupId>
-        <version>2.0.2-SNAPSHOT</version>
+        <version>2.0.2-RELEASE</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>hmily-demo-springcloud</artifactId>
@@ -35,5 +35,22 @@
         <module>hmily-demo-springcloud-account</module>
         <module>hmily-demo-springcloud-eureka</module>
     </modules>
+
+    <properties>
+        <spring-cloud.version>Finchley.RELEASE</spring-cloud.version>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+        </dependencies>
+    </dependencyManagement>
     
 </project>

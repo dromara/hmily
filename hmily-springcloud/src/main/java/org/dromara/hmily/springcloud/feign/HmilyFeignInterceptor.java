@@ -19,6 +19,7 @@ package org.dromara.hmily.springcloud.feign;
 
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
+import org.dromara.hmily.core.concurrent.threadlocal.HmilyTransactionContextLocal;
 import org.dromara.hmily.core.transmit.Transmiter;
 import org.springframework.context.annotation.Configuration;
 
@@ -27,12 +28,11 @@ import org.springframework.context.annotation.Configuration;
  *
  * @author xiaoyu
  */
-@Configuration
 public class HmilyFeignInterceptor implements RequestInterceptor {
 
     @Override
     public void apply(final RequestTemplate requestTemplate) {
-        Transmiter.getInstance().transmit(requestTemplate::header);
+        Transmiter.getInstance().transmit(requestTemplate::header, HmilyTransactionContextLocal.getInstance().get());
     }
 
 }

@@ -17,7 +17,7 @@
 
 package org.dromara.hmily.core.service.handler;
 
-import org.apache.commons.lang3.StringUtils;
+import org.dromara.hmily.common.utils.StringUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.dromara.hmily.annotation.Hmily;

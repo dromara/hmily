@@ -18,7 +18,7 @@
 package org.dromara.hmily.core.service.recovery;
 
 import com.google.common.collect.Lists;
-import org.apache.commons.collections.CollectionUtils;
+import org.dromara.hmily.common.utils.CollectionUtils;
 import org.apache.commons.lang3.reflect.MethodUtils;
 import org.dromara.hmily.common.bean.context.HmilyTransactionContext;
 import org.dromara.hmily.common.bean.entity.HmilyInvocation;

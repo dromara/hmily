@@ -17,7 +17,7 @@
 
 package org.dromara.hmily.core.coordinator.impl;
 
-import org.apache.commons.lang3.StringUtils;
+import org.dromara.hmily.common.utils.StringUtils;
 import org.dromara.hmily.common.bean.entity.HmilyTransaction;
 import org.dromara.hmily.common.config.HmilyConfig;
 import org.dromara.hmily.core.coordinator.HmilyCoordinatorService;

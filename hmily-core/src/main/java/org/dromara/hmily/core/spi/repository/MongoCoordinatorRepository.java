@@ -18,6 +18,10 @@
 package org.dromara.hmily.core.spi.repository;
 
 import com.google.common.base.Splitter;
+import com.mongodb.MongoCredential;
+import com.mongodb.ServerAddress;
+import com.mongodb.client.result.UpdateResult;
+import org.dromara.hmily.common.utils.CollectionUtils;
 import org.dromara.hmily.common.bean.adapter.MongoAdapter;
 import org.dromara.hmily.common.bean.entity.HmilyParticipant;
 import org.dromara.hmily.common.bean.entity.HmilyTransaction;
@@ -30,10 +34,6 @@ import org.dromara.hmily.common.serializer.ObjectSerializer;
 import org.dromara.hmily.common.utils.AssertUtils;
 import org.dromara.hmily.common.utils.LogUtil;
 import org.dromara.hmily.common.utils.RepositoryPathUtils;
-import com.mongodb.MongoCredential;
-import com.mongodb.ServerAddress;
-import com.mongodb.client.result.UpdateResult;
-import org.apache.commons.collections.CollectionUtils;
 import org.dromara.hmily.core.spi.HmilyCoordinatorRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -108,7 +108,7 @@ public class MongoCoordinatorRepository implements HmilyCoordinatorRepository {
         query.addCriteria(new Criteria("transId").is(hmilyTransaction.getTransId()));
         Update update = new Update();
         update.set("lastTime", new Date());
-        update.set("retriedCount", hmilyTransaction.getRetriedCount() + 1);
+        update.set("retriedCount", hmilyTransaction.getRetriedCount());
         update.set("version", hmilyTransaction.getVersion() + 1);
         try {
             if (CollectionUtils.isNotEmpty(hmilyTransaction.getHmilyParticipants())) {

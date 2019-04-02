@@ -15,33 +15,36 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.demo.springcloud.account.service;
+package org.dromara.hmily.demo.springcloud.order.client;
 
-import org.dromara.hmily.annotation.Hmily;
-import org.dromara.hmily.demo.springcloud.account.dto.AccountDTO;
-import org.dromara.hmily.demo.springcloud.account.entity.AccountDO;
+import org.dromara.hmily.demo.springcloud.order.dto.InventoryDTO;
+import org.springframework.stereotype.Component;
 
 /**
- * AccountService.
- *
- * @author xiaoyu
+ * @author xiaoyu(Myth)
  */
-public interface AccountService {
+@Component
+public class InventoryHystrix implements InventoryClient {
 
-    /**
-     * 扣款支付.
-     *
-     * @param accountDTO 参数dto
-     * @return true
-     */
-    @Hmily
-    boolean payment(AccountDTO accountDTO);
 
-    /**
-     * 获取用户账户信息.
-     *
-     * @param userId 用户id
-     * @return AccountDO
-     */
-    AccountDO findByUserId(String userId);
+    @Override
+    public Boolean decrease(InventoryDTO inventoryDTO) {
+        System.out.println("inventory hystrix.......");
+        return false;
+    }
+
+    @Override
+    public Integer findByProductId(String productId) {
+        return 0;
+    }
+
+    @Override
+    public Boolean mockWithTryException(InventoryDTO inventoryDTO) {
+        return false;
+    }
+
+    @Override
+    public Boolean mockWithTryTimeout(InventoryDTO inventoryDTO) {
+        return false;
+    }
 }

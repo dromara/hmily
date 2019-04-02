@@ -47,5 +47,4 @@ public class SpringCloudHmilyOrderApplication {
         SpringApplication.run(SpringCloudHmilyOrderApplication.class, args);
     }
 
-
 }

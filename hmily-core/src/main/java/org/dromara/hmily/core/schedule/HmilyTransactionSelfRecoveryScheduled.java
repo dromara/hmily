@@ -17,7 +17,7 @@
 
 package org.dromara.hmily.core.schedule;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.dromara.hmily.common.utils.CollectionUtils;
 import org.dromara.hmily.annotation.PatternEnum;
 import org.dromara.hmily.common.bean.entity.HmilyTransaction;
 import org.dromara.hmily.common.config.HmilyConfig;
