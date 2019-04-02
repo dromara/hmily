@@ -18,6 +18,12 @@
         </dependency>
 
         <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
             <groupId>com.weibo</groupId>
             <artifactId>motan-core</artifactId>
             <scope>provided</scope>
