@@ -31,6 +31,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+
 /**
  * PaymentServiceImpl.
  *
@@ -77,17 +79,20 @@ public class PaymentServiceImpl implements PaymentService {
         if (inventoryInfo < order.getCount()) {
             throw new TccRuntimeException("库存不足！");
         }*/
+
         //扣除用户余额
-        AccountDTO accountDTO = new AccountDTO();
-        accountDTO.setAmount(order.getTotalAmount());
-        accountDTO.setUserId(order.getUserId());
-        LOGGER.debug("===========执行springcloud扣减资金接口==========");
-        accountClient.payment(accountDTO);
+
         //进入扣减库存操作
         InventoryDTO inventoryDTO = new InventoryDTO();
         inventoryDTO.setCount(order.getCount());
         inventoryDTO.setProductId(order.getProductId());
         inventoryClient.decrease(inventoryDTO);
+
+        AccountDTO accountDTO = new AccountDTO();
+        accountDTO.setAmount(order.getTotalAmount());
+        accountDTO.setUserId(order.getUserId());
+        LOGGER.debug("===========执行springcloud扣减资金接口==========");
+        accountClient.payment(accountDTO);
     }
 
     @Override

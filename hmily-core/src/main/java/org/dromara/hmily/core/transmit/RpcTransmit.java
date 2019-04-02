@@ -15,33 +15,20 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.demo.springcloud.account.service;
-
-import org.dromara.hmily.annotation.Hmily;
-import org.dromara.hmily.demo.springcloud.account.dto.AccountDTO;
-import org.dromara.hmily.demo.springcloud.account.entity.AccountDO;
+package org.dromara.hmily.core.transmit;
 
 /**
- * AccountService.
+ * The interface Rpc transmit.
  *
- * @author xiaoyu
+ * @author xiaoyu(Myth)
  */
-public interface AccountService {
+public interface RpcTransmit {
 
     /**
-     * 扣款支付.
+     * Transmit.
      *
-     * @param accountDTO 参数dto
-     * @return true
+     * @param key   the key
+     * @param value the value
      */
-    @Hmily
-    boolean payment(AccountDTO accountDTO);
-
-    /**
-     * 获取用户账户信息.
-     *
-     * @param userId 用户id
-     * @return AccountDO
-     */
-    AccountDO findByUserId(String userId);
+    void transmit(String key, String value);
 }

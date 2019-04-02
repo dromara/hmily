@@ -75,13 +75,11 @@ public class ParticipantHmilyTransactionHandler implements HmilyTransactionHandl
             case CONFIRMING:
                 currentTransaction = HmilyTransactionGuavaCacheManager
                         .getInstance().getHmilyTransaction(context.getTransId());
-                hmilyTransactionExecutor.confirm(currentTransaction);
-                break;
+                return hmilyTransactionExecutor.confirm(currentTransaction);
             case CANCELING:
                 currentTransaction = HmilyTransactionGuavaCacheManager
                         .getInstance().getHmilyTransaction(context.getTransId());
-                hmilyTransactionExecutor.cancel(currentTransaction);
-                break;
+                return hmilyTransactionExecutor.cancel(currentTransaction);
             default:
                 break;
         }

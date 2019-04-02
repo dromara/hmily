@@ -19,32 +19,20 @@ package org.dromara.hmily.springcloud.feign;
 
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
-import org.dromara.hmily.common.bean.context.HmilyTransactionContext;
-import org.dromara.hmily.common.constant.CommonConstant;
-import org.dromara.hmily.common.enums.HmilyRoleEnum;
-import org.dromara.hmily.common.utils.GsonUtils;
 import org.dromara.hmily.core.concurrent.threadlocal.HmilyTransactionContextLocal;
+import org.dromara.hmily.core.transmit.Transmiter;
 import org.springframework.context.annotation.Configuration;
-
-import java.util.Objects;
 
 /**
  * HmilyRestTemplateInterceptor.
  *
  * @author xiaoyu
  */
-@Configuration
 public class HmilyFeignInterceptor implements RequestInterceptor {
 
     @Override
     public void apply(final RequestTemplate requestTemplate) {
-        final HmilyTransactionContext hmilyTransactionContext = HmilyTransactionContextLocal.getInstance().get();
-        if (Objects.nonNull(hmilyTransactionContext)) {
-            if (hmilyTransactionContext.getRole() == HmilyRoleEnum.LOCAL.getCode()) {
-                hmilyTransactionContext.setRole(HmilyRoleEnum.INLINE.getCode());
-            }
-        }
-        requestTemplate.header(CommonConstant.HMILY_TRANSACTION_CONTEXT, GsonUtils.getInstance().toJson(hmilyTransactionContext));
+        Transmiter.getInstance().transmit(requestTemplate::header, HmilyTransactionContextLocal.getInstance().get());
     }
 
 }
