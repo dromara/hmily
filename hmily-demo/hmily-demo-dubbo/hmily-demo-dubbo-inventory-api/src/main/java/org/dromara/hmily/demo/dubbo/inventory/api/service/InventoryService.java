@@ -21,6 +21,8 @@ import org.dromara.hmily.annotation.Hmily;
 import org.dromara.hmily.demo.dubbo.inventory.api.dto.InventoryDTO;
 import org.dromara.hmily.demo.dubbo.inventory.api.entity.InventoryDO;
 
+import java.util.List;
+
 /**
  * The interface Inventory service.
  *
@@ -38,6 +40,9 @@ public interface InventoryService {
      */
     @Hmily
     Boolean decrease(InventoryDTO inventoryDTO);
+
+    @Hmily
+    List<InventoryDTO> testInLine();
 
 
     /**

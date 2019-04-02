@@ -43,9 +43,8 @@ public class SpringCloudHmilyAccountApplication {
      *
      * @param args the input arguments
      */
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
         SpringApplication.run(SpringCloudHmilyAccountApplication.class, args);
     }
-
 
 }

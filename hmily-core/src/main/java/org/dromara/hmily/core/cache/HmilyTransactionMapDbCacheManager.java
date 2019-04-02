@@ -18,7 +18,7 @@
 
 package org.dromara.hmily.core.cache;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.dromara.hmily.common.utils.CollectionUtils;
 import org.dromara.hmily.common.bean.entity.HmilyTransaction;
 import org.dromara.hmily.common.config.HmilyConfig;
 import org.dromara.hmily.common.enums.HmilyActionEnum;

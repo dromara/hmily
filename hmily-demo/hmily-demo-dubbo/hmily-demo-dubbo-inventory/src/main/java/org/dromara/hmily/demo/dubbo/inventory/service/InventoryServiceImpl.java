@@ -17,6 +17,7 @@
 
 package org.dromara.hmily.demo.dubbo.inventory.service;
 
+import com.google.common.collect.Lists;
 import org.dromara.hmily.annotation.Hmily;
 import org.dromara.hmily.common.exception.HmilyRuntimeException;
 import org.dromara.hmily.demo.dubbo.inventory.api.dto.InventoryDTO;
@@ -29,6 +30,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -73,9 +76,34 @@ public class InventoryServiceImpl implements InventoryService {
     public Boolean decrease(InventoryDTO inventoryDTO) {
         inventoryMapper.decrease(inventoryDTO);
         final int i = tryCount.incrementAndGet();
-        System.out.println("调用了inventory  try " + i + " 次");
+        LOGGER.info("调用了inventory  try " + i + " 次");
         return true;
     }
+
+    @Override
+    @Hmily(confirmMethod = "confirmInline", cancelMethod = "cancelInline")
+    public List<InventoryDTO> testInLine() {
+        System.out.println("test in line for rpc.......");
+        return new ArrayList<>();
+    }
+
+
+    public List<InventoryDTO> confirmInline() {
+        System.out.println("confirmInline in line for rpc.......");
+        List<InventoryDTO> rs = Lists.newArrayList();
+        InventoryDTO dto = new InventoryDTO();
+        dto.setProductId("1111");
+        dto.setCount(9);
+        rs.add(dto);
+        return rs;
+    }
+
+
+    public List<InventoryDTO> cancelInline() {
+        System.out.println("cancelTest in line for rpc.......");
+        return new ArrayList<>();
+    }
+
 
     @Override
     public Boolean testDecrease(InventoryDTO inventoryDTO) {
@@ -183,9 +211,10 @@ public class InventoryServiceImpl implements InventoryService {
      * @return the boolean
      */
     public Boolean confirmMethod(InventoryDTO inventoryDTO) {
+        LOGGER.info("==========调用扣减库存confirm方法===========");
         inventoryMapper.confirm(inventoryDTO);
         final int i = confirmCount.incrementAndGet();
-        System.out.println("调用了inventory confirm " + i + " 次");
+        LOGGER.info("调用了inventory confirm " + i + " 次");
         return true;
     }
 

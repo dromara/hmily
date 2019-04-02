@@ -17,42 +17,28 @@
 
 package org.dromara.hmily.demo.springcloud.order.client;
 
-import org.dromara.hmily.annotation.Hmily;
 import org.dromara.hmily.demo.springcloud.order.dto.AccountDTO;
-import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 
 /**
- * The interface Account client.
+ * The type Account hystrix.
  *
- * @author xiaoyu
+ * @author xiaoyu(Myth)
  */
-@FeignClient(value = "account-service")
-public interface AccountClient {
+@Component
+public class AccountHystrix implements AccountClient {
 
-    /**
-     * 用户账户付款.
-     *
-     * @param accountDO 实体类
-     * @return true 成功
-     */
-    @RequestMapping("/account-service/account/payment")
-    @Hmily
-    Boolean payment(@RequestBody AccountDTO accountDO);
+    @Override
+    public Boolean payment(AccountDTO accountDO) {
+        System.out.println("执行断路器。。" + accountDO.toString());
+        return false;
+    }
 
-
-    /**
-     * 获取用户账户信息.
-     *
-     * @param userId 用户id
-     * @return AccountDO big decimal
-     */
-    @RequestMapping("/account-service/account/findByUserId")
-    BigDecimal findByUserId(@RequestParam("userId") String userId);
-
+    @Override
+    public BigDecimal findByUserId(String userId) {
+        System.out.println("执行断路器。。");
+        return BigDecimal.ZERO;
+    }
 }

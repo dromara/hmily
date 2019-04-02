@@ -18,7 +18,7 @@
 package org.dromara.hmily.dubbo.interceptor;
 
 import com.alibaba.dubbo.rpc.RpcContext;
-import org.apache.commons.lang3.StringUtils;
+import org.dromara.hmily.common.utils.StringUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.dromara.hmily.common.bean.context.HmilyTransactionContext;
 import org.dromara.hmily.common.constant.CommonConstant;
