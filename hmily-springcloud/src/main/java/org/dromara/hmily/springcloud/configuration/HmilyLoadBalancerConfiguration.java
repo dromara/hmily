@@ -17,49 +17,33 @@
 
 package org.dromara.hmily.springcloud.configuration;
 
-import com.netflix.client.config.IClientConfig;
-import com.netflix.loadbalancer.ILoadBalancer;
-import com.netflix.loadbalancer.IPing;
 import com.netflix.loadbalancer.IRule;
-import com.netflix.loadbalancer.Server;
-import com.netflix.loadbalancer.ServerList;
-import com.netflix.loadbalancer.ServerListFilter;
-import com.netflix.loadbalancer.ServerListUpdater;
 import org.dromara.hmily.springcloud.loadbalancer.HmilyZoneAwareLoadBalancer;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
-import org.springframework.cloud.netflix.ribbon.RibbonClientConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Scope;
 
 /**
- * The type Hmily loadbalancer configuration.
+ * The type Hmily loadBalancer configuration.
  *
  * @author xiaoyu
  */
 @Configuration
-@ConditionalOnBean(RibbonClientConfiguration.class)
+@ConditionalOnClass(IRule.class)
 public class HmilyLoadBalancerConfiguration {
 
     /**
-     * Hmily load balancer load balancer.
+     * Hmily load balancer rule.
      *
-     * @param config            the config
-     * @param serverList        the server list
-     * @param serverListFilter  the server list filter
-     * @param rule              the rule
-     * @param ping              the ping
-     * @param serverListUpdater the server list updater
-     * @return the load balancer
+     * @return the rule
      */
     @Bean
-    public ILoadBalancer hmilyLoadBalancer(final IClientConfig config,
-                                           final ServerList<Server> serverList,
-                                           final ServerListFilter<Server> serverListFilter,
-                                           final IRule rule,
-                                           final IPing ping,
-                                           final ServerListUpdater serverListUpdater) {
-        return new HmilyZoneAwareLoadBalancer(config, rule, ping, serverList,
-                serverListFilter, serverListUpdater);
+    @ConditionalOnProperty(name = "hmily.ribbon.rule.enabled")
+    @Scope("prototype")
+    public IRule hmilyLoadBalancer() {
+        return new HmilyZoneAwareLoadBalancer();
     }
 
 }

@@ -22,7 +22,7 @@ import org.dromara.hmily.common.bean.entity.HmilyParticipant;
 import org.dromara.hmily.common.bean.entity.HmilyTransaction;
 import org.dromara.hmily.common.exception.HmilyException;
 import org.dromara.hmily.common.serializer.ObjectSerializer;
-import org.apache.commons.collections.CollectionUtils;
+import org.dromara.hmily.common.utils.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;

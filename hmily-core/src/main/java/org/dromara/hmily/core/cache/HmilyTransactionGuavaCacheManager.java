@@ -21,7 +21,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.cache.Weigher;
-import org.apache.commons.lang3.StringUtils;
+import org.dromara.hmily.common.utils.StringUtils;
 import org.dromara.hmily.common.bean.entity.HmilyTransaction;
 import org.dromara.hmily.core.coordinator.HmilyCoordinatorService;
 import org.dromara.hmily.core.helper.SpringBeanUtils;
@@ -102,7 +102,7 @@ public final class HmilyTransactionGuavaCacheManager {
      * @param key guava cache key.
      */
     public void removeByKey(final String key) {
-        if (StringUtils.isNotEmpty(key)) {
+        if (StringUtils.isNoneBlank(key)) {
             LOADING_CACHE.invalidate(key);
         }
     }

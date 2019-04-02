@@ -25,7 +25,7 @@ import com.weibo.api.motan.rpc.Caller;
 import com.weibo.api.motan.rpc.Request;
 import com.weibo.api.motan.rpc.Response;
 import com.weibo.api.motan.util.ReflectUtil;
-import org.apache.commons.lang3.StringUtils;
+import org.dromara.hmily.common.utils.StringUtils;
 import org.dromara.hmily.annotation.Hmily;
 import org.dromara.hmily.annotation.PatternEnum;
 import org.dromara.hmily.common.bean.context.HmilyTransactionContext;
@@ -80,7 +80,7 @@ public class MotanHmilyTransactionFilter implements Filter {
                 final HmilyTransactionExecutor hmilyTransactionExecutor = SpringBeanUtils.getInstance().getBean(HmilyTransactionExecutor.class);
                 final HmilyTransactionContext hmilyTransactionContext = HmilyTransactionContextLocal.getInstance().get();
                 if (Objects.nonNull(hmilyTransactionContext)) {
-                    Transmiter.getInstance().transmit(request::setAttachment);
+                    Transmiter.getInstance().transmit(request::setAttachment,hmilyTransactionContext);
                 }
                 final Response response = caller.call(request);
                 final HmilyParticipant hmilyParticipant = buildParticipant(hmilyTransactionContext, hmily, method, clazz, arguments, args);

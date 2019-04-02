@@ -21,9 +21,6 @@ import org.dromara.hmily.common.bean.context.HmilyTransactionContext;
 import org.dromara.hmily.common.constant.CommonConstant;
 import org.dromara.hmily.common.enums.HmilyRoleEnum;
 import org.dromara.hmily.common.utils.GsonUtils;
-import org.dromara.hmily.core.concurrent.threadlocal.HmilyTransactionContextLocal;
-
-import java.util.Objects;
 
 /**
  * The type Transmiter.
@@ -49,12 +46,9 @@ public class Transmiter {
      *
      * @param rpcTransmit the rpc transmit
      */
-    public void transmit(final RpcTransmit rpcTransmit) {
-        final HmilyTransactionContext context = HmilyTransactionContextLocal.getInstance().get();
-        if (Objects.nonNull(context)) {
-            if (context.getRole() == HmilyRoleEnum.LOCAL.getCode()) {
-                context.setRole(HmilyRoleEnum.INLINE.getCode());
-            }
+    public void transmit(final RpcTransmit rpcTransmit, final HmilyTransactionContext context) {
+        if (context.getRole() == HmilyRoleEnum.LOCAL.getCode()) {
+            context.setRole(HmilyRoleEnum.INLINE.getCode());
         }
         rpcTransmit.transmit(CommonConstant.HMILY_TRANSACTION_CONTEXT,
                 GsonUtils.getInstance().toJson(context));

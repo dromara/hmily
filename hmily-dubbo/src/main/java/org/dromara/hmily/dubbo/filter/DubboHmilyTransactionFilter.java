@@ -25,7 +25,7 @@ import com.alibaba.dubbo.rpc.Invoker;
 import com.alibaba.dubbo.rpc.Result;
 import com.alibaba.dubbo.rpc.RpcContext;
 import com.alibaba.dubbo.rpc.RpcException;
-import org.apache.commons.lang3.StringUtils;
+import org.dromara.hmily.common.utils.StringUtils;
 import org.dromara.hmily.annotation.Hmily;
 import org.dromara.hmily.common.bean.context.HmilyTransactionContext;
 import org.dromara.hmily.common.bean.entity.HmilyInvocation;
@@ -88,9 +88,7 @@ public class DubboHmilyTransactionFilter implements Filter {
             try {
                 final HmilyTransactionContext hmilyTransactionContext = HmilyTransactionContextLocal.getInstance().get();
                 if (Objects.nonNull(hmilyTransactionContext)) {
-
-                    Transmiter.getInstance().transmit(RpcContext.getContext()::setAttachment);
-
+                    Transmiter.getInstance().transmit(RpcContext.getContext()::setAttachment,hmilyTransactionContext);
                     final Result result = invoker.invoke(invocation);
                     //if result has not exception
                     if (!result.hasException()) {
