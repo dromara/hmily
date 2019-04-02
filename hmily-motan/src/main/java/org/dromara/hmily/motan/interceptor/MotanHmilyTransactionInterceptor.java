@@ -19,7 +19,7 @@ package org.dromara.hmily.motan.interceptor;
 
 import com.weibo.api.motan.rpc.Request;
 import com.weibo.api.motan.rpc.RpcContext;
-import org.apache.commons.lang3.StringUtils;
+import org.dromara.hmily.common.utils.StringUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.dromara.hmily.common.bean.context.HmilyTransactionContext;
 import org.dromara.hmily.common.constant.CommonConstant;

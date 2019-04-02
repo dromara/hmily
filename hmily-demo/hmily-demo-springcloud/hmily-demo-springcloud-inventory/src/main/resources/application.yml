@@ -5,6 +5,8 @@ server:
     context-path: /inventory-service
 
 spring:
+    main:
+        allow-bean-definition-overriding: true
     datasource:
         driver-class-name:  com.mysql.jdbc.Driver
         url: jdbc:mysql://192.168.1.98:3306/tcc_stock?useUnicode=true&characterEncoding=utf8
@@ -20,7 +22,7 @@ mybatis:
 eureka:
  client:
      serviceUrl:
-       defaultZone: http://localhost:8761/eureka/
+       defaultZone: http://localhost:8768/eureka/
  instance:
    prefer-ip-address: true
 

@@ -18,8 +18,8 @@
 package org.dromara.hmily.admin.service.compensate;
 
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.dromara.hmily.common.utils.CollectionUtils;
+import org.dromara.hmily.common.utils.StringUtils;
 import org.dromara.hmily.admin.helper.PageHelper;
 import org.dromara.hmily.admin.page.CommonPager;
 import org.dromara.hmily.admin.page.PageParameter;
