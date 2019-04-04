@@ -17,13 +17,13 @@
 
 package org.dromara.hmily.springcloud.interceptor;
 
-import org.dromara.hmily.common.utils.StringUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.dromara.hmily.common.bean.context.HmilyTransactionContext;
 import org.dromara.hmily.common.constant.CommonConstant;
 import org.dromara.hmily.common.enums.HmilyRoleEnum;
 import org.dromara.hmily.common.utils.GsonUtils;
 import org.dromara.hmily.common.utils.LogUtil;
+import org.dromara.hmily.common.utils.StringUtils;
 import org.dromara.hmily.core.concurrent.threadlocal.HmilyTransactionContextLocal;
 import org.dromara.hmily.core.interceptor.HmilyTransactionInterceptor;
 import org.dromara.hmily.core.service.HmilyTransactionAspectService;
@@ -71,10 +71,9 @@ public class SpringCloudHmilyTransactionInterceptor implements HmilyTransactionI
         } else {
             try {
                 requestAttributes = RequestContextHolder.currentRequestAttributes();
-            } catch (Throwable ex) {
+            } catch (IllegalStateException ex) {
                 LogUtil.warn(LOGGER, () -> "can not acquire request info:" + ex.getLocalizedMessage());
             }
-
             HttpServletRequest request = requestAttributes == null ? null : ((ServletRequestAttributes) requestAttributes).getRequest();
             String context = request == null ? null : request.getHeader(CommonConstant.HMILY_TRANSACTION_CONTEXT);
             if (StringUtils.isNoneBlank(context)) {

@@ -23,7 +23,6 @@ import org.dromara.hmily.springcloud.feign.HmilyFeignBeanPostProcessor;
 import org.dromara.hmily.springcloud.feign.HmilyFeignInterceptor;
 import org.dromara.hmily.springcloud.hystrix.HmilyHystrixConcurrencyStrategy;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
