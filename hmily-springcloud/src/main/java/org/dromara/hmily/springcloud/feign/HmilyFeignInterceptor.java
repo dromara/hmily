@@ -21,7 +21,6 @@ import feign.RequestInterceptor;
 import feign.RequestTemplate;
 import org.dromara.hmily.core.concurrent.threadlocal.HmilyTransactionContextLocal;
 import org.dromara.hmily.core.transmit.Transmiter;
-import org.springframework.context.annotation.Configuration;
 
 /**
  * HmilyRestTemplateInterceptor.
