@@ -30,12 +30,18 @@ Hmily
 
 # 官网
 
- ## http://dromara.org  或者 https://dromara.org 有时候https打不开。
+ ## https://dromara.org
  
 
 # 文档 
  
  ##  http://dromara.org/website/zh-cn/docs/hmily/index.html
+ 
+# Stargazers over time
+
+[![Stargazers over time](https://starchart.cc/yu199195/hmily.svg)](https://starchart.cc/yu199195/hmily) 
+ 
+ 
 
 #  为什么高性能？
   
@@ -49,16 +55,6 @@ Hmily
   * ## 源码详解以及调试 : http://www.iqiyi.com/w_19rwkreutt.html
 
 
-# FAQ
-
-* ### 为什么我下载的代码后，用idea打开没有相应的get set 方法呢？
-   ##### 答：因为框架使用了Lombok包，它是在编译的时期，自动生成get set方法，并不影响运行，如果觉得提示错误难受，请自行下载lombok包插件，[lombok官网](http://projectlombok.org/)
-
-* ### 为什么我运行demo工程，找不到applicationContent.xml呢？
-  ##### 答：请设置项目的资源文件夹。
-
-* ### 为什么我启动hmily-admin项目的时候，会报mongo 集群连接错误呢？
-  ##### 答：这是因为项目里面有mongo代码，spring boot会自动配置，该错误没有关系，只要admin项目能正常启动就行。
 
 
 # Support
