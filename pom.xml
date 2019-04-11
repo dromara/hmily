@@ -3,32 +3,40 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
-    <groupId>com.hmily.tcc</groupId>
-    <artifactId>hmily-tcc</artifactId>
+    <groupId>org.dromara</groupId>
+    <artifactId>hmily</artifactId>
     <packaging>pom</packaging>
-    <version>1.2.1-RELEASE</version>
-    <name>hmily-tcc</name>
+    <version>2.0.2-RELEASE</version>
+    <name>hmily</name>
     <modules>
-        <module>hmily-tcc-common</module>
-        <module>hmily-tcc-core</module>
-        <module>hmily-tcc-demo</module>
-        <module>hmily-tcc-dubbo</module>
-        <module>hmily-tcc-springcloud</module>
-        <module>hmily-tcc-annotation</module>
-        <module>hmily-tcc-admin</module>
-        <module>hmily-tcc-motan</module>
-        <module>hmily-tcc-spring-boot-starter</module>
+        <module>hmily-common</module>
+        <module>hmily-core</module>
+        <module>hmily-dubbo</module>
+        <module>hmily-apache-dubbo</module>
+        <module>hmily-springcloud</module>
+        <module>hmily-annotation</module>
+        <module>hmily-admin</module>
+        <module>hmily-motan</module>
+        <module>hmily-spring-boot-starter</module>
     </modules>
+
+    <organization>
+        <name>dromara</name>
+        <url>http://www.dromara.org</url>
+    </organization>
 
     <licenses>
         <license>
             <name>Apache License, Version 2.0</name>
             <url>http://www.apache.org/licenses/LICENSE-2.0</url>
+            <distribution>repo</distribution>
         </license>
     </licenses>
     <scm>
         <url>https://github.com/yu199195/hmily.git</url>
+        <connection>scm:git:https://github.com/yu199195/hmily</connection>
+        <developerConnection>scm:git:git@github.com:yu199195/hmily</developerConnection>
+        <tag>${project.version}</tag>
     </scm>
 
     <parent>
@@ -36,6 +44,11 @@
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>2.0.2.RELEASE</version>
     </parent>
+
+    <issueManagement>
+        <system>GitHub Issues</system>
+        <url>https://github.com/yu199195/hmily/issues</url>
+    </issueManagement>
 
     <developers>
         <developer>
@@ -55,6 +68,7 @@
         <spring.version>5.0.7.RELEASE</spring.version>
         <spring-cloud.version>Finchley.RELEASE</spring-cloud.version>
         <dubbo.version>2.6.2</dubbo.version>
+        <apache.dubbo.version>2.7.1</apache.dubbo.version>
         <mongo.driver.version>3.5.0</mongo.driver.version>
         <mysql-connector-java>5.1.46</mysql-connector-java>
         <commons-lang3.version>3.3.2</commons-lang3.version>
@@ -69,89 +83,78 @@
         <httpclient.version>4.5.1</httpclient.version>
         <okhttp.version>3.7.0</okhttp.version>
         <gson.verions>2.6.2</gson.verions>
-        <springfox.version>2.6.1</springfox.version>
         <lombok.version>1.16.14</lombok.version>
         <motan.version>1.0.0</motan.version>
         <disruptor.version>3.4.0</disruptor.version>
         <hikaricp.version>3.2.0</hikaricp.version>
-        <eureka.version>1.4.5.RELEASE</eureka.version>
-
     </properties>
-
 
     <dependencyManagement>
         <dependencies>
-            <dependency>
-                <groupId>org.springframework.cloud</groupId>
-                <artifactId>spring-cloud-starter-eureka-server</artifactId>
-                <version>${eureka.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.cloud</groupId>
-                <artifactId>spring-cloud-starter-eureka</artifactId>
-                <version>${eureka.version}</version>
-            </dependency>
 
             <dependency>
-                <groupId>com.hmily.tcc</groupId>
-                <artifactId>hmily-tcc-admin</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.hmily.tcc</groupId>
-                <artifactId>hmily-tcc-common</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.hmily.tcc</groupId>
-                <artifactId>hmily-tcc-core</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.hmily.tcc</groupId>
-                <artifactId>hmily-tcc-dubbo</artifactId>
+                <groupId>org.dromara</groupId>
+                <artifactId>hmily-admin</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>com.hmily.tcc</groupId>
-                <artifactId>hmily-tcc-springcloud</artifactId>
+                <groupId>org.dromara</groupId>
+                <artifactId>hmily-common</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>com.hmily.tcc</groupId>
-                <artifactId>hmily-tcc-motan</artifactId>
+                <groupId>org.dromara</groupId>
+                <artifactId>hmily-core</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>com.hmily.tcc</groupId>
-                <artifactId>hmily-tcc-annotation</artifactId>
+                <groupId>org.dromara</groupId>
+                <artifactId>hmily-dubbo</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>com.hmily.tcc</groupId>
-                <artifactId>hmily-tcc-spring-boot-starter-parent</artifactId>
+                <groupId>org.dromara</groupId>
+                <artifactId>hmily-springcloud</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>com.hmily.tcc</groupId>
-                <artifactId>hmily-tcc-spring-boot-starter-dubbo</artifactId>
+                <groupId>org.dromara</groupId>
+                <artifactId>hmily-motan</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>com.hmily.tcc</groupId>
-                <artifactId>hmily-tcc-spring-boot-starter-springcloud</artifactId>
+                <groupId>org.dromara</groupId>
+                <artifactId>hmily-annotation</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>com.hmily.tcc</groupId>
-                <artifactId>hmily-tcc-spring-boot-starter-motan</artifactId>
+                <groupId>org.dromara</groupId>
+                <artifactId>hmily-spring-boot-starter-parent</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.dromara</groupId>
+                <artifactId>hmily-spring-boot-starter-dubbo</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.dromara</groupId>
+                <artifactId>hmily-spring-boot-starter-springcloud</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.dromara</groupId>
+                <artifactId>hmily-spring-boot-starter-motan</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
@@ -216,6 +219,11 @@
                     </exclusion>
                 </exclusions>
             </dependency>
+            <dependency>
+                <groupId>org.apache.dubbo</groupId>
+                <artifactId>dubbo</artifactId>
+                <version>${apache.dubbo.version}</version>
+            </dependency>
 
             <!-- motan config start-->
             <dependency>
@@ -242,22 +250,6 @@
                 <version>${motan.version}</version>
             </dependency>
             <!-- motan config end-->
-
-            <dependency>
-                <groupId>io.springfox</groupId>
-                <artifactId>springfox-swagger2</artifactId>
-                <version>${springfox.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.springfox</groupId>
-                <artifactId>springfox-swagger-ui</artifactId>
-                <version>${springfox.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.springfox</groupId>
-                <artifactId>springfox-bean-validators</artifactId>
-                <version>${springfox.version}</version>
-            </dependency>
             <dependency>
                 <groupId>org.mongodb</groupId>
                 <artifactId>mongo-java-driver</artifactId>
@@ -461,20 +453,56 @@
                 <artifactId>zkclient</artifactId>
                 <version>0.4</version>
             </dependency>
-
-
         </dependencies>
     </dependencyManagement>
+
+  <!--
+
+   <distributionManagement>
+         <snapshotRepository>
+             <id>ossrh</id>
+             <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+         </snapshotRepository>
+         <repository>
+             <id>ossrh</id>
+             <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+         </repository>
+     </distributionManagement>
+-->
+
     <build>
         <plugins>
+            <!-- <plugin>
+                 <groupId>org.sonatype.plugins</groupId>
+                 <artifactId>nexus-staging-maven-plugin</artifactId>
+                 <version>1.6.3</version>
+                 <extensions>true</extensions>
+                 <configuration>
+                     <serverId>ossrh</serverId>
+                     <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                     <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                 </configuration>
+             </plugin>
+             <plugin>
+                 <groupId>org.apache.maven.plugins</groupId>
+                 <artifactId>maven-gpg-plugin</artifactId>
+                 <version>1.5</version>
+                 <executions>
+                     <execution>
+                         <phase>verify</phase>
+                         <goals>
+                             <goal>sign</goal>
+                         </goals>
+                     </execution>
+                 </executions>
+             </plugin>-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
-                <version>2.1.2</version>
+                <version>3.0.1</version>
                 <executions>
                     <execution>
-                        <id>attach-sources</id>
-                        <phase>verify</phase>
+                        <phase>package</phase>
                         <goals>
                             <goal>jar-no-fork</goal>
                         </goals>
@@ -483,14 +511,17 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.5.1</version>
-                <configuration>
-                    <source>${jdk.version}</source>
-                    <target>${jdk.version}</target>
-                </configuration>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.10.3</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
@@ -500,39 +531,13 @@
                     <autoVersionSubmodules>true</autoVersionSubmodules>
                 </configuration>
             </plugin>
-
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>versions-maven-plugin</artifactId>
                 <version>2.5</version>
             </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <version>3.0.2</version>
-                <executions>
-                    <execution>
-                        <id>analyze</id>
-                        <goals>
-                            <goal>analyze-only</goal>
-                        </goals>
-                        <configuration>
-                            <failOnWarning>false</failOnWarning>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
         </plugins>
     </build>
-
-    <pluginRepositories>
-        <pluginRepository>
-            <id>spring-releases</id>
-            <url>https://repo.spring.io/libs-release</url>
-        </pluginRepository>
-    </pluginRepositories>
 
 
 </project>

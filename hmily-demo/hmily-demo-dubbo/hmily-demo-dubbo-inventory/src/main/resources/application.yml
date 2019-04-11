@@ -1,0 +1,28 @@
+server:
+  port: 8084
+  address: 0.0.0.0
+  servlet:
+    context-path: /
+
+spring:
+    datasource:
+        driver-class-name:  com.mysql.jdbc.Driver
+        url: jdbc:mysql://192.168.1.98:3306/tcc_stock?useUnicode=true&characterEncoding=utf8
+        username: root
+        password: 123456
+
+
+mybatis:
+  type-aliases-package: com.hmily.tcc.demo.dubbo.inventory.api.entity
+  config-location: classpath:mybatis/mybatis-config.xml
+
+logging:
+    level:
+        root: error
+        org.springframework.web: info
+        org.apache.ibatis: debug
+        org.dromara.hmily.bonuspoint: debug
+        org.dromara.hmily.lottery: debug
+        org.dromara.hmily: debug
+    path: "./logs"
+
