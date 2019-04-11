@@ -15,36 +15,38 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.core.transmit;
+package org.dromara.hmily.core.mediator;
 
 import org.dromara.hmily.common.bean.context.HmilyTransactionContext;
 import org.dromara.hmily.common.constant.CommonConstant;
 import org.dromara.hmily.common.enums.HmilyRoleEnum;
 import org.dromara.hmily.common.utils.GsonUtils;
+import org.dromara.hmily.common.utils.StringUtils;
 
 /**
- * The type Transmiter.
+ * The type RpcMediator.
  *
  * @author xiaoyu(Myth)
  */
-public class Transmiter {
+public class RpcMediator {
 
-    private static final Transmiter TRANSMITER = new Transmiter();
+    private static final RpcMediator RPC_MEDIATOR = new RpcMediator();
 
     /**
      * Gets instance.
      *
      * @return the instance
      */
-    public static Transmiter getInstance() {
-        return TRANSMITER;
+    public static RpcMediator getInstance() {
+        return RPC_MEDIATOR;
     }
 
 
     /**
      * Transmit.
      *
-     * @param rpcTransmit the rpc transmit
+     * @param rpcTransmit the rpc mediator
+     * @param context     the context
      */
     public void transmit(final RpcTransmit rpcTransmit, final HmilyTransactionContext context) {
         if (context.getRole() == HmilyRoleEnum.LOCAL.getCode()) {
@@ -52,5 +54,20 @@ public class Transmiter {
         }
         rpcTransmit.transmit(CommonConstant.HMILY_TRANSACTION_CONTEXT,
                 GsonUtils.getInstance().toJson(context));
+    }
+
+    /**
+     * Acquire hmily transaction context.
+     *
+     * @param rpcAcquire the rpc acquire
+     * @return the hmily transaction context
+     */
+    public HmilyTransactionContext acquire(RpcAcquire rpcAcquire) {
+        HmilyTransactionContext hmilyTransactionContext = null;
+        final String context = rpcAcquire.acquire(CommonConstant.HMILY_TRANSACTION_CONTEXT);
+        if (StringUtils.isNoneBlank(context)) {
+            hmilyTransactionContext = GsonUtils.getInstance().fromJson(context, HmilyTransactionContext.class);
+        }
+        return hmilyTransactionContext;
     }
 }
