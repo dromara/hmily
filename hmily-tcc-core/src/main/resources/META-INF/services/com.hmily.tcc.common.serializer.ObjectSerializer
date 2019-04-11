@@ -1,4 +1,0 @@
-com.hmily.tcc.common.serializer.KryoSerializer
-com.hmily.tcc.common.serializer.ProtostuffSerializer
-com.hmily.tcc.common.serializer.HessianSerializer
-com.hmily.tcc.common.serializer.JavaSerializer

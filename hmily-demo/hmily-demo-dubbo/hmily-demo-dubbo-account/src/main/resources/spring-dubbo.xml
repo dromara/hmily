@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://code.alibabatech.com/schema/dubbo
+       http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
+
+    <dubbo:application name="account_service"/>
+
+    <dubbo:registry protocol="zookeeper" address="localhost:2181"/>
+
+    <dubbo:protocol name="dubbo" port="20884"
+                    server="netty" client="netty"
+                    charset="UTF-8" threadpool="fixed" threads="500"
+                    queues="0" buffer="8192" accepts="0" payload="8388608" />
+
+    <dubbo:service interface="org.dromara.hmily.demo.dubbo.account.api.service.AccountService"
+                   ref="accountService" executes="20"/>
+
+    <dubbo:reference timeout="20000"
+                     interface="org.dromara.hmily.demo.dubbo.inventory.api.service.InventoryService"
+                     id="inventoryService"
+                     retries="0" check="false"/>
+
+</beans>

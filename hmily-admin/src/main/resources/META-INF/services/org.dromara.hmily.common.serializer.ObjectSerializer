@@ -1,0 +1,4 @@
+org.dromara.hmily.common.serializer.KryoSerializer
+org.dromara.hmily.common.serializer.ProtostuffSerializer
+org.dromara.hmily.common.serializer.HessianSerializer
+org.dromara.hmily.common.serializer.JavaSerializer

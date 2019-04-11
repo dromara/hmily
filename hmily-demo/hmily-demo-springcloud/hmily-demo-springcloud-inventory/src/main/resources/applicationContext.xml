@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~
+  ~ Copyright 2017-2018 549477611@qq.com(xiaoyu)
+  ~
+  ~ This copyrighted material is made available to anyone wishing to use, modify,
+  ~ copy, or redistribute it subject to the terms and conditions of the GNU
+  ~ Lesser General Public License, as published by the Free Software Foundation.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+  ~ or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+  ~ for more details.
+  ~
+  ~ You should have received a copy of the GNU Lesser General Public License
+  ~ along with this distribution; if not, see <http://www.gnu.org/licenses/>.
+  ~
+  -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.0.xsd
+
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop-3.0.xsd"
+       default-autowire="byName">
+
+    <context:component-scan base-package="org.dromara.hmily.*"/>
+    <aop:aspectj-autoproxy expose-proxy="true"/>
+    <bean id="hmilyTransactionBootstrap" class="org.dromara.hmily.core.bootstrap.HmilyTransactionBootstrap">
+        <property name="serializer" value="kryo"/>
+        <property name="recoverDelayTime" value="120"/>
+        <property name="retryMax" value="3"/>
+        <property name="scheduledDelay" value="120"/>
+        <property name="scheduledThreadMax" value="4"/>
+        <property name="repositorySupport" value="db"/>
+        <property name="started" value="false"/>
+        <property name="hmilyDbConfig">
+            <bean class="org.dromara.hmily.common.config.HmilyDbConfig">
+                <property name="url"
+                          value="jdbc:mysql://192.168.1.98:3306/tcc?useUnicode=true&amp;characterEncoding=utf8"/>
+                <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+                <property name="username" value="root"/>
+                <property name="password" value="123456"/>
+            </bean>
+        </property>
+    </bean>
+
+    <!--
+      <property name="repositorySupport" value="db" />
+       <property name="hmilyDbConfig">
+           <bean class="org.dromara.hmily.common.config.HmilyDbConfig">
+               <property name="url"
+                         value="jdbc:mysql://192.168.1.68:3306/hmily?useUnicode=true&amp;characterEncoding=utf8"/>
+               <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+               <property name="password" value="Wgj@555888"/>
+               <property name="username" value="xiaoyu"/>
+           </bean>
+       </property>
+
+
+      <property name="repositorySupport" value="redis" />
+       <property name="hmilyRedisConfig">
+           <bean class="org.dromara.hmily.common.config.HmilyRedisConfig">
+               <property name="hostName"
+                         value="192.168.1.68"/>
+               <property name="port" value="6379"/>
+               <property name="password" value=""/>
+           </bean>
+       </property>
+
+       <property name="repositorySupport" value="zookeeper"/>
+       <property name="hmilyZookeeperConfig">
+           <bean class="org.dromara.hmily.common.config.HmilyZookeeperConfig">
+               <property name="host"  value="192.168.1.73:2181"/>
+               <property name="sessionTimeOut" value="100000"/>
+               <property name="rootPath" value="/hmily"/>
+           </bean>
+       </property>
+
+
+      <property name="repositorySupport" value="mongodb"/>
+       <property name="hmilyMongoConfig">
+           <bean class="org.dromara.hmily.common.config.HmilyMongoConfig">
+               <property name="mongoDbUrl"  value="192.168.1.68:27017"/>
+               <property name="mongoDbName" value="happylife"/>
+               <property name="mongoUserName" value="xiaoyu"/>
+               <property name="mongoUserPwd" value="123456"/>
+           </bean>
+       </property>
+
+
+       <property name="repositorySupport" value="file"/>
+       <property name="hmilyFileConfig">
+           <bean class="org.dromara.hmily.common.config.HmilyFileConfig">
+               <property name="path"  value="/account"/>
+               <property name="prefix" value="account"/>
+           </bean>
+       </property>
+
+
+    -->
+
+</beans>
