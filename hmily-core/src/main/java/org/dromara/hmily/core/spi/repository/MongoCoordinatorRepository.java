@@ -21,6 +21,7 @@ import com.google.common.base.Splitter;
 import com.mongodb.MongoCredential;
 import com.mongodb.ServerAddress;
 import com.mongodb.client.result.UpdateResult;
+import org.dromara.hmily.annotation.HmilySPI;
 import org.dromara.hmily.common.utils.CollectionUtils;
 import org.dromara.hmily.common.bean.adapter.MongoAdapter;
 import org.dromara.hmily.common.bean.entity.HmilyParticipant;
@@ -56,6 +57,7 @@ import java.util.stream.Collectors;
  *
  * @author xiaoyu
  */
+@HmilySPI("mongodb")
 public class MongoCoordinatorRepository implements HmilyCoordinatorRepository {
 
     /**
