@@ -25,7 +25,6 @@ import com.alibaba.dubbo.rpc.Invoker;
 import com.alibaba.dubbo.rpc.Result;
 import com.alibaba.dubbo.rpc.RpcContext;
 import com.alibaba.dubbo.rpc.RpcException;
-import org.dromara.hmily.common.utils.StringUtils;
 import org.dromara.hmily.annotation.Hmily;
 import org.dromara.hmily.common.bean.context.HmilyTransactionContext;
 import org.dromara.hmily.common.bean.entity.HmilyInvocation;
@@ -34,9 +33,10 @@ import org.dromara.hmily.common.enums.HmilyActionEnum;
 import org.dromara.hmily.common.enums.HmilyRoleEnum;
 import org.dromara.hmily.common.exception.HmilyRuntimeException;
 import org.dromara.hmily.common.utils.LogUtil;
+import org.dromara.hmily.common.utils.StringUtils;
 import org.dromara.hmily.core.concurrent.threadlocal.HmilyTransactionContextLocal;
 import org.dromara.hmily.core.service.executor.HmilyTransactionExecutor;
-import org.dromara.hmily.core.transmit.Transmiter;
+import org.dromara.hmily.core.mediator.RpcMediator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,6 +49,7 @@ import java.util.Objects;
  * @author xiaoyu
  */
 @Activate(group = {Constants.SERVER_KEY, Constants.CONSUMER})
+@SuppressWarnings("all")
 public class DubboHmilyTransactionFilter implements Filter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DubboHmilyTransactionFilter.class);
@@ -66,7 +67,6 @@ public class DubboHmilyTransactionFilter implements Filter {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public Result invoke(final Invoker<?> invoker, final Invocation invocation) throws RpcException {
         String methodName = invocation.getMethodName();
         Class clazz = invoker.getInterface();
@@ -88,7 +88,7 @@ public class DubboHmilyTransactionFilter implements Filter {
             try {
                 final HmilyTransactionContext hmilyTransactionContext = HmilyTransactionContextLocal.getInstance().get();
                 if (Objects.nonNull(hmilyTransactionContext)) {
-                    Transmiter.getInstance().transmit(RpcContext.getContext()::setAttachment,hmilyTransactionContext);
+                    RpcMediator.getInstance().transmit(RpcContext.getContext()::setAttachment, hmilyTransactionContext);
                     final Result result = invoker.invoke(invocation);
                     //if result has not exception
                     if (!result.hasException()) {

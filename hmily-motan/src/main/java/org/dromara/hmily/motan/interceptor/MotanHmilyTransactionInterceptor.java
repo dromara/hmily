@@ -19,14 +19,12 @@ package org.dromara.hmily.motan.interceptor;
 
 import com.weibo.api.motan.rpc.Request;
 import com.weibo.api.motan.rpc.RpcContext;
-import org.dromara.hmily.common.utils.StringUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.dromara.hmily.common.bean.context.HmilyTransactionContext;
-import org.dromara.hmily.common.constant.CommonConstant;
-import org.dromara.hmily.common.utils.GsonUtils;
 import org.dromara.hmily.core.concurrent.threadlocal.HmilyTransactionContextLocal;
 import org.dromara.hmily.core.interceptor.HmilyTransactionInterceptor;
 import org.dromara.hmily.core.service.HmilyTransactionAspectService;
+import org.dromara.hmily.core.mediator.RpcMediator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -50,20 +48,17 @@ public class MotanHmilyTransactionInterceptor implements HmilyTransactionInterce
 
     @Override
     public Object interceptor(final ProceedingJoinPoint pjp) throws Throwable {
-        HmilyTransactionContext hmilyTransactionContext = null;
-        final Request request = RpcContext.getContext().getRequest();
-        if (Objects.nonNull(request)) {
-            final Map<String, String> attachments = request.getAttachments();
-            if (attachments != null && !attachments.isEmpty()) {
-                String context = attachments.get(CommonConstant.HMILY_TRANSACTION_CONTEXT);
-                if (StringUtils.isNoneBlank(context)) {
-                    hmilyTransactionContext = GsonUtils.getInstance().fromJson(context, HmilyTransactionContext.class);
-                    request.getAttachments().remove(CommonConstant.HMILY_TRANSACTION_CONTEXT);
-                } else {
-                    hmilyTransactionContext = HmilyTransactionContextLocal.getInstance().get();
+        HmilyTransactionContext hmilyTransactionContext = RpcMediator.getInstance().acquire(key -> {
+            final Request request = RpcContext.getContext().getRequest();
+            if (Objects.nonNull(request)) {
+                final Map<String, String> attachments = request.getAttachments();
+                if (attachments != null && !attachments.isEmpty()) {
+                    return attachments.get(key);
                 }
             }
-        } else {
+            return "";
+        });
+        if (Objects.isNull(hmilyTransactionContext)) {
             hmilyTransactionContext = HmilyTransactionContextLocal.getInstance().get();
         }
         return hmilyTransactionAspectService.invoke(hmilyTransactionContext, pjp);
