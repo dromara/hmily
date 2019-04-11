@@ -17,6 +17,7 @@
 
 package org.dromara.hmily.core.spi;
 
+import org.dromara.hmily.annotation.HmilySPI;
 import org.dromara.hmily.common.bean.entity.HmilyTransaction;
 import org.dromara.hmily.common.config.HmilyConfig;
 import org.dromara.hmily.common.serializer.ObjectSerializer;
@@ -28,6 +29,7 @@ import java.util.List;
  * CoordinatorRepository.
  * @author xiaoyu
  */
+@HmilySPI
 public interface HmilyCoordinatorRepository {
 
     int ROWS = 1;

@@ -18,9 +18,6 @@
 package org.dromara.hmily.core.service.executor;
 
 import com.google.common.collect.Lists;
-import org.dromara.hmily.common.utils.CollectionUtils;
-import org.dromara.hmily.common.utils.StringUtils;
-import org.apache.commons.lang3.reflect.MethodUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.dromara.hmily.annotation.Hmily;
@@ -33,11 +30,13 @@ import org.dromara.hmily.common.enums.EventTypeEnum;
 import org.dromara.hmily.common.enums.HmilyActionEnum;
 import org.dromara.hmily.common.enums.HmilyRoleEnum;
 import org.dromara.hmily.common.exception.HmilyRuntimeException;
+import org.dromara.hmily.common.utils.CollectionUtils;
 import org.dromara.hmily.common.utils.LogUtil;
+import org.dromara.hmily.common.utils.StringUtils;
 import org.dromara.hmily.core.cache.HmilyTransactionGuavaCacheManager;
 import org.dromara.hmily.core.concurrent.threadlocal.HmilyTransactionContextLocal;
 import org.dromara.hmily.core.disruptor.publisher.HmilyTransactionEventPublisher;
-import org.dromara.hmily.core.helper.SpringBeanUtils;
+import org.dromara.hmily.core.reflect.HmilyReflector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,6 +69,11 @@ public class HmilyTransactionExecutor {
 
     private final HmilyTransactionEventPublisher hmilyTransactionEventPublisher;
 
+    /**
+     * Instantiates a new Hmily transaction executor.
+     *
+     * @param hmilyTransactionEventPublisher the hmily transaction event publisher
+     */
     @Autowired
     public HmilyTransactionExecutor(final HmilyTransactionEventPublisher hmilyTransactionEventPublisher) {
         this.hmilyTransactionEventPublisher = hmilyTransactionEventPublisher;
@@ -79,7 +83,7 @@ public class HmilyTransactionExecutor {
      * transaction preTry.
      *
      * @param point cut point.
-     * @return TccTransaction
+     * @return TccTransaction hmily transaction
      */
     public HmilyTransaction preTry(final ProceedingJoinPoint point) {
         LogUtil.debug(LOGGER, () -> "......hmily transaction starter....");
@@ -104,7 +108,7 @@ public class HmilyTransactionExecutor {
      *
      * @param context transaction context.
      * @param point   cut point
-     * @return TccTransaction
+     * @return TccTransaction hmily transaction
      */
     public HmilyTransaction preTryParticipant(final HmilyTransactionContext context, final ProceedingJoinPoint point) {
         LogUtil.debug(LOGGER, "participant hmily transaction start..：{}", context::toString);
@@ -125,6 +129,7 @@ public class HmilyTransactionExecutor {
      * The remote service calls the confirm method.
      *
      * @param currentTransaction {@linkplain HmilyTransaction}
+     * @return the object
      * @throws HmilyRuntimeException ex
      */
     public Object confirm(final HmilyTransaction currentTransaction) throws HmilyRuntimeException {
@@ -141,14 +146,11 @@ public class HmilyTransactionExecutor {
             List<Object> results = Lists.newArrayListWithCapacity(hmilyParticipants.size());
             for (HmilyParticipant hmilyParticipant : hmilyParticipants) {
                 try {
-                    HmilyTransactionContext context = new HmilyTransactionContext();
-                    context.setAction(HmilyActionEnum.CONFIRMING.getCode());
-                    context.setRole(HmilyRoleEnum.START.getCode());
-                    context.setTransId(hmilyParticipant.getTransId());
-                    HmilyTransactionContextLocal.getInstance().set(context);
-                    final Object result = executeParticipantMethod(hmilyParticipant.getConfirmHmilyInvocation());
+                    final Object result = HmilyReflector.executor(hmilyParticipant.getTransId(),
+                            HmilyActionEnum.CONFIRMING,
+                            hmilyParticipant.getConfirmHmilyInvocation());
                     results.add(result);
-                } catch (Exception e) {
+                } catch (Throwable e) {
                     LogUtil.error(LOGGER, "execute confirm :{}", () -> e);
                     success = false;
                     failList.add(hmilyParticipant);
@@ -166,6 +168,7 @@ public class HmilyTransactionExecutor {
      * cancel transaction.
      *
      * @param currentTransaction {@linkplain HmilyTransaction}
+     * @return the object
      */
     public Object cancel(final HmilyTransaction currentTransaction) {
         LogUtil.debug(LOGGER, () -> "tcc cancel ...........start!");
@@ -188,12 +191,9 @@ public class HmilyTransactionExecutor {
             List<Object> results = Lists.newArrayListWithCapacity(hmilyParticipants.size());
             for (HmilyParticipant hmilyParticipant : hmilyParticipants) {
                 try {
-                    HmilyTransactionContext context = new HmilyTransactionContext();
-                    context.setAction(HmilyActionEnum.CANCELING.getCode());
-                    context.setTransId(hmilyParticipant.getTransId());
-                    context.setRole(HmilyRoleEnum.START.getCode());
-                    HmilyTransactionContextLocal.getInstance().set(context);
-                    final Object result = executeParticipantMethod(hmilyParticipant.getCancelHmilyInvocation());
+                    final Object result = HmilyReflector.executor(hmilyParticipant.getTransId(),
+                            HmilyActionEnum.CANCELING,
+                            hmilyParticipant.getCancelHmilyInvocation());
                     results.add(result);
                 } catch (Throwable e) {
                     LogUtil.error(LOGGER, "execute cancel ex:{}", () -> e);
@@ -243,6 +243,14 @@ public class HmilyTransactionExecutor {
      */
     public HmilyTransaction getCurrentTransaction() {
         return CURRENT.get();
+    }
+
+
+    /**
+     * clean threadLocal help gc.
+     */
+    public void remove() {
+        CURRENT.remove();
     }
 
     /**
@@ -304,26 +312,6 @@ public class HmilyTransactionExecutor {
             }
         }
         return hmilyParticipants;
-    }
-
-    @SuppressWarnings("unchecked")
-    private Object executeParticipantMethod(final HmilyInvocation hmilyInvocation) throws Exception {
-        if (Objects.nonNull(hmilyInvocation)) {
-            final Class clazz = hmilyInvocation.getTargetClass();
-            final String method = hmilyInvocation.getMethodName();
-            final Object[] args = hmilyInvocation.getArgs();
-            final Class[] parameterTypes = hmilyInvocation.getParameterTypes();
-            final Object bean = SpringBeanUtils.getInstance().getBean(clazz);
-            return MethodUtils.invokeMethod(bean, method, args, parameterTypes);
-        }
-        return null;
-    }
-
-    /**
-     * clean threadLocal help gc.
-     */
-    public void remove() {
-        CURRENT.remove();
     }
 
     private HmilyTransaction buildHmilyTransaction(final ProceedingJoinPoint point, final int role, final String transId) {

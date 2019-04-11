@@ -21,7 +21,6 @@ import com.google.common.base.Splitter;
 import com.mongodb.MongoCredential;
 import com.mongodb.ServerAddress;
 import com.zaxxer.hikari.HikariDataSource;
-import org.dromara.hmily.common.utils.StringUtils;
 import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.ZooKeeper;
 import org.dromara.hmily.admin.service.CompensationService;
@@ -30,14 +29,13 @@ import org.dromara.hmily.admin.service.compensate.JdbcCompensationServiceImpl;
 import org.dromara.hmily.admin.service.compensate.MongoCompensationServiceImpl;
 import org.dromara.hmily.admin.service.compensate.RedisCompensationServiceImpl;
 import org.dromara.hmily.admin.service.compensate.ZookeeperCompensationServiceImpl;
-import org.dromara.hmily.common.enums.SerializeEnum;
 import org.dromara.hmily.common.jedis.JedisClient;
 import org.dromara.hmily.common.jedis.JedisClientCluster;
 import org.dromara.hmily.common.jedis.JedisClientSentinel;
 import org.dromara.hmily.common.jedis.JedisClientSingle;
-import org.dromara.hmily.common.serializer.KryoSerializer;
 import org.dromara.hmily.common.serializer.ObjectSerializer;
-import org.dromara.hmily.common.utils.ServiceBootstrap;
+import org.dromara.hmily.common.utils.StringUtils;
+import org.dromara.hmily.common.utils.extension.ExtensionLoader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -57,12 +55,10 @@ import java.net.InetSocketAddress;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
-import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 /**
  * CompensationConfiguration.
@@ -70,7 +66,7 @@ import java.util.stream.StreamSupport;
  * @author xiaoyu
  */
 @Configuration
-public class CompensationConfiguration {
+public class HmilyAdminConfiguration {
 
     @Configuration
     static class SerializerConfiguration {
@@ -84,14 +80,8 @@ public class CompensationConfiguration {
 
         @Bean
         public ObjectSerializer objectSerializer() {
-            final SerializeEnum serializeEnum =
-                    SerializeEnum.acquire(env.getProperty("recover.serializer.support"));
-            final ServiceLoader<ObjectSerializer> objectSerializers =
-                    ServiceBootstrap.loadAll(ObjectSerializer.class);
-            return StreamSupport.stream(objectSerializers.spliterator(), false)
-                    .filter(objectSerializer ->
-                            Objects.equals(objectSerializer.getScheme(), serializeEnum.getSerialize()))
-                    .findFirst().orElse(new KryoSerializer());
+            return ExtensionLoader.getExtensionLoader(ObjectSerializer.class)
+                    .getActivateExtension(env.getProperty("recover.serializer.support"));
         }
     }
 

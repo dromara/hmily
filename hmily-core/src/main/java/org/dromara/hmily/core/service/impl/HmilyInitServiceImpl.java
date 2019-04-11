@@ -18,26 +18,18 @@
 package org.dromara.hmily.core.service.impl;
 
 import org.dromara.hmily.common.config.HmilyConfig;
-import org.dromara.hmily.common.enums.RepositorySupportEnum;
-import org.dromara.hmily.common.enums.SerializeEnum;
-import org.dromara.hmily.common.serializer.KryoSerializer;
 import org.dromara.hmily.common.serializer.ObjectSerializer;
 import org.dromara.hmily.common.utils.LogUtil;
-import org.dromara.hmily.common.utils.ServiceBootstrap;
+import org.dromara.hmily.common.utils.extension.ExtensionLoader;
 import org.dromara.hmily.core.coordinator.HmilyCoordinatorService;
 import org.dromara.hmily.core.helper.SpringBeanUtils;
 import org.dromara.hmily.core.logo.HmilyLogo;
 import org.dromara.hmily.core.service.HmilyInitService;
 import org.dromara.hmily.core.spi.HmilyCoordinatorRepository;
-import org.dromara.hmily.core.spi.repository.JdbcCoordinatorRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.Objects;
-import java.util.ServiceLoader;
-import java.util.stream.StreamSupport;
 
 /**
  * hmily init service.
@@ -89,17 +81,12 @@ public class HmilyInitServiceImpl implements HmilyInitService {
      */
     private void loadSpiSupport(final HmilyConfig hmilyConfig) {
         //spi serialize
-        final SerializeEnum serializeEnum = SerializeEnum.acquire(hmilyConfig.getSerializer());
-        final ServiceLoader<ObjectSerializer> objectSerializers = ServiceBootstrap.loadAll(ObjectSerializer.class);
-        final ObjectSerializer serializer = StreamSupport.stream(objectSerializers.spliterator(), false)
-                .filter(objectSerializer -> Objects.equals(objectSerializer.getScheme(), serializeEnum.getSerialize()))
-                .findFirst().orElse(new KryoSerializer());
+        final ObjectSerializer serializer = ExtensionLoader.getExtensionLoader(ObjectSerializer.class)
+                .getActivateExtension(hmilyConfig.getSerializer());
         //spi repository
-        final RepositorySupportEnum repositorySupportEnum = RepositorySupportEnum.acquire(hmilyConfig.getRepositorySupport());
-        final ServiceLoader<HmilyCoordinatorRepository> recoverRepositories = ServiceBootstrap.loadAll(HmilyCoordinatorRepository.class);
-        final HmilyCoordinatorRepository repository = StreamSupport.stream(recoverRepositories.spliterator(), false)
-                .filter(recoverRepository -> Objects.equals(recoverRepository.getScheme(), repositorySupportEnum.getSupport()))
-                .findFirst().orElse(new JdbcCoordinatorRepository());
+        final HmilyCoordinatorRepository repository = ExtensionLoader.getExtensionLoader(HmilyCoordinatorRepository.class)
+                .getActivateExtension(hmilyConfig.getRepositorySupport());
+
         repository.setSerializer(serializer);
         SpringBeanUtils.getInstance().registerBean(HmilyCoordinatorRepository.class.getName(), repository);
     }

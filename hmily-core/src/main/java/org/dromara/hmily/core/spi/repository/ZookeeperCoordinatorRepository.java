@@ -18,6 +18,7 @@
 package org.dromara.hmily.core.spi.repository;
 
 import com.google.common.collect.Lists;
+import org.dromara.hmily.annotation.HmilySPI;
 import org.dromara.hmily.common.bean.adapter.CoordinatorRepositoryAdapter;
 import org.dromara.hmily.common.bean.entity.HmilyTransaction;
 import org.dromara.hmily.common.config.HmilyConfig;
@@ -51,6 +52,7 @@ import java.util.stream.Collectors;
  *
  * @author xiaoyu
  */
+@HmilySPI("zookeeper")
 public class ZookeeperCoordinatorRepository implements HmilyCoordinatorRepository {
 
     /**

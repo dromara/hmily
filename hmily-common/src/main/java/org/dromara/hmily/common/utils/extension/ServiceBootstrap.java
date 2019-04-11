@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.common.utils;
+package org.dromara.hmily.common.utils.extension;
 
 import java.util.Iterator;
 import java.util.ServiceLoader;

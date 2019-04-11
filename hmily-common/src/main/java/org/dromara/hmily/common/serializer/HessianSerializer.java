@@ -19,6 +19,7 @@ package org.dromara.hmily.common.serializer;
 
 import com.caucho.hessian.io.Hessian2Input;
 import com.caucho.hessian.io.Hessian2Output;
+import org.dromara.hmily.annotation.HmilySPI;
 import org.dromara.hmily.common.enums.SerializeEnum;
 import org.dromara.hmily.common.exception.HmilyException;
 
@@ -32,6 +33,7 @@ import java.io.IOException;
  * @author xiaoyu
  */
 @SuppressWarnings("unchecked")
+@HmilySPI("hessian")
 public class HessianSerializer implements ObjectSerializer {
 
     @Override
@@ -57,15 +59,5 @@ public class HessianSerializer implements ObjectSerializer {
         } catch (IOException e) {
             throw new HmilyException("Hessian deSerialize error " + e.getMessage());
         }
-    }
-
-    /**
-     * 设置scheme.
-     *
-     * @return scheme 命名
-     */
-    @Override
-    public String getScheme() {
-        return SerializeEnum.HESSIAN.getSerialize();
     }
 }
