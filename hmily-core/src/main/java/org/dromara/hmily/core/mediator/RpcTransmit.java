@@ -15,23 +15,21 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.springcloud.feign;
-
-import feign.RequestInterceptor;
-import feign.RequestTemplate;
-import org.dromara.hmily.core.concurrent.threadlocal.HmilyTransactionContextLocal;
-import org.dromara.hmily.core.mediator.RpcMediator;
+package org.dromara.hmily.core.mediator;
 
 /**
- * HmilyRestTemplateInterceptor.
+ * The interface Rpc mediator.
  *
- * @author xiaoyu
+ * @author xiaoyu(Myth)
  */
-public class HmilyFeignInterceptor implements RequestInterceptor {
+public interface RpcTransmit {
 
-    @Override
-    public void apply(final RequestTemplate requestTemplate) {
-        RpcMediator.getInstance().transmit(requestTemplate::header, HmilyTransactionContextLocal.getInstance().get());
-    }
+    /**
+     * Transmit.
+     *
+     * @param key   the key
+     * @param value the value
+     */
+    void transmit(String key, String value);
 
 }

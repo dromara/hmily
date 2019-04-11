@@ -15,20 +15,20 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.core.transmit;
+package org.dromara.hmily.core.mediator;
 
 /**
- * The interface Rpc transmit.
+ * The interface Rpc acquire.
  *
  * @author xiaoyu(Myth)
  */
-public interface RpcTransmit {
+public interface RpcAcquire {
 
     /**
-     * Transmit.
+     * Acquire string.
      *
-     * @param key   the key
-     * @param value the value
+     * @param key the key
+     * @return the string
      */
-    void transmit(String key, String value);
+    String acquire(String key);
 }
