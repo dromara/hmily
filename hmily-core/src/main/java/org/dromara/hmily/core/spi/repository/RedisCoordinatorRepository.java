@@ -19,6 +19,7 @@ package org.dromara.hmily.core.spi.repository;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
+import org.dromara.hmily.annotation.HmilySPI;
 import org.dromara.hmily.common.utils.StringUtils;
 import org.dromara.hmily.common.bean.adapter.CoordinatorRepositoryAdapter;
 import org.dromara.hmily.common.bean.entity.HmilyTransaction;
@@ -55,6 +56,7 @@ import java.util.stream.Collectors;
  *
  * @author xiaoyu
  */
+@HmilySPI("redis")
 public class RedisCoordinatorRepository implements HmilyCoordinatorRepository {
 
     /**

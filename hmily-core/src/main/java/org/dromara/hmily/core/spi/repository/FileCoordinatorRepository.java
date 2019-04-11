@@ -18,6 +18,7 @@
 package org.dromara.hmily.core.spi.repository;
 
 import com.google.common.collect.Lists;
+import org.dromara.hmily.annotation.HmilySPI;
 import org.dromara.hmily.common.bean.adapter.CoordinatorRepositoryAdapter;
 import org.dromara.hmily.common.bean.entity.HmilyTransaction;
 import org.dromara.hmily.common.config.HmilyConfig;
@@ -41,6 +42,7 @@ import java.util.stream.Collectors;
  * @author xiaoyu
  */
 @SuppressWarnings("all")
+@HmilySPI("file")
 public class FileCoordinatorRepository implements HmilyCoordinatorRepository {
 
     private static volatile boolean initialized;
@@ -56,6 +58,7 @@ public class FileCoordinatorRepository implements HmilyCoordinatorRepository {
 
     @Override
     public int create(final HmilyTransaction hmilyTransaction) {
+
         writeFile(hmilyTransaction);
         return 1;
     }

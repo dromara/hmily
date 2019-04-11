@@ -17,7 +17,7 @@
 
 package org.dromara.hmily.common.serializer;
 
-import org.dromara.hmily.common.enums.SerializeEnum;
+import org.dromara.hmily.annotation.HmilySPI;
 import org.dromara.hmily.common.exception.HmilyException;
 
 import java.io.ByteArrayInputStream;
@@ -30,9 +30,10 @@ import java.io.ObjectOutputStream;
 
 /**
  * JavaSerializer.
+ *
  * @author xiaoyu
  */
-@SuppressWarnings("unchecked")
+@HmilySPI("hessian")
 public class JavaSerializer implements ObjectSerializer {
 
     @Override
@@ -47,21 +48,12 @@ public class JavaSerializer implements ObjectSerializer {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public <T> T deSerialize(final byte[] param, final Class<T> clazz) throws HmilyException {
         try (ByteArrayInputStream arrayInputStream = new ByteArrayInputStream(param); ObjectInput input = new ObjectInputStream(arrayInputStream)) {
             return (T) input.readObject();
         } catch (IOException | ClassNotFoundException e) {
             throw new HmilyException("java deSerialize error " + e.getMessage());
         }
-    }
-
-    /**
-     * 设置scheme.
-     *
-     * @return scheme 命名
-     */
-    @Override
-    public String getScheme() {
-        return SerializeEnum.JDK.getSerialize();
     }
 }

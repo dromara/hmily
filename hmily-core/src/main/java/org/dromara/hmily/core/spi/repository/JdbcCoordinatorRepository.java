@@ -18,6 +18,7 @@
 package org.dromara.hmily.core.spi.repository;
 
 import com.google.common.collect.Maps;
+import org.dromara.hmily.annotation.HmilySPI;
 import org.dromara.hmily.common.bean.entity.HmilyParticipant;
 import org.dromara.hmily.common.bean.entity.HmilyTransaction;
 import org.dromara.hmily.common.config.HmilyConfig;
@@ -54,6 +55,7 @@ import java.util.stream.Collectors;
  * @author xiaoyu
  */
 @SuppressWarnings("all")
+@HmilySPI("db")
 public class JdbcCoordinatorRepository implements HmilyCoordinatorRepository {
 
     /**

@@ -17,39 +17,36 @@
 
 package org.dromara.hmily.common.serializer;
 
+import org.dromara.hmily.annotation.HmilySPI;
 import org.dromara.hmily.common.exception.HmilyException;
 
 /**
  * ObjectSerializer.
+ *
  * @author xiaoyu
  */
+@HmilySPI
 public interface ObjectSerializer {
 
     /**
-     * 序列化对象.
+     * Serialize byte [ ].
      *
-     * @param obj 需要序更列化的对象
-     * @return byte []
-     * @throws HmilyException 异常信息
+     * @param obj the obj
+     * @return the byte [ ]
+     * @throws HmilyException the hmily exception
      */
     byte[] serialize(Object obj) throws HmilyException;
 
 
     /**
-     * 反序列化对象.
+     * De serialize t.
      *
-     * @param param 需要反序列化的byte []
-     * @param clazz java对象
-     * @param <T>   泛型支持
-     * @return 对象
-     * @throws HmilyException 异常信息
+     * @param <T>   the type parameter
+     * @param param the param
+     * @param clazz the clazz
+     * @return the t
+     * @throws HmilyException the hmily exception
      */
     <T> T deSerialize(byte[] param, Class<T> clazz) throws HmilyException;
 
-    /**
-     * 设置scheme.
-     *
-     * @return scheme 命名
-     */
-    String getScheme();
 }

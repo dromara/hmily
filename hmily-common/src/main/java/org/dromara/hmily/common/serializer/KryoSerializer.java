@@ -20,7 +20,7 @@ package org.dromara.hmily.common.serializer;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
-import org.dromara.hmily.common.enums.SerializeEnum;
+import org.dromara.hmily.annotation.HmilySPI;
 import org.dromara.hmily.common.exception.HmilyException;
 
 import java.io.ByteArrayInputStream;
@@ -29,17 +29,12 @@ import java.io.IOException;
 
 /**
  * KryoSerializer.
+ *
  * @author xiaoyu
  */
+@HmilySPI("kryo")
 public class KryoSerializer implements ObjectSerializer {
 
-    /**
-     * 序列化.
-     *
-     * @param obj 需要序更列化的对象
-     * @return 序列化后的byte 数组
-     * @throws HmilyException 异常
-     */
     @Override
     public byte[] serialize(final Object obj) throws HmilyException {
         byte[] bytes;
@@ -55,13 +50,6 @@ public class KryoSerializer implements ObjectSerializer {
         return bytes;
     }
 
-    /**
-     * 反序列化.
-     *
-     * @param param 需要反序列化的byte []
-     * @return 序列化对象
-     * @throws HmilyException 异常
-     */
     @Override
     public <T> T deSerialize(final byte[] param, final Class<T> clazz) throws HmilyException {
         T object;
@@ -76,13 +64,4 @@ public class KryoSerializer implements ObjectSerializer {
         return object;
     }
 
-    /**
-     * 设置scheme.
-     *
-     * @return scheme 命名
-     */
-    @Override
-    public String getScheme() {
-        return SerializeEnum.KRYO.getSerialize();
-    }
 }

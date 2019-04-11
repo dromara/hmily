@@ -15,48 +15,28 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.common.exception;
+package org.dromara.hmily.annotation;
+
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * HmilyException.
+ * The interface Hmily spi.
  *
  * @author xiaoyu
  */
-public class HmilyException extends RuntimeException {
-
-    private static final long serialVersionUID = -948934144333391208L;
-
-    /**
-     * Instantiates a new Tcc exception.
-     */
-    public HmilyException() {
-    }
+@Documented
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.TYPE})
+public @interface HmilySPI {
 
     /**
-     * Instantiates a new Tcc exception.
+     * Value string.
      *
-     * @param message the message
+     * @return the string
      */
-    public HmilyException(final String message) {
-        super(message);
-    }
-
-    /**
-     * Instantiates a new Tcc exception.
-     *
-     * @param message the message
-     * @param cause   the cause
-     */
-    public HmilyException(final String message, final Throwable cause) {
-        super(message, cause);
-    }
-
-    /**
-     * Instantiates a new Tcc exception.
-     *
-     * @param cause the cause
-     */
-    public HmilyException(final Throwable cause) {
-        super(cause);
-    }
+    String value() default "";
 }

@@ -21,7 +21,7 @@ package org.dromara.hmily.core.spi;
 
 import org.dromara.hmily.common.enums.SerializeEnum;
 import org.dromara.hmily.common.serializer.ObjectSerializer;
-import org.dromara.hmily.common.utils.ServiceBootstrap;
+import org.dromara.hmily.common.utils.extension.ServiceBootstrap;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -18,23 +18,18 @@
 package org.dromara.hmily.core.service.recovery;
 
 import com.google.common.collect.Lists;
-import org.dromara.hmily.common.utils.CollectionUtils;
-import org.apache.commons.lang3.reflect.MethodUtils;
-import org.dromara.hmily.common.bean.context.HmilyTransactionContext;
-import org.dromara.hmily.common.bean.entity.HmilyInvocation;
 import org.dromara.hmily.common.bean.entity.HmilyParticipant;
 import org.dromara.hmily.common.bean.entity.HmilyTransaction;
 import org.dromara.hmily.common.enums.HmilyActionEnum;
-import org.dromara.hmily.common.enums.HmilyRoleEnum;
+import org.dromara.hmily.common.utils.CollectionUtils;
 import org.dromara.hmily.common.utils.LogUtil;
 import org.dromara.hmily.core.concurrent.threadlocal.HmilyTransactionContextLocal;
-import org.dromara.hmily.core.helper.SpringBeanUtils;
+import org.dromara.hmily.core.reflect.HmilyReflector;
 import org.dromara.hmily.core.spi.HmilyCoordinatorRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
-import java.util.Objects;
 
 /**
  * The type Hmily transaction recovery service.
@@ -71,12 +66,9 @@ public class HmilyTransactionRecoveryService {
         if (CollectionUtils.isNotEmpty(hmilyParticipants)) {
             for (HmilyParticipant hmilyParticipant : hmilyParticipants) {
                 try {
-                    HmilyTransactionContext context = new HmilyTransactionContext();
-                    context.setAction(HmilyActionEnum.CANCELING.getCode());
-                    context.setTransId(hmilyTransaction.getTransId());
-                    context.setRole(HmilyRoleEnum.START.getCode());
-                    HmilyTransactionContextLocal.getInstance().set(context);
-                    executeCoordinator(hmilyParticipant.getCancelHmilyInvocation());
+                    HmilyReflector.executor(hmilyParticipant.getTransId(),
+                            HmilyActionEnum.CANCELING,
+                            hmilyParticipant.getCancelHmilyInvocation());
                 } catch (Exception e) {
                     LogUtil.error(LOGGER, "execute cancel exception:{}", () -> e);
                     success = false;
@@ -102,12 +94,9 @@ public class HmilyTransactionRecoveryService {
         if (CollectionUtils.isNotEmpty(hmilyParticipants)) {
             for (HmilyParticipant hmilyParticipant : hmilyParticipants) {
                 try {
-                    HmilyTransactionContext context = new HmilyTransactionContext();
-                    context.setAction(HmilyActionEnum.CONFIRMING.getCode());
-                    context.setRole(HmilyRoleEnum.START.getCode());
-                    context.setTransId(hmilyTransaction.getTransId());
-                    HmilyTransactionContextLocal.getInstance().set(context);
-                    executeCoordinator(hmilyParticipant.getConfirmHmilyInvocation());
+                    HmilyReflector.executor(hmilyParticipant.getTransId(),
+                            HmilyActionEnum.CONFIRMING,
+                            hmilyParticipant.getConfirmHmilyInvocation());
                 } catch (Exception e) {
                     LogUtil.error(LOGGER, "execute confirm exception:{}", () -> e);
                     success = false;
@@ -131,18 +120,5 @@ public class HmilyTransactionRecoveryService {
 
     private void deleteTransaction(final String transId) {
         hmilyCoordinatorRepository.remove(transId);
-    }
-
-    @SuppressWarnings("unchecked")
-    private void executeCoordinator(final HmilyInvocation hmilyInvocation) throws Exception {
-        if (Objects.nonNull(hmilyInvocation)) {
-            final Class clazz = hmilyInvocation.getTargetClass();
-            final String method = hmilyInvocation.getMethodName();
-            final Object[] args = hmilyInvocation.getArgs();
-            final Class[] parameterTypes = hmilyInvocation.getParameterTypes();
-            final Object bean = SpringBeanUtils.getInstance().getBean(clazz);
-            MethodUtils.invokeMethod(bean, method, args, parameterTypes);
-            LogUtil.debug(LOGGER, "recovery execute transaction compensation:{}", () -> hmilyInvocation.getTargetClass() + ":" + hmilyInvocation.getMethodName());
-        }
     }
 }
