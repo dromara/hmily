@@ -41,7 +41,6 @@
     <properties>
         <curator.version>4.0.1</curator.version>
         <dubbo.version>2.6.5</dubbo.version>
-
     </properties>
 
     <dependencyManagement>

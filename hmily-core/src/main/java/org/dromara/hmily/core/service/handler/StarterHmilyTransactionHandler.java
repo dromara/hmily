@@ -26,6 +26,7 @@ import org.dromara.hmily.core.concurrent.threadlocal.HmilyTransactionContextLoca
 import org.dromara.hmily.core.disruptor.DisruptorProviderManage;
 import org.dromara.hmily.core.disruptor.handler.HmilyConsumerTransactionDataHandler;
 import org.dromara.hmily.core.service.HmilyTransactionHandler;
+import org.dromara.hmily.core.service.HmilyTransactionHandlerAlbum;
 import org.dromara.hmily.core.service.executor.HmilyTransactionExecutor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
@@ -44,7 +45,7 @@ public class StarterHmilyTransactionHandler implements HmilyTransactionHandler, 
 
     private final HmilyConfig hmilyConfig;
 
-    private DisruptorProviderManage<TransactionHandlerAlbum> disruptorProviderManage;
+    private DisruptorProviderManage<HmilyTransactionHandlerAlbum> disruptorProviderManage;
 
     /**
      * Instantiates a new Starter hmily transaction handler.

@@ -1,8 +1,8 @@
 package org.dromara.hmily.core.disruptor.handler;
 
-import org.dromara.hmily.core.disruptor.DisruptorConsumerExecutor;
+import org.dromara.hmily.core.disruptor.AbstractDisruptorConsumerExecutor;
 import org.dromara.hmily.core.disruptor.DisruptorConsumerFactory;
-import org.dromara.hmily.core.service.handler.TransactionHandlerAlbum;
+import org.dromara.hmily.core.service.HmilyTransactionHandlerAlbum;
 
 /**
  * HmilyTransactionHandler.
@@ -10,7 +10,7 @@ import org.dromara.hmily.core.service.handler.TransactionHandlerAlbum;
  *
  * @author chenbin sixh
  */
-public class HmilyConsumerTransactionDataHandler extends DisruptorConsumerExecutor<TransactionHandlerAlbum> implements DisruptorConsumerFactory {
+public class HmilyConsumerTransactionDataHandler extends AbstractDisruptorConsumerExecutor<HmilyTransactionHandlerAlbum> implements DisruptorConsumerFactory {
 
 
     @Override
@@ -19,12 +19,12 @@ public class HmilyConsumerTransactionDataHandler extends DisruptorConsumerExecut
     }
 
     @Override
-    public DisruptorConsumerExecutor create() {
+    public AbstractDisruptorConsumerExecutor create() {
         return this;
     }
 
     @Override
-    public void executor(final TransactionHandlerAlbum data) {
+    public void executor(final HmilyTransactionHandlerAlbum data) {
         data.run();
     }
 }
