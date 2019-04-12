@@ -19,21 +19,15 @@
 
 package org.dromara.hmily.core.disruptor.publisher;
 
-import com.lmax.disruptor.BlockingWaitStrategy;
-import com.lmax.disruptor.IgnoreExceptionHandler;
-import com.lmax.disruptor.RingBuffer;
-import com.lmax.disruptor.dsl.Disruptor;
-import com.lmax.disruptor.dsl.ProducerType;
 import org.dromara.hmily.common.bean.entity.HmilyTransaction;
 import org.dromara.hmily.common.config.HmilyConfig;
 import org.dromara.hmily.common.enums.EventTypeEnum;
 import org.dromara.hmily.core.concurrent.ConsistentHashSelector;
 import org.dromara.hmily.core.concurrent.SingletonExecutor;
 import org.dromara.hmily.core.coordinator.HmilyCoordinatorService;
+import org.dromara.hmily.core.disruptor.DisruptorProviderManage;
 import org.dromara.hmily.core.disruptor.event.HmilyTransactionEvent;
-import org.dromara.hmily.core.disruptor.factory.HmilyTransactionEventFactory;
 import org.dromara.hmily.core.disruptor.handler.HmilyConsumerDataHandler;
-import org.dromara.hmily.core.disruptor.translator.HmilyTransactionEventTranslator;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
@@ -54,7 +48,7 @@ public class HmilyTransactionEventPublisher implements DisposableBean, Applicati
 
     private static final AtomicLong INDEX = new AtomicLong(1);
 
-    private Disruptor<HmilyTransactionEvent> disruptor;
+    private DisruptorProviderManage<HmilyTransactionEvent> disruptorProviderManage;
 
     private final HmilyCoordinatorService coordinatorService;
 
@@ -74,20 +68,13 @@ public class HmilyTransactionEventPublisher implements DisposableBean, Applicati
      * @param threadSize this is disruptor consumer thread size.
      */
     private void start(final int bufferSize, final int threadSize) {
-        disruptor = new Disruptor<>(new HmilyTransactionEventFactory(), bufferSize, runnable -> {
-            return new Thread(new ThreadGroup("hmily-disruptor"), runnable,
-                    "disruptor-thread-" + INDEX.getAndIncrement());
-        }, ProducerType.MULTI, new BlockingWaitStrategy());
-        HmilyConsumerDataHandler[] consumers = new HmilyConsumerDataHandler[1];
         List<SingletonExecutor> selects = new ArrayList<>();
         for (int i = 0; i < threadSize; i++) {
             selects.add(new SingletonExecutor("hmily-log-disruptor" + i));
         }
         ConsistentHashSelector selector = new ConsistentHashSelector(selects);
-        consumers[0] = new HmilyConsumerDataHandler(selector, coordinatorService);
-        disruptor.handleEventsWithWorkerPool(consumers);
-        disruptor.setDefaultExceptionHandler(new IgnoreExceptionHandler());
-        disruptor.start();
+        disruptorProviderManage = new DisruptorProviderManage<>(new HmilyConsumerDataHandler(selector, coordinatorService), 1, bufferSize);
+        disruptorProviderManage.startup();
     }
 
     /**
@@ -97,13 +84,15 @@ public class HmilyTransactionEventPublisher implements DisposableBean, Applicati
      * @param type             {@linkplain EventTypeEnum}
      */
     public void publishEvent(final HmilyTransaction hmilyTransaction, final int type) {
-        final RingBuffer<HmilyTransactionEvent> ringBuffer = disruptor.getRingBuffer();
-        ringBuffer.publishEvent(new HmilyTransactionEventTranslator(type), hmilyTransaction);
+        HmilyTransactionEvent event = new HmilyTransactionEvent();
+        event.setType(type);
+        event.setHmilyTransaction(hmilyTransaction);
+        disruptorProviderManage.getProvider().onData(event);
     }
 
     @Override
     public void destroy() {
-        disruptor.shutdown();
+
     }
 
     @Override
