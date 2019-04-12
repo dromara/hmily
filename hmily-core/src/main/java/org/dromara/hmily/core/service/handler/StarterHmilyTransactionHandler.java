@@ -23,18 +23,14 @@ import org.dromara.hmily.common.bean.entity.HmilyTransaction;
 import org.dromara.hmily.common.config.HmilyConfig;
 import org.dromara.hmily.common.enums.HmilyActionEnum;
 import org.dromara.hmily.core.concurrent.threadlocal.HmilyTransactionContextLocal;
-import org.dromara.hmily.core.concurrent.threadpool.HmilyThreadFactory;
+import org.dromara.hmily.core.disruptor.DisruptorProviderManage;
+import org.dromara.hmily.core.disruptor.handler.HmilyConsumerTransactionDataHandler;
 import org.dromara.hmily.core.service.HmilyTransactionHandler;
 import org.dromara.hmily.core.service.executor.HmilyTransactionExecutor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
-
-import java.util.concurrent.Executor;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 /**
  * this is hmily transaction starter.
@@ -46,9 +42,9 @@ public class StarterHmilyTransactionHandler implements HmilyTransactionHandler, 
 
     private final HmilyTransactionExecutor hmilyTransactionExecutor;
 
-    private Executor executor;
-
     private final HmilyConfig hmilyConfig;
+
+    private DisruptorProviderManage<TransactionHandlerAlbum> disruptorProviderManage;
 
     /**
      * Instantiates a new Starter hmily transaction handler.
@@ -57,7 +53,7 @@ public class StarterHmilyTransactionHandler implements HmilyTransactionHandler, 
      * @param hmilyConfig              the hmily config
      */
     @Autowired
-    public StarterHmilyTransactionHandler(final HmilyTransactionExecutor hmilyTransactionExecutor, HmilyConfig hmilyConfig) {
+    public StarterHmilyTransactionHandler(final HmilyTransactionExecutor hmilyTransactionExecutor, final HmilyConfig hmilyConfig) {
         this.hmilyTransactionExecutor = hmilyTransactionExecutor;
         this.hmilyConfig = hmilyConfig;
     }
@@ -76,13 +72,12 @@ public class StarterHmilyTransactionHandler implements HmilyTransactionHandler, 
             } catch (Throwable throwable) {
                 //if exception ,execute cancel
                 final HmilyTransaction currentTransaction = hmilyTransactionExecutor.getCurrentTransaction();
-                executor.execute(() -> hmilyTransactionExecutor
-                        .cancel(currentTransaction));
+                disruptorProviderManage.getProvider().onData(() -> hmilyTransactionExecutor.cancel(currentTransaction));
                 throw throwable;
             }
             //execute confirm
             final HmilyTransaction currentTransaction = hmilyTransactionExecutor.getCurrentTransaction();
-            executor.execute(() -> hmilyTransactionExecutor.confirm(currentTransaction));
+            disruptorProviderManage.getProvider().onData(() -> hmilyTransactionExecutor.confirm(currentTransaction));
         } finally {
             HmilyTransactionContextLocal.getInstance().remove();
             hmilyTransactionExecutor.remove();
@@ -91,13 +86,12 @@ public class StarterHmilyTransactionHandler implements HmilyTransactionHandler, 
     }
 
     @Override
-    public void onApplicationEvent(ContextRefreshedEvent event) {
+    public void onApplicationEvent(final ContextRefreshedEvent event) {
         if (hmilyConfig.getStarted()) {
-            executor = new ThreadPoolExecutor(hmilyConfig.getAsyncThreads(),
-                    hmilyConfig.getAsyncThreads(), 0, TimeUnit.MILLISECONDS,
-                    new LinkedBlockingQueue<>(),
-                    HmilyThreadFactory.create("hmily-execute", false),
-                    new ThreadPoolExecutor.AbortPolicy());
+            disruptorProviderManage = new DisruptorProviderManage<>(new HmilyConsumerTransactionDataHandler(),
+                    hmilyConfig.getAsyncThreads(),
+                    DisruptorProviderManage.DEFAULT_SIZE);
+            disruptorProviderManage.startup();
         }
 
     }
