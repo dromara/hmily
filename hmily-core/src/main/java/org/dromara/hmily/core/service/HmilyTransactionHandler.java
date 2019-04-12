@@ -21,7 +21,7 @@ import org.dromara.hmily.common.bean.context.HmilyTransactionContext;
 import org.aspectj.lang.ProceedingJoinPoint;
 
 /**
- * TccTransactionHandler.
+ * HmilyTransactionHandler.
  * @author xiaoyu
  */
 @FunctionalInterface
