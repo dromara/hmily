@@ -4,7 +4,7 @@ import org.dromara.hmily.common.bean.entity.HmilyTransaction;
 import org.dromara.hmily.common.enums.EventTypeEnum;
 import org.dromara.hmily.core.concurrent.ConsistentHashSelector;
 import org.dromara.hmily.core.coordinator.HmilyCoordinatorService;
-import org.dromara.hmily.core.disruptor.DisruptorConsumerExecutor;
+import org.dromara.hmily.core.disruptor.AbstractDisruptorConsumerExecutor;
 import org.dromara.hmily.core.disruptor.DisruptorConsumerFactory;
 import org.dromara.hmily.core.disruptor.event.HmilyTransactionEvent;
 
@@ -13,13 +13,13 @@ import org.dromara.hmily.core.disruptor.event.HmilyTransactionEvent;
  *
  * @author xiaoyu(Myth)
  */
-public class HmilyConsumerDataHandler extends DisruptorConsumerExecutor<HmilyTransactionEvent> implements DisruptorConsumerFactory {
+public class HmilyConsumerLogDataHandler extends AbstractDisruptorConsumerExecutor<HmilyTransactionEvent> implements DisruptorConsumerFactory {
 
     private ConsistentHashSelector executor;
 
     private final HmilyCoordinatorService coordinatorService;
 
-    public HmilyConsumerDataHandler(final ConsistentHashSelector executor, final HmilyCoordinatorService coordinatorService) {
+    public HmilyConsumerLogDataHandler(final ConsistentHashSelector executor, final HmilyCoordinatorService coordinatorService) {
         this.executor = executor;
         this.coordinatorService = coordinatorService;
     }
@@ -30,7 +30,7 @@ public class HmilyConsumerDataHandler extends DisruptorConsumerExecutor<HmilyTra
     }
 
     @Override
-    public DisruptorConsumerExecutor create() {
+    public AbstractDisruptorConsumerExecutor create() {
         return this;
     }
 
