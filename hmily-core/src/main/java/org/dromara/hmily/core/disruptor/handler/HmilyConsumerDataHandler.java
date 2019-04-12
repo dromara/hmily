@@ -1,10 +1,11 @@
 package org.dromara.hmily.core.disruptor.handler;
 
-import com.lmax.disruptor.WorkHandler;
 import org.dromara.hmily.common.bean.entity.HmilyTransaction;
 import org.dromara.hmily.common.enums.EventTypeEnum;
 import org.dromara.hmily.core.concurrent.ConsistentHashSelector;
 import org.dromara.hmily.core.coordinator.HmilyCoordinatorService;
+import org.dromara.hmily.core.disruptor.DisruptorConsumerExecutor;
+import org.dromara.hmily.core.disruptor.DisruptorConsumerFactory;
 import org.dromara.hmily.core.disruptor.event.HmilyTransactionEvent;
 
 /**
@@ -12,7 +13,7 @@ import org.dromara.hmily.core.disruptor.event.HmilyTransactionEvent;
  *
  * @author xiaoyu(Myth)
  */
-public class HmilyConsumerDataHandler implements WorkHandler<HmilyTransactionEvent> {
+public class HmilyConsumerDataHandler extends DisruptorConsumerExecutor<HmilyTransactionEvent> implements DisruptorConsumerFactory {
 
     private ConsistentHashSelector executor;
 
@@ -24,7 +25,17 @@ public class HmilyConsumerDataHandler implements WorkHandler<HmilyTransactionEve
     }
 
     @Override
-    public void onEvent(final HmilyTransactionEvent event) {
+    public String fixName() {
+        return "HmilyConsumerDataHandler";
+    }
+
+    @Override
+    public DisruptorConsumerExecutor create() {
+        return this;
+    }
+
+    @Override
+    public void executor(final HmilyTransactionEvent event) {
         String transId = event.getHmilyTransaction().getTransId();
         executor.select(transId).execute(() -> {
             if (event.getType() == EventTypeEnum.SAVE.getCode()) {
