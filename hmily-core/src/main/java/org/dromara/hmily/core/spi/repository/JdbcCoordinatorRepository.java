@@ -18,6 +18,7 @@
 package org.dromara.hmily.core.spi.repository;
 
 import com.google.common.collect.Maps;
+import com.zaxxer.hikari.HikariDataSource;
 import org.dromara.hmily.annotation.HmilySPI;
 import org.dromara.hmily.common.bean.entity.HmilyParticipant;
 import org.dromara.hmily.common.bean.entity.HmilyTransaction;
@@ -28,11 +29,10 @@ import org.dromara.hmily.common.enums.RepositorySupportEnum;
 import org.dromara.hmily.common.exception.HmilyException;
 import org.dromara.hmily.common.exception.HmilyRuntimeException;
 import org.dromara.hmily.common.serializer.ObjectSerializer;
+import org.dromara.hmily.common.utils.CollectionUtils;
 import org.dromara.hmily.common.utils.DbTypeUtils;
 import org.dromara.hmily.common.utils.LogUtil;
 import org.dromara.hmily.common.utils.RepositoryPathUtils;
-import com.zaxxer.hikari.HikariDataSource;
-import org.dromara.hmily.common.utils.CollectionUtils;
 import org.dromara.hmily.common.utils.StringUtils;
 import org.dromara.hmily.core.helper.SqlHelper;
 import org.dromara.hmily.core.spi.HmilyCoordinatorRepository;
@@ -40,12 +40,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.sql.DataSource;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
@@ -54,7 +62,6 @@ import java.util.stream.Collectors;
  *
  * @author xiaoyu
  */
-@SuppressWarnings("all")
 @HmilySPI("db")
 public class JdbcCoordinatorRepository implements HmilyCoordinatorRepository {
 
@@ -164,7 +171,6 @@ public class JdbcCoordinatorRepository implements HmilyCoordinatorRepository {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public List<HmilyTransaction> listAllByDelay(final Date date) {
         String sb = "select * from " + tableName + " where last_time <?";
         List<Map<String, Object>> list = executeQuery(sb, date);
@@ -176,6 +182,7 @@ public class JdbcCoordinatorRepository implements HmilyCoordinatorRepository {
         return Collections.emptyList();
     }
 
+    @SuppressWarnings("unchecked")
     private HmilyTransaction buildByResultMap(final Map<String, Object> map) {
         HmilyTransaction hmilyTransaction = new HmilyTransaction();
         hmilyTransaction.setTransId((String) map.get("trans_id"));
@@ -295,19 +302,28 @@ public class JdbcCoordinatorRepository implements HmilyCoordinatorRepository {
         return list;
     }
 
-    private void close(final Connection connection, final PreparedStatement ps, final ResultSet rs) {
+    private void close(final Connection con, final PreparedStatement ps, final ResultSet rs) {
         try {
             if (rs != null) {
                 rs.close();
             }
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage());
+        }
+        try {
             if (ps != null) {
                 ps.close();
             }
-            if (connection != null) {
-                connection.close();
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage());
         }
+        try {
+            if (con != null) {
+                con.close();
+            }
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage());
+        }
+
     }
 }
