@@ -15,18 +15,18 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.core.disruptor;
-
-import com.lmax.disruptor.EventFactory;
+package org.dromara.hmily.core.service;
 
 /**
- * DisruptorEventFactory.
- * disruptor Create a factory implementation of the object.
+ * TransactionHandlerAlbum.
+ *
  * @author chenbin sixh
  */
-public class DisruptorEventFactory<T> implements EventFactory<DataEvent<T>> {
-    @Override
-    public DataEvent<T> newInstance() {
-        return new DataEvent<>();
-    }
+@FunctionalInterface
+public interface HmilyTransactionHandlerAlbum {
+
+    /**
+     * Run.
+     */
+    void run();
 }
