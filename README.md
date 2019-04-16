@@ -7,7 +7,7 @@ Hmily
 [![Build Status](https://travis-ci.org/yu199195/hmily.svg?branch=master)](https://travis-ci.org/yu199195/hmily)
 [![QQ群](https://img.shields.io/badge/chat-on%20QQ-ff69b4.svg?style=flat-square)](https://shang.qq.com/wpa/qunwpa?idkey=2e9e353fa10924812bc58c10ab46de0ca6bef80e34168bccde275f7ca0cafd85)
 
-### Open source framework for high-performance distributed transaction solution (Try Confirm cancel).
+#### High-Performance distributed transaction solution (Try Confirm cancel).
 
 
 # Modules
