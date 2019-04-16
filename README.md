@@ -50,6 +50,13 @@ Hmily
    
    *  Spi extension : Users can customize the storage of serialization and transaction logs
 
+# Prerequisite 
+
+  * You must use jdk1.8 +
+  
+  * You must be a user of the spring framework
+  
+  * You must use one of the dubbo, motan, and springcloud RPC frameworks
   
 # About 
 
@@ -59,12 +66,10 @@ Hmily
   
    If you want to use it or get a quick look at it. [Quick Start](http://dromara.org/website/zh-cn/docs/hmily/index.html)
   
- 
-# Stargazers over time
+# Stargazers
 
 [![Stargazers over time](https://starchart.cc/yu199195/hmily.svg)](https://starchart.cc/yu199195/hmily) 
  
-
 # Support
 
   ![](https://yu199195.github.io/images/qq.png)    ![](https://yu199195.github.io/images/public.jpg)
