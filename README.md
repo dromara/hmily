@@ -6,63 +6,66 @@ Hmily
 [![Maven Central](https://img.shields.io/maven-central/v/org.dromara/hmily.svg?label=maven%20central)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.dromara%22%20AND%20hmily)
 [![Build Status](https://travis-ci.org/yu199195/hmily.svg?branch=master)](https://travis-ci.org/yu199195/hmily)
 [![QQ群](https://img.shields.io/badge/chat-on%20QQ-ff69b4.svg?style=flat-square)](https://shang.qq.com/wpa/qunwpa?idkey=2e9e353fa10924812bc58c10ab46de0ca6bef80e34168bccde275f7ca0cafd85)
-### 高性能分布式事务tcc方案开源框架。基于java语言来开发（JDK1.8）,支持dubbo，springcloud,motan等rpc框架进行分布式事务。
+### Open source framework for high-performance distributed transaction TCC solution.Based on Java language development (JDK1.8), support dubbo, springcloud,motan and other RPC framework for distributed transactions.
+
+
+# Modules
+
+  * hmily-admin: Transaction log management background
+  
+  * hmily-annotation : Framework common annotations
+  
+  * hmily-apache-dubbo : Support for the dubbo rpc framework 2.7.X
+
+  * hmily-common :  Framework common class
+  
+  * hmily-core : Framework core package (annotation processing, log storage...)              
+  
+  * hmily-dashboard : Management background front-end
+  
+  * hmily-dubbo : Support for the dubbo framework Less than 2.7 version
+  
+  * hmily-motan : Support for the motan rpc framework
+  
+  * hmily-springcloud : Support for the spring cloud rpc framework
+  
+  * hmily-spring-boot-starter : Support for the spring boot starter
+  
+  * hmily-demo : Examples using the hmily framework
  
-# 框架特性
+#  Features
+   
+   *  All spring versions are supported and Seamless integration
+   
+   *  Provides support for the springcloud dubbo motan RPC framework
+   
+   *  Provides integration of the spring boot starter approach
+   
+   *  Support Nested transaction 
+   
+   *  Local transaction storage support :  redis mongodb zookeeper file mysql
+   
+   *  Transaction log serialization support : java hessian kryo protostuff
+   
+   *  Spi extension : Users can customize the storage of serialization and transaction logs
 
-   * ##### 支持嵌套事务(Nested transaction support).
+  
+* Users
 
-   * ##### 采用disruptor框架进行事务日志的异步读写，与RPC框架的性能毫无差别。
-
-   * ##### 支持SpringBoot-starter 项目启动，使用简单。
-
-   * ##### RPC框架支持 : dubbo,motan,springcloud。
-
-   * ##### 本地事务存储支持 : redis,mongodb,zookeeper,file,mysql。
-
-   * ##### 事务日志序列化支持 ：java，hessian，kryo，protostuff。
-
-   * ##### 采用Aspect AOP 切面思想与Spring无缝集成，天然支持集群。
-
-   * ##### 内置经典的分布式事务场景demo工程，并有swagger-ui可视化界面可以快速体验。
-
-
-# 官网
-
- ## https://dromara.org
- 
-
-# 文档 
- 
- ##  http://dromara.org/website/zh-cn/docs/hmily/index.html
+  #####  Hmily is a TCC solution for distributed transactions, Its rapid integration, zero penetration high performance has been run by a number of companies including my own company in the production environment
+    
+  #####  Its performance is nearly lossless compared to your RPC framework, its confrim cancel, and its log store is conducted asynchronously using a disruptor.
+  
+  #####  If you want to use it or get a quick look at it [!Quick Start](http://dromara.org/website/zh-cn/docs/hmily/index.html)
+  
  
 # Stargazers over time
 
 [![Stargazers over time](https://starchart.cc/yu199195/hmily.svg)](https://starchart.cc/yu199195/hmily) 
  
- 
-
-#  为什么高性能？
-  
-  * ## https://mp.weixin.qq.com/s/Eh9CKTU0nwLZ1rl3xmaZGA
-  
-
-#  视频详解
-
-  * ## 环境搭建以及运行 : http://www.iqiyi.com/w_19rwkrfu69.html#vfrm=16-1-1-1
- 
-  * ## 源码详解以及调试 : http://www.iqiyi.com/w_19rwkreutt.html
-
-
-
 
 # Support
 
- * ###  如有任何问题欢迎加入QQ群进行讨论
-   ![](https://yu199195.github.io/images/qq.png)
+ * ![](https://yu199195.github.io/images/qq.png)  ![](https://yu199195.github.io/images/public.jpg)
 
 
- * ###  微信公众号
-   ![](https://yu199195.github.io/images/public.jpg)
-
- # Contribution
