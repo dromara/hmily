@@ -23,6 +23,7 @@ import com.mongodb.ServerAddress;
 import com.zaxxer.hikari.HikariDataSource;
 import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.ZooKeeper;
+import org.dromara.hmily.admin.interceptor.AuthInterceptor;
 import org.dromara.hmily.admin.service.CompensationService;
 import org.dromara.hmily.admin.service.compensate.FileCompensationServiceImpl;
 import org.dromara.hmily.admin.service.compensate.JdbcCompensationServiceImpl;
@@ -44,6 +45,8 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.Environment;
 import org.springframework.data.mongodb.core.MongoClientFactoryBean;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import redis.clients.jedis.HostAndPort;
 import redis.clients.jedis.JedisCluster;
 import redis.clients.jedis.JedisPool;
@@ -67,6 +70,16 @@ import java.util.stream.Collectors;
  */
 @Configuration
 public class HmilyAdminConfiguration {
+
+    @Bean
+    public WebMvcConfigurer corsConfigurer() {
+        return new WebMvcConfigurer() {
+            @Override
+            public void addInterceptors(final InterceptorRegistry registry) {
+                registry.addInterceptor(new AuthInterceptor()).addPathPatterns("/**");
+            }
+        };
+    }
 
     @Configuration
     static class SerializerConfiguration {
