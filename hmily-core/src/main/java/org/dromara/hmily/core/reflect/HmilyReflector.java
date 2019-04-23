@@ -35,7 +35,6 @@ import java.util.Objects;
  */
 public class HmilyReflector {
 
-
     /**
      * Executor object.
      *
@@ -44,7 +43,7 @@ public class HmilyReflector {
      * @param hmilyInvocation the hmily invocation
      * @return the object
      */
-    public static Object executor(final String transId, final HmilyActionEnum actionEnum, final HmilyInvocation hmilyInvocation) {
+    public static Object executor(final String transId, final HmilyActionEnum actionEnum, final HmilyInvocation hmilyInvocation) throws Exception {
         HmilyTransactionContext context = new HmilyTransactionContext();
         context.setAction(actionEnum.getCode());
         context.setTransId(transId);
@@ -53,7 +52,7 @@ public class HmilyReflector {
         return execute(hmilyInvocation);
     }
 
-    private static Object execute(final HmilyInvocation hmilyInvocation) {
+    private static Object execute(final HmilyInvocation hmilyInvocation) throws Exception {
         if (Objects.isNull(hmilyInvocation)) {
             return null;
         }
@@ -61,12 +60,8 @@ public class HmilyReflector {
         final String method = hmilyInvocation.getMethodName();
         final Object[] args = hmilyInvocation.getArgs();
         final Class[] parameterTypes = hmilyInvocation.getParameterTypes();
-        try {
-            final Object bean = SpringBeanUtils.getInstance().getBean(clazz);
-            return MethodUtils.invokeMethod(bean, method, args, parameterTypes);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
+        final Object bean = SpringBeanUtils.getInstance().getBean(clazz);
+        return MethodUtils.invokeMethod(bean, method, args, parameterTypes);
+
     }
 }
