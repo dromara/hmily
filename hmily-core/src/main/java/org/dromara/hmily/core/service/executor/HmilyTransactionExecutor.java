@@ -150,7 +150,7 @@ public class HmilyTransactionExecutor {
                             HmilyActionEnum.CONFIRMING,
                             hmilyParticipant.getConfirmHmilyInvocation());
                     results.add(result);
-                } catch (Throwable e) {
+                } catch (Exception e) {
                     LogUtil.error(LOGGER, "execute confirm :{}", () -> e);
                     success = false;
                     failList.add(hmilyParticipant);
@@ -195,7 +195,7 @@ public class HmilyTransactionExecutor {
                             HmilyActionEnum.CANCELING,
                             hmilyParticipant.getCancelHmilyInvocation());
                     results.add(result);
-                } catch (Throwable e) {
+                } catch (Exception e) {
                     LogUtil.error(LOGGER, "execute cancel ex:{}", () -> e);
                     success = false;
                     failList.add(hmilyParticipant);
