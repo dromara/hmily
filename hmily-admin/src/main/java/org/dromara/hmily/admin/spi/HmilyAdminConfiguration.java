@@ -94,7 +94,7 @@ public class HmilyAdminConfiguration {
         @Bean
         public ObjectSerializer objectSerializer() {
             return ExtensionLoader.getExtensionLoader(ObjectSerializer.class)
-                    .getActivateExtension(env.getProperty("recover.serializer.support"));
+                    .getActivateExtension(env.getProperty("compensation.serializer.support"));
         }
     }
 
