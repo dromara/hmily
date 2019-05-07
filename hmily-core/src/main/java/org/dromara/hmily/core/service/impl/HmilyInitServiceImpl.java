@@ -83,11 +83,13 @@ public class HmilyInitServiceImpl implements HmilyInitService {
         //spi serialize
         final ObjectSerializer serializer = ExtensionLoader.getExtensionLoader(ObjectSerializer.class)
                 .getActivateExtension(hmilyConfig.getSerializer());
+
         //spi repository
         final HmilyCoordinatorRepository repository = ExtensionLoader.getExtensionLoader(HmilyCoordinatorRepository.class)
                 .getActivateExtension(hmilyConfig.getRepositorySupport());
 
         repository.setSerializer(serializer);
+
         SpringBeanUtils.getInstance().registerBean(HmilyCoordinatorRepository.class.getName(), repository);
     }
 }
