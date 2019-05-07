@@ -58,7 +58,8 @@ public class HmilyTransactionAspectServiceImpl implements HmilyTransactionAspect
     @Override
     public Object invoke(final HmilyTransactionContext hmilyTransactionContext, final ProceedingJoinPoint point) throws Throwable {
         final Class clazz = hmilyTransactionFactoryService.factoryOf(hmilyTransactionContext);
-        final HmilyTransactionHandler txTransactionHandler = (HmilyTransactionHandler) SpringBeanUtils.getInstance().getBean(clazz);
+        final HmilyTransactionHandler txTransactionHandler =
+                (HmilyTransactionHandler) SpringBeanUtils.getInstance().getBean(clazz);
         return txTransactionHandler.handler(point, hmilyTransactionContext);
     }
 }
