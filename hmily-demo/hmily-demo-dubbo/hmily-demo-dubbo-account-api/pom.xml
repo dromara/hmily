@@ -30,10 +30,12 @@
     <artifactId>hmily-demo-dubbo-account-api</artifactId>
 
     <dependencies>
+
         <dependency>
             <groupId>org.dromara</groupId>
             <artifactId>hmily-annotation</artifactId>
         </dependency>
+
 
         <dependency>
             <groupId>org.projectlombok</groupId>
