@@ -23,6 +23,8 @@ import org.dromara.hmily.common.enums.HmilyRoleEnum;
 import org.dromara.hmily.common.utils.GsonUtils;
 import org.dromara.hmily.common.utils.StringUtils;
 
+import java.util.Objects;
+
 /**
  * The type RpcMediator.
  *
@@ -49,11 +51,14 @@ public class RpcMediator {
      * @param context     the context
      */
     public void transmit(final RpcTransmit rpcTransmit, final HmilyTransactionContext context) {
-        if (context.getRole() == HmilyRoleEnum.LOCAL.getCode()) {
-            context.setRole(HmilyRoleEnum.INLINE.getCode());
+        if (Objects.nonNull(context)) {
+            if (context.getRole() == HmilyRoleEnum.LOCAL.getCode()) {
+                context.setRole(HmilyRoleEnum.INLINE.getCode());
+            }
+            rpcTransmit.transmit(CommonConstant.HMILY_TRANSACTION_CONTEXT,
+                    GsonUtils.getInstance().toJson(context));
         }
-        rpcTransmit.transmit(CommonConstant.HMILY_TRANSACTION_CONTEXT,
-                GsonUtils.getInstance().toJson(context));
+
     }
 
     /**
