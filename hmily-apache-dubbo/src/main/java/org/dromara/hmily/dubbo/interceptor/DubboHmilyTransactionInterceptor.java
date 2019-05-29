@@ -18,16 +18,16 @@
 package org.dromara.hmily.dubbo.interceptor;
 
 import org.apache.dubbo.rpc.RpcContext;
-import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.dromara.hmily.common.bean.context.HmilyTransactionContext;
-import org.dromara.hmily.common.constant.CommonConstant;
-import org.dromara.hmily.common.utils.GsonUtils;
 import org.dromara.hmily.core.concurrent.threadlocal.HmilyTransactionContextLocal;
 import org.dromara.hmily.core.interceptor.HmilyTransactionInterceptor;
+import org.dromara.hmily.core.mediator.RpcMediator;
 import org.dromara.hmily.core.service.HmilyTransactionAspectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.Objects;
 
 /**
  * The DubboHmilyTransactionInterceptor.
@@ -46,12 +46,9 @@ public class DubboHmilyTransactionInterceptor implements HmilyTransactionInterce
 
     @Override
     public Object interceptor(final ProceedingJoinPoint pjp) throws Throwable {
-        final String context = RpcContext.getContext().getAttachment(CommonConstant.HMILY_TRANSACTION_CONTEXT);
-        HmilyTransactionContext hmilyTransactionContext;
-        if (StringUtils.isNoneBlank(context)) {
-            hmilyTransactionContext = GsonUtils.getInstance().fromJson(context, HmilyTransactionContext.class);
-            RpcContext.getContext().getAttachments().remove(CommonConstant.HMILY_TRANSACTION_CONTEXT);
-        } else {
+        HmilyTransactionContext hmilyTransactionContext =
+                RpcMediator.getInstance().acquire(RpcContext.getContext()::getAttachment);
+        if (Objects.isNull(hmilyTransactionContext)) {
             hmilyTransactionContext = HmilyTransactionContextLocal.getInstance().get();
         }
         return hmilyTransactionAspectService.invoke(hmilyTransactionContext, pjp);
