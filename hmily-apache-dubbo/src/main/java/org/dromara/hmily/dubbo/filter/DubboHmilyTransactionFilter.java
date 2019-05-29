@@ -30,13 +30,11 @@ import org.dromara.hmily.annotation.Hmily;
 import org.dromara.hmily.common.bean.context.HmilyTransactionContext;
 import org.dromara.hmily.common.bean.entity.HmilyInvocation;
 import org.dromara.hmily.common.bean.entity.HmilyParticipant;
-import org.dromara.hmily.common.constant.CommonConstant;
 import org.dromara.hmily.common.enums.HmilyActionEnum;
 import org.dromara.hmily.common.enums.HmilyRoleEnum;
 import org.dromara.hmily.common.exception.HmilyRuntimeException;
-import org.dromara.hmily.common.utils.GsonUtils;
-import org.dromara.hmily.common.utils.LogUtil;
 import org.dromara.hmily.core.concurrent.threadlocal.HmilyTransactionContextLocal;
+import org.dromara.hmily.core.mediator.RpcMediator;
 import org.dromara.hmily.core.service.executor.HmilyTransactionExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,6 +48,7 @@ import java.util.Objects;
  * @author xiaoyu
  */
 @Activate(group = {Constants.SERVER_KEY, Constants.CONSUMER})
+@SuppressWarnings("all")
 public class DubboHmilyTransactionFilter implements Filter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DubboHmilyTransactionFilter.class);
@@ -67,7 +66,6 @@ public class DubboHmilyTransactionFilter implements Filter {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public Result invoke(final Invoker<?> invoker, final Invocation invocation) throws RpcException {
         String methodName = invocation.getMethodName();
         Class clazz = invoker.getInterface();
@@ -79,21 +77,14 @@ public class DubboHmilyTransactionFilter implements Filter {
             converterParamsClass(args, arguments);
             method = clazz.getMethod(methodName, args);
             hmily = method.getAnnotation(Hmily.class);
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
         } catch (Exception ex) {
-            ex.printStackTrace();
-            LogUtil.error(LOGGER, "hmily find method error {} ", ex::getMessage);
+            LOGGER.error("hmily find method error {} ", ex);
         }
         if (Objects.nonNull(hmily)) {
             try {
                 final HmilyTransactionContext hmilyTransactionContext = HmilyTransactionContextLocal.getInstance().get();
                 if (Objects.nonNull(hmilyTransactionContext)) {
-                    if (hmilyTransactionContext.getRole() == HmilyRoleEnum.LOCAL.getCode()) {
-                        hmilyTransactionContext.setRole(HmilyRoleEnum.INLINE.getCode());
-                    }
-                    RpcContext.getContext()
-                            .setAttachment(CommonConstant.HMILY_TRANSACTION_CONTEXT, GsonUtils.getInstance().toJson(hmilyTransactionContext));
+                    RpcMediator.getInstance().transmit(RpcContext.getContext()::setAttachment, hmilyTransactionContext);
                     final Result result = invoker.invoke(invocation);
                     //if result has not exception
                     if (!result.hasException()) {
