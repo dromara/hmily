@@ -36,6 +36,7 @@ import java.util.Random;
  *
  * @author xiaoyu(Myth)
  */
+@SuppressWarnings("all")
 public class DubboHmilyLoadBalance extends AbstractLoadBalance {
 
     private static final Map<String, URL> URL_MAP = Maps.newConcurrentMap();

@@ -33,7 +33,7 @@ import java.util.Optional;
 @Service("hmilyApplicationService")
 public class DubboHmilyApplicationServiceImpl implements HmilyApplicationService {
 
-    private static final String DEFAULT_APPLICATION_NAME = "hmilyDubbo";
+    private static final String DEFAULT_APPLICATION_NAME = "hmilyApacheDubbo";
 
     /**
      * dubbo ApplicationConfig.
