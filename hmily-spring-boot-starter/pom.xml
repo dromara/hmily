@@ -36,6 +36,7 @@
         <module>hmily-spring-boot-starter-springcloud</module>
         <module>hmily-spring-boot-starter-motan</module>
         <module>hmily-spring-boot-starter-parent</module>
+        <module>hmily-spring-boot-starter-apache-dubbo</module>
     </modules>
 
     <dependencies>
