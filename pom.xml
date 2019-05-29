@@ -148,6 +148,12 @@
 
             <dependency>
                 <groupId>org.dromara</groupId>
+                <artifactId>hmily-spring-boot-starter-apache-dubbo</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.dromara</groupId>
                 <artifactId>hmily-spring-boot-starter-springcloud</artifactId>
                 <version>${project.version}</version>
             </dependency>
