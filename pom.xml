@@ -55,7 +55,7 @@
             <id>xiaoyu</id>
             <name>xiaoyu(Myth)</name>
             <email>549477611@qq.com</email>
-            <organization>free</organization>
+            <organization>dromara.org</organization>
             <roles>
                 <role>Developer</role>
             </roles>
@@ -113,6 +113,12 @@
             <dependency>
                 <groupId>org.dromara</groupId>
                 <artifactId>hmily-dubbo</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.dromara</groupId>
+                <artifactId>hmily-apache-dubbo</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
@@ -419,12 +425,7 @@
                 <artifactId>hessian</artifactId>
                 <version>${hessian.version}</version>
             </dependency>
-            <!--  <dependency>
-                  <groupId>com.esotericsoftware</groupId>
-                  <artifactId>kryo</artifactId>
-                  <version>${kryo.version}</version>
-              </dependency>
-  -->
+        
             <dependency>
                 <groupId>com.esotericsoftware</groupId>
                 <artifactId>kryo-shaded</artifactId>
