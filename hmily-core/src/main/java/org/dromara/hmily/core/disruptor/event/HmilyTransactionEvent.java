@@ -19,13 +19,14 @@
 
 package org.dromara.hmily.core.disruptor.event;
 
-import org.dromara.hmily.common.bean.entity.HmilyTransaction;
 import lombok.Data;
+import org.dromara.hmily.common.bean.entity.HmilyTransaction;
 
 import java.io.Serializable;
 
 /**
- * TccTransactionEvent.
+ * The HmilyTransactionEvent.
+ *
  * @author xiaoyu(Myth)
  */
 @Data
