@@ -57,14 +57,18 @@ public class HmilyTransactionSelfRecoveryScheduled implements ApplicationListene
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(HmilyTransactionSelfRecoveryScheduled.class);
 
-    @Autowired
-    private HmilyConfig hmilyConfig;
+    private final HmilyConfig hmilyConfig;
 
     private ScheduledExecutorService scheduledExecutorService;
 
     private HmilyCoordinatorRepository hmilyCoordinatorRepository;
 
     private HmilyTransactionRecoveryService hmilyTransactionRecoveryService;
+
+    @Autowired(required = false)
+    public HmilyTransactionSelfRecoveryScheduled(final HmilyConfig hmilyConfig) {
+        this.hmilyConfig = hmilyConfig;
+    }
 
     @Override
     public void onApplicationEvent(final ContextRefreshedEvent event) {
@@ -82,7 +86,7 @@ public class HmilyTransactionSelfRecoveryScheduled implements ApplicationListene
     private void selfRecovery() {
         scheduledExecutorService
                 .scheduleWithFixedDelay(() -> {
-                    LogUtil.info(LOGGER, "self recovery execute delayTime:{}", () -> hmilyConfig.getScheduledDelay());
+                    LogUtil.info(LOGGER, "self recovery execute delayTime:{}", hmilyConfig::getScheduledDelay);
                     try {
                         final List<HmilyTransaction> hmilyTransactions = hmilyCoordinatorRepository.listAllByDelay(acquireData());
                         if (CollectionUtils.isEmpty(hmilyTransactions)) {
