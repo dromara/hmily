@@ -54,6 +54,7 @@ public class HmilyReflector {
         return execute(hmilyInvocation);
     }
 
+    @SuppressWarnings("unchecked")
     private static Object execute(final HmilyInvocation hmilyInvocation) throws Exception {
         if (Objects.isNull(hmilyInvocation)) {
             return null;
