@@ -17,12 +17,12 @@
 
 package org.dromara.hmily.core.schedule;
 
-import org.dromara.hmily.common.utils.CollectionUtils;
 import org.dromara.hmily.annotation.PatternEnum;
 import org.dromara.hmily.common.bean.entity.HmilyTransaction;
 import org.dromara.hmily.common.config.HmilyConfig;
 import org.dromara.hmily.common.enums.HmilyActionEnum;
 import org.dromara.hmily.common.enums.HmilyRoleEnum;
+import org.dromara.hmily.common.utils.CollectionUtils;
 import org.dromara.hmily.common.utils.LogUtil;
 import org.dromara.hmily.core.concurrent.threadpool.HmilyThreadFactory;
 import org.dromara.hmily.core.helper.SpringBeanUtils;
@@ -110,26 +110,21 @@ public class HmilyTransactionSelfRecoveryScheduled implements ApplicationListene
                                     > System.currentTimeMillis())) {
                                 continue;
                             }
-                            try {
-                                hmilyTransaction.setRetriedCount(hmilyTransaction.getRetriedCount() + 1);
-                                final int rows = hmilyCoordinatorRepository.update(hmilyTransaction);
-                                // determine that rows>0 is executed to prevent concurrency when the business side is in cluster mode
-                                if (rows > 0) {
-                                    if (hmilyTransaction.getStatus() == HmilyActionEnum.TRYING.getCode()
-                                            || hmilyTransaction.getStatus() == HmilyActionEnum.PRE_TRY.getCode()
-                                            || hmilyTransaction.getStatus() == HmilyActionEnum.CANCELING.getCode()) {
-                                        hmilyTransactionRecoveryService.cancel(hmilyTransaction);
-                                    } else if (hmilyTransaction.getStatus() == HmilyActionEnum.CONFIRMING.getCode()) {
-                                        hmilyTransactionRecoveryService.confirm(hmilyTransaction);
-                                    }
+                            hmilyTransaction.setRetriedCount(hmilyTransaction.getRetriedCount() + 1);
+                            final int rows = hmilyCoordinatorRepository.update(hmilyTransaction);
+                            // determine that rows>0 is executed to prevent concurrency when the business side is in cluster mode
+                            if (rows > 0) {
+                                if (hmilyTransaction.getStatus() == HmilyActionEnum.TRYING.getCode()
+                                        || hmilyTransaction.getStatus() == HmilyActionEnum.PRE_TRY.getCode()
+                                        || hmilyTransaction.getStatus() == HmilyActionEnum.CANCELING.getCode()) {
+                                    hmilyTransactionRecoveryService.cancel(hmilyTransaction);
+                                } else if (hmilyTransaction.getStatus() == HmilyActionEnum.CONFIRMING.getCode()) {
+                                    hmilyTransactionRecoveryService.confirm(hmilyTransaction);
                                 }
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                                LogUtil.error(LOGGER, "execute recover exception:{}", e::getMessage);
                             }
                         }
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        LOGGER.error("hmily scheduled transaction log is error:{}", e);
                     }
                 }, hmilyConfig.getScheduledInitDelay(), hmilyConfig.getScheduledDelay(), TimeUnit.SECONDS);
 
