@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.core.disruptor;
+package org.dromara.hmily.core.disruptor.event;
 
 import lombok.Data;
 

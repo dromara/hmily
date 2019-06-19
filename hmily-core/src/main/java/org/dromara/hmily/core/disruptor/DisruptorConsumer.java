@@ -18,6 +18,7 @@
 package org.dromara.hmily.core.disruptor;
 
 import com.lmax.disruptor.WorkHandler;
+import org.dromara.hmily.core.disruptor.event.DataEvent;
 
 /**
  * DisruptorConsumer.

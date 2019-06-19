@@ -18,6 +18,7 @@
 package org.dromara.hmily.core.disruptor;
 
 import com.lmax.disruptor.RingBuffer;
+import org.dromara.hmily.core.disruptor.event.DataEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

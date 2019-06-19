@@ -17,6 +17,8 @@
 
 package org.dromara.hmily.core.disruptor;
 
+import org.dromara.hmily.core.disruptor.event.DataEvent;
+
 /**
  * DisruptorConsumerFactory.
  * Create a subclass implementation object via the {@link #create()} method,

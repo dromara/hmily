@@ -23,6 +23,7 @@ import com.lmax.disruptor.RingBuffer;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.dsl.ProducerType;
 import org.dromara.hmily.core.concurrent.threadpool.HmilyThreadFactory;
+import org.dromara.hmily.core.disruptor.event.DataEvent;
 
 /**
  * DisruptorProviderManage.
