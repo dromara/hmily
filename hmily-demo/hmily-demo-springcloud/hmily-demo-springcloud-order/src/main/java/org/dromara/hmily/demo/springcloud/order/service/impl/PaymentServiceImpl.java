@@ -18,6 +18,7 @@
 package org.dromara.hmily.demo.springcloud.order.service.impl;
 
 import org.dromara.hmily.annotation.Hmily;
+import org.dromara.hmily.common.exception.HmilyRuntimeException;
 import org.dromara.hmily.demo.springcloud.order.client.AccountClient;
 import org.dromara.hmily.demo.springcloud.order.client.InventoryClient;
 import org.dromara.hmily.demo.springcloud.order.dto.AccountDTO;
@@ -67,18 +68,18 @@ public class PaymentServiceImpl implements PaymentService {
     public void makePayment(Order order) {
         order.setStatus(OrderStatusEnum.PAYING.getCode());
         orderMapper.update(order);
-      /*  //检查数据
+        //检查数据
         final BigDecimal accountInfo = accountClient.findByUserId(order.getUserId());
 
         final Integer inventoryInfo = inventoryClient.findByProductId(order.getProductId());
 
         if (accountInfo.compareTo(order.getTotalAmount()) < 0) {
-            throw new TccRuntimeException("余额不足！");
+            throw new HmilyRuntimeException("余额不足！");
         }
 
         if (inventoryInfo < order.getCount()) {
-            throw new TccRuntimeException("库存不足！");
-        }*/
+            throw new HmilyRuntimeException("库存不足！");
+        }
 
         //扣除用户余额
 
