@@ -33,6 +33,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * event publisher.
@@ -41,6 +42,8 @@ import java.util.List;
  */
 @Component
 public class HmilyTransactionEventPublisher implements ApplicationListener<ContextRefreshedEvent> {
+
+    private volatile AtomicBoolean isInit = new AtomicBoolean(false);
 
     private DisruptorProviderManage<HmilyTransactionEvent> disruptorProviderManage;
 
@@ -88,6 +91,9 @@ public class HmilyTransactionEventPublisher implements ApplicationListener<Conte
 
     @Override
     public void onApplicationEvent(final ContextRefreshedEvent event) {
+        if (!isInit.compareAndSet(false, true)) {
+            return;
+        }
         start(hmilyConfig.getBufferSize(), hmilyConfig.getConsumerThreads());
     }
 }
