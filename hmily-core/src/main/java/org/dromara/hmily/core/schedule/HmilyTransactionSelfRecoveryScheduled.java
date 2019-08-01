@@ -43,6 +43,7 @@ import java.util.Objects;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * The type Hmily transaction self recovery scheduled.
@@ -59,6 +60,8 @@ public class HmilyTransactionSelfRecoveryScheduled implements ApplicationListene
 
     private final HmilyConfig hmilyConfig;
 
+    private volatile AtomicBoolean isInit = new AtomicBoolean(false);
+
     private ScheduledExecutorService scheduledExecutorService;
 
     private HmilyCoordinatorRepository hmilyCoordinatorRepository;
@@ -72,6 +75,9 @@ public class HmilyTransactionSelfRecoveryScheduled implements ApplicationListene
 
     @Override
     public void onApplicationEvent(final ContextRefreshedEvent event) {
+        if (!isInit.compareAndSet(false, true)) {
+            return;
+        }
         hmilyCoordinatorRepository = SpringBeanUtils.getInstance().getBean(HmilyCoordinatorRepository.class);
         this.scheduledExecutorService =
                 new ScheduledThreadPoolExecutor(1,
