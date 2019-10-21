@@ -35,7 +35,7 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
  */
 @Configuration
 @EnableAspectJAutoProxy(proxyTargetClass = true)
-@EnableConfigurationProperties
+@EnableConfigurationProperties({HmilyConfigProperties.class})
 @ComponentScan(basePackages = {"org.dromara.hmily"})
 public class HmilyAutoConfiguration {
 
