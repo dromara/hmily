@@ -26,7 +26,6 @@ import org.springframework.stereotype.Component;
  *
  * @author xiaoyu(Myth)
  */
-@Component("hmilyConfig")
 @ConfigurationProperties(prefix = "org.dromara.hmily", ignoreInvalidFields = true)
 public class HmilyConfigProperties extends HmilyConfig {
 }
