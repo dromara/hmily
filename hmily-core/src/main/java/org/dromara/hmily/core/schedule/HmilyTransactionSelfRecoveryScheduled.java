@@ -33,6 +33,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -74,7 +75,7 @@ public class HmilyTransactionSelfRecoveryScheduled implements ApplicationListene
     }
 
     @Override
-    public void onApplicationEvent(final ContextRefreshedEvent event) {
+    public void onApplicationEvent(@NonNull final ContextRefreshedEvent event) {
         if (!isInit.compareAndSet(false, true)) {
             return;
         }
@@ -134,7 +135,7 @@ public class HmilyTransactionSelfRecoveryScheduled implements ApplicationListene
                             }
                         }
                     } catch (Exception e) {
-                        LOGGER.error("hmily scheduled transaction log is error:{}", e);
+                        LOGGER.error("hmily scheduled transaction log is error:", e);
                     }
                 }, hmilyConfig.getScheduledInitDelay(), hmilyConfig.getScheduledDelay(), TimeUnit.SECONDS);
 

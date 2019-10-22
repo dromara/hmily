@@ -86,7 +86,7 @@ public final class SpringBeanUtils {
         if (StringUtils.isEmpty(target)) {
             return target;
         }
-        return target.substring(1, target.length());
+        return target.substring(1);
     }
 
 
