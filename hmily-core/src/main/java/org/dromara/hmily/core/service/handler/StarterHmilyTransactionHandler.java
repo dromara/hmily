@@ -31,6 +31,7 @@ import org.dromara.hmily.core.service.executor.HmilyTransactionExecutor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
 /**
@@ -87,7 +88,7 @@ public class StarterHmilyTransactionHandler implements HmilyTransactionHandler, 
     }
 
     @Override
-    public void onApplicationEvent(final ContextRefreshedEvent event) {
+    public void onApplicationEvent(@NonNull final ContextRefreshedEvent event) {
         if (hmilyConfig.getStarted()) {
             disruptorProviderManage = new DisruptorProviderManage<>(new HmilyConsumerTransactionDataHandler(),
                     hmilyConfig.getAsyncThreads(),

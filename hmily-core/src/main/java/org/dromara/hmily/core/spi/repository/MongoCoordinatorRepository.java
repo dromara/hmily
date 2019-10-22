@@ -18,6 +18,7 @@
 package org.dromara.hmily.core.spi.repository;
 
 import com.google.common.base.Splitter;
+import com.google.common.collect.Lists;
 import com.mongodb.MongoCredential;
 import com.mongodb.ServerAddress;
 import com.mongodb.client.result.UpdateResult;
@@ -231,10 +232,10 @@ public class MongoCoordinatorRepository implements HmilyCoordinatorRepository {
                 hmilyMongoConfig.getMongoUserPwd().toCharArray());
         clientFactoryBean.setCredentials(new MongoCredential[]{credential});
 
-        List<String> urls = Splitter.on(",").trimResults().splitToList(hmilyMongoConfig.getMongoDbUrl());
+        List<String> urls = Lists.newArrayList(Splitter.on(",").trimResults().split(hmilyMongoConfig.getMongoDbUrl()));
         ServerAddress[] sds = new ServerAddress[urls.size()];
         for (int i = 0; i < sds.length; i++) {
-            List<String> adds = Splitter.on(":").trimResults().splitToList(urls.get(i));
+            List<String> adds = Lists.newArrayList(Splitter.on(":").trimResults().split(urls.get(i)));
             InetSocketAddress address = new InetSocketAddress(adds.get(0), Integer.parseInt(adds.get(1)));
             sds[i] = new ServerAddress(address);
         }

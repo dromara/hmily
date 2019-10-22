@@ -213,8 +213,8 @@ public class RedisCoordinatorRepository implements HmilyCoordinatorRepository {
             LogUtil.info(LOGGER, () -> "build redis cluster ............");
             final String clusterUrl = hmilyRedisConfig.getClusterUrl();
             final Set<HostAndPort> hostAndPorts =
-                    Splitter.on(";")
-                            .splitToList(clusterUrl)
+                    Lists.newArrayList(Splitter.on(";")
+                            .split(clusterUrl))
                             .stream()
                             .map(HostAndPort::parseString).collect(Collectors.toSet());
             JedisCluster jedisCluster = new JedisCluster(hostAndPorts, config);
@@ -223,9 +223,7 @@ public class RedisCoordinatorRepository implements HmilyCoordinatorRepository {
             LogUtil.info(LOGGER, () -> "build redis sentinel ............");
             final String sentinelUrl = hmilyRedisConfig.getSentinelUrl();
             final Set<String> hostAndPorts =
-                    new HashSet<>(Splitter.on(";")
-                            .splitToList(sentinelUrl));
-
+                    new HashSet<>(Lists.newArrayList(Splitter.on(";").split(sentinelUrl)));
             JedisSentinelPool pool =
                     new JedisSentinelPool(hmilyRedisConfig.getMasterName(), hostAndPorts,
                             config, hmilyRedisConfig.getTimeOut(), hmilyRedisConfig.getPassword());

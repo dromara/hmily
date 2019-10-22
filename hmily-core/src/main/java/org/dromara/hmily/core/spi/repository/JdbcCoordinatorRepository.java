@@ -157,7 +157,6 @@ public class JdbcCoordinatorRepository implements HmilyCoordinatorRepository {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public List<HmilyTransaction> listAll() {
         String selectSql = "select * from " + tableName;
         List<Map<String, Object>> list = executeQuery(selectSql);
