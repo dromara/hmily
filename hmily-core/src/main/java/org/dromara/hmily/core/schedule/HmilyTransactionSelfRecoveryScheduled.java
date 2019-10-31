@@ -31,8 +31,9 @@ import org.dromara.hmily.core.spi.HmilyCoordinatorRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationListener;
+import org.springframework.context.ApplicationEvent;
 import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.context.event.SmartApplicationListener;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
@@ -52,7 +53,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @author xiaoyu(Myth)
  */
 @Component
-public class HmilyTransactionSelfRecoveryScheduled implements ApplicationListener<ContextRefreshedEvent> {
+public class HmilyTransactionSelfRecoveryScheduled implements SmartApplicationListener {
 
     /**
      * logger.
@@ -75,7 +76,22 @@ public class HmilyTransactionSelfRecoveryScheduled implements ApplicationListene
     }
 
     @Override
-    public void onApplicationEvent(@NonNull final ContextRefreshedEvent event) {
+    public int getOrder() {
+        return LOWEST_PRECEDENCE;
+    }
+
+    @Override
+    public boolean supportsEventType(Class<? extends ApplicationEvent> aClass) {
+        return aClass == ContextRefreshedEvent.class;
+    }
+
+    @Override
+    public boolean supportsSourceType(Class<?> aClass) {
+        return true;
+    }
+
+    @Override
+    public void onApplicationEvent(@NonNull final ApplicationEvent event) {
         if (!isInit.compareAndSet(false, true)) {
             return;
         }
@@ -145,5 +161,6 @@ public class HmilyTransactionSelfRecoveryScheduled implements ApplicationListene
         return new Date(LocalDateTime.now().atZone(ZoneId.systemDefault())
                 .toInstant().toEpochMilli() - (hmilyConfig.getRecoverDelayTime() * 1000));
     }
+
 
 }
