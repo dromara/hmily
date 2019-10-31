@@ -30,10 +30,8 @@ import org.dromara.hmily.core.service.HmilyTransactionHandlerAlbum;
 import org.dromara.hmily.core.service.executor.HmilyTransactionExecutor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEvent;
-import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.SmartApplicationListener;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
 /**
