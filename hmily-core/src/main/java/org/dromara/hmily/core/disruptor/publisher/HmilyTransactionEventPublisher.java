@@ -27,8 +27,10 @@ import org.dromara.hmily.core.disruptor.DisruptorProviderManage;
 import org.dromara.hmily.core.disruptor.event.HmilyTransactionEvent;
 import org.dromara.hmily.core.disruptor.handler.HmilyConsumerLogDataHandler;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.context.event.SmartApplicationListener;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
@@ -42,7 +44,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @author xiaoyu(Myth)
  */
 @Component
-public class HmilyTransactionEventPublisher implements ApplicationListener<ContextRefreshedEvent> {
+public class HmilyTransactionEventPublisher implements SmartApplicationListener {
 
     private volatile AtomicBoolean isInit = new AtomicBoolean(false);
 
@@ -91,10 +93,25 @@ public class HmilyTransactionEventPublisher implements ApplicationListener<Conte
     }
 
     @Override
-    public void onApplicationEvent(@NonNull final ContextRefreshedEvent event) {
+    public boolean supportsEventType(Class<? extends ApplicationEvent> aClass) {
+        return aClass == ContextRefreshedEvent.class;
+    }
+
+    @Override
+    public boolean supportsSourceType(Class<?> aClass) {
+        return true;
+    }
+
+    @Override
+    public void onApplicationEvent(ApplicationEvent applicationEvent) {
         if (!isInit.compareAndSet(false, true)) {
             return;
         }
         start(hmilyConfig.getBufferSize(), hmilyConfig.getConsumerThreads());
+    }
+
+    @Override
+    public int getOrder() {
+        return LOWEST_PRECEDENCE - 1;
     }
 }

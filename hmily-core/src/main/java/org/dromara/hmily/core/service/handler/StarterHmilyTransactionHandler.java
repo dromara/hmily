@@ -29,8 +29,10 @@ import org.dromara.hmily.core.service.HmilyTransactionHandler;
 import org.dromara.hmily.core.service.HmilyTransactionHandlerAlbum;
 import org.dromara.hmily.core.service.executor.HmilyTransactionExecutor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.context.event.SmartApplicationListener;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
@@ -40,7 +42,7 @@ import org.springframework.stereotype.Component;
  * @author xiaoyu
  */
 @Component
-public class StarterHmilyTransactionHandler implements HmilyTransactionHandler, ApplicationListener<ContextRefreshedEvent> {
+public class StarterHmilyTransactionHandler implements HmilyTransactionHandler, SmartApplicationListener {
 
     private final HmilyTransactionExecutor hmilyTransactionExecutor;
 
@@ -87,14 +89,29 @@ public class StarterHmilyTransactionHandler implements HmilyTransactionHandler, 
         return returnValue;
     }
 
+
     @Override
-    public void onApplicationEvent(@NonNull final ContextRefreshedEvent event) {
+    public boolean supportsEventType(Class<? extends ApplicationEvent> aClass) {
+        return aClass == ContextRefreshedEvent.class;
+    }
+
+    @Override
+    public boolean supportsSourceType(Class<?> aClass) {
+        return true;
+    }
+
+    @Override
+    public void onApplicationEvent(ApplicationEvent applicationEvent) {
         if (hmilyConfig.getStarted()) {
             disruptorProviderManage = new DisruptorProviderManage<>(new HmilyConsumerTransactionDataHandler(),
                     hmilyConfig.getAsyncThreads(),
                     DisruptorProviderManage.DEFAULT_SIZE);
             disruptorProviderManage.startup();
         }
+    }
 
+    @Override
+    public int getOrder() {
+        return LOWEST_PRECEDENCE - 2;
     }
 }
