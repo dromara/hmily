@@ -27,6 +27,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
+import org.springframework.context.annotation.Primary;
 
 /**
  * HmilyAutoConfiguration is spring boot starter handler.
@@ -48,6 +49,7 @@ public class HmilyAutoConfiguration {
 
     @Bean
     @Qualifier("hmilyTransactionBootstrap")
+    @Primary
     public HmilyTransactionBootstrap hmilyTransactionBootstrap(HmilyInitService hmilyInitService) {
         final HmilyTransactionBootstrap hmilyTransactionBootstrap = new HmilyTransactionBootstrap(hmilyInitService);
         hmilyTransactionBootstrap.setBufferSize(hmilyConfigProperties.getBufferSize());
