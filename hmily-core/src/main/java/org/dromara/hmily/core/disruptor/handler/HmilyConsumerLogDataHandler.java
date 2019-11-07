@@ -38,15 +38,23 @@ public class HmilyConsumerLogDataHandler extends AbstractDisruptorConsumerExecut
     public void executor(final HmilyTransactionEvent event) {
         String transId = event.getHmilyTransaction().getTransId();
         executor.select(transId).execute(() -> {
-            if (event.getType() == EventTypeEnum.SAVE.getCode()) {
-                coordinatorService.save(event.getHmilyTransaction());
-            } else if (event.getType() == EventTypeEnum.UPDATE_PARTICIPANT.getCode()) {
-                coordinatorService.updateParticipant(event.getHmilyTransaction());
-            } else if (event.getType() == EventTypeEnum.UPDATE_STATUS.getCode()) {
-                final HmilyTransaction hmilyTransaction = event.getHmilyTransaction();
-                coordinatorService.updateStatus(hmilyTransaction.getTransId(), hmilyTransaction.getStatus());
-            } else if (event.getType() == EventTypeEnum.DELETE.getCode()) {
-                coordinatorService.remove(event.getHmilyTransaction().getTransId());
+            EventTypeEnum eventTypeEnum = EventTypeEnum.buildByCode(event.getType());
+            switch (eventTypeEnum) {
+                case SAVE:
+                    coordinatorService.save(event.getHmilyTransaction());
+                    break;
+                case DELETE:
+                    coordinatorService.remove(event.getHmilyTransaction().getTransId());
+                    break;
+                case UPDATE_STATUS:
+                    final HmilyTransaction hmilyTransaction = event.getHmilyTransaction();
+                    coordinatorService.updateStatus(hmilyTransaction.getTransId(), hmilyTransaction.getStatus());
+                    break;
+                case UPDATE_PARTICIPANT:
+                    coordinatorService.updateParticipant(event.getHmilyTransaction());
+                    break;
+                default:
+                    break;
             }
             event.clear();
         });
