@@ -18,6 +18,9 @@ package org.dromara.hmily.common.enums;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.dromara.hmily.common.exception.HmilyRuntimeException;
+
+import java.util.Arrays;
 
 /**
  * The enum Coordinator action enum.
@@ -51,5 +54,16 @@ public enum EventTypeEnum {
     private final int code;
 
     private final String desc;
+
+    /**
+     * Build by code event type enum.
+     *
+     * @param code the code
+     * @return the event type enum
+     */
+    public static EventTypeEnum buildByCode(int code) {
+        return Arrays.stream(EventTypeEnum.values()).filter(e -> e.code == code).findFirst()
+                .orElseThrow(() -> new HmilyRuntimeException("can not support this code!"));
+    }
 
 }
