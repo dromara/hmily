@@ -15,7 +15,7 @@
         <module>hmily-apache-dubbo</module>
         <module>hmily-springcloud</module>
         <module>hmily-annotation</module>
-   <!--     <module>hmily-admin</module>-->
+        <module>hmily-admin</module>
         <module>hmily-motan</module>
         <module>hmily-spring-boot-starter</module>
     </modules>
