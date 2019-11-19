@@ -8,9 +8,9 @@ server:
 spring:
     datasource:
         driver-class-name:  com.mysql.jdbc.Driver
-        url: jdbc:mysql://192.168.1.98:3306/tcc_account?useUnicode=true&characterEncoding=utf8
+        url: jdbc:mysql://rm-bp10o39k37lfxh090.mysql.rds.aliyuncs.com:3306/soul-open?useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT&failOverReadOnly=false&autoReconnect=true
         username: root
-        password: 123456
+        password: dev-mysql-R3ND7N4zvjYt0Wvw
     application:
       name: account-service
     main:
@@ -28,9 +28,9 @@ org:
             started: false
             hmilyDbConfig :
                  driverClassName  : com.mysql.jdbc.Driver
-                 url :  jdbc:mysql://192.168.1.98:3306/tcc?useUnicode=true&characterEncoding=utf8
+                 url: jdbc:mysql://rm-bp10o39k37lfxh090.mysql.rds.aliyuncs.com:3306/soul-open?useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT&failOverReadOnly=false&autoReconnect=true
                  username : root
-                 password : 123456
+                 password : dev-mysql-R3ND7N4zvjYt0Wvw
 
        # repositorySupport : redis
        #         hostName  : 192.168.1.68
