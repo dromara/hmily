@@ -10,7 +10,7 @@ spring:
         allow-bean-definition-overriding: true
     datasource:
         driver-class-name:  com.mysql.jdbc.Driver
-        url: jdbc:mysql://rm-bp10o39k37lfxh090.mysql.rds.aliyuncs.com:3306/soul-open?useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT&failOverReadOnly=false&autoReconnect=true
+        url: jdbc:mysql://localhost:3306/soul-open?useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT&failOverReadOnly=false&autoReconnect=true
         username: root
         password: dev-mysql-R3ND7N4zvjYt0Wvw
     application:
