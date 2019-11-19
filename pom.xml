@@ -6,7 +6,7 @@
     <groupId>org.dromara</groupId>
     <artifactId>hmily</artifactId>
     <packaging>pom</packaging>
-    <version>2.0.5-RELEASE</version>
+    <version>2.0.6-RELEASE</version>
     <name>hmily</name>
     <modules>
         <module>hmily-common</module>
@@ -15,7 +15,7 @@
         <module>hmily-apache-dubbo</module>
         <module>hmily-springcloud</module>
         <module>hmily-annotation</module>
-        <module>hmily-admin</module>
+   <!--     <module>hmily-admin</module>-->
         <module>hmily-motan</module>
         <module>hmily-spring-boot-starter</module>
     </modules>
@@ -477,7 +477,7 @@
 
     <build>
         <plugins>
-            <!--<plugin>
+           <!-- <plugin>
                 <groupId>org.sonatype.plugins</groupId>
                 <artifactId>nexus-staging-maven-plugin</artifactId>
                 <version>1.6.3</version>
