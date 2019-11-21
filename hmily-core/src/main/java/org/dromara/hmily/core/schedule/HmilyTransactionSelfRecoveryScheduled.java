@@ -117,11 +117,22 @@ public class HmilyTransactionSelfRecoveryScheduled implements SmartApplicationLi
                         }
                         for (HmilyTransaction hmilyTransaction : hmilyTransactions) {
                             // if the try is not completed, no compensation will be provided (to prevent various exceptions in the try phase)
-                            if (hmilyTransaction.getRole() == HmilyRoleEnum.PROVIDER.getCode()
-                                    && hmilyTransaction.getStatus() == HmilyActionEnum.PRE_TRY.getCode()) {
-                                hmilyCoordinatorRepository.remove(hmilyTransaction.getTransId());
+//                            if (hmilyTransaction.getRole() == HmilyRoleEnum.PROVIDER.getCode()
+//                                    && hmilyTransaction.getStatus() == HmilyActionEnum.PRE_TRY.getCode()) {
+//                                hmilyCoordinatorRepository.remove(hmilyTransaction.getTransId());
+//                                continue;
+//                            }
+                            if (hmilyTransaction.getRole() == HmilyRoleEnum.PROVIDER.getCode()) {
+                                if (hmilyTransaction.getStatus() == HmilyActionEnum.PRE_TRY.getCode()) {
+                                    //如果是提供者，并且还在try阶段，说明发起者一定不是conform状态，可以直接删除。
+                                    hmilyCoordinatorRepository.remove(hmilyTransaction.getTransId());
+                                    continue;
+                                }
+                                LogUtil.debug(LOGGER, " 定时扫描本地表为提供者，跳过事务处理，等待客户端调用：{}", () -> hmilyTransaction);
                                 continue;
                             }
+
+
                             if (hmilyTransaction.getRetriedCount() > hmilyConfig.getRetryMax()) {
                                 LogUtil.error(LOGGER, "This transaction exceeds the maximum number of retries and no retries will occur：{}", () -> hmilyTransaction);
                                 continue;
