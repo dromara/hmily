@@ -27,7 +27,7 @@ import java.io.*;
  *
  * @author xiaoyu
  */
-@HmilySPI("hessian")
+@HmilySPI("jdk")
 public class JavaSerializer implements ObjectSerializer {
 
     @Override
