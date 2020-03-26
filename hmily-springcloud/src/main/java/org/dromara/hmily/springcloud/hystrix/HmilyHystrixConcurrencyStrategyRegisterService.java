@@ -19,18 +19,10 @@
 
 package org.dromara.hmily.springcloud.hystrix;
 
-import com.netflix.hystrix.strategy.HystrixPlugins;
-
 /**
  * The type Hmily hystrix concurrency strategy register.
  * @author xiaoyu(Myth)
  */
-public class HmilyHystrixConcurrencyStrategyRegister implements HmilyHystrixConcurrencyStrategyRegisterService {
-    
-    /**
-     * Instantiates a new Hmily hystrix concurrency strategy register.
-     */
-    public HmilyHystrixConcurrencyStrategyRegister() {
-        HystrixPlugins.getInstance().registerConcurrencyStrategy(new HmilyHystrixConcurrencyStrategy());
-    }
+public interface HmilyHystrixConcurrencyStrategyRegisterService {
+
 }
