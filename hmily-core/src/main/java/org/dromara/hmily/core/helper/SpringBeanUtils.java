@@ -69,7 +69,7 @@ public final class SpringBeanUtils {
     private <T> T getByName(Class<T> type) {
         T bean;
         String className = type.getSimpleName();
-        bean = cfgContext.getBean(firstLowercase(firstDelete(className)), type);
+        bean = cfgContext.getBean(firstLowercase(className), type);
         return bean;
     }
 
