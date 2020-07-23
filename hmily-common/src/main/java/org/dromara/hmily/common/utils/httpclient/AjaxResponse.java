@@ -41,7 +41,7 @@ public class AjaxResponse implements Serializable {
      * @param message the message
      * @param data    the data
      */
-    public AjaxResponse(int code, String message, Object data) {
+    public AjaxResponse(final int code, final String message, final Object data) {
         this.code = code;
         this.message = message;
         this.data = data;
@@ -55,27 +55,27 @@ public class AjaxResponse implements Serializable {
     public static AjaxResponse success() {
         return success("");
     }
-
+    
     /**
      * Success ajax response.
      *
      * @param msg the msg
      * @return the ajax response
      */
-    public static AjaxResponse success(String msg) {
+    public static AjaxResponse success(final String msg) {
         return success(msg, null);
     }
-
+    
     /**
      * Success ajax response.
      *
      * @param data the data
      * @return the ajax response
      */
-    public static AjaxResponse success(Object data) {
+    public static AjaxResponse success(final Object data) {
         return success(null, data);
     }
-
+    
     /**
      * Success ajax response.
      *
@@ -83,20 +83,20 @@ public class AjaxResponse implements Serializable {
      * @param data the data
      * @return the ajax response
      */
-    public static AjaxResponse success(String msg, Object data) {
+    public static AjaxResponse success(final String msg, final Object data) {
         return get(CommonErrorCode.SUCCESSFUL, msg, data);
     }
-
+    
     /**
      * Error ajax response.
      *
      * @param msg the msg
      * @return the ajax response
      */
-    public static AjaxResponse error(String msg) {
+    public static AjaxResponse error(final String msg) {
         return error(CommonErrorCode.ERROR, msg);
     }
-
+    
     /**
      * Error ajax response.
      *
@@ -104,10 +104,10 @@ public class AjaxResponse implements Serializable {
      * @param msg  the msg
      * @return the ajax response
      */
-    public static AjaxResponse error(int code, String msg) {
+    public static AjaxResponse error(final int code, final String msg) {
         return get(code, msg, null);
     }
-
+    
     /**
      * Get ajax response.
      *
@@ -116,7 +116,7 @@ public class AjaxResponse implements Serializable {
      * @param data the data
      * @return the ajax response
      */
-    public static AjaxResponse get(int code, String msg, Object data) {
+    public static AjaxResponse get(final int code, final String msg, final Object data) {
         return new AjaxResponse(code, msg, data);
     }
 
@@ -146,20 +146,19 @@ public class AjaxResponse implements Serializable {
     public Object getData() {
         return data;
     }
-
+    
     /**
      * Sets data.
      *
      * @param data the data
      */
-    public void setData(Object data) {
+    public void setData(final Object data) {
         this.data = data;
     }
 
     @Override
     public String toString() {
-        return "AjaxResponse [code=" + code + ", message=" + message + ", data=" + data
-                + "]";
+        return "AjaxResponse [code=" + code + ", message=" + message + ", data=" + data + "]";
     }
 
 }

@@ -31,7 +31,6 @@ import java.util.Objects;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -240,7 +239,7 @@ public final class ExtensionLoader<T> {
             properties.load(inputStream);
             properties.forEach((k, v) -> {
                 String name = (String) k;
-                if (StringUtils.isNotBlank(name)) {
+                if (null != name && !"".equals(name)) {
                     try {
                         loadClass(entityList, name, classLoader);
                     } catch (ClassNotFoundException e) {

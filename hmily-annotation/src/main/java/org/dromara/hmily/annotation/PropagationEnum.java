@@ -17,13 +17,18 @@
 
 package org.dromara.hmily.annotation;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
 /**
  * PropagationEnum.
+ *
  * @author xiaoyu
  */
-
+@AllArgsConstructor
+@Getter
 public enum PropagationEnum {
-
+    
     /**
      * PropagationEnum required propagation.
      */
@@ -58,22 +63,6 @@ public enum PropagationEnum {
      * PropagationEnum nested propagation.
      */
     PROPAGATION_NESTED(6);
-
-
+    
     private final int value;
-
-    PropagationEnum(int value) {
-        this.value = value;
-    }
-
-    /**
-     * Gets value.
-     *
-     * @return the value
-     */
-    public int getValue() {
-        return this.value;
-    }
-
-
 }

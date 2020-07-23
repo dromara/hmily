@@ -91,12 +91,12 @@ public class HmilyTransactionEventPublisher implements SmartApplicationListener 
     }
 
     @Override
-    public boolean supportsEventType(Class<? extends ApplicationEvent> aClass) {
+    public boolean supportsEventType(final Class<? extends ApplicationEvent> aClass) {
         return aClass == ContextRefreshedEvent.class;
     }
 
     @Override
-    public boolean supportsSourceType(Class<?> aClass) {
+    public boolean supportsSourceType(final Class<?> aClass) {
         return true;
     }
 
