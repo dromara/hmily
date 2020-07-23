@@ -46,7 +46,6 @@
         <dependency>
             <groupId>org.apache.tomcat.embed</groupId>
             <artifactId>tomcat-embed-core</artifactId>
-            <version>RELEASE</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
