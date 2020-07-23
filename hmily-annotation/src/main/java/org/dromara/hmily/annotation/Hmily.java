@@ -29,7 +29,7 @@ import java.lang.annotation.Target;
  * @author xiaoyu
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.METHOD})
+@Target(ElementType.METHOD)
 public @interface Hmily {
 
     /**
@@ -52,5 +52,4 @@ public @interface Hmily {
      * @return the pattern enum
      */
     PatternEnum pattern() default PatternEnum.TCC;
-
 }

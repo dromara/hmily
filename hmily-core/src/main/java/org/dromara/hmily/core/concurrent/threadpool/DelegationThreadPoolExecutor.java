@@ -36,7 +36,7 @@ import java.util.concurrent.TimeUnit;
 @SuppressWarnings("unused")
 public class DelegationThreadPoolExecutor extends ThreadPoolExecutor {
 
-    private final Logger logger = LoggerFactory.getLogger(DelegationThreadPoolExecutor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DelegationThreadPoolExecutor.class);
 
     /**
      * Define a thread saturation strategy.
@@ -141,6 +141,6 @@ public class DelegationThreadPoolExecutor extends ThreadPoolExecutor {
      * @param runnable the runnable
      */
     private void onInitialRejection(final Runnable runnable) {
-        logger.info("DelegationThreadPoolExecutor:thread {} rejection", runnable);
+        LOGGER.info("DelegationThreadPoolExecutor:thread {} rejection", runnable);
     }
 }

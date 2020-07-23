@@ -33,7 +33,7 @@ public class CollectionUtils {
      * @param coll the coll
      * @return the boolean
      */
-    public static boolean isEmpty(Collection coll) {
+    public static boolean isEmpty(final Collection<?> coll) {
         return coll == null || coll.isEmpty();
     }
 
@@ -43,7 +43,7 @@ public class CollectionUtils {
      * @param coll the coll
      * @return the boolean
      */
-    public static boolean isNotEmpty(Collection coll) {
+    public static boolean isNotEmpty(final Collection<?> coll) {
         return !isEmpty(coll);
     }
 }

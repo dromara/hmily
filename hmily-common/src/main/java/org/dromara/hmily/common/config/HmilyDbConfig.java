@@ -17,13 +17,11 @@
 
 package org.dromara.hmily.common.config;
 
+import java.util.concurrent.TimeUnit;
 import lombok.Data;
 
 import javax.sql.DataSource;
 import java.util.Map;
-
-import static java.util.concurrent.TimeUnit.MINUTES;
-import static java.util.concurrent.TimeUnit.SECONDS;
 
 /**
  * The HmilyDbConfig.
@@ -52,12 +50,9 @@ public class HmilyDbConfig {
      * password.
      */
     private String password;
-
-
+    
     /**
      * the maxActive.
-     *
-     * https://github.com/brettwooldridge/HikariCP/wiki/About-Pool-Sizing
      */
     private int maxActive = 20;
 
@@ -65,17 +60,15 @@ public class HmilyDbConfig {
      * minIdle.
      */
     private int minIdle = 10;
-
-
+    
     /**
      * This property controls the maximum number of milliseconds that a client (that's you) will wait for a connection from the pool.
      * If this time is exceeded without a connection becoming available, a SQLException will be thrown.
      * Lowest acceptable connection timeout is 250 ms.
      * Default: 30000 (30 seconds)
      */
-    private long connectionTimeout = SECONDS.toMillis(30);
-
-
+    private long connectionTimeout = TimeUnit.SECONDS.toMillis(30);
+    
     /**
      * This property controls the maximum amount of time that a connection is allowed to sit idle in the pool.
      * This setting only applies when minimumIdle is defined to be less than maximumPoolSize.
@@ -85,9 +78,8 @@ public class HmilyDbConfig {
      * A value of 0 means that idle connections are never removed from the pool. The minimum allowed value is 10000ms (10 seconds).
      * Default: 600000 (10 minutes)
      */
-    private long idleTimeout = MINUTES.toMillis(10);
-
-
+    private long idleTimeout = TimeUnit.MINUTES.toMillis(10);
+    
     /**
      * This property controls the maximum lifetime of a connection in the pool. An in-use connection will never be
      * retired, only when it is closed will it then be removed. On a connection-by-connection basis, minor negative
@@ -96,9 +88,8 @@ public class HmilyDbConfig {
      * 0 indicates no maximum lifetime (infinite lifetime), subject of course to the idleTimeout setting.
      * Default: 1800000 (30 minutes)
      */
-    private long maxLifetime = MINUTES.toMillis(30);
-
-
+    private long maxLifetime = TimeUnit.MINUTES.toMillis(30);
+    
     /**
      * If your driver supports JDBC4 we strongly recommend not setting this property. This is for "legacy" drivers that
      * do not support the JDBC4 Connection.isValid() API. This is the query that will be executed just before a connection
@@ -107,17 +98,14 @@ public class HmilyDbConfig {
      * Default: none
      */
     private String connectionTestQuery;
-
-
+    
     /**
      * Add a property (name/value pair) that will be used to configure the {@link DataSource}/{@link java.sql.Driver}.
      */
     private Map<String, Object> dataSourcePropertyMap;
-
-
+    
     /**
      * You can use a existing DataSource or generate a new DataSource based on the configuration.
      */
     private DataSource dataSource;
-
 }

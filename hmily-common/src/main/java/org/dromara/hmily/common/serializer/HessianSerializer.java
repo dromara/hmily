@@ -20,7 +20,6 @@ package org.dromara.hmily.common.serializer;
 import com.caucho.hessian.io.Hessian2Input;
 import com.caucho.hessian.io.Hessian2Output;
 import org.dromara.hmily.annotation.HmilySPI;
-import org.dromara.hmily.common.enums.SerializeEnum;
 import org.dromara.hmily.common.exception.HmilyException;
 
 import java.io.ByteArrayInputStream;

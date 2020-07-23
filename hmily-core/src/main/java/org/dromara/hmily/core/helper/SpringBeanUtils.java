@@ -66,14 +66,14 @@ public final class SpringBeanUtils {
         return bean;
     }
 
-    private <T> T getByName(Class<T> type) {
+    private <T> T getByName(final Class<T> type) {
         T bean;
         String className = type.getSimpleName();
         bean = cfgContext.getBean(firstLowercase(firstDelete(className)), type);
         return bean;
     }
 
-    private String firstLowercase(String target) {
+    private String firstLowercase(final String target) {
         if (StringUtils.isEmpty(target)) {
             return target;
         }
@@ -82,7 +82,7 @@ public final class SpringBeanUtils {
         return String.valueOf(targetChar);
     }
 
-    private static String firstDelete(String target) {
+    private static String firstDelete(final String target) {
         if (StringUtils.isEmpty(target)) {
             return target;
         }

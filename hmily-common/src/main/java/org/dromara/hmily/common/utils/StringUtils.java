@@ -32,7 +32,7 @@ public class StringUtils {
      * @param css the css
      * @return the boolean
      */
-    public static boolean isNoneBlank(CharSequence... css) {
+    public static boolean isNoneBlank(final CharSequence... css) {
         return !isAnyBlank(css);
     }
 
@@ -42,7 +42,7 @@ public class StringUtils {
      * @param css the css
      * @return the boolean
      */
-    private static boolean isAnyBlank(CharSequence... css) {
+    private static boolean isAnyBlank(final CharSequence... css) {
         if (isEmpty(css)) {
             return true;
         }

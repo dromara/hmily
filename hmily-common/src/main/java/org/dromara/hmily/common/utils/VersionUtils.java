@@ -29,7 +29,7 @@ import java.security.CodeSource;
  * @author xiaoyu(Myth)
  */
 @SuppressWarnings("all")
-public class VersionUtils {
+public final class VersionUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(VersionUtils.class);
 
@@ -92,7 +92,7 @@ public class VersionUtils {
             }
             // return default version if no version info is found
             return version == null || version.length() == 0 ? defaultVersion : version;
-        } catch (Throwable e) {
+        } catch (Exception e) {
             // return default version when any exception is thrown
             LOGGER.error("return default version, ignore exception " + e.getMessage(), e);
             return defaultVersion;
