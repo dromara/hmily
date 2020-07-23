@@ -57,7 +57,7 @@ public final class LogUtil {
      * @param format   log information
      * @param supplier supplier
      */
-    public static void debug(Logger logger, String format, Supplier<Object> supplier) {
+    public static void debug(final Logger logger, final String format, final Supplier<Object> supplier) {
         if (logger.isDebugEnabled()) {
             logger.debug(format, supplier.get());
         }
@@ -69,7 +69,7 @@ public final class LogUtil {
      * @param logger   the logger
      * @param supplier the supplier
      */
-    public static void debug(Logger logger, Supplier<Object> supplier) {
+    public static void debug(final Logger logger, final Supplier<Object> supplier) {
         if (logger.isDebugEnabled()) {
             logger.debug(Objects.toString(supplier.get()));
         }
@@ -82,7 +82,7 @@ public final class LogUtil {
      * @param format   the format
      * @param supplier the supplier
      */
-    public static void info(Logger logger, String format, Supplier<Object> supplier) {
+    public static void info(final Logger logger, final String format, final Supplier<Object> supplier) {
         if (logger.isInfoEnabled()) {
             logger.info(format, supplier.get());
         }
@@ -94,7 +94,7 @@ public final class LogUtil {
      * @param logger   the logger
      * @param supplier the supplier
      */
-    public static void info(Logger logger, Supplier<Object> supplier) {
+    public static void info(final Logger logger, final Supplier<Object> supplier) {
         if (logger.isInfoEnabled()) {
             logger.info(Objects.toString(supplier.get()));
         }
@@ -107,7 +107,7 @@ public final class LogUtil {
      * @param format   the format
      * @param supplier the supplier
      */
-    public static void error(Logger logger, String format, Supplier<Object> supplier) {
+    public static void error(final Logger logger, final String format, final Supplier<Object> supplier) {
         if (logger.isErrorEnabled()) {
             logger.error(format, supplier.get());
         }
@@ -119,7 +119,7 @@ public final class LogUtil {
      * @param logger   the logger
      * @param supplier the supplier
      */
-    public static void error(Logger logger, Supplier<Object> supplier) {
+    public static void error(final Logger logger, final Supplier<Object> supplier) {
         if (logger.isErrorEnabled()) {
             logger.error(Objects.toString(supplier.get()));
         }
@@ -132,7 +132,7 @@ public final class LogUtil {
      * @param format   the format
      * @param supplier the supplier
      */
-    public static void warn(Logger logger, String format, Supplier<Object> supplier) {
+    public static void warn(final Logger logger, final String format, final Supplier<Object> supplier) {
         if (logger.isWarnEnabled()) {
             logger.warn(format, supplier.get());
         }
@@ -144,11 +144,9 @@ public final class LogUtil {
      * @param logger   the logger
      * @param supplier the supplier
      */
-    public static void warn(Logger logger, Supplier<Object> supplier) {
+    public static void warn(final Logger logger, final Supplier<Object> supplier) {
         if (logger.isWarnEnabled()) {
             logger.warn(Objects.toString(supplier.get()));
         }
     }
-
-
 }

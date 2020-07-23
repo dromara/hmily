@@ -23,6 +23,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.concurrent.ConcurrentSkipListMap;
 
 /**
  * Thread routing selector.
@@ -41,7 +42,7 @@ public final class ConsistentHashSelector {
     /**
      * The Virtual invokers.
      */
-    private final TreeMap<Long, SingletonExecutor> virtualInvokers;
+    private final ConcurrentSkipListMap<Long, SingletonExecutor> virtualInvokers;
 
     /**
      * Instantiates a new Consistent hash selector.
@@ -49,7 +50,7 @@ public final class ConsistentHashSelector {
      * @param selects the selects
      */
     public ConsistentHashSelector(final List<SingletonExecutor> selects) {
-        this.virtualInvokers = new TreeMap<>();
+        this.virtualInvokers = new ConcurrentSkipListMap<>();
         for (SingletonExecutor executor : selects) {
             for (int i = 0; i < REPLICA_NUMBER / FOUR; i++) {
                 byte[] digest = md5(executor.getName() + i);

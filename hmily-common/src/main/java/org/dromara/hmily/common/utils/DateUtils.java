@@ -71,7 +71,7 @@ public class DateUtils {
      * @param date the date
      * @return the string
      */
-    public static String parseDate(Date date) {
+    public static String parseDate(final Date date) {
         Instant instant = date.toInstant();
         ZoneId zone = ZoneId.systemDefault();
         LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, zone);
@@ -90,5 +90,4 @@ public class DateUtils {
     public static String getCurrentDateTime() {
         return LocalDateTime.now().format(DateTimeFormatter.ofPattern(DATE_FORMAT_DATETIME));
     }
-
 }

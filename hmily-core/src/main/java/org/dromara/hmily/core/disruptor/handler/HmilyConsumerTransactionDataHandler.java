@@ -11,8 +11,7 @@ import org.dromara.hmily.core.service.HmilyTransactionHandlerAlbum;
  * @author chenbin sixh
  */
 public class HmilyConsumerTransactionDataHandler extends AbstractDisruptorConsumerExecutor<HmilyTransactionHandlerAlbum> implements DisruptorConsumerFactory {
-
-
+    
     @Override
     public String fixName() {
         return "HmilyConsumerTransactionDataHandler";

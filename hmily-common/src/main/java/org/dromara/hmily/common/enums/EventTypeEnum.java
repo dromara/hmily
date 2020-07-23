@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.dromara.hmily.common.enums;
 
 import lombok.Getter;
@@ -61,7 +62,7 @@ public enum EventTypeEnum {
      * @param code the code
      * @return the event type enum
      */
-    public static EventTypeEnum buildByCode(int code) {
+    public static EventTypeEnum buildByCode(final int code) {
         return Arrays.stream(EventTypeEnum.values()).filter(e -> e.code == code).findFirst()
                 .orElseThrow(() -> new HmilyRuntimeException("can not support this code!"));
     }
