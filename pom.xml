@@ -19,6 +19,7 @@
         <module>hmily-motan</module>
         <module>hmily-spring-boot-starter</module>
         <module>hmily-spi</module>
+        <module>hmily-serializer</module>
     </modules>
 
     <organization>
