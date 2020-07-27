@@ -20,6 +20,8 @@
         <module>hmily-spring-boot-starter</module>
         <module>hmily-spi</module>
         <module>hmily-serializer</module>
+        <module>hmily-repository</module>
+        <module>hmily-config</module>
     </modules>
 
     <organization>
