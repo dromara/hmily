@@ -16,10 +16,9 @@
  */
 
 package org.dromara.hmily.spring.boot.starter.parent.config;
-
-import org.dromara.hmily.common.config.HmilyConfig;
+;
+import org.dromara.hmily.config.HmilyConfig;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
 
 /**
  * HmilyConfigProperties starter.

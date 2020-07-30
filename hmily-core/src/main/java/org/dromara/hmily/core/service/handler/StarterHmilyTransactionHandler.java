@@ -18,98 +18,63 @@
 package org.dromara.hmily.core.service.handler;
 
 import org.aspectj.lang.ProceedingJoinPoint;
-import org.dromara.hmily.common.bean.context.HmilyTransactionContext;
-import org.dromara.hmily.common.bean.entity.HmilyTransaction;
-import org.dromara.hmily.common.config.HmilyConfig;
+import org.dromara.hmily.core.context.HmilyContextHolder;
+import org.dromara.hmily.core.context.HmilyTransactionContext;
 import org.dromara.hmily.common.enums.HmilyActionEnum;
-import org.dromara.hmily.core.concurrent.threadlocal.HmilyTransactionContextLocal;
 import org.dromara.hmily.core.disruptor.DisruptorProviderManage;
-import org.dromara.hmily.core.disruptor.handler.HmilyConsumerTransactionDataHandler;
+import org.dromara.hmily.core.disruptor.handler.HmilyTransactionExecutorHandler;
 import org.dromara.hmily.core.service.HmilyTransactionHandler;
 import org.dromara.hmily.core.service.HmilyTransactionHandlerAlbum;
 import org.dromara.hmily.core.service.executor.HmilyTransactionExecutor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEvent;
-import org.springframework.context.event.ContextRefreshedEvent;
-import org.springframework.context.event.SmartApplicationListener;
-import org.springframework.stereotype.Component;
+import org.dromara.hmily.repository.spi.entity.HmilyTransaction;
+
 
 /**
  * this is hmily transaction starter.
  *
  * @author xiaoyu
  */
-@Component
-public class StarterHmilyTransactionHandler implements HmilyTransactionHandler, SmartApplicationListener {
-
-    private final HmilyTransactionExecutor hmilyTransactionExecutor;
-
-    private final HmilyConfig hmilyConfig;
-
+public class StarterHmilyTransactionHandler implements HmilyTransactionHandler, AutoCloseable {
+    
+    private final HmilyTransactionExecutor executor = HmilyTransactionExecutor.getInstance();
+    
     private DisruptorProviderManage<HmilyTransactionHandlerAlbum> disruptorProviderManage;
-
-    /**
-     * Instantiates a new Starter hmily transaction handler.
-     *
-     * @param hmilyTransactionExecutor the hmily transaction executor
-     * @param hmilyConfig              the hmily config
-     */
-    @Autowired
-    public StarterHmilyTransactionHandler(final HmilyTransactionExecutor hmilyTransactionExecutor, final HmilyConfig hmilyConfig) {
-        this.hmilyTransactionExecutor = hmilyTransactionExecutor;
-        this.hmilyConfig = hmilyConfig;
+    
+    public StarterHmilyTransactionHandler() {
+        disruptorProviderManage = new DisruptorProviderManage<>(new HmilyTransactionExecutorHandler(),
+                Runtime.getRuntime().availableProcessors() << 1, DisruptorProviderManage.DEFAULT_SIZE);
+        disruptorProviderManage.startup();
     }
-
+    
     @Override
     public Object handler(final ProceedingJoinPoint point, final HmilyTransactionContext context)
             throws Throwable {
         Object returnValue;
         try {
-            HmilyTransaction hmilyTransaction = hmilyTransactionExecutor.preTry(point);
+            HmilyTransaction hmilyTransaction = executor.preTry(point);
             try {
                 //execute try
                 returnValue = point.proceed();
                 hmilyTransaction.setStatus(HmilyActionEnum.TRYING.getCode());
-                hmilyTransactionExecutor.updateStatus(hmilyTransaction);
+                executor.updateStartStatus(hmilyTransaction);
             } catch (Throwable throwable) {
                 //if exception ,execute cancel
-                final HmilyTransaction currentTransaction = hmilyTransactionExecutor.getCurrentTransaction();
-                disruptorProviderManage.getProvider().onData(() -> hmilyTransactionExecutor.cancel(currentTransaction));
+                final HmilyTransaction currentTransaction = executor.getCurrentTransaction();
+                disruptorProviderManage.getProvider().onData(() -> executor.globalCancel(currentTransaction));
                 throw throwable;
             }
             //execute confirm
-            final HmilyTransaction currentTransaction = hmilyTransactionExecutor.getCurrentTransaction();
-            disruptorProviderManage.getProvider().onData(() -> hmilyTransactionExecutor.confirm(currentTransaction));
+            final HmilyTransaction currentTransaction = executor.getCurrentTransaction();
+            disruptorProviderManage.getProvider().onData(() -> executor.globalConfirm(currentTransaction));
         } finally {
-            HmilyTransactionContextLocal.getInstance().remove();
-            hmilyTransactionExecutor.remove();
+            HmilyContextHolder.remove();
+            executor.remove();
         }
         return returnValue;
     }
-
-
+    
     @Override
-    public boolean supportsEventType(Class<? extends ApplicationEvent> aClass) {
-        return aClass == ContextRefreshedEvent.class;
-    }
-
-    @Override
-    public boolean supportsSourceType(Class<?> aClass) {
-        return true;
-    }
-
-    @Override
-    public void onApplicationEvent(ApplicationEvent applicationEvent) {
-        if (hmilyConfig.getStarted()) {
-            disruptorProviderManage = new DisruptorProviderManage<>(new HmilyConsumerTransactionDataHandler(),
-                    hmilyConfig.getAsyncThreads(),
-                    DisruptorProviderManage.DEFAULT_SIZE);
-            disruptorProviderManage.startup();
-        }
-    }
-
-    @Override
-    public int getOrder() {
-        return LOWEST_PRECEDENCE - 2;
+    public void close() {
+        disruptorProviderManage.getProvider().shutdown();
     }
 }

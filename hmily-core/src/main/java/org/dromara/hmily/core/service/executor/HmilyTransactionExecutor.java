@@ -18,35 +18,33 @@
 package org.dromara.hmily.core.service.executor;
 
 import com.google.common.collect.Lists;
-import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.reflect.MethodSignature;
-import org.dromara.hmily.annotation.Hmily;
-import org.dromara.hmily.annotation.PatternEnum;
-import org.dromara.hmily.common.bean.context.HmilyTransactionContext;
-import org.dromara.hmily.common.bean.entity.HmilyInvocation;
-import org.dromara.hmily.common.bean.entity.HmilyParticipant;
-import org.dromara.hmily.common.bean.entity.HmilyTransaction;
-import org.dromara.hmily.common.enums.EventTypeEnum;
-import org.dromara.hmily.common.enums.HmilyActionEnum;
-import org.dromara.hmily.common.enums.HmilyRoleEnum;
-import org.dromara.hmily.common.exception.HmilyRuntimeException;
-import org.dromara.hmily.common.utils.CollectionUtils;
-import org.dromara.hmily.common.utils.LogUtil;
-import org.dromara.hmily.common.utils.StringUtils;
-import org.dromara.hmily.core.cache.HmilyTransactionGuavaCacheManager;
-import org.dromara.hmily.core.concurrent.threadlocal.HmilyTransactionContextLocal;
-import org.dromara.hmily.core.disruptor.publisher.HmilyTransactionEventPublisher;
-import org.dromara.hmily.core.reflect.HmilyReflector;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.reflect.MethodSignature;
+import org.dromara.hmily.annotation.HmilyTCC;
+import org.dromara.hmily.annotation.TransTypeEnum;
+import org.dromara.hmily.common.enums.EventTypeEnum;
+import org.dromara.hmily.common.enums.ExecutorTypeEnum;
+import org.dromara.hmily.common.enums.HmilyActionEnum;
+import org.dromara.hmily.common.enums.HmilyRoleEnum;
+import org.dromara.hmily.common.exception.HmilyRuntimeException;
+import org.dromara.hmily.common.utils.CollectionUtils;
+import org.dromara.hmily.common.utils.IdWorkerUtils;
+import org.dromara.hmily.common.utils.LogUtil;
+import org.dromara.hmily.common.utils.StringUtils;
+import org.dromara.hmily.core.cache.HmilyParticipantCacheManager;
+import org.dromara.hmily.core.context.HmilyContextHolder;
+import org.dromara.hmily.core.context.HmilyTransactionContext;
+import org.dromara.hmily.core.disruptor.publisher.HmilyRepositoryEventPublisher;
+import org.dromara.hmily.core.reflect.HmilyReflector;
+import org.dromara.hmily.repository.spi.entity.HmilyInvocation;
+import org.dromara.hmily.repository.spi.entity.HmilyParticipant;
+import org.dromara.hmily.repository.spi.entity.HmilyTransaction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -54,31 +52,23 @@ import java.util.stream.Collectors;
  *
  * @author xiaoyu
  */
-@Component
-public class HmilyTransactionExecutor {
-
-    /**
-     * logger.
-     */
+public final class HmilyTransactionExecutor {
+    
     private static final Logger LOGGER = LoggerFactory.getLogger(HmilyTransactionExecutor.class);
-
-    /**
-     * transaction save threadLocal.
-     */
+    
+    private static final HmilyTransactionExecutor INSTANCE = new HmilyTransactionExecutor();
+    
+    private static final HmilyRepositoryEventPublisher PUBLISHER = HmilyRepositoryEventPublisher.getInstance();
+    
     private static final ThreadLocal<HmilyTransaction> CURRENT = new ThreadLocal<>();
-
-    private final HmilyTransactionEventPublisher hmilyTransactionEventPublisher;
-
-    /**
-     * Instantiates a new Hmily transaction executor.
-     *
-     * @param hmilyTransactionEventPublisher the hmily transaction event publisher
-     */
-    @Autowired
-    public HmilyTransactionExecutor(final HmilyTransactionEventPublisher hmilyTransactionEventPublisher) {
-        this.hmilyTransactionEventPublisher = hmilyTransactionEventPublisher;
+    
+    private HmilyTransactionExecutor() {
     }
-
+    
+    public static HmilyTransactionExecutor getInstance() {
+        return INSTANCE;
+    }
+    
     /**
      * transaction preTry.
      *
@@ -86,23 +76,26 @@ public class HmilyTransactionExecutor {
      * @return TccTransaction hmily transaction
      */
     public HmilyTransaction preTry(final ProceedingJoinPoint point) {
-        LogUtil.debug(LOGGER, () -> "......hmily transaction starter....");
+        LogUtil.debug(LOGGER, () -> "......hmily tcc transaction starter....");
         //build tccTransaction
-        final HmilyTransaction hmilyTransaction = buildHmilyTransaction(point, HmilyRoleEnum.START.getCode(), null);
+        final HmilyTransaction hmilyTransaction = createHmilyTransaction();
+        PUBLISHER.publishEvent(hmilyTransaction, EventTypeEnum.CREATE_HMILY_TRANSACTION.getCode());
+        final HmilyParticipant hmilyParticipant = buildHmilyParticipant(point, null, null, HmilyRoleEnum.START.getCode(), hmilyTransaction.getTransId());
+        Optional.ofNullable(hmilyParticipant).ifPresent(h -> PUBLISHER.publishEvent(h, EventTypeEnum.CREATE_HMILY_PARTICIPANT.getCode()));
+        hmilyTransaction.registerParticipant(hmilyParticipant);
         //save tccTransaction in threadLocal
         CURRENT.set(hmilyTransaction);
-        //publishEvent
-        hmilyTransactionEventPublisher.publishEvent(hmilyTransaction, EventTypeEnum.SAVE.getCode());
         //set TccTransactionContext this context transfer remote
         HmilyTransactionContext context = new HmilyTransactionContext();
         //set action is try
         context.setAction(HmilyActionEnum.TRYING.getCode());
         context.setTransId(hmilyTransaction.getTransId());
         context.setRole(HmilyRoleEnum.START.getCode());
-        HmilyTransactionContextLocal.getInstance().set(context);
+        context.setTransType(TransTypeEnum.TCC.name());
+        HmilyContextHolder.set(context);
         return hmilyTransaction;
     }
-
+    
     /**
      * this is Participant transaction preTry.
      *
@@ -110,19 +103,21 @@ public class HmilyTransactionExecutor {
      * @param point   cut point
      * @return TccTransaction hmily transaction
      */
-    public HmilyTransaction preTryParticipant(final HmilyTransactionContext context, final ProceedingJoinPoint point) {
-        LogUtil.debug(LOGGER, "participant hmily transaction start..：{}", context::toString);
-        final HmilyTransaction hmilyTransaction = buildHmilyTransaction(point, HmilyRoleEnum.PROVIDER.getCode(), context.getTransId());
+    public HmilyParticipant preTryParticipant(final HmilyTransactionContext context, final ProceedingJoinPoint point) {
+        LogUtil.debug(LOGGER, "participant hmily tcc transaction start..：{}", context::toString);
+        final HmilyParticipant hmilyParticipant = buildHmilyParticipant(point, context.getParticipantId(), context.getParticipantRefId(), HmilyRoleEnum.PARTICIPANT.getCode(), context.getTransId());
         //cache by guava
-        HmilyTransactionGuavaCacheManager.getInstance().cacheHmilyTransaction(hmilyTransaction);
+        if (Objects.nonNull(hmilyParticipant)) {
+            HmilyParticipantCacheManager.getInstance().cacheHmilyParticipant(hmilyParticipant);
+            PUBLISHER.publishEvent(hmilyParticipant, EventTypeEnum.CREATE_HMILY_PARTICIPANT.getCode());
+        }
         //publishEvent
-        hmilyTransactionEventPublisher.publishEvent(hmilyTransaction, EventTypeEnum.SAVE.getCode());
         //Nested transaction support
-        context.setRole(HmilyRoleEnum.LOCAL.getCode());
-        HmilyTransactionContextLocal.getInstance().set(context);
-        return hmilyTransaction;
+        context.setRole(HmilyRoleEnum.PARTICIPANT.getCode());
+        HmilyContextHolder.set(context);
+        return hmilyParticipant;
     }
-
+    
     /**
      * Call the confirm method and basically if the initiator calls here call the remote or the original method
      * However, the context sets the call confirm
@@ -132,13 +127,13 @@ public class HmilyTransactionExecutor {
      * @return the object
      * @throws HmilyRuntimeException ex
      */
-    public Object confirm(final HmilyTransaction currentTransaction) throws HmilyRuntimeException {
+    public Object globalConfirm(final HmilyTransaction currentTransaction) throws HmilyRuntimeException {
         LogUtil.debug(LOGGER, () -> "hmily transaction confirm .......！start");
         if (Objects.isNull(currentTransaction) || CollectionUtils.isEmpty(currentTransaction.getHmilyParticipants())) {
             return null;
         }
         currentTransaction.setStatus(HmilyActionEnum.CONFIRMING.getCode());
-        updateStatus(currentTransaction);
+        updateHmilyTransactionStatus(currentTransaction);
         final List<HmilyParticipant> hmilyParticipants = currentTransaction.getHmilyParticipants();
         boolean success = true;
         if (CollectionUtils.isNotEmpty(hmilyParticipants)) {
@@ -146,16 +141,14 @@ public class HmilyTransactionExecutor {
             List<Object> results = Lists.newArrayListWithCapacity(hmilyParticipants.size());
             for (HmilyParticipant hmilyParticipant : hmilyParticipants) {
                 try {
-                    final Object result = HmilyReflector.executor(hmilyParticipant.getTransId(),
-                            HmilyActionEnum.CONFIRMING,
-                            hmilyParticipant.getConfirmHmilyInvocation());
+                    final Object result = HmilyReflector.executor(HmilyActionEnum.CONFIRMING, ExecutorTypeEnum.RPC, hmilyParticipant);
                     results.add(result);
-                } catch (Exception e) {
+                } catch (Throwable e) {
                     LogUtil.error(LOGGER, "execute confirm :{}", () -> e);
                     success = false;
                     failList.add(hmilyParticipant);
                 } finally {
-                    HmilyTransactionContextLocal.getInstance().remove();
+                    HmilyContextHolder.remove();
                 }
             }
             executeHandler(success, currentTransaction, failList);
@@ -163,44 +156,57 @@ public class HmilyTransactionExecutor {
         }
         return null;
     }
-
+    
+    public Object participantConfirm(final List<HmilyParticipant> hmilyParticipantList) {
+        if (CollectionUtils.isEmpty(hmilyParticipantList)) {
+            return null;
+        }
+        List<Object> results = Lists.newArrayListWithCapacity(hmilyParticipantList.size());
+        for (HmilyParticipant hmilyParticipant : hmilyParticipantList) {
+            try {
+                final Object result = HmilyReflector.executor(HmilyActionEnum.CONFIRMING, ExecutorTypeEnum.LOCAL, hmilyParticipant);
+                results.add(result);
+                removeHmilyParticipant(hmilyParticipant);
+            } catch (Throwable e) {
+                LogUtil.error(LOGGER, "execute confirm :{}", () -> e);
+            } finally {
+                HmilyContextHolder.remove();
+            }
+        }
+        return results.get(0);
+    }
+    
     /**
      * cancel transaction.
      *
      * @param currentTransaction {@linkplain HmilyTransaction}
      * @return the object
      */
-    public Object cancel(final HmilyTransaction currentTransaction) {
+    public Object globalCancel(final HmilyTransaction currentTransaction) {
         LogUtil.debug(LOGGER, () -> "tcc cancel ...........start!");
         if (Objects.isNull(currentTransaction) || CollectionUtils.isEmpty(currentTransaction.getHmilyParticipants())) {
             return null;
         }
         //if cc pattern，can not execute cancel
-        if (currentTransaction.getStatus() == HmilyActionEnum.TRYING.getCode()
-                && Objects.equals(currentTransaction.getPattern(), PatternEnum.CC.getCode())) {
-            deleteTransaction(currentTransaction);
-            return null;
-        }
         currentTransaction.setStatus(HmilyActionEnum.CANCELING.getCode());
         //update cancel
-        updateStatus(currentTransaction);
-        final List<HmilyParticipant> hmilyParticipants = filterPoint(currentTransaction);
+        updateHmilyTransactionStatus(currentTransaction);
+        final List<HmilyParticipant> hmilyParticipants = currentTransaction.getHmilyParticipants();
         boolean success = true;
         if (CollectionUtils.isNotEmpty(hmilyParticipants)) {
             List<HmilyParticipant> failList = Lists.newArrayListWithCapacity(hmilyParticipants.size());
             List<Object> results = Lists.newArrayListWithCapacity(hmilyParticipants.size());
             for (HmilyParticipant hmilyParticipant : hmilyParticipants) {
                 try {
-                    final Object result = HmilyReflector.executor(hmilyParticipant.getTransId(),
-                            HmilyActionEnum.CANCELING,
-                            hmilyParticipant.getCancelHmilyInvocation());
+                    final Object result = HmilyReflector.executor(HmilyActionEnum.CANCELING, ExecutorTypeEnum.RPC, hmilyParticipant);
+                    removeHmilyParticipant(hmilyParticipant);
                     results.add(result);
                 } catch (Exception e) {
                     LogUtil.error(LOGGER, "execute cancel ex:{}", () -> e);
                     success = false;
                     failList.add(hmilyParticipant);
                 } finally {
-                    HmilyTransactionContextLocal.getInstance().remove();
+                    HmilyContextHolder.remove();
                 }
             }
             executeHandler(success, currentTransaction, failList);
@@ -208,34 +214,81 @@ public class HmilyTransactionExecutor {
         }
         return null;
     }
-
+    
+    public Object participantCancel(final List<HmilyParticipant> hmilyParticipants) {
+        LogUtil.debug(LOGGER, () -> "tcc cancel ...........start!");
+        if (CollectionUtils.isEmpty(hmilyParticipants)) {
+            return null;
+        }
+        //if cc pattern，can not execute cancel
+        //update cancel
+        HmilyParticipant selfHmilyParticipant = filterSelfHmilyParticipant(hmilyParticipants);
+        if (Objects.nonNull(selfHmilyParticipant)) {
+            selfHmilyParticipant.setStatus(HmilyActionEnum.CANCELING.getCode());
+            updateHmilyParticipantStatus(selfHmilyParticipant);
+        }
+        List<Object> results = Lists.newArrayListWithCapacity(hmilyParticipants.size());
+        for (HmilyParticipant hmilyParticipant : hmilyParticipants) {
+            try {
+                final Object result = HmilyReflector.executor(HmilyActionEnum.CANCELING, ExecutorTypeEnum.LOCAL, hmilyParticipant);
+                results.add(result);
+                removeHmilyParticipant(hmilyParticipant);
+            } catch (Exception e) {
+                LogUtil.error(LOGGER, "execute cancel ex:{}", () -> e);
+            } finally {
+                HmilyContextHolder.remove();
+            }
+        }
+        return results.get(0);
+    }
+    
     /**
      * update transaction status by disruptor.
      *
      * @param hmilyTransaction {@linkplain HmilyTransaction}
      */
-    public void updateStatus(final HmilyTransaction hmilyTransaction) {
-        hmilyTransactionEventPublisher.publishEvent(hmilyTransaction, EventTypeEnum.UPDATE_STATUS.getCode());
+    public void updateStartStatus(final HmilyTransaction hmilyTransaction) {
+        updateHmilyTransactionStatus(hmilyTransaction);
+        HmilyParticipant hmilyParticipant = filterStartHmilyParticipant(hmilyTransaction);
+        if (Objects.nonNull(hmilyParticipant)) {
+            hmilyParticipant.setStatus(hmilyTransaction.getStatus());
+            updateHmilyParticipantStatus(hmilyParticipant);
+        }
     }
-
-    /**
-     * delete transaction by disruptor.
-     *
-     * @param hmilyTransaction {@linkplain HmilyTransaction}
-     */
-    public void deleteTransaction(final HmilyTransaction hmilyTransaction) {
-        hmilyTransactionEventPublisher.publishEvent(hmilyTransaction, EventTypeEnum.DELETE.getCode());
+    
+    public void removeStart(final HmilyTransaction hmilyTransaction) {
+        removeHmilyParticipant(filterStartHmilyParticipant(hmilyTransaction));
+        PUBLISHER.publishEvent(hmilyTransaction, EventTypeEnum.REMOVE_HMILY_TRANSACTION.getCode());
     }
-
+    
+    public void updateHmilyTransactionStatus(final HmilyTransaction hmilyTransaction) {
+        if (Objects.nonNull(hmilyTransaction)) {
+            PUBLISHER.publishEvent(hmilyTransaction, EventTypeEnum.UPDATE_HMILY_TRANSACTION_STATUS.getCode());
+        }
+    }
+    
+    public void updateHmilyParticipantStatus(final HmilyParticipant hmilyParticipant) {
+        if (Objects.nonNull(hmilyParticipant)) {
+            PUBLISHER.publishEvent(hmilyParticipant, EventTypeEnum.UPDATE_HMILY_PARTICIPANT_STATUS.getCode());
+        }
+    }
+    
+    public void removeHmilyParticipant(final HmilyParticipant hmilyParticipant) {
+        if (null != hmilyParticipant) {
+            PUBLISHER.publishEvent(hmilyParticipant, EventTypeEnum.REMOVE_HMILY_PARTICIPANT.getCode());
+        }
+    }
+    
+    
     /**
      * update Participant in transaction by disruptor.
      *
      * @param hmilyTransaction {@linkplain HmilyTransaction}
      */
     public void updateParticipant(final HmilyTransaction hmilyTransaction) {
-        hmilyTransactionEventPublisher.publishEvent(hmilyTransaction, EventTypeEnum.UPDATE_PARTICIPANT.getCode());
+        PUBLISHER.publishEvent(hmilyTransaction, EventTypeEnum.UPDATE_PARTICIPANT.getCode());
     }
-
+    
     /**
      * acquired by threadLocal.
      *
@@ -263,90 +316,95 @@ public class HmilyTransactionExecutor {
             return;
         }
         Optional.ofNullable(getCurrentTransaction())
-                .ifPresent(c -> {
-                    c.registerParticipant(hmilyParticipant);
-                    updateParticipant(c);
-                });
+                .ifPresent(c -> c.registerParticipant(hmilyParticipant));
     }
-
+    
     /**
      * when nested transaction add participant.
      *
-     * @param transId          key
+     * @param participantId    key
      * @param hmilyParticipant {@linkplain HmilyParticipant}
      */
-    public void registerByNested(final String transId, final HmilyParticipant hmilyParticipant) {
-        if (Objects.isNull(hmilyParticipant)
-                || Objects.isNull(hmilyParticipant.getCancelHmilyInvocation())
-                || Objects.isNull(hmilyParticipant.getConfirmHmilyInvocation())) {
+    public void registerParticipantByNested(final String participantId, final HmilyParticipant hmilyParticipant) {
+        if (Objects.isNull(hmilyParticipant)) {
             return;
         }
-        final HmilyTransaction hmilyTransaction =
-                HmilyTransactionGuavaCacheManager.getInstance().getHmilyTransaction(transId);
-        Optional.ofNullable(hmilyTransaction)
-                .ifPresent(transaction -> {
-                    transaction.registerParticipant(hmilyParticipant);
-                    updateParticipant(transaction);
-                });
+        HmilyParticipantCacheManager.getInstance().cacheHmilyParticipant(participantId, hmilyParticipant);
     }
-
+    
     private void executeHandler(final boolean success, final HmilyTransaction currentTransaction, final List<HmilyParticipant> failList) {
-        HmilyTransactionGuavaCacheManager.getInstance().removeByKey(currentTransaction.getTransId());
+        HmilyParticipantCacheManager.getInstance().removeByKey(currentTransaction.getTransId());
         if (success) {
-            deleteTransaction(currentTransaction);
+            removeStart(currentTransaction);
         } else {
-            currentTransaction.setHmilyParticipants(failList);
-            updateParticipant(currentTransaction);
             throw new HmilyRuntimeException(failList.toString());
         }
     }
-
-    private List<HmilyParticipant> filterPoint(final HmilyTransaction currentTransaction) {
+    
+    private HmilyParticipant filterStartHmilyParticipant(final HmilyTransaction currentTransaction) {
         final List<HmilyParticipant> hmilyParticipants = currentTransaction.getHmilyParticipants();
-        if (CollectionUtils.isNotEmpty(hmilyParticipants)) {
-            if (currentTransaction.getStatus() == HmilyActionEnum.TRYING.getCode()
-                    && currentTransaction.getRole() == HmilyRoleEnum.START.getCode()) {
-                return hmilyParticipants.stream()
-                        .limit(hmilyParticipants.size())
-                        .filter(Objects::nonNull).collect(Collectors.toList());
-            }
-        }
-        return hmilyParticipants;
+        return filterStartHmilyParticipant(hmilyParticipants);
     }
-
-    private HmilyTransaction buildHmilyTransaction(final ProceedingJoinPoint point, final int role, final String transId) {
-        HmilyTransaction hmilyTransaction;
-        if (StringUtils.isNoneBlank(transId)) {
-            hmilyTransaction = new HmilyTransaction(transId);
-        } else {
-            hmilyTransaction = new HmilyTransaction();
+    
+    
+    private HmilyParticipant filterStartHmilyParticipant(final List<HmilyParticipant> hmilyParticipants) {
+        if (CollectionUtils.isNotEmpty(hmilyParticipants)) {
+            return hmilyParticipants.stream().filter(e -> e.getRole() == HmilyRoleEnum.START.getCode()).findFirst().orElse(null);
         }
+        return null;
+    }
+    
+    private HmilyParticipant filterSelfHmilyParticipant(List<HmilyParticipant> hmilyParticipants) {
+        if (CollectionUtils.isNotEmpty(hmilyParticipants)) {
+            return hmilyParticipants.stream().filter(e -> e.getParticipantRefId() != null).findFirst().orElse(null);
+        }
+        return null;
+    }
+    
+    private HmilyTransaction createHmilyTransaction() {
+        HmilyTransaction hmilyTransaction = new HmilyTransaction();
+        hmilyTransaction.setTransId(IdWorkerUtils.getInstance().createUUID());
         hmilyTransaction.setStatus(HmilyActionEnum.PRE_TRY.getCode());
-        hmilyTransaction.setRole(role);
+        hmilyTransaction.setTransType(TransTypeEnum.TCC.name());
+        return hmilyTransaction;
+    }
+    
+    private HmilyParticipant buildHmilyParticipant(final ProceedingJoinPoint point, final String participantId, final String participantRefId, final int role, final String transId) {
         MethodSignature signature = (MethodSignature) point.getSignature();
         Method method = signature.getMethod();
         Class<?> clazz = point.getTarget().getClass();
         Object[] args = point.getArgs();
-        final Hmily hmily = method.getAnnotation(Hmily.class);
-        final PatternEnum pattern = hmily.pattern();
-        hmilyTransaction.setTargetClass(clazz.getName());
-        hmilyTransaction.setTargetMethod(method.getName());
-        hmilyTransaction.setPattern(pattern.getCode());
-        HmilyInvocation confirmInvocation = null;
-        String confirmMethodName = hmily.confirmMethod();
-        String cancelMethodName = hmily.cancelMethod();
+        final HmilyTCC hmilyTCC = method.getAnnotation(HmilyTCC.class);
+        String confirmMethodName = hmilyTCC.confirmMethod();
+        String cancelMethodName = hmilyTCC.cancelMethod();
+        if (StringUtils.isBlank(confirmMethodName) || StringUtils.isBlank(cancelMethodName)) {
+            return null;
+        }
+        HmilyParticipant hmilyParticipant = new HmilyParticipant();
+        if (null == participantId) {
+            hmilyParticipant.setParticipantId(IdWorkerUtils.getInstance().createUUID());
+        } else {
+            hmilyParticipant.setParticipantId(participantId);
+        }
+        if (null != participantRefId) {
+            hmilyParticipant.setParticipantRefId(participantRefId);
+        }
+        hmilyParticipant.setTransId(transId);
+        hmilyParticipant.setTransType(TransTypeEnum.TCC.name());
+        hmilyParticipant.setStatus(HmilyActionEnum.PRE_TRY.getCode());
+        hmilyParticipant.setRole(role);
+        hmilyParticipant.setTargetClass(clazz.getName());
+        hmilyParticipant.setTargetMethod(method.getName());
         if (StringUtils.isNoneBlank(confirmMethodName)) {
-            hmilyTransaction.setConfirmMethod(confirmMethodName);
-            confirmInvocation = new HmilyInvocation(clazz, confirmMethodName, method.getParameterTypes(), args);
+            hmilyParticipant.setConfirmMethod(confirmMethodName);
+            HmilyInvocation confirmInvocation = new HmilyInvocation(clazz.getInterfaces()[0], method.getName(), method.getParameterTypes(), args);
+            hmilyParticipant.setConfirmHmilyInvocation(confirmInvocation);
         }
-        HmilyInvocation cancelInvocation = null;
         if (StringUtils.isNoneBlank(cancelMethodName)) {
-            hmilyTransaction.setCancelMethod(cancelMethodName);
-            cancelInvocation = new HmilyInvocation(clazz, cancelMethodName, method.getParameterTypes(), args);
+            hmilyParticipant.setCancelMethod(cancelMethodName);
+            HmilyInvocation cancelInvocation = new HmilyInvocation(clazz.getInterfaces()[0], method.getName(), method.getParameterTypes(), args);
+            hmilyParticipant.setCancelHmilyInvocation(cancelInvocation);
         }
-        final HmilyParticipant hmilyParticipant = new HmilyParticipant(hmilyTransaction.getTransId(), confirmInvocation, cancelInvocation);
-        hmilyTransaction.registerParticipant(hmilyParticipant);
-        return hmilyTransaction;
+        return hmilyParticipant;
     }
-
 }

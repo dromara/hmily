@@ -42,7 +42,7 @@ public enum HmilyRoleEnum {
     /**
      * Provider tcc role enum.
      */
-    PROVIDER(3, "提供者"),
+    PARTICIPANT(3, "参与者"),
 
     /**
      * Local tcc role enum.

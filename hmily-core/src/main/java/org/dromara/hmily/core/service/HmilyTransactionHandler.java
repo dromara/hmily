@@ -17,7 +17,7 @@
 
 package org.dromara.hmily.core.service;
 
-import org.dromara.hmily.common.bean.context.HmilyTransactionContext;
+import org.dromara.hmily.core.context.HmilyTransactionContext;
 import org.aspectj.lang.ProceedingJoinPoint;
 
 /**

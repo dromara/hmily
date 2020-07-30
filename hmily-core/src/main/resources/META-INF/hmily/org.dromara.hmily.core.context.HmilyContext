@@ -1,0 +1,2 @@
+org.dromara.hmily.core.context.ThreadLocalHmilyContext
+org.dromara.hmily.core.context.TransmittableThreadLocalHmilyContext

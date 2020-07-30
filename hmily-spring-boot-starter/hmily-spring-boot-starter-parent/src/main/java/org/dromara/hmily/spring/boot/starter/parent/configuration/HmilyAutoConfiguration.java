@@ -17,8 +17,7 @@
 
 package org.dromara.hmily.spring.boot.starter.parent.configuration;
 
-import org.dromara.hmily.core.bootstrap.HmilyTransactionBootstrap;
-import org.dromara.hmily.core.service.HmilyInitService;
+import org.dromara.hmily.spring.HmilyApplicationContextAware;
 import org.dromara.hmily.spring.boot.starter.parent.config.HmilyConfigProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -50,26 +49,26 @@ public class HmilyAutoConfiguration {
     @Bean
     @Qualifier("hmilyTransactionBootstrap")
     @Primary
-    public HmilyTransactionBootstrap hmilyTransactionBootstrap(HmilyInitService hmilyInitService) {
-        final HmilyTransactionBootstrap hmilyTransactionBootstrap = new HmilyTransactionBootstrap(hmilyInitService);
-        hmilyTransactionBootstrap.setBufferSize(hmilyConfigProperties.getBufferSize());
-        hmilyTransactionBootstrap.setRetryMax(hmilyConfigProperties.getRetryMax());
-        hmilyTransactionBootstrap.setRecoverDelayTime(hmilyConfigProperties.getRecoverDelayTime());
-        hmilyTransactionBootstrap.setRepositorySuffix(hmilyConfigProperties.getRepositorySuffix());
-        hmilyTransactionBootstrap.setRepositorySupport(hmilyConfigProperties.getRepositorySupport());
-        hmilyTransactionBootstrap.setScheduledDelay(hmilyConfigProperties.getScheduledDelay());
-        hmilyTransactionBootstrap.setScheduledInitDelay(hmilyConfigProperties.getScheduledInitDelay());
-        hmilyTransactionBootstrap.setScheduledThreadMax(hmilyConfigProperties.getScheduledThreadMax());
-        hmilyTransactionBootstrap.setSerializer(hmilyConfigProperties.getSerializer());
-        hmilyTransactionBootstrap.setHmilyFileConfig(hmilyConfigProperties.getHmilyFileConfig());
-        hmilyTransactionBootstrap.setHmilyDbConfig(hmilyConfigProperties.getHmilyDbConfig());
-        hmilyTransactionBootstrap.setHmilyRedisConfig(hmilyConfigProperties.getHmilyRedisConfig());
-        hmilyTransactionBootstrap.setHmilyZookeeperConfig(hmilyConfigProperties.getHmilyZookeeperConfig());
-        hmilyTransactionBootstrap.setHmilyMongoConfig(hmilyConfigProperties.getHmilyMongoConfig());
-        hmilyTransactionBootstrap.setConsumerThreads(hmilyConfigProperties.getConsumerThreads());
-        hmilyTransactionBootstrap.setLoadFactor(hmilyConfigProperties.getLoadFactor());
-        hmilyTransactionBootstrap.setAsyncThreads(hmilyConfigProperties.getAsyncThreads());
-        hmilyTransactionBootstrap.setConcurrencyScale(hmilyConfigProperties.getConcurrencyScale());
-        return hmilyTransactionBootstrap;
+    public HmilyApplicationContextAware hmilyTransactionBootstrap() {
+        final HmilyApplicationContextAware contextAware = new HmilyApplicationContextAware();
+        contextAware.setBufferSize(hmilyConfigProperties.getBufferSize());
+        contextAware.setRetryMax(hmilyConfigProperties.getRetryMax());
+        contextAware.setRecoverDelayTime(hmilyConfigProperties.getRecoverDelayTime());
+        contextAware.setAppName(hmilyConfigProperties.getAppName());
+        contextAware.setRepository(hmilyConfigProperties.getRepository());
+        contextAware.setScheduledDelay(hmilyConfigProperties.getScheduledDelay());
+        contextAware.setScheduledInitDelay(hmilyConfigProperties.getScheduledInitDelay());
+        contextAware.setScheduledThreadMax(hmilyConfigProperties.getScheduledThreadMax());
+        contextAware.setSerializer(hmilyConfigProperties.getSerializer());
+        contextAware.setHmilyFileConfig(hmilyConfigProperties.getHmilyFileConfig());
+        contextAware.setHmilyDbConfig(hmilyConfigProperties.getHmilyDbConfig());
+        contextAware.setHmilyRedisConfig(hmilyConfigProperties.getHmilyRedisConfig());
+        contextAware.setHmilyZookeeperConfig(hmilyConfigProperties.getHmilyZookeeperConfig());
+        contextAware.setHmilyMongoConfig(hmilyConfigProperties.getHmilyMongoConfig());
+        contextAware.setConsumerThreads(hmilyConfigProperties.getConsumerThreads());
+        contextAware.setLoadFactor(hmilyConfigProperties.getLoadFactor());
+        contextAware.setAsyncThreads(hmilyConfigProperties.getAsyncThreads());
+        contextAware.setConcurrencyScale(hmilyConfigProperties.getConcurrencyScale());
+        return contextAware;
     }
 }

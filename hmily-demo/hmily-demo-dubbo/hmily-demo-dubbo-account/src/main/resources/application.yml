@@ -6,24 +6,25 @@ server:
 spring:
     datasource:
         driver-class-name:  com.mysql.jdbc.Driver
-        url: jdbc:mysql://192.168.1.98:3306/tcc_account?useUnicode=true&characterEncoding=utf8
+        url: jdbc:mysql://127.0.0.1:3306/tcc_account?useUnicode=true&characterEncoding=utf8
         username: root
-        password: 123456
+        password:
 org:
     dromara:
          hmily :
+            app-name: account
             serializer : kryo
-            recoverDelayTime : 128
+            recoverDelayTime : 60
             retryMax : 30
-            scheduledDelay : 128
+            scheduledDelay : 60
             scheduledThreadMax :  10
-            repositorySupport : db
-            started: false
+            repository : mysql
             hmilyDbConfig :
-                 driverClassName  : com.mysql.jdbc.Driver
-                 url :  jdbc:mysql://192.168.1.98:3306/tcc?useUnicode=true&characterEncoding=utf8
+                 driverClassName : com.mysql.jdbc.Driver
+                 url :  jdbc:mysql://127.0.0.1:3306/hmily?useUnicode=true&characterEncoding=utf8
                  username : root
-                 password : 123456
+                 password :
+
 
 
 

@@ -18,15 +18,16 @@
 
 package org.dromara.hmily.core.reflect;
 
+import java.util.Objects;
 import org.apache.commons.lang3.reflect.MethodUtils;
-import org.dromara.hmily.common.bean.context.HmilyTransactionContext;
-import org.dromara.hmily.common.bean.entity.HmilyInvocation;
+import org.dromara.hmily.common.enums.ExecutorTypeEnum;
 import org.dromara.hmily.common.enums.HmilyActionEnum;
 import org.dromara.hmily.common.enums.HmilyRoleEnum;
-import org.dromara.hmily.core.concurrent.threadlocal.HmilyTransactionContextLocal;
+import org.dromara.hmily.core.context.HmilyContextHolder;
+import org.dromara.hmily.core.context.HmilyTransactionContext;
 import org.dromara.hmily.core.helper.SpringBeanUtils;
-
-import java.util.Objects;
+import org.dromara.hmily.repository.spi.entity.HmilyInvocation;
+import org.dromara.hmily.repository.spi.entity.HmilyParticipant;
 
 /**
  * The type Hmily reflector.
@@ -34,37 +35,63 @@ import java.util.Objects;
  * @author xiaoyu(Myth)
  */
 public class HmilyReflector {
-
+    
     /**
      * Executor object.
      *
-     * @param transId         the trans id
-     * @param actionEnum      the action enum
-     * @param hmilyInvocation the hmily invocation
+     * @param action           the action
+     * @param executorType     the executor type
+     * @param hmilyParticipant the hmily participant
      * @return the object
      * @throws Exception the exception
      */
-    public static Object executor(final String transId, final HmilyActionEnum actionEnum,
-                                  final HmilyInvocation hmilyInvocation) throws Exception {
-        HmilyTransactionContext context = new HmilyTransactionContext();
-        context.setAction(actionEnum.getCode());
-        context.setTransId(transId);
-        context.setRole(HmilyRoleEnum.START.getCode());
-        HmilyTransactionContextLocal.getInstance().set(context);
-        return execute(hmilyInvocation);
+    public static Object executor(final HmilyActionEnum action, final ExecutorTypeEnum executorType, final HmilyParticipant hmilyParticipant) throws Exception {
+        if (executorType == ExecutorTypeEnum.RPC && hmilyParticipant.getRole() != HmilyRoleEnum.START.getCode()) {
+            setContext(action, hmilyParticipant);
+            if (action == HmilyActionEnum.CONFIRMING) {
+                return executeRpc(hmilyParticipant.getConfirmHmilyInvocation());
+            } else {
+                return executeRpc(hmilyParticipant.getCancelHmilyInvocation());
+            }
+        } else {
+            if (action == HmilyActionEnum.CONFIRMING) {
+                return executeLocal(hmilyParticipant.getConfirmHmilyInvocation(), hmilyParticipant.getTargetClass(), hmilyParticipant.getConfirmMethod());
+            } else {
+                return executeLocal(hmilyParticipant.getConfirmHmilyInvocation(), hmilyParticipant.getTargetClass(), hmilyParticipant.getCancelMethod());
+            }
+        }
     }
-
-    @SuppressWarnings("unchecked")
-    private static Object execute(final HmilyInvocation hmilyInvocation) throws Exception {
+    
+    private static void setContext(final HmilyActionEnum action, final HmilyParticipant hmilyParticipant) {
+        HmilyTransactionContext context = new HmilyTransactionContext();
+        context.setAction(action.getCode());
+        context.setTransId(hmilyParticipant.getTransId());
+        context.setParticipantId(hmilyParticipant.getParticipantId());
+        context.setRole(HmilyRoleEnum.START.getCode());
+        context.setTransType(hmilyParticipant.getTransType());
+        HmilyContextHolder.set(context);
+    }
+    
+    private static Object executeLocal(final HmilyInvocation hmilyInvocation, final String className, final String methodName) throws Exception {
         if (Objects.isNull(hmilyInvocation)) {
             return null;
         }
-        final Class clazz = hmilyInvocation.getTargetClass();
+        final Class<?> clazz = Class.forName(className);
+        final Object[] args = hmilyInvocation.getArgs();
+        final Class<?>[] parameterTypes = hmilyInvocation.getParameterTypes();
+        final Object bean = SpringBeanUtils.getInstance().getBean(clazz);
+        return MethodUtils.invokeMethod(bean, methodName, args, parameterTypes);
+    }
+    
+    private static Object executeRpc(final HmilyInvocation hmilyInvocation) throws Exception {
+        if (Objects.isNull(hmilyInvocation)) {
+            return null;
+        }
+        final Class<?> clazz = hmilyInvocation.getTargetClass();
         final String method = hmilyInvocation.getMethodName();
         final Object[] args = hmilyInvocation.getArgs();
-        final Class[] parameterTypes = hmilyInvocation.getParameterTypes();
+        final Class<?>[] parameterTypes = hmilyInvocation.getParameterTypes();
         final Object bean = SpringBeanUtils.getInstance().getBean(clazz);
         return MethodUtils.invokeMethod(bean, method, args, parameterTypes);
-
     }
 }
