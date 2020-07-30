@@ -21,7 +21,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <jdk.version>1.8</jdk.version>
-        <hmily.version>2.0.5-RELEASE</hmily.version>
+        <hmily.version>2.1.0-SNAPSHOT</hmily.version>
         <spring-cloud.version>Dalston.SR1</spring-cloud.version>
         <springfox.version>2.6.1</springfox.version>
     </properties>

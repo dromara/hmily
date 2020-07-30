@@ -36,6 +36,16 @@ public class SqlserverRepository extends AbstractHmilyDatabase {
     }
     
     @Override
+    protected String hmilyTransactionLimitSql() {
+        return null;
+    }
+    
+    @Override
+    protected String hmilyParticipantLimitSql() {
+        return null;
+    }
+    
+    @Override
     protected Object convertDataType(final Object params) {
         return params;
     }

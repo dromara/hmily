@@ -21,10 +21,10 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
-import org.dromara.hmily.annotation.Hmily;
+import org.dromara.hmily.annotation.HmilyTCC;
 
 /**
- * this is {@linkplain Hmily} aspect handler.
+ * this is aspect handler.
  *
  * @author xiaoyu
  */
@@ -43,14 +43,14 @@ public abstract class AbstractHmilyTransactionAspect {
     }
 
     /**
-     * this is point cut with {@linkplain Hmily }.
+     * this is point cut with {@linkplain HmilyTCC }.
      */
-    @Pointcut("@annotation(org.dromara.hmily.annotation.Hmily)")
+    @Pointcut("@annotation(org.dromara.hmily.annotation.HmilyTCC) || @annotation(org.dromara.hmily.annotation.HmilyAC)")
     public void hmilyInterceptor() {
     }
 
     /**
-     * this is around in {@linkplain Hmily }.
+     * this is around in {@linkplain HmilyTCC }.
      *
      * @param proceedingJoinPoint proceedingJoinPoint
      * @return Object object

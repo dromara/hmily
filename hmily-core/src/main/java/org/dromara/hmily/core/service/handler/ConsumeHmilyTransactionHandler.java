@@ -18,16 +18,14 @@
 package org.dromara.hmily.core.service.handler;
 
 import org.aspectj.lang.ProceedingJoinPoint;
-import org.dromara.hmily.common.bean.context.HmilyTransactionContext;
+import org.dromara.hmily.core.context.HmilyTransactionContext;
 import org.dromara.hmily.core.service.HmilyTransactionHandler;
-import org.springframework.stereotype.Component;
 
 /**
  * ConsumeHmilyTransactionHandler.
  *
  * @author xiaoyu
  */
-@Component
 public class ConsumeHmilyTransactionHandler implements HmilyTransactionHandler {
 
     @Override

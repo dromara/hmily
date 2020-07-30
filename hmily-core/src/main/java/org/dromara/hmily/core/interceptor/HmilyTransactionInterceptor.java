@@ -26,8 +26,7 @@ import org.aspectj.lang.ProceedingJoinPoint;
  */
 @FunctionalInterface
 public interface HmilyTransactionInterceptor {
-
-
+    
     /**
      * hmily interceptor handler.
      *

@@ -17,69 +17,53 @@
 
 package org.dromara.hmily.core.service.handler;
 
+import java.lang.reflect.Method;
+import java.util.List;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
-import org.dromara.hmily.common.bean.context.HmilyTransactionContext;
-import org.dromara.hmily.common.bean.entity.HmilyTransaction;
 import org.dromara.hmily.common.enums.HmilyActionEnum;
 import org.dromara.hmily.common.utils.DefaultValueUtils;
-import org.dromara.hmily.core.cache.HmilyTransactionGuavaCacheManager;
-import org.dromara.hmily.core.concurrent.threadlocal.HmilyTransactionContextLocal;
+import org.dromara.hmily.core.cache.HmilyParticipantCacheManager;
+import org.dromara.hmily.core.context.HmilyContextHolder;
+import org.dromara.hmily.core.context.HmilyTransactionContext;
 import org.dromara.hmily.core.service.HmilyTransactionHandler;
 import org.dromara.hmily.core.service.executor.HmilyTransactionExecutor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import java.lang.reflect.Method;
+import org.dromara.hmily.repository.spi.entity.HmilyParticipant;
 
 /**
  * Participant Handler.
  *
  * @author xiaoyu
  */
-@Component
 public class ParticipantHmilyTransactionHandler implements HmilyTransactionHandler {
-
-    private final HmilyTransactionExecutor hmilyTransactionExecutor;
-
-    /**
-     * Instantiates a new Participant hmily transaction handler.
-     *
-     * @param hmilyTransactionExecutor the hmily transaction executor
-     */
-    @Autowired
-    public ParticipantHmilyTransactionHandler(final HmilyTransactionExecutor hmilyTransactionExecutor) {
-        this.hmilyTransactionExecutor = hmilyTransactionExecutor;
-    }
-
+    
+    private final HmilyTransactionExecutor executor = HmilyTransactionExecutor.getInstance();
+    
     @Override
     public Object handler(final ProceedingJoinPoint point, final HmilyTransactionContext context) throws Throwable {
-        HmilyTransaction hmilyTransaction = null;
-        HmilyTransaction currentTransaction;
+        HmilyParticipant hmilyParticipant = null;
         switch (HmilyActionEnum.acquireByCode(context.getAction())) {
             case TRYING:
                 try {
-                    hmilyTransaction = hmilyTransactionExecutor.preTryParticipant(context, point);
+                    hmilyParticipant = executor.preTryParticipant(context, point);
                     final Object proceed = point.proceed();
-                    hmilyTransaction.setStatus(HmilyActionEnum.TRYING.getCode());
+                    hmilyParticipant.setStatus(HmilyActionEnum.TRYING.getCode());
                     //update log status to try
-                    hmilyTransactionExecutor.updateStatus(hmilyTransaction);
+                    executor.updateHmilyParticipantStatus(hmilyParticipant);
                     return proceed;
                 } catch (Throwable throwable) {
                     //if exception ,delete log.
-                    hmilyTransactionExecutor.deleteTransaction(hmilyTransaction);
+                    executor.removeHmilyParticipant(hmilyParticipant);
                     throw throwable;
                 } finally {
-                    HmilyTransactionContextLocal.getInstance().remove();
+                    HmilyContextHolder.remove();
                 }
             case CONFIRMING:
-                currentTransaction = HmilyTransactionGuavaCacheManager
-                        .getInstance().getHmilyTransaction(context.getTransId());
-                return hmilyTransactionExecutor.confirm(currentTransaction);
+                List<HmilyParticipant> confirmList = HmilyParticipantCacheManager.getInstance().get(context.getParticipantId());
+                return executor.participantConfirm(confirmList);
             case CANCELING:
-                currentTransaction = HmilyTransactionGuavaCacheManager
-                        .getInstance().getHmilyTransaction(context.getTransId());
-                return hmilyTransactionExecutor.cancel(currentTransaction);
+                List<HmilyParticipant> cancelList = HmilyParticipantCacheManager.getInstance().get(context.getParticipantId());
+                return executor.participantCancel(cancelList);
             default:
                 break;
         }

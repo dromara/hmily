@@ -18,7 +18,7 @@
 package org.dromara.hmily.demo.dubbo.inventory.service;
 
 import com.google.common.collect.Lists;
-import org.dromara.hmily.annotation.Hmily;
+import org.dromara.hmily.annotation.HmilyTCC;
 import org.dromara.hmily.common.exception.HmilyRuntimeException;
 import org.dromara.hmily.demo.dubbo.inventory.api.dto.InventoryDTO;
 import org.dromara.hmily.demo.dubbo.inventory.api.entity.InventoryDO;
@@ -72,7 +72,7 @@ public class InventoryServiceImpl implements InventoryService {
      * @return true
      */
     @Override
-    @Hmily(confirmMethod = "confirmMethod", cancelMethod = "cancelMethod")
+    @HmilyTCC(confirmMethod = "confirmMethod", cancelMethod = "cancelMethod")
     public Boolean decrease(InventoryDTO inventoryDTO) {
         inventoryMapper.decrease(inventoryDTO);
         final int i = tryCount.incrementAndGet();
@@ -81,7 +81,7 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     @Override
-    @Hmily(confirmMethod = "confirmInline", cancelMethod = "cancelInline")
+    @HmilyTCC(confirmMethod = "confirmInline", cancelMethod = "cancelInline")
     public List<InventoryDTO> testInLine() {
         System.out.println("test in line for rpc.......");
         return new ArrayList<>();
@@ -123,14 +123,14 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     @Override
-    @Hmily(confirmMethod = "confirmMethod", cancelMethod = "cancelMethod")
+    @HmilyTCC(confirmMethod = "confirmMethod", cancelMethod = "cancelMethod")
     public String mockWithTryException(InventoryDTO inventoryDTO) {
         //这里是模拟异常所以就直接抛出异常了
         throw new HmilyRuntimeException("库存扣减异常！");
     }
 
     @Override
-    @Hmily(confirmMethod = "confirmMethod", cancelMethod = "cancelMethod")
+    @HmilyTCC(confirmMethod = "confirmMethod", cancelMethod = "cancelMethod")
     @Transactional(rollbackFor = Exception.class)
     public Boolean mockWithTryTimeout(InventoryDTO inventoryDTO) {
         try {
@@ -147,7 +147,7 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     @Override
-    @Hmily(confirmMethod = "confirmMethodException", cancelMethod = "cancelMethod")
+    @HmilyTCC(confirmMethod = "confirmMethodException", cancelMethod = "cancelMethod")
     @Transactional(rollbackFor = Exception.class)
     public String mockWithConfirmException(InventoryDTO inventoryDTO) {
         final int decrease = inventoryMapper.decrease(inventoryDTO);
@@ -158,7 +158,7 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     @Override
-    @Hmily(confirmMethod = "confirmMethodTimeout", cancelMethod = "cancelMethod")
+    @HmilyTCC(confirmMethod = "confirmMethodTimeout", cancelMethod = "cancelMethod")
     @Transactional(rollbackFor = Exception.class)
     public Boolean mockWithConfirmTimeout(InventoryDTO inventoryDTO) {
         LOGGER.info("==========调用扣减库存确认方法mockWithConfirmTimeout===========");

@@ -30,7 +30,7 @@ import org.dromara.hmily.core.disruptor.event.DataEvent;
  * disruptor provider manager.
  *
  * @param <T> the type parameter
- * @author chenbin sixh
+ * @author xiaoyu sixh
  */
 public class DisruptorProviderManage<T> {
 
@@ -44,7 +44,7 @@ public class DisruptorProviderManage<T> {
 
     private Integer consumerSize;
 
-    private DisruptorConsumerFactory consumerFactory;
+    private DisruptorConsumerFactory<T> consumerFactory;
 
     /**
      * Instantiates a new Disruptor provider manage.
@@ -52,7 +52,7 @@ public class DisruptorProviderManage<T> {
      * @param consumerFactory the consumer factory
      * @param ringBufferSize  the size
      */
-    public DisruptorProviderManage(final DisruptorConsumerFactory consumerFactory, final Integer ringBufferSize) {
+    public DisruptorProviderManage(final DisruptorConsumerFactory<T> consumerFactory, final Integer ringBufferSize) {
         this(consumerFactory,
                 DEFAULT_CONSUMER_SIZE,
                 ringBufferSize);
@@ -63,7 +63,7 @@ public class DisruptorProviderManage<T> {
      *
      * @param consumerFactory the consumer factory
      */
-    public DisruptorProviderManage(final DisruptorConsumerFactory consumerFactory) {
+    public DisruptorProviderManage(final DisruptorConsumerFactory<T> consumerFactory) {
         this(consumerFactory, DEFAULT_CONSUMER_SIZE, DEFAULT_SIZE);
     }
 
@@ -74,7 +74,7 @@ public class DisruptorProviderManage<T> {
      * @param consumerSize    the consumer size
      * @param ringBufferSize  the ringBuffer size
      */
-    public DisruptorProviderManage(final DisruptorConsumerFactory consumerFactory,
+    public DisruptorProviderManage(final DisruptorConsumerFactory<T> consumerFactory,
                                    final int consumerSize,
                                    final int ringBufferSize) {
         this.consumerFactory = consumerFactory;
@@ -101,9 +101,9 @@ public class DisruptorProviderManage<T> {
         disruptor.setDefaultExceptionHandler(new IgnoreExceptionHandler());
         disruptor.start();
         RingBuffer<DataEvent<T>> ringBuffer = disruptor.getRingBuffer();
-        provider = new DisruptorProvider<>(ringBuffer);
+        provider = new DisruptorProvider<>(ringBuffer, disruptor);
     }
-
+    
     /**
      * Gets provider.
      *

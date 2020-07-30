@@ -17,20 +17,9 @@
 
 package org.dromara.hmily.core.service.handler;
 
-import org.dromara.hmily.common.utils.StringUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.reflect.MethodSignature;
-import org.dromara.hmily.annotation.Hmily;
-import org.dromara.hmily.common.bean.context.HmilyTransactionContext;
-import org.dromara.hmily.common.bean.entity.HmilyInvocation;
-import org.dromara.hmily.common.bean.entity.HmilyParticipant;
-import org.dromara.hmily.common.enums.HmilyActionEnum;
+import org.dromara.hmily.core.context.HmilyTransactionContext;
 import org.dromara.hmily.core.service.HmilyTransactionHandler;
-import org.dromara.hmily.core.service.executor.HmilyTransactionExecutor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import java.lang.reflect.Method;
 
 /**
  * InlineHmilyTransactionHandler.
@@ -38,24 +27,12 @@ import java.lang.reflect.Method;
  *
  * @author xiaoyu
  */
-@Component
 public class LocalHmilyTransactionHandler implements HmilyTransactionHandler {
-
-    private final HmilyTransactionExecutor hmilyTransactionExecutor;
-
-    /**
-     * Instantiates a new Local hmily transaction handler.
-     *
-     * @param hmilyTransactionExecutor the hmily transaction executor
-     */
-    @Autowired
-    public LocalHmilyTransactionHandler(final HmilyTransactionExecutor hmilyTransactionExecutor) {
-        this.hmilyTransactionExecutor = hmilyTransactionExecutor;
-    }
+    
 
     @Override
     public Object handler(final ProceedingJoinPoint point, final HmilyTransactionContext context) throws Throwable {
-        if (HmilyActionEnum.TRYING.getCode() == context.getAction()) {
+       /* if (HmilyActionEnum.TRYING.getCode() == context.getAction()) {
             MethodSignature signature = (MethodSignature) point.getSignature();
             Method method = signature.getMethod();
             Class<?> clazz = point.getTarget().getClass();
@@ -74,7 +51,7 @@ public class LocalHmilyTransactionHandler implements HmilyTransactionHandler {
             final HmilyParticipant hmilyParticipant = new HmilyParticipant(context.getTransId(),
                     confirmInvocation, cancelInvocation);
             hmilyTransactionExecutor.registerByNested(context.getTransId(), hmilyParticipant);
-        }
+        }*/
         return point.proceed();
     }
 

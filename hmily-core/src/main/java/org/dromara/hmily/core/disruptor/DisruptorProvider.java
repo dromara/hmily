@@ -18,6 +18,7 @@
 package org.dromara.hmily.core.disruptor;
 
 import com.lmax.disruptor.RingBuffer;
+import com.lmax.disruptor.dsl.Disruptor;
 import org.dromara.hmily.core.disruptor.event.DataEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,24 +28,27 @@ import org.slf4j.LoggerFactory;
  * disruptor provider definition.
  *
  * @param <T> the type parameter
- * @author chenbin sixh
+ * @author xiaoyu sixh
  */
 public class DisruptorProvider<T> {
-
+    
     private final RingBuffer<DataEvent<T>> ringBuffer;
-
+    
+    private final Disruptor<DataEvent<T>> disruptor;
+    
     /**
      * The Logger.
      */
     private Logger logger = LoggerFactory.getLogger(DisruptorProvider.class);
-
+    
     /**
      * Instantiates a new Disruptor provider.
      *
      * @param ringBuffer the ring buffer
      */
-    DisruptorProvider(final RingBuffer<DataEvent<T>> ringBuffer) {
+    DisruptorProvider(final RingBuffer<DataEvent<T>> ringBuffer, final Disruptor<DataEvent<T>> disruptor) {
         this.ringBuffer = ringBuffer;
+        this.disruptor = disruptor;
     }
 
     /**
@@ -60,6 +64,12 @@ public class DisruptorProvider<T> {
             ringBuffer.publish(position);
         } catch (Exception ex) {
             logger.error("push data error:", ex);
+        }
+    }
+    
+    public void shutdown() {
+        if (null != disruptor) {
+            disruptor.shutdown();
         }
     }
 }

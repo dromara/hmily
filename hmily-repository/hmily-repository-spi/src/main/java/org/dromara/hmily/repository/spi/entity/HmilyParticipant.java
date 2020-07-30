@@ -19,9 +19,7 @@ package org.dromara.hmily.repository.spi.entity;
 
 import java.io.Serializable;
 import java.util.Date;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 
 /**
@@ -30,8 +28,6 @@ import lombok.NoArgsConstructor;
  * @author xiaoyu
  */
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
 public class HmilyParticipant implements Serializable {
     
     private static final long serialVersionUID = -2590970715288987627L;
@@ -40,6 +36,11 @@ public class HmilyParticipant implements Serializable {
      * participant id
      */
     private String participantId;
+    
+    /**
+     * participant ref id.
+     */
+    private String participantRefId;
     
     /**
      * transaction id.
@@ -69,7 +70,7 @@ public class HmilyParticipant implements Serializable {
     /**
      * retry.
      */
-    private int retry;
+    private int retry = 0;
     
     /**
      * Call interface name.
@@ -115,4 +116,9 @@ public class HmilyParticipant implements Serializable {
      * cancel hmilyInvocation.
      */
     private HmilyInvocation cancelHmilyInvocation;
+    
+    public HmilyParticipant() {
+        this.createTime = new Date();
+        this.updateTime = new Date();
+    }
 }
