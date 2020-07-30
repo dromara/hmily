@@ -182,7 +182,7 @@ public class OrderServiceImpl implements OrderService {
     private Order buildOrder(Integer count, BigDecimal amount) {
         Order order = new Order();
         order.setCreateTime(new Date());
-        order.setNumber(IdWorkerUtils.getInstance().buildPartNumber());
+        order.setNumber(IdWorkerUtils.getInstance().createUUID());
         //demo中的表里只有商品id为1的数据
         order.setProductId("1");
         order.setStatus(OrderStatusEnum.NOT_PAY.getCode());
@@ -196,7 +196,7 @@ public class OrderServiceImpl implements OrderService {
     private Order buildTestOrder(Integer count, BigDecimal amount) {
         Order order = new Order();
         order.setCreateTime(new Date());
-        order.setNumber(IdWorkerUtils.getInstance().buildPartNumber());
+        order.setNumber(IdWorkerUtils.getInstance().createUUID());
         //demo中的表里只有商品id为1的数据
         order.setProductId("1");
         order.setStatus(OrderStatusEnum.PAY_SUCCESS.getCode());

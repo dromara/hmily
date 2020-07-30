@@ -7,26 +7,26 @@ server:
 spring:
     datasource:
         driver-class-name:  com.mysql.jdbc.Driver
-        url: jdbc:mysql://192.168.1.98:3306/tcc_order?useUnicode=true&characterEncoding=utf8
+        url: jdbc:mysql://127.0.0.1:3306/tcc_order?useUnicode=true&characterEncoding=utf8
         username: root
-        password: 123456
+        password:
 
 org:
     dromara:
          hmily :
+            app-name: order
             serializer : kryo
-            recoverDelayTime : 128
+            recoverDelayTime : 60
             retryMax : 30
-            scheduledDelay : 128
+            scheduledDelay : 60
             scheduledThreadMax :  10
-            repositorySupport : db
-            started: true
-            async-threads: 200
+            repository : mysql
+            async-threads: 16
             hmilyDbConfig :
                  driverClassName  : com.mysql.jdbc.Driver
-                 url :  jdbc:mysql://192.168.1.98:3306/tcc?useUnicode=true&characterEncoding=utf8
+                 url :  jdbc:mysql://127.0.0.1:3306/hmily?useUnicode=true&characterEncoding=utf8
                  username : root
-                 password : 123456
+                 password :
 
         #repositorySupport : redis
         #tccRedisConfig:
@@ -34,6 +34,7 @@ org:
                  #sentinel : true
                  #sentinelUrl : 192.168.1.91:26379;192.168.1.92:26379;192.168.1.93:26379
                 # password  : foobaredbbexONE123
+
 
 mybatis:
   type-aliases-package: com.hmily.tcc.demo.dubbo.order.entity

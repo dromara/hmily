@@ -17,7 +17,7 @@
 
 package org.dromara.hmily.core.concurrent.threadlocal;
 
-import org.dromara.hmily.common.bean.context.HmilyTransactionContext;
+import org.dromara.hmily.core.context.HmilyTransactionContext;
 
 /**
  * this is save hmily transactionContext in threadLocal.

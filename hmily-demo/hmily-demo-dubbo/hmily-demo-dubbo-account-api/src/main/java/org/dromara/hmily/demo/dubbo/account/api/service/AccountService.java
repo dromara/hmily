@@ -17,7 +17,7 @@
 
 package org.dromara.hmily.demo.dubbo.account.api.service;
 
-import org.dromara.hmily.annotation.Hmily;
+import org.dromara.hmily.annotation.HmilyTCC;
 import org.dromara.hmily.demo.dubbo.account.api.dto.AccountDTO;
 import org.dromara.hmily.demo.dubbo.account.api.dto.AccountNestedDTO;
 import org.dromara.hmily.demo.dubbo.account.api.entity.AccountDO;
@@ -35,7 +35,7 @@ public interface AccountService {
      * @param accountDTO 参数dto
      * @return true
      */
-    @Hmily
+    @HmilyTCC
     void payment(AccountDTO accountDTO);
 
     boolean testPayment(AccountDTO accountDTO);
@@ -46,7 +46,7 @@ public interface AccountService {
      * @param accountNestedDTO 参数dto
      * @return true
      */
-    @Hmily
+    @HmilyTCC
     boolean paymentWithNested(AccountNestedDTO accountNestedDTO);
 
 

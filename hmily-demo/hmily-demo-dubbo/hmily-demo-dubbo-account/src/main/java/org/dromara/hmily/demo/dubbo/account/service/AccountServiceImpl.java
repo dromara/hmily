@@ -17,7 +17,7 @@
 
 package org.dromara.hmily.demo.dubbo.account.service;
 
-import org.dromara.hmily.annotation.Hmily;
+import org.dromara.hmily.annotation.HmilyTCC;
 import org.dromara.hmily.demo.dubbo.account.api.dto.AccountDTO;
 import org.dromara.hmily.demo.dubbo.account.api.dto.AccountNestedDTO;
 import org.dromara.hmily.demo.dubbo.account.api.entity.AccountDO;
@@ -78,7 +78,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    @Hmily(confirmMethod = "confirm", cancelMethod = "cancel")
+    @HmilyTCC(confirmMethod = "confirm", cancelMethod = "cancel")
     public void payment(AccountDTO accountDTO) {
         accountMapper.update(accountDTO);
         /*final int i = trycount.incrementAndGet();
@@ -98,7 +98,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    @Hmily(confirmMethod = "confirmNested", cancelMethod = "cancelNested")
+    @HmilyTCC(confirmMethod = "confirmNested", cancelMethod = "cancelNested")
     @Transactional(rollbackFor = Exception.class)
     public boolean paymentWithNested(AccountNestedDTO accountNestedDTO) {
         AccountDTO dto = new AccountDTO();

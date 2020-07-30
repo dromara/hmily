@@ -18,7 +18,7 @@
 package org.dromara.hmily.demo.dubbo.order.service.impl;
 
 
-import org.dromara.hmily.annotation.Hmily;
+import org.dromara.hmily.annotation.HmilyTCC;
 import org.dromara.hmily.common.exception.HmilyRuntimeException;
 import org.dromara.hmily.demo.dubbo.account.api.dto.AccountDTO;
 import org.dromara.hmily.demo.dubbo.account.api.dto.AccountNestedDTO;
@@ -39,12 +39,8 @@ import org.springframework.stereotype.Service;
  * @author xiaoyu
  */
 @Service
-@SuppressWarnings("all")
 public class PaymentServiceImpl implements PaymentService {
-
-    /**
-     * logger.
-     */
+    
     private static final Logger LOGGER = LoggerFactory.getLogger(PaymentServiceImpl.class);
 
     private final OrderMapper orderMapper;
@@ -64,7 +60,7 @@ public class PaymentServiceImpl implements PaymentService {
 
 
     @Override
-    @Hmily(confirmMethod = "confirmOrderStatus", cancelMethod = "cancelOrderStatus")
+    @HmilyTCC(confirmMethod = "confirmOrderStatus", cancelMethod = "cancelOrderStatus")
     public void makePayment(Order order) {
         order.setStatus(OrderStatusEnum.PAYING.getCode());
         orderMapper.update(order);
@@ -121,7 +117,7 @@ public class PaymentServiceImpl implements PaymentService {
      * @param order 订单实体
      */
     @Override
-    @Hmily(confirmMethod = "confirmOrderStatus", cancelMethod = "cancelOrderStatus")
+    @HmilyTCC(confirmMethod = "confirmOrderStatus", cancelMethod = "cancelOrderStatus")
     public void makePaymentWithNested(Order order) {
         order.setStatus(OrderStatusEnum.PAYING.getCode());
         orderMapper.update(order);
@@ -141,7 +137,7 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    @Hmily(confirmMethod = "confirmOrderStatus", cancelMethod = "cancelOrderStatus")
+    @HmilyTCC(confirmMethod = "confirmOrderStatus", cancelMethod = "cancelOrderStatus")
     public String mockPaymentInventoryWithTryException(Order order) {
         order.setStatus(OrderStatusEnum.PAYING.getCode());
         orderMapper.update(order);
@@ -161,7 +157,7 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    @Hmily(confirmMethod = "confirmOrderStatus", cancelMethod = "cancelOrderStatus")
+    @HmilyTCC(confirmMethod = "confirmOrderStatus", cancelMethod = "cancelOrderStatus")
     public String mockPaymentInventoryWithTryTimeout(Order order) {
         order.setStatus(OrderStatusEnum.PAYING.getCode());
         orderMapper.update(order);
@@ -181,7 +177,7 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    @Hmily(confirmMethod = "confirmOrderStatus", cancelMethod = "cancelOrderStatus")
+    @HmilyTCC(confirmMethod = "confirmOrderStatus", cancelMethod = "cancelOrderStatus")
     public String mockPaymentInventoryWithConfirmException(Order order) {
         order.setStatus(OrderStatusEnum.PAYING.getCode());
         orderMapper.update(order);
@@ -201,7 +197,7 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    @Hmily(confirmMethod = "confirmOrderStatus", cancelMethod = "cancelOrderStatus")
+    @HmilyTCC(confirmMethod = "confirmOrderStatus", cancelMethod = "cancelOrderStatus")
     public String mockPaymentInventoryWithConfirmTimeout(Order order) {
         order.setStatus(OrderStatusEnum.PAYING.getCode());
         orderMapper.update(order);

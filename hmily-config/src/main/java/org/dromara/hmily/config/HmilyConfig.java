@@ -57,7 +57,9 @@ public class HmilyConfig {
     /**
      * scheduledPool scheduledInitDelay unit SECONDS.
      */
-    private int scheduledInitDelay = 120;
+    private int scheduledInitDelay = 30;
+    
+    private int limit = 100;
 
     /**
      * retry max.
@@ -76,17 +78,27 @@ public class HmilyConfig {
      * 2.such as the starter down machine
      */
     private int loadFactor = 2;
-
+    
     /**
      * repository.
      */
     private String repository = "mysql";
     
     /**
+     * contextTransmittalMode.
+     */
+    private String contextTransmittalMode = "threadLocal";
+    
+    /**
+     * asyncRepository.
+     */
+    private boolean asyncRepository = true;
+    
+    /**
      * autoSql.
      */
     private boolean autoSql = true;
-
+    
     /**
      * disruptor bufferSize.
      */
@@ -106,7 +118,8 @@ public class HmilyConfig {
      * when start this set true  actor set false.
      */
     private Boolean started = true;
-
+    
+    
     /**
      * db config.
      */

@@ -15,21 +15,21 @@
 
     <context:component-scan base-package="org.dromara.hmily.*"/>
     <aop:aspectj-autoproxy expose-proxy="true"/>
-    <bean id="hmilyTransactionBootstrap" class="org.dromara.hmily.core.bootstrap.HmilyTransactionBootstrap">
+    <bean id="hmilyApplicationContextAware" class="org.dromara.hmily.spring.HmilyApplicationContextAware">
+        <property name="appName" value="inventory"/>
         <property name="serializer" value="kryo"/>
-        <property name="recoverDelayTime" value="120"/>
+        <property name="recoverDelayTime" value="60"/>
         <property name="retryMax" value="3"/>
-        <property name="scheduledDelay" value="120"/>
+        <property name="scheduledDelay" value="60"/>
         <property name="scheduledThreadMax" value="4"/>
-        <property name="repositorySupport" value="db"/>
-        <property name="started" value="false"/>
+        <property name="repository" value="mysql"/>
         <property name="hmilyDbConfig">
-            <bean class="org.dromara.hmily.common.config.HmilyDbConfig">
+            <bean class="org.dromara.hmily.config.HmilyDbConfig">
                 <property name="url"
-                          value="jdbc:mysql://192.168.1.98:3306/tcc?useUnicode=true&amp;characterEncoding=utf8"/>
+                          value="jdbc:mysql://127.0.0.1:3306/hmily?useUnicode=true&amp;characterEncoding=utf8"/>
                 <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
                 <property name="username" value="root"/>
-                <property name="password" value="123456"/>
+                <property name="password" value=""/>
             </bean>
         </property>
     </bean>

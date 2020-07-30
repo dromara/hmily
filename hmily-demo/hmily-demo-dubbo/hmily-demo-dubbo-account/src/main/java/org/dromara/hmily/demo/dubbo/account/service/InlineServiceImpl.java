@@ -1,6 +1,6 @@
 package org.dromara.hmily.demo.dubbo.account.service;
 
-import org.dromara.hmily.annotation.Hmily;
+import org.dromara.hmily.annotation.HmilyTCC;
 import org.dromara.hmily.demo.dubbo.account.api.service.InlineService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +18,7 @@ public class InlineServiceImpl implements InlineService {
     private static final Logger LOGGER = LoggerFactory.getLogger(InlineServiceImpl.class);
 
     @Override
-    @Hmily(confirmMethod = "inLineConfirm", cancelMethod = "inLineCancel")
+    @HmilyTCC(confirmMethod = "inLineConfirm", cancelMethod = "inLineCancel")
     public void testInline() {
         LOGGER.info("===========执行inline try 方法==============");
     }

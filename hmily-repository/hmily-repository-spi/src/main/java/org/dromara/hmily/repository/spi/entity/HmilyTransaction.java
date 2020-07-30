@@ -21,6 +21,7 @@ import com.google.common.collect.Lists;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import lombok.Data;
 
 /**
@@ -56,7 +57,7 @@ public class HmilyTransaction implements Serializable {
     /**
      * retry.
      */
-    private Integer retry;
+    private Integer retry = 0;
     
     /**
      * version number mysql optimistic lock control.
@@ -91,14 +92,20 @@ public class HmilyTransaction implements Serializable {
         this.updateTime = new Date();
         hmilyParticipants = Lists.newCopyOnWriteArrayList();
     }
-
+    
     /**
      * registerParticipant.
      *
      * @param hmilyParticipant {@linkplain HmilyParticipant}
      */
     public void registerParticipant(final HmilyParticipant hmilyParticipant) {
-        hmilyParticipants.add(hmilyParticipant);
+        if (Objects.nonNull(hmilyParticipant)) {
+            hmilyParticipants.add(hmilyParticipant);
+        }
     }
-
+    
+    public void registerParticipantList(final List<HmilyParticipant> hmilyParticipantList) {
+        hmilyParticipants.addAll(hmilyParticipantList);
+    }
+    
 }

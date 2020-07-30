@@ -31,5 +31,4 @@ public interface RpcTransmit {
      * @param value the value
      */
     void transmit(String key, String value);
-
 }

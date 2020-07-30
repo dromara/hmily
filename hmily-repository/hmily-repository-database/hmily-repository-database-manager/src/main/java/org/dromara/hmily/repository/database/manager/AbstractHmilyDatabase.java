@@ -22,23 +22,33 @@ import com.zaxxer.hikari.HikariDataSource;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 import javax.sql.DataSource;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.jdbc.ScriptRunner;
+import org.dromara.hmily.common.utils.CollectionUtils;
 import org.dromara.hmily.config.HmilyConfig;
 import org.dromara.hmily.config.HmilyDbConfig;
 import org.dromara.hmily.repository.spi.HmilyRepository;
+import org.dromara.hmily.repository.spi.entity.HmilyInvocation;
+import org.dromara.hmily.repository.spi.entity.HmilyParticipant;
 import org.dromara.hmily.repository.spi.entity.HmilyTransaction;
 import org.dromara.hmily.repository.spi.exception.HmilyRepositoryException;
 import org.dromara.hmily.serializer.spi.HmilySerializer;
+import org.dromara.hmily.serializer.spi.exception.HmilySerializerException;
 
 /**
  * The type Abstract hmily database.
@@ -46,8 +56,38 @@ import org.dromara.hmily.serializer.spi.HmilySerializer;
 @Slf4j
 public abstract class AbstractHmilyDatabase implements HmilyRepository {
     
-    protected static final String INSERT_HMILY_TRANSACTION = "INSERT INTO hmily_transaction_global (trans_id,app_name,status,trans_type,"
-            + "retry,version,create_time,update_time) VALUES(?,?,?,?,?,?,?,?,?)";
+    protected static final String INSERT_HMILY_TRANSACTION = "INSERT INTO hmily_transaction_global (trans_id, app_name, status, trans_type, "
+            + "retry, version, create_time, update_time) VALUES(?, ?, ?, ?, ?, ?, ?, ?)";
+    
+    protected static final String SELECT_HMILY_TRANSACTION_COMMON = "select trans_id, app_name, status, trans_type, retry, version from hmily_transaction_global ";
+    
+    protected static final String SELECT_HMILY_TRANSACTION_DELAY = SELECT_HMILY_TRANSACTION_COMMON + " where update_time < ? and app_name = ?";
+    
+    protected static final String SELECT_HMILY_TRANSACTION_WITH_TRANS_ID = SELECT_HMILY_TRANSACTION_COMMON + " where trans_id = ?";
+    
+    protected static final String UPDATE_HMILY_TRANSACTION_STATUS = "update hmily_transaction_global  set status=?  where trans_id = ? ";
+    
+    protected static final String UPDATE_HMILY_TRANSACTION_RETRY_LOCK = "update hmily_transaction_global set version =?, retry =? where trans_id = ? and version = ? ";
+    
+    protected static final String UPDATE_HMILY_PARTICIPANT_LOCK = "update hmily_transaction_participant set version =?, retry =? where participant_id = ? and version = ? ";
+    
+    protected static final String DELETE_HMILY_TRANSACTION = "delete from hmily_transaction_global where trans_id = ? ";
+    
+    protected static final String INSERT_HMILY_PARTICIPANT = "INSERT INTO hmily_transaction_participant (participant_id, participant_ref_id, trans_id, trans_type, status, app_name,"
+            + "role, retry, target_class, target_method, confirm_method, cancel_method, confirm_invocation, cancel_invocation, version, create_time, update_time) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? ,? , ? , ?, ?)";
+    
+    protected static final String SELECTOR_HMILY_PARTICIPANT_COMMON = "select participant_id, participant_ref_id, trans_id, trans_type, status, app_name,"
+            + "role, retry, target_class, target_method, confirm_method, cancel_method, confirm_invocation, cancel_invocation, version from hmily_transaction_participant ";
+    
+    protected static final String SELECTOR_HMILY_PARTICIPANT_WITH_KEY = SELECTOR_HMILY_PARTICIPANT_COMMON + "  where participant_id = ?";
+    
+    protected static final String SELECTOR_HMILY_PARTICIPANT_WITH_TRANS_ID = SELECTOR_HMILY_PARTICIPANT_COMMON + " where trans_id = ?";
+    
+    protected static final String SELECTOR_HMILY_PARTICIPANT_WITH_DELAY_AND_APP_NAME = SELECTOR_HMILY_PARTICIPANT_COMMON + " where update_time < ? and app_name = ? ";
+    
+    protected static final String UPDATE_HMILY_PARTICIPANT_STATUS = "update hmily_transaction_participant set status=? where participant_id = ? ";
+    
+    protected static final String DELETE_HMILY_PARTICIPANT = "delete from hmily_transaction_participant where participant_id = ? ";
     
     /**
      * The data source.
@@ -70,6 +110,10 @@ public abstract class AbstractHmilyDatabase implements HmilyRepository {
      * @return the string
      */
     protected abstract String sqlFilePath();
+    
+    protected abstract String hmilyTransactionLimitSql();
+    
+    protected abstract String hmilyParticipantLimitSql();
     
     /**
      * Convert data type object.
@@ -100,7 +144,9 @@ public abstract class AbstractHmilyDatabase implements HmilyRepository {
             this.dataSource = hikariDataSource;
             this.appName = hmilyConfig.getAppName();
             if (hmilyConfig.isAutoSql()) {
-                this.executeScript(dataSource.getConnection(), sqlFilePath());
+                String jdbcUrl = StringUtils.replace(hmilyDbConfig.getUrl(), "/hmily?", "?");
+                Connection connection = DriverManager.getConnection(jdbcUrl, hmilyDbConfig.getUsername(), hmilyDbConfig.getPassword());
+                this.executeScript(connection, sqlFilePath());
             }
         } catch (Exception e) {
             log.error("hmily jdbc log init exception please check config:{}", e.getMessage());
@@ -114,14 +160,162 @@ public abstract class AbstractHmilyDatabase implements HmilyRepository {
     }
     
     @Override
-    public int beginHmilyTransaction(final HmilyTransaction hmilyTransaction) {
-        try {
-            return executeUpdate(INSERT_HMILY_TRANSACTION, hmilyTransaction.getTransId(), hmilyTransaction.getAppName(), hmilyTransaction.getStatus(),
-                    hmilyTransaction.getTransType(), hmilyTransaction.getRetry(), hmilyTransaction.getVersion(), hmilyTransaction.getCreateTime(), hmilyTransaction.getUpdateTime());
-        } catch (HmilyRepositoryException e) {
-            log.error("create begin hmilyTransaction have exception ", e);
-            return FAIL_ROWS;
+    public HmilyTransaction findByTransId(final String transId) {
+        List<Map<String, Object>> list = executeQuery(SELECT_HMILY_TRANSACTION_WITH_TRANS_ID, transId);
+        if (CollectionUtils.isNotEmpty(list)) {
+            return list.stream().filter(Objects::nonNull)
+                    .map(this::buildHmilyTransactionByResultMap)
+                    .findFirst().orElse(null);
         }
+        return null;
+    }
+    
+    @Override
+    public int createHmilyTransaction(final HmilyTransaction hmilyTransaction) {
+        return executeUpdate(INSERT_HMILY_TRANSACTION, hmilyTransaction.getTransId(), appName, hmilyTransaction.getStatus(),
+                hmilyTransaction.getTransType(), hmilyTransaction.getRetry(), hmilyTransaction.getVersion(), hmilyTransaction.getCreateTime(), hmilyTransaction.getUpdateTime());
+    }
+    
+    @Override
+    public int updateRetryByLock(final HmilyTransaction hmilyTransaction) {
+        final Integer currentVersion = hmilyTransaction.getVersion();
+        hmilyTransaction.setVersion(hmilyTransaction.getVersion() + 1);
+        hmilyTransaction.setRetry(hmilyTransaction.getRetry() + 1);
+        return executeUpdate(UPDATE_HMILY_TRANSACTION_RETRY_LOCK, hmilyTransaction.getVersion(), hmilyTransaction.getRetry(), hmilyTransaction.getTransId(), currentVersion);
+    }
+    
+    @Override
+    public boolean lockHmilyParticipant(final HmilyParticipant hmilyParticipant) {
+        final Integer currentVersion = hmilyParticipant.getVersion();
+        hmilyParticipant.setVersion(hmilyParticipant.getVersion() + 1);
+        hmilyParticipant.setRetry(hmilyParticipant.getRetry() + 1);
+        return executeUpdate(UPDATE_HMILY_PARTICIPANT_LOCK, hmilyParticipant.getVersion(), hmilyParticipant.getRetry(), hmilyParticipant.getParticipantId(), currentVersion) > 0;
+    }
+    
+    @Override
+    public List<HmilyParticipant> listHmilyParticipant(Date date, int limit) {
+        String limitSql = hmilyParticipantLimitSql();
+        List<Map<String, Object>> participantList = executeQuery(limitSql, date, appName, limit);
+        if (CollectionUtils.isNotEmpty(participantList)) {
+            return participantList.stream()
+                    .filter(Objects::nonNull)
+                    .map(this::buildHmilyParticipantByResultMap)
+                    .collect(Collectors.toList());
+        }
+        return Collections.emptyList();
+    }
+    
+    @Override
+    public List<HmilyTransaction> listLimitByDelay(final Date date, final int limit) {
+        String limitSql = hmilyTransactionLimitSql();
+        List<Map<String, Object>> list = executeQuery(limitSql, date, appName, limit);
+        if (CollectionUtils.isNotEmpty(list)) {
+            List<HmilyTransaction> hmilyTransactionList = list.stream().filter(Objects::nonNull)
+                    .map(this::buildHmilyTransactionByResultMap)
+                    .collect(Collectors.toList());
+            for (HmilyTransaction hmilyTransaction : hmilyTransactionList) {
+                String sql = SELECTOR_HMILY_PARTICIPANT_WITH_TRANS_ID + "  and participant_ref_id is null";
+                List<Map<String, Object>> participantList = executeQuery(sql, hmilyTransaction.getTransId());
+                if (CollectionUtils.isNotEmpty(participantList)) {
+                    List<HmilyParticipant> hmilyParticipants = participantList.stream()
+                            .filter(Objects::nonNull)
+                            .map(this::buildHmilyParticipantByResultMap)
+                            .collect(Collectors.toList());
+                    hmilyTransaction.registerParticipantList(hmilyParticipants);
+                }
+            }
+            return hmilyTransactionList;
+        }
+        return Collections.emptyList();
+    }
+    
+    
+    @Override
+    public int updateHmilyTransactionStatus(final String transId, final Integer status) throws HmilyRepositoryException {
+        return executeUpdate(UPDATE_HMILY_TRANSACTION_STATUS, status, transId);
+    }
+    
+    @Override
+    public int removeHmilyTransaction(final String transId) {
+        return executeUpdate(DELETE_HMILY_TRANSACTION, transId);
+    }
+    
+    @Override
+    public int createHmilyParticipant(final HmilyParticipant hmilyParticipant) throws HmilyRepositoryException {
+        byte[] confirmSerialize = hmilySerializer.serialize(hmilyParticipant.getConfirmHmilyInvocation());
+        byte[] cancelSerialize = hmilySerializer.serialize(hmilyParticipant.getCancelHmilyInvocation());
+        return executeUpdate(INSERT_HMILY_PARTICIPANT, hmilyParticipant.getParticipantId(), hmilyParticipant.getParticipantRefId(), hmilyParticipant.getTransId(), hmilyParticipant.getTransType(), hmilyParticipant.getStatus(),
+                appName, hmilyParticipant.getRole(), hmilyParticipant.getRetry(), hmilyParticipant.getTargetClass(), hmilyParticipant.getTargetMethod(),
+                hmilyParticipant.getConfirmMethod(), hmilyParticipant.getCancelMethod(), confirmSerialize, cancelSerialize, hmilyParticipant.getVersion(), hmilyParticipant.getCreateTime(), hmilyParticipant.getUpdateTime());
+    }
+    
+    
+    @Override
+    public List<HmilyParticipant> findHmilyParticipant(final String participantId) {
+        List<HmilyParticipant> hmilyParticipantList = new ArrayList<>();
+        List<Map<String, Object>> result = executeQuery(SELECTOR_HMILY_PARTICIPANT_WITH_KEY, participantId);
+        if (CollectionUtils.isNotEmpty(result)) {
+            HmilyParticipant hmilyParticipant = result.stream()
+                    .filter(Objects::nonNull)
+                    .map(this::buildHmilyParticipantByResultMap)
+                    .findFirst().orElse(new HmilyParticipant());
+            hmilyParticipantList.add(hmilyParticipant);
+            if (StringUtils.isNoneBlank(hmilyParticipant.getParticipantRefId())) {
+                List<HmilyParticipant> hmilyParticipantRef = findHmilyParticipant(hmilyParticipant.getParticipantRefId());
+                hmilyParticipantList.addAll(hmilyParticipantRef);
+            }
+        }
+        return hmilyParticipantList;
+    }
+    
+    private HmilyTransaction buildHmilyTransactionByResultMap(final Map<String, Object> map) {
+        HmilyTransaction hmilyTransaction = new HmilyTransaction();
+        hmilyTransaction.setTransId((String) map.get("trans_id"));
+        hmilyTransaction.setTransType((String) map.get("trans_type"));
+        hmilyTransaction.setStatus((Integer) map.get("status"));
+        hmilyTransaction.setAppName((String) map.get("app_ame"));
+        hmilyTransaction.setRetry((Integer) map.get("retry"));
+        hmilyTransaction.setVersion((Integer) map.get("version"));
+        return hmilyTransaction;
+    }
+    
+    private HmilyParticipant buildHmilyParticipantByResultMap(final Map<String, Object> map) {
+        HmilyParticipant hmilyParticipant = new HmilyParticipant();
+        hmilyParticipant.setParticipantId((String) map.get("participant_id"));
+        hmilyParticipant.setParticipantRefId((String) map.get("participant_ref_id"));
+        hmilyParticipant.setTransId((String) map.get("trans_id"));
+        hmilyParticipant.setTransType((String) map.get("trans_type"));
+        hmilyParticipant.setStatus((Integer) map.get("status"));
+        hmilyParticipant.setRole((Integer) map.get("role"));
+        hmilyParticipant.setRetry((Integer) map.get("retry"));
+        hmilyParticipant.setAppName((String) map.get("app_name"));
+        hmilyParticipant.setTargetClass((String) map.get("target_class"));
+        hmilyParticipant.setTargetMethod((String) map.get("target_method"));
+        hmilyParticipant.setConfirmMethod((String) map.get("confirm_method"));
+        hmilyParticipant.setCancelMethod((String) map.get("cancel_method"));
+        byte[] confirmInvocation = (byte[]) map.get("confirm_invocation");
+        byte[] cancelInvocation = (byte[]) map.get("cancel_invocation");
+        try {
+            final HmilyInvocation confirmHmilyInvocation = hmilySerializer.deSerialize(confirmInvocation, HmilyInvocation.class);
+            hmilyParticipant.setConfirmHmilyInvocation(confirmHmilyInvocation);
+            final HmilyInvocation cancelHmilyInvocation = hmilySerializer.deSerialize(cancelInvocation, HmilyInvocation.class);
+            hmilyParticipant.setCancelHmilyInvocation(cancelHmilyInvocation);
+        } catch (HmilySerializerException e) {
+            log.error("hmilySerializer deSerialize have exception:{} ", e.getMessage());
+        }
+        hmilyParticipant.setVersion((Integer) map.get("version"));
+        return hmilyParticipant;
+    }
+    
+    @Override
+    public int updateHmilyParticipantStatus(final String participantId, final Integer status) {
+        return executeUpdate(UPDATE_HMILY_PARTICIPANT_STATUS, status, participantId);
+    }
+    
+    
+    @Override
+    public int removeHmilyParticipant(final String participantId) {
+        return executeUpdate(DELETE_HMILY_PARTICIPANT, participantId);
     }
     
     /**
@@ -201,7 +395,7 @@ public abstract class AbstractHmilyDatabase implements HmilyRepository {
         }
     }
     
-    private void executeScript(final Connection conn, final String sqlPath) throws Exception {
+    private void executeScript(Connection conn, final String sqlPath) throws Exception {
         ScriptRunner runner = new ScriptRunner(conn);
         // doesn't print logger
         runner.setLogWriter(null);

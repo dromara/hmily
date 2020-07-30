@@ -40,6 +40,16 @@ public class PostgresqlRepository extends AbstractHmilyDatabase {
     }
     
     @Override
+    protected String hmilyTransactionLimitSql() {
+        return null;
+    }
+    
+    @Override
+    protected String hmilyParticipantLimitSql() {
+        return null;
+    }
+    
+    @Override
     protected Object convertDataType(final Object params) {
         //https://jdbc.postgresql.org/documentation/head/8-date-time.html
         if (params instanceof java.util.Date) {
