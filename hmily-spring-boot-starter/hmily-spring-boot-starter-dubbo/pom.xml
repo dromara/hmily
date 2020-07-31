@@ -35,6 +35,7 @@
         <dependency>
             <groupId>org.dromara</groupId>
             <artifactId>hmily-spring-boot-starter-parent</artifactId>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>

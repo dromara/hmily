@@ -34,11 +34,13 @@
         <dependency>
             <groupId>org.dromara</groupId>
             <artifactId>hmily-spring-boot-starter-parent</artifactId>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.dromara</groupId>
             <artifactId>hmily-springcloud</artifactId>
+            <version>${project.version}</version>
         </dependency>
 
     </dependencies>

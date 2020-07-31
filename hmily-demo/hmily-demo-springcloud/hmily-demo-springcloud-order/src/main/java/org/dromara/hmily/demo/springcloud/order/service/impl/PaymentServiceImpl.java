@@ -17,7 +17,7 @@
 
 package org.dromara.hmily.demo.springcloud.order.service.impl;
 
-import org.dromara.hmily.annotation.Hmily;
+import org.dromara.hmily.annotation.HmilyTCC;
 import org.dromara.hmily.common.exception.HmilyRuntimeException;
 import org.dromara.hmily.demo.springcloud.order.client.AccountClient;
 import org.dromara.hmily.demo.springcloud.order.client.InventoryClient;
@@ -64,25 +64,24 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    @Hmily(confirmMethod = "confirmOrderStatus", cancelMethod = "cancelOrderStatus")
+    @HmilyTCC(confirmMethod = "confirmOrderStatus", cancelMethod = "cancelOrderStatus")
     public void makePayment(Order order) {
         order.setStatus(OrderStatusEnum.PAYING.getCode());
         orderMapper.update(order);
-        //检查数据
-        final BigDecimal accountInfo = accountClient.findByUserId(order.getUserId());
-
-        final Integer inventoryInfo = inventoryClient.findByProductId(order.getProductId());
-
-        if (accountInfo.compareTo(order.getTotalAmount()) < 0) {
-            throw new HmilyRuntimeException("余额不足！");
-        }
-
-        if (inventoryInfo < order.getCount()) {
-            throw new HmilyRuntimeException("库存不足！");
-        }
+//        //检查数据
+//        final BigDecimal accountInfo = accountClient.findByUserId(order.getUserId());
+//
+//        final Integer inventoryInfo = inventoryClient.findByProductId(order.getProductId());
+//
+//        if (accountInfo.compareTo(order.getTotalAmount()) < 0) {
+//            throw new HmilyRuntimeException("余额不足！");
+//        }
+//
+//        if (inventoryInfo < order.getCount()) {
+//            throw new HmilyRuntimeException("库存不足！");
+//        }
 
         //扣除用户余额
-
         //进入扣减库存操作
         InventoryDTO inventoryDTO = new InventoryDTO();
         inventoryDTO.setCount(order.getCount());
@@ -97,7 +96,7 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    @Hmily(confirmMethod = "confirmOrderStatus", cancelMethod = "cancelOrderStatus")
+    @HmilyTCC(confirmMethod = "confirmOrderStatus", cancelMethod = "cancelOrderStatus")
     public String mockPaymentInventoryWithTryException(Order order) {
         LOGGER.debug("===========执行springcloud  mockPaymentInventoryWithTryException 扣减资金接口==========");
         order.setStatus(OrderStatusEnum.PAYING.getCode());
@@ -115,7 +114,7 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    @Hmily(confirmMethod = "confirmOrderStatus", cancelMethod = "cancelOrderStatus")
+    @HmilyTCC(confirmMethod = "confirmOrderStatus", cancelMethod = "cancelOrderStatus")
     public String mockPaymentInventoryWithTryTimeout(Order order) {
         LOGGER.debug("===========执行springcloud  mockPaymentInventoryWithTryTimeout 扣减资金接口==========");
         order.setStatus(OrderStatusEnum.PAYING.getCode());

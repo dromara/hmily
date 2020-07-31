@@ -20,7 +20,7 @@
         <property name="serializer" value="kryo"/>
         <property name="recoverDelayTime" value="60"/>
         <property name="retryMax" value="3"/>
-        <property name="scheduledDelay" value="60"/>
+        <property name="scheduledRecoveryDelay" value="60"/>
         <property name="scheduledThreadMax" value="4"/>
         <property name="repository" value="mysql"/>
         <property name="hmilyDbConfig">

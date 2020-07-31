@@ -19,6 +19,7 @@ package org.dromara.hmily.core.service.handler;
 
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.Objects;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.dromara.hmily.common.enums.HmilyActionEnum;
@@ -53,6 +54,9 @@ public class ParticipantHmilyTransactionHandler implements HmilyTransactionHandl
                     return proceed;
                 } catch (Throwable throwable) {
                     //if exception ,delete log.
+                    if (Objects.nonNull(hmilyParticipant)) {
+                        HmilyParticipantCacheManager.getInstance().removeByKey(hmilyParticipant.getParticipantId());
+                    }
                     executor.removeHmilyParticipant(hmilyParticipant);
                     throw throwable;
                 } finally {
@@ -60,15 +64,14 @@ public class ParticipantHmilyTransactionHandler implements HmilyTransactionHandl
                 }
             case CONFIRMING:
                 List<HmilyParticipant> confirmList = HmilyParticipantCacheManager.getInstance().get(context.getParticipantId());
-                return executor.participantConfirm(confirmList);
+                return executor.participantConfirm(confirmList, context.getParticipantId());
             case CANCELING:
                 List<HmilyParticipant> cancelList = HmilyParticipantCacheManager.getInstance().get(context.getParticipantId());
-                return executor.participantCancel(cancelList);
+                return executor.participantCancel(cancelList, context.getParticipantId());
             default:
                 break;
         }
         Method method = ((MethodSignature) (point.getSignature())).getMethod();
         return DefaultValueUtils.getDefaultValue(method.getReturnType());
     }
-
 }

@@ -104,7 +104,17 @@ public class OrderServiceImpl implements OrderService {
         }
         return "success";
     }
-
+    
+    @Override
+    public String orderPayWithNestedException(Integer count, BigDecimal amount) {
+        final Order order = buildOrder(count, amount);
+        final int rows = orderMapper.save(order);
+        if (rows > 0) {
+            paymentService.makePaymentWithNestedException(order);
+        }
+        return "success";
+    }
+    
     /**
      * 模拟在订单支付操作中，库存在try阶段中的库存异常
      *

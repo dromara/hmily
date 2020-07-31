@@ -20,6 +20,7 @@ package org.dromara.hmily.repository.spi.entity;
 import java.io.Serializable;
 import java.util.Date;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 
 /**
@@ -28,6 +29,7 @@ import lombok.Data;
  * @author xiaoyu
  */
 @Data
+@EqualsAndHashCode
 public class HmilyParticipant implements Serializable {
     
     private static final long serialVersionUID = -2590970715288987627L;

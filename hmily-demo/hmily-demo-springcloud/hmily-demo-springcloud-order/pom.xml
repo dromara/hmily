@@ -33,6 +33,7 @@
         <dependency>
             <groupId>org.dromara</groupId>
             <artifactId>hmily-springcloud</artifactId>
+            <version>${hmily.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>

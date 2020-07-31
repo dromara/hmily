@@ -134,8 +134,38 @@ public class PaymentServiceImpl implements PaymentService {
         accountDTO.setProductId(order.getProductId());
         accountDTO.setCount(order.getCount());
         accountService.paymentWithNested(accountDTO);
+        //进入扣减库存操作
+        InventoryDTO inventoryDTO = new InventoryDTO();
+        inventoryDTO.setCount(order.getCount());
+        inventoryDTO.setProductId(order.getProductId());
+        inventoryService.decrease(inventoryDTO);
     }
-
+    
+    @Override
+    @HmilyTCC(confirmMethod = "confirmOrderStatus", cancelMethod = "cancelOrderStatus")
+    public void makePaymentWithNestedException(Order order) {
+        order.setStatus(OrderStatusEnum.PAYING.getCode());
+        orderMapper.update(order);
+    
+        //做库存和资金账户的检验工作 这里只是demo 。。。
+        final AccountDO accountDO = accountService.findByUserId(order.getUserId());
+        if (accountDO.getBalance().compareTo(order.getTotalAmount()) <= 0) {
+            throw new HmilyRuntimeException("余额不足！");
+        }
+        //扣除用户余额
+        AccountNestedDTO accountDTO = new AccountNestedDTO();
+        accountDTO.setAmount(order.getTotalAmount());
+        accountDTO.setUserId(order.getUserId());
+        accountDTO.setProductId(order.getProductId());
+        accountDTO.setCount(order.getCount());
+        accountService.paymentWithNestedException(accountDTO);
+        //进入扣减库存操作
+        InventoryDTO inventoryDTO = new InventoryDTO();
+        inventoryDTO.setCount(order.getCount());
+        inventoryDTO.setProductId(order.getProductId());
+        inventoryService.decrease(inventoryDTO);
+    }
+    
     @Override
     @HmilyTCC(confirmMethod = "confirmOrderStatus", cancelMethod = "cancelOrderStatus")
     public String mockPaymentInventoryWithTryException(Order order) {

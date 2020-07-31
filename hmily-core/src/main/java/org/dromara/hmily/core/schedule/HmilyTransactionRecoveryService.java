@@ -49,6 +49,7 @@ public class HmilyTransactionRecoveryService {
      * Cancel.
      *
      * @param hmilyParticipant the hmily participant
+     * @return the boolean
      */
     public boolean cancel(final HmilyParticipant hmilyParticipant) {
         try {
@@ -65,6 +66,7 @@ public class HmilyTransactionRecoveryService {
      * Confirm.
      *
      * @param hmilyParticipant the hmily participant
+     * @return the boolean
      */
     public boolean confirm(final HmilyParticipant hmilyParticipant) {
         try {

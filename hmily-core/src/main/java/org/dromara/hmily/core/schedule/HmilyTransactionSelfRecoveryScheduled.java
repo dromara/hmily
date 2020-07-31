@@ -51,17 +51,23 @@ public class HmilyTransactionSelfRecoveryScheduled implements AutoCloseable {
     
     private final HmilyRepository hmilyRepository;
     
-    private ScheduledExecutorService scheduledExecutorService;
+    private ScheduledExecutorService selfRecoveryExecutor;
+    
+    private ScheduledExecutorService cleanHmilyTransactionExecutor;
     
     private HmilyTransactionRecoveryService hmilyTransactionRecoveryService;
     
     public HmilyTransactionSelfRecoveryScheduled() {
         hmilyRepository = ExtensionLoaderFactory.load(HmilyRepository.class, hmilyConfig.getRepository());
-        this.scheduledExecutorService =
+        this.selfRecoveryExecutor =
                 new ScheduledThreadPoolExecutor(1,
                         HmilyThreadFactory.create("hmily-transaction-self-recovery", true));
+        this.cleanHmilyTransactionExecutor =
+                new ScheduledThreadPoolExecutor(1,
+                        HmilyThreadFactory.create("hmily-transaction-clean", true));
         hmilyTransactionRecoveryService = new HmilyTransactionRecoveryService(hmilyRepository);
         selfRecovery();
+        cleanHmilyTransaction();
     }
     
     
@@ -69,11 +75,10 @@ public class HmilyTransactionSelfRecoveryScheduled implements AutoCloseable {
      * if have some exception by schedule execute hmily transaction log.
      */
     private void selfRecovery() {
-        scheduledExecutorService
+        selfRecoveryExecutor
                 .scheduleWithFixedDelay(() -> {
-                    LogUtil.info(LOGGER, "self recovery execute delayTime:{}", hmilyConfig::getScheduledDelay);
                     try {
-                        List<HmilyParticipant> hmilyParticipantList = hmilyRepository.listHmilyParticipant(acquireData(), hmilyConfig.getLimit());
+                        List<HmilyParticipant> hmilyParticipantList = hmilyRepository.listHmilyParticipant(acquireDelayData(hmilyConfig.getRecoverDelayTime()), hmilyConfig.getLimit());
                         if (CollectionUtils.isEmpty(hmilyParticipantList)) {
                             return;
                         }
@@ -106,18 +111,39 @@ public class HmilyTransactionSelfRecoveryScheduled implements AutoCloseable {
                     } catch (Exception e) {
                         LOGGER.error("hmily scheduled transaction log is error:", e);
                     }
-                }, hmilyConfig.getScheduledInitDelay(), hmilyConfig.getScheduledDelay(), TimeUnit.SECONDS);
-    
+                }, hmilyConfig.getScheduledInitDelay(), hmilyConfig.getScheduledRecoveryDelay(), TimeUnit.SECONDS);
     }
     
-    private Date acquireData() {
+    private void cleanHmilyTransaction() {
+        cleanHmilyTransactionExecutor
+                .scheduleWithFixedDelay(() -> {
+                    try {
+                        List<HmilyTransaction> hmilyTransactionList = hmilyRepository.listLimitByDelay(acquireDelayData(hmilyConfig.getCleanDelayTime()), hmilyConfig.getLimit());
+                        if (CollectionUtils.isEmpty(hmilyTransactionList)) {
+                            return;
+                        }
+                        for (HmilyTransaction hmilyTransaction : hmilyTransactionList) {
+                            boolean exist = hmilyRepository.existHmilyParticipantByTransId(hmilyTransaction.getTransId());
+                            if (!exist) {
+                                hmilyRepository.removeHmilyTransaction(hmilyTransaction.getTransId());
+                            }
+                        }
+                    } catch (Exception e) {
+                        LOGGER.error(" scheduled clean hmily transaction log is error:", e);
+                    }
+                }, hmilyConfig.getScheduledInitDelay(), hmilyConfig.getScheduledCleanDelay(), TimeUnit.SECONDS);
+        
+    }
+    
+    private Date acquireDelayData(final int delayTime) {
         return new Date(LocalDateTime.now().atZone(ZoneId.systemDefault())
-                .toInstant().toEpochMilli() - (hmilyConfig.getRecoverDelayTime() * 1000));
+                .toInstant().toEpochMilli() - (delayTime * 1000));
     }
     
     
     @Override
     public void close() {
-        scheduledExecutorService.shutdown();
+        selfRecoveryExecutor.shutdown();
+        cleanHmilyTransactionExecutor.shutdown();
     }
 }
