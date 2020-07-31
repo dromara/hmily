@@ -48,8 +48,10 @@ public interface AccountService {
      */
     @HmilyTCC
     boolean paymentWithNested(AccountNestedDTO accountNestedDTO);
-
-
+    
+    @HmilyTCC
+    boolean paymentWithNestedException(AccountNestedDTO accountNestedDTO);
+    
     /**
      * 获取用户账户信息
      *

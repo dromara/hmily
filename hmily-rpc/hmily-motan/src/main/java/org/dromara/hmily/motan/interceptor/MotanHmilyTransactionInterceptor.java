@@ -22,7 +22,7 @@ import com.weibo.api.motan.rpc.RpcContext;
 import java.util.Map;
 import java.util.Objects;
 import org.aspectj.lang.ProceedingJoinPoint;
-import org.dromara.hmily.core.concurrent.threadlocal.HmilyTransactionContextLocal;
+import org.dromara.hmily.core.context.HmilyContextHolder;
 import org.dromara.hmily.core.context.HmilyTransactionContext;
 import org.dromara.hmily.core.interceptor.HmilyTransactionInterceptor;
 import org.dromara.hmily.core.mediator.RpcMediator;
@@ -50,7 +50,7 @@ public class MotanHmilyTransactionInterceptor implements HmilyTransactionInterce
             return "";
         });
         if (Objects.isNull(hmilyTransactionContext)) {
-            hmilyTransactionContext = HmilyTransactionContextLocal.getInstance().get();
+            hmilyTransactionContext = HmilyContextHolder.get();
         }
         return HmilyTransactionAspectInvoker.getInstance().invoke(hmilyTransactionContext, pjp);
     }

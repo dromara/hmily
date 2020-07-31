@@ -25,9 +25,9 @@ import com.weibo.api.motan.core.extension.SpiMeta;
 import com.weibo.api.motan.rpc.Referer;
 import com.weibo.api.motan.rpc.Request;
 import com.weibo.api.motan.rpc.URL;
+import org.dromara.hmily.core.context.HmilyContextHolder;
 import org.dromara.hmily.core.context.HmilyTransactionContext;
 import org.dromara.hmily.common.enums.HmilyActionEnum;
-import org.dromara.hmily.core.concurrent.threadlocal.HmilyTransactionContextLocal;
 
 import java.util.List;
 import java.util.Map;
@@ -52,7 +52,7 @@ public class MotanHmilyLoadBalance<T> extends RandomLoadBalance<T> {
 
         final List<Referer<T>> refererList = getReferers();
 
-        final HmilyTransactionContext hmilyTransactionContext = HmilyTransactionContextLocal.getInstance().get();
+        final HmilyTransactionContext hmilyTransactionContext = HmilyContextHolder.get();
 
         if (Objects.isNull(hmilyTransactionContext)) {
             return referer;

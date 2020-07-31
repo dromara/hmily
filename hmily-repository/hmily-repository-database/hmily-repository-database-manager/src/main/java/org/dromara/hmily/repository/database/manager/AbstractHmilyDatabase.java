@@ -79,9 +79,13 @@ public abstract class AbstractHmilyDatabase implements HmilyRepository {
     protected static final String SELECTOR_HMILY_PARTICIPANT_COMMON = "select participant_id, participant_ref_id, trans_id, trans_type, status, app_name,"
             + "role, retry, target_class, target_method, confirm_method, cancel_method, confirm_invocation, cancel_invocation, version from hmily_transaction_participant ";
     
-    protected static final String SELECTOR_HMILY_PARTICIPANT_WITH_KEY = SELECTOR_HMILY_PARTICIPANT_COMMON + "  where participant_id = ?";
+    protected static final String SELECTOR_HMILY_PARTICIPANT_WITH_KEY = SELECTOR_HMILY_PARTICIPANT_COMMON + " where participant_id = ?";
+    
+    protected static final String SELECTOR_HMILY_PARTICIPANT_WITH_PARTICIPANT_REF_ID = SELECTOR_HMILY_PARTICIPANT_COMMON + " where participant_ref_id = ?";
     
     protected static final String SELECTOR_HMILY_PARTICIPANT_WITH_TRANS_ID = SELECTOR_HMILY_PARTICIPANT_COMMON + " where trans_id = ?";
+    
+    protected static final String EXIST_HMILY_PARTICIPANT_WITH_TRANS_ID = " select count(*) as count_total from hmily_transaction_participant where trans_id = ? ";
     
     protected static final String SELECTOR_HMILY_PARTICIPANT_WITH_DELAY_AND_APP_NAME = SELECTOR_HMILY_PARTICIPANT_COMMON + " where update_time < ? and app_name = ? ";
     
@@ -193,6 +197,30 @@ public abstract class AbstractHmilyDatabase implements HmilyRepository {
     }
     
     @Override
+    public boolean existHmilyParticipantByTransId(String transId) {
+        List<Map<String, Object>> participantList = executeQuery(EXIST_HMILY_PARTICIPANT_WITH_TRANS_ID, transId);
+        if (CollectionUtils.isNotEmpty(participantList)) {
+            Long total = participantList.stream()
+                    .filter(Objects::nonNull)
+                    .map(e -> (Long) e.get("count_total")).findFirst().orElse(0L);
+            return total > 0;
+        }
+        return false;
+    }
+    
+    @Override
+    public List<HmilyParticipant> listHmilyParticipantByTransId(String transId) {
+        List<Map<String, Object>> participantList = executeQuery(SELECTOR_HMILY_PARTICIPANT_WITH_TRANS_ID, transId);
+        if (CollectionUtils.isNotEmpty(participantList)) {
+            return participantList.stream()
+                    .filter(Objects::nonNull)
+                    .map(this::buildHmilyParticipantByResultMap)
+                    .collect(Collectors.toList());
+        }
+        return Collections.emptyList();
+    }
+    
+    @Override
     public List<HmilyParticipant> listHmilyParticipant(Date date, int limit) {
         String limitSql = hmilyParticipantLimitSql();
         List<Map<String, Object>> participantList = executeQuery(limitSql, date, appName, limit);
@@ -210,21 +238,9 @@ public abstract class AbstractHmilyDatabase implements HmilyRepository {
         String limitSql = hmilyTransactionLimitSql();
         List<Map<String, Object>> list = executeQuery(limitSql, date, appName, limit);
         if (CollectionUtils.isNotEmpty(list)) {
-            List<HmilyTransaction> hmilyTransactionList = list.stream().filter(Objects::nonNull)
+            return list.stream().filter(Objects::nonNull)
                     .map(this::buildHmilyTransactionByResultMap)
                     .collect(Collectors.toList());
-            for (HmilyTransaction hmilyTransaction : hmilyTransactionList) {
-                String sql = SELECTOR_HMILY_PARTICIPANT_WITH_TRANS_ID + "  and participant_ref_id is null";
-                List<Map<String, Object>> participantList = executeQuery(sql, hmilyTransaction.getTransId());
-                if (CollectionUtils.isNotEmpty(participantList)) {
-                    List<HmilyParticipant> hmilyParticipants = participantList.stream()
-                            .filter(Objects::nonNull)
-                            .map(this::buildHmilyParticipantByResultMap)
-                            .collect(Collectors.toList());
-                    hmilyTransaction.registerParticipantList(hmilyParticipants);
-                }
-            }
-            return hmilyTransactionList;
         }
         return Collections.emptyList();
     }
@@ -260,9 +276,14 @@ public abstract class AbstractHmilyDatabase implements HmilyRepository {
                     .map(this::buildHmilyParticipantByResultMap)
                     .findFirst().orElse(new HmilyParticipant());
             hmilyParticipantList.add(hmilyParticipant);
-            if (StringUtils.isNoneBlank(hmilyParticipant.getParticipantRefId())) {
-                List<HmilyParticipant> hmilyParticipantRef = findHmilyParticipant(hmilyParticipant.getParticipantRefId());
-                hmilyParticipantList.addAll(hmilyParticipantRef);
+            //get ref
+            List<Map<String, Object>> refParticipants = executeQuery(SELECTOR_HMILY_PARTICIPANT_WITH_PARTICIPANT_REF_ID, participantId);
+            if (CollectionUtils.isNotEmpty(refParticipants)) {
+                List<HmilyParticipant> refParticipantList = refParticipants.stream()
+                        .filter(Objects::nonNull)
+                        .map(this::buildHmilyParticipantByResultMap)
+                        .collect(Collectors.toList());
+                hmilyParticipantList.addAll(refParticipantList);
             }
         }
         return hmilyParticipantList;

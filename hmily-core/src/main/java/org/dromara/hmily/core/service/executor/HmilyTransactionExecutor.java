@@ -124,55 +124,54 @@ public final class HmilyTransactionExecutor {
      * The remote service calls the confirm method.
      *
      * @param currentTransaction {@linkplain HmilyTransaction}
-     * @return the object
      * @throws HmilyRuntimeException ex
      */
-    public Object globalConfirm(final HmilyTransaction currentTransaction) throws HmilyRuntimeException {
+    public void globalConfirm(final HmilyTransaction currentTransaction) throws HmilyRuntimeException {
         LogUtil.debug(LOGGER, () -> "hmily transaction confirm .......！start");
         if (Objects.isNull(currentTransaction) || CollectionUtils.isEmpty(currentTransaction.getHmilyParticipants())) {
-            return null;
+            return;
         }
         currentTransaction.setStatus(HmilyActionEnum.CONFIRMING.getCode());
         updateHmilyTransactionStatus(currentTransaction);
         final List<HmilyParticipant> hmilyParticipants = currentTransaction.getHmilyParticipants();
-        boolean success = true;
-        if (CollectionUtils.isNotEmpty(hmilyParticipants)) {
-            List<HmilyParticipant> failList = Lists.newArrayListWithCapacity(hmilyParticipants.size());
-            List<Object> results = Lists.newArrayListWithCapacity(hmilyParticipants.size());
-            for (HmilyParticipant hmilyParticipant : hmilyParticipants) {
-                try {
-                    final Object result = HmilyReflector.executor(HmilyActionEnum.CONFIRMING, ExecutorTypeEnum.RPC, hmilyParticipant);
-                    results.add(result);
-                } catch (Throwable e) {
-                    LogUtil.error(LOGGER, "execute confirm :{}", () -> e);
-                    success = false;
-                    failList.add(hmilyParticipant);
-                } finally {
-                    HmilyContextHolder.remove();
+        for (HmilyParticipant hmilyParticipant : hmilyParticipants) {
+            try {
+                if (hmilyParticipant.getRole() == HmilyRoleEnum.START.getCode()) {
+                    HmilyReflector.executor(HmilyActionEnum.CONFIRMING, ExecutorTypeEnum.LOCAL, hmilyParticipant);
+                    removeHmilyParticipant(hmilyParticipant);
+                } else {
+                    HmilyReflector.executor(HmilyActionEnum.CONFIRMING, ExecutorTypeEnum.RPC, hmilyParticipant);
                 }
+            } catch (Throwable e) {
+                LOGGER.error("HmilyParticipant confirm exception :{} ", hmilyParticipant.toString());
+            } finally {
+                HmilyContextHolder.remove();
             }
-            executeHandler(success, currentTransaction, failList);
-            return results.get(0);
         }
-        return null;
     }
     
-    public Object participantConfirm(final List<HmilyParticipant> hmilyParticipantList) {
+    public Object participantConfirm(final List<HmilyParticipant> hmilyParticipantList, final String selfParticipantId) {
         if (CollectionUtils.isEmpty(hmilyParticipantList)) {
             return null;
         }
         List<Object> results = Lists.newArrayListWithCapacity(hmilyParticipantList.size());
         for (HmilyParticipant hmilyParticipant : hmilyParticipantList) {
             try {
-                final Object result = HmilyReflector.executor(HmilyActionEnum.CONFIRMING, ExecutorTypeEnum.LOCAL, hmilyParticipant);
-                results.add(result);
-                removeHmilyParticipant(hmilyParticipant);
-            } catch (Throwable e) {
-                LogUtil.error(LOGGER, "execute confirm :{}", () -> e);
+                if (hmilyParticipant.getParticipantId().equals(selfParticipantId)) {
+                    final Object result = HmilyReflector.executor(HmilyActionEnum.CONFIRMING, ExecutorTypeEnum.LOCAL, hmilyParticipant);
+                    results.add(result);
+                    removeHmilyParticipant(hmilyParticipant);
+                } else {
+                    final Object result = HmilyReflector.executor(HmilyActionEnum.CONFIRMING, ExecutorTypeEnum.RPC, hmilyParticipant);
+                    results.add(result);
+                }
+            } catch (Throwable throwable) {
+                throw new HmilyRuntimeException(" hmilyParticipant execute confirm exception:" + hmilyParticipant.toString());
             } finally {
                 HmilyContextHolder.remove();
             }
         }
+        HmilyParticipantCacheManager.getInstance().removeByKey(selfParticipantId);
         return results.get(0);
     }
     
@@ -180,42 +179,33 @@ public final class HmilyTransactionExecutor {
      * cancel transaction.
      *
      * @param currentTransaction {@linkplain HmilyTransaction}
-     * @return the object
      */
-    public Object globalCancel(final HmilyTransaction currentTransaction) {
+    public void globalCancel(final HmilyTransaction currentTransaction) {
         LogUtil.debug(LOGGER, () -> "tcc cancel ...........start!");
         if (Objects.isNull(currentTransaction) || CollectionUtils.isEmpty(currentTransaction.getHmilyParticipants())) {
-            return null;
+            return;
         }
-        //if cc pattern，can not execute cancel
         currentTransaction.setStatus(HmilyActionEnum.CANCELING.getCode());
         //update cancel
         updateHmilyTransactionStatus(currentTransaction);
         final List<HmilyParticipant> hmilyParticipants = currentTransaction.getHmilyParticipants();
-        boolean success = true;
-        if (CollectionUtils.isNotEmpty(hmilyParticipants)) {
-            List<HmilyParticipant> failList = Lists.newArrayListWithCapacity(hmilyParticipants.size());
-            List<Object> results = Lists.newArrayListWithCapacity(hmilyParticipants.size());
-            for (HmilyParticipant hmilyParticipant : hmilyParticipants) {
-                try {
-                    final Object result = HmilyReflector.executor(HmilyActionEnum.CANCELING, ExecutorTypeEnum.RPC, hmilyParticipant);
+        for (HmilyParticipant hmilyParticipant : hmilyParticipants) {
+            try {
+                if (hmilyParticipant.getRole() == HmilyRoleEnum.START.getCode()) {
+                    HmilyReflector.executor(HmilyActionEnum.CANCELING, ExecutorTypeEnum.LOCAL, hmilyParticipant);
                     removeHmilyParticipant(hmilyParticipant);
-                    results.add(result);
-                } catch (Exception e) {
-                    LogUtil.error(LOGGER, "execute cancel ex:{}", () -> e);
-                    success = false;
-                    failList.add(hmilyParticipant);
-                } finally {
-                    HmilyContextHolder.remove();
+                } else {
+                    HmilyReflector.executor(HmilyActionEnum.CANCELING, ExecutorTypeEnum.RPC, hmilyParticipant);
                 }
+            } catch (Throwable e) {
+                LOGGER.error("HmilyParticipant cancel exception :{}", hmilyParticipant.toString(), e);
+            } finally {
+                HmilyContextHolder.remove();
             }
-            executeHandler(success, currentTransaction, failList);
-            return results.get(0);
         }
-        return null;
     }
     
-    public Object participantCancel(final List<HmilyParticipant> hmilyParticipants) {
+    public Object participantCancel(final List<HmilyParticipant> hmilyParticipants, final String selfParticipantId) {
         LogUtil.debug(LOGGER, () -> "tcc cancel ...........start!");
         if (CollectionUtils.isEmpty(hmilyParticipants)) {
             return null;
@@ -230,15 +220,21 @@ public final class HmilyTransactionExecutor {
         List<Object> results = Lists.newArrayListWithCapacity(hmilyParticipants.size());
         for (HmilyParticipant hmilyParticipant : hmilyParticipants) {
             try {
-                final Object result = HmilyReflector.executor(HmilyActionEnum.CANCELING, ExecutorTypeEnum.LOCAL, hmilyParticipant);
-                results.add(result);
-                removeHmilyParticipant(hmilyParticipant);
-            } catch (Exception e) {
-                LogUtil.error(LOGGER, "execute cancel ex:{}", () -> e);
+                if (hmilyParticipant.getParticipantId().equals(selfParticipantId)) {
+                    final Object result = HmilyReflector.executor(HmilyActionEnum.CANCELING, ExecutorTypeEnum.LOCAL, hmilyParticipant);
+                    results.add(result);
+                    removeHmilyParticipant(hmilyParticipant);
+                } else {
+                    final Object result = HmilyReflector.executor(HmilyActionEnum.CANCELING, ExecutorTypeEnum.RPC, hmilyParticipant);
+                    results.add(result);
+                }
+            } catch (Throwable throwable) {
+                throw new HmilyRuntimeException(" hmilyParticipant execute cancel exception:" + hmilyParticipant.toString());
             } finally {
                 HmilyContextHolder.remove();
             }
         }
+        HmilyParticipantCacheManager.getInstance().removeByKey(selfParticipantId);
         return results.get(0);
     }
     
@@ -254,11 +250,6 @@ public final class HmilyTransactionExecutor {
             hmilyParticipant.setStatus(hmilyTransaction.getStatus());
             updateHmilyParticipantStatus(hmilyParticipant);
         }
-    }
-    
-    public void removeStart(final HmilyTransaction hmilyTransaction) {
-        removeHmilyParticipant(filterStartHmilyParticipant(hmilyTransaction));
-        PUBLISHER.publishEvent(hmilyTransaction, EventTypeEnum.REMOVE_HMILY_TRANSACTION.getCode());
     }
     
     public void updateHmilyTransactionStatus(final HmilyTransaction hmilyTransaction) {
@@ -277,16 +268,6 @@ public final class HmilyTransactionExecutor {
         if (null != hmilyParticipant) {
             PUBLISHER.publishEvent(hmilyParticipant, EventTypeEnum.REMOVE_HMILY_PARTICIPANT.getCode());
         }
-    }
-    
-    
-    /**
-     * update Participant in transaction by disruptor.
-     *
-     * @param hmilyTransaction {@linkplain HmilyTransaction}
-     */
-    public void updateParticipant(final HmilyTransaction hmilyTransaction) {
-        PUBLISHER.publishEvent(hmilyTransaction, EventTypeEnum.UPDATE_PARTICIPANT.getCode());
     }
     
     /**
@@ -330,15 +311,6 @@ public final class HmilyTransactionExecutor {
             return;
         }
         HmilyParticipantCacheManager.getInstance().cacheHmilyParticipant(participantId, hmilyParticipant);
-    }
-    
-    private void executeHandler(final boolean success, final HmilyTransaction currentTransaction, final List<HmilyParticipant> failList) {
-        HmilyParticipantCacheManager.getInstance().removeByKey(currentTransaction.getTransId());
-        if (success) {
-            removeStart(currentTransaction);
-        } else {
-            throw new HmilyRuntimeException(failList.toString());
-        }
     }
     
     private HmilyParticipant filterStartHmilyParticipant(final HmilyTransaction currentTransaction) {

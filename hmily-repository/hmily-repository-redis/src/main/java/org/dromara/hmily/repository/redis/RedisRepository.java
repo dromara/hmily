@@ -125,6 +125,16 @@ public class RedisRepository implements HmilyRepository {
     }
     
     @Override
+    public List<HmilyParticipant> listHmilyParticipantByTransId(String transId) {
+        return null;
+    }
+    
+    @Override
+    public boolean existHmilyParticipantByTransId(String transId) {
+        return false;
+    }
+    
+    @Override
     public int updateHmilyParticipantStatus(String participantId, Integer status) throws HmilyRepositoryException {
         return 0;
     }

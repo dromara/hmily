@@ -89,6 +89,16 @@ public class OrderController {
         return orderService.orderPayWithNested(count, amount);
 
     }
+    
+    @PostMapping(value = "/orderPayWithNestedException")
+    @ApiOperation(value = "订单支付接口（这里模拟且套调用时候的异常")
+    public String orderPayWithNestedException(@RequestParam(value = "count") Integer count,
+                                     @RequestParam(value = "amount") BigDecimal amount) {
+        
+        return orderService.orderPayWithNestedException(count, amount);
+        
+    }
+
 
 
 

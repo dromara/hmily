@@ -8,9 +8,9 @@ server:
 spring:
     datasource:
         driver-class-name:  com.mysql.jdbc.Driver
-        url: jdbc:mysql://localhost:3306/soul-open?useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT&failOverReadOnly=false&autoReconnect=true
+        url: jdbc:mysql://127.0.0.1:3306/tcc_account?useUnicode=true&characterEncoding=utf8
         username: root
-        password: dev-mysql-R3ND7N4zvjYt0Wvw
+        password:
     application:
       name: account-service
     main:
@@ -19,20 +19,23 @@ spring:
 org:
     dromara:
          hmily :
+            app-name: sc-account
             serializer : kryo
             recoverDelayTime : 128
             retryMax : 30
-            scheduledDelay : 128
+            scheduled-recovery-delay: 60
             scheduledThreadMax :  10
-            repositorySupport : db
+            repository : mysql
             started: false
             hmilyDbConfig :
                  driverClassName  : com.mysql.jdbc.Driver
-                 url: jdbc:mysql://rm-bp10o39k37lfxh090.mysql.rds.aliyuncs.com:3306/soul-open?useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT&failOverReadOnly=false&autoReconnect=true
+                 url: jdbc:mysql://127.0.0.1:3306/hmily?useUnicode=true&characterEncoding=utf8
                  username : root
-                 password : dev-mysql-R3ND7N4zvjYt0Wvw
+                 password :
 
-       # repositorySupport : redis
+
+
+      # repositorySupport : redis
        #         hostName  : 192.168.1.68
        #         port      :  6379
        #         password  :

@@ -12,7 +12,7 @@
 
     <dubbo:registry protocol="zookeeper" address="localhost:2181"/>
 
-    <dubbo:protocol name="dubbo" port="20885"
+    <dubbo:protocol name="dubbo" port="-1"
                     server="netty"
                     charset="UTF-8" threadpool="fixed" threads="500"
                     queues="0" buffer="8192" accepts="0" payload="8388608" />

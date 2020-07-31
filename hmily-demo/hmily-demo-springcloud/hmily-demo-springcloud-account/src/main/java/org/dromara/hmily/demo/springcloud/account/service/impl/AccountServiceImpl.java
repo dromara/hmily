@@ -17,7 +17,7 @@
 
 package org.dromara.hmily.demo.springcloud.account.service.impl;
 
-import org.dromara.hmily.annotation.Hmily;
+import org.dromara.hmily.annotation.HmilyTCC;
 import org.dromara.hmily.common.exception.HmilyRuntimeException;
 import org.dromara.hmily.demo.springcloud.account.dto.AccountDTO;
 import org.dromara.hmily.demo.springcloud.account.entity.AccountDO;
@@ -58,7 +58,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    @Hmily(confirmMethod = "confirm", cancelMethod = "cancel")
+    @HmilyTCC(confirmMethod = "confirm", cancelMethod = "cancel")
     public boolean payment(final AccountDTO accountDTO) {
         LOGGER.debug("============执行try付款接口===============");
         accountMapper.update(accountDTO);

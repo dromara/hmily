@@ -20,7 +20,7 @@ package org.dromara.hmily.dubbo.interceptor;
 import com.alibaba.dubbo.rpc.RpcContext;
 import java.util.Objects;
 import org.aspectj.lang.ProceedingJoinPoint;
-import org.dromara.hmily.core.concurrent.threadlocal.HmilyTransactionContextLocal;
+import org.dromara.hmily.core.context.HmilyContextHolder;
 import org.dromara.hmily.core.context.HmilyTransactionContext;
 import org.dromara.hmily.core.interceptor.HmilyTransactionInterceptor;
 import org.dromara.hmily.core.mediator.RpcMediator;
@@ -40,7 +40,7 @@ public class DubboHmilyTransactionInterceptor implements HmilyTransactionInterce
         HmilyTransactionContext hmilyTransactionContext =
                 RpcMediator.getInstance().acquire(RpcContext.getContext()::getAttachment);
         if (Objects.isNull(hmilyTransactionContext)) {
-            hmilyTransactionContext = HmilyTransactionContextLocal.getInstance().get();
+            hmilyTransactionContext = HmilyContextHolder.get();
         }
         return HmilyTransactionAspectInvoker.getInstance().invoke(hmilyTransactionContext, pjp);
     }

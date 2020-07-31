@@ -57,8 +57,11 @@ public interface OrderService {
      * @return string string
      */
     String orderPayWithNested(Integer count, BigDecimal amount);
-
-
+    
+    String orderPayWithNestedException(Integer count, BigDecimal amount);
+    
+    
+    
     /**
      * 模拟在订单支付操作中，库存在try阶段中的库存异常
      *

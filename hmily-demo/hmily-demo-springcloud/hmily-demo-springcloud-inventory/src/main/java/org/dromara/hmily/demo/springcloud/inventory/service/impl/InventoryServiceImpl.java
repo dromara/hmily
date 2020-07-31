@@ -17,7 +17,7 @@
 
 package org.dromara.hmily.demo.springcloud.inventory.service.impl;
 
-import org.dromara.hmily.annotation.Hmily;
+import org.dromara.hmily.annotation.HmilyTCC;
 import org.dromara.hmily.common.exception.HmilyRuntimeException;
 import org.dromara.hmily.demo.springcloud.inventory.dto.InventoryDTO;
 import org.dromara.hmily.demo.springcloud.inventory.entity.InventoryDO;
@@ -57,7 +57,7 @@ public class InventoryServiceImpl implements InventoryService {
      * @return true
      */
     @Override
-    @Hmily(confirmMethod = "confirmMethod", cancelMethod = "cancelMethod")
+    @HmilyTCC(confirmMethod = "confirmMethod", cancelMethod = "cancelMethod")
     public Boolean decrease(InventoryDTO inventoryDTO) {
         LOGGER.info("==========springcloud调用扣减库存decrease===========");
         inventoryMapper.decrease(inventoryDTO);
@@ -76,7 +76,7 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     @Override
-    @Hmily(confirmMethod = "confirmMethod", cancelMethod = "cancelMethod")
+    @HmilyTCC(confirmMethod = "confirmMethod", cancelMethod = "cancelMethod")
     @Transactional
     public Boolean mockWithTryException(InventoryDTO inventoryDTO) {
         //这里是模拟异常所以就直接抛出异常了
@@ -84,7 +84,7 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     @Override
-    @Hmily(confirmMethod = "confirmMethod", cancelMethod = "cancelMethod")
+    @HmilyTCC(confirmMethod = "confirmMethod", cancelMethod = "cancelMethod")
     @Transactional(rollbackFor = Exception.class)
     public Boolean mockWithTryTimeout(InventoryDTO inventoryDTO) {
         try {

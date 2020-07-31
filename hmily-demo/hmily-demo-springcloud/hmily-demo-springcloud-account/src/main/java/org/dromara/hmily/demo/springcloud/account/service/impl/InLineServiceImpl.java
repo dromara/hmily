@@ -1,6 +1,6 @@
 package org.dromara.hmily.demo.springcloud.account.service.impl;
 
-import org.dromara.hmily.annotation.Hmily;
+import org.dromara.hmily.annotation.HmilyTCC;
 import org.dromara.hmily.demo.springcloud.account.service.InLineService;
 import org.springframework.stereotype.Component;
 
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 public class InLineServiceImpl implements InLineService {
 
     @Override
-    @Hmily(confirmMethod = "confirm", cancelMethod = "cancel")
+    @HmilyTCC(confirmMethod = "confirm", cancelMethod = "cancel")
     public void test() {
         System.out.println("执行inline try......");
     }

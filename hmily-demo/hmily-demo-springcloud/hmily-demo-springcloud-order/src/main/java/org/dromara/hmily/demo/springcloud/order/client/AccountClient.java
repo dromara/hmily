@@ -17,10 +17,9 @@
 
 package org.dromara.hmily.demo.springcloud.order.client;
 
-import org.dromara.hmily.annotation.Hmily;
+import org.dromara.hmily.annotation.HmilyTCC;
 import org.dromara.hmily.demo.springcloud.order.dto.AccountDTO;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -42,7 +41,7 @@ public interface AccountClient {
      * @return true 成功
      */
     @RequestMapping("/account-service/account/payment")
-    @Hmily
+    @HmilyTCC
     Boolean payment(@RequestBody AccountDTO accountDO);
 
 
