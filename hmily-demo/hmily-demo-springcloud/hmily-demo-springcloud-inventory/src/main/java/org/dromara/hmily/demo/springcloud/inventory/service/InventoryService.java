@@ -17,7 +17,7 @@
 
 package org.dromara.hmily.demo.springcloud.inventory.service;
 
-import org.dromara.hmily.annotation.Hmily;
+import org.dromara.hmily.annotation.HmilyTCC;
 import org.dromara.hmily.demo.springcloud.inventory.dto.InventoryDTO;
 import org.dromara.hmily.demo.springcloud.inventory.entity.InventoryDO;
 
@@ -35,7 +35,7 @@ public interface InventoryService {
      * @param inventoryDTO 库存DTO对象
      * @return true
      */
-    @Hmily
+    @HmilyTCC
     Boolean decrease(InventoryDTO inventoryDTO);
 
     /**
@@ -51,7 +51,7 @@ public interface InventoryService {
      * @param inventoryDTO dto
      * @return true
      */
-    @Hmily
+    @HmilyTCC
     Boolean mockWithTryException(InventoryDTO inventoryDTO);
 
     /**
@@ -60,7 +60,7 @@ public interface InventoryService {
      * @param inventoryDTO dto
      * @return true
      */
-    @Hmily
+    @HmilyTCC
     Boolean mockWithTryTimeout(InventoryDTO inventoryDTO);
 
 }

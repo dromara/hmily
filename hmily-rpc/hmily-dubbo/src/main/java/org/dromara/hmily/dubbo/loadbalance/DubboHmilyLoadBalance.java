@@ -22,9 +22,9 @@ import com.alibaba.dubbo.rpc.Invocation;
 import com.alibaba.dubbo.rpc.Invoker;
 import com.alibaba.dubbo.rpc.cluster.loadbalance.AbstractLoadBalance;
 import com.google.common.collect.Maps;
+import org.dromara.hmily.core.context.HmilyContextHolder;
 import org.dromara.hmily.core.context.HmilyTransactionContext;
 import org.dromara.hmily.common.enums.HmilyActionEnum;
-import org.dromara.hmily.core.concurrent.threadlocal.HmilyTransactionContextLocal;
 
 import java.util.List;
 import java.util.Map;
@@ -48,7 +48,7 @@ public class DubboHmilyLoadBalance extends AbstractLoadBalance {
 
         final Invoker<T> invoker = invokers.get(random.nextInt(invokers.size()));
 
-        final HmilyTransactionContext hmilyTransactionContext = HmilyTransactionContextLocal.getInstance().get();
+        final HmilyTransactionContext hmilyTransactionContext = HmilyContextHolder.get();
 
         if (Objects.isNull(hmilyTransactionContext)) {
             return invoker;

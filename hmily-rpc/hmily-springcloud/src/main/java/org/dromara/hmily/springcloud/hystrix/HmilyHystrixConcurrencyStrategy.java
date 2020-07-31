@@ -28,8 +28,8 @@ import com.netflix.hystrix.strategy.executionhook.HystrixCommandExecutionHook;
 import com.netflix.hystrix.strategy.metrics.HystrixMetricsPublisher;
 import com.netflix.hystrix.strategy.properties.HystrixPropertiesStrategy;
 import com.netflix.hystrix.strategy.properties.HystrixProperty;
+import org.dromara.hmily.core.context.HmilyContextHolder;
 import org.dromara.hmily.core.context.HmilyTransactionContext;
-import org.dromara.hmily.core.concurrent.threadlocal.HmilyTransactionContextLocal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -79,10 +79,9 @@ public class HmilyHystrixConcurrencyStrategy extends HystrixConcurrencyStrategy 
 
     @Override
     public <T> Callable<T> wrapCallable(Callable<T> callable) {
-        final HmilyTransactionContext hmilyTransactionContext =
-                HmilyTransactionContextLocal.getInstance().get();
+        final HmilyTransactionContext hmilyTransactionContext = HmilyContextHolder.get();
         return () -> {
-            HmilyTransactionContextLocal.getInstance().set(hmilyTransactionContext);
+            HmilyContextHolder.set(hmilyTransactionContext);
             return delegate.wrapCallable(callable).call();
         };
     }

@@ -17,7 +17,7 @@
 
 package org.dromara.hmily.demo.springcloud.account.service;
 
-import org.dromara.hmily.annotation.Hmily;
+import org.dromara.hmily.annotation.HmilyTCC;
 import org.dromara.hmily.demo.springcloud.account.dto.AccountDTO;
 import org.dromara.hmily.demo.springcloud.account.entity.AccountDO;
 
@@ -34,7 +34,6 @@ public interface AccountService {
      * @param accountDTO 参数dto
      * @return true
      */
-    @Hmily
     boolean payment(AccountDTO accountDTO);
 
     /**

@@ -43,24 +43,26 @@ public class HmilyConfig {
      * log serializer.
      */
     private String serializer = "kryo";
-
+    
     /**
      * scheduledPool Thread size.
      */
     private int scheduledThreadMax = Runtime.getRuntime().availableProcessors() << 1;
-
+    
     /**
      * scheduledPool scheduledDelay unit SECONDS.
      */
-    private int scheduledDelay = 60;
-
+    private int scheduledRecoveryDelay = 60;
+    
+    private int scheduledCleanDelay = 60;
+    
     /**
      * scheduledPool scheduledInitDelay unit SECONDS.
      */
     private int scheduledInitDelay = 30;
     
     private int limit = 100;
-
+    
     /**
      * retry max.
      */
@@ -71,7 +73,9 @@ public class HmilyConfig {
      * (note that this time represents how many seconds after the local transaction was created before execution).
      */
     private int recoverDelayTime = 60;
-
+    
+    private int cleanDelayTime = 180;
+    
     /**
      * Parameters when participants perform their own recovery.
      * 1.such as RPC calls time out

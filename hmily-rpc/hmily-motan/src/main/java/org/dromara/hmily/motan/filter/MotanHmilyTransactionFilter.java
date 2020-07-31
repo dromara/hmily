@@ -25,13 +25,19 @@ import com.weibo.api.motan.rpc.Caller;
 import com.weibo.api.motan.rpc.Request;
 import com.weibo.api.motan.rpc.Response;
 import com.weibo.api.motan.util.ReflectUtil;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Stream;
 import lombok.SneakyThrows;
+import org.dromara.hmily.annotation.HmilyAC;
+import org.dromara.hmily.annotation.HmilyTCC;
 import org.dromara.hmily.common.enums.HmilyActionEnum;
 import org.dromara.hmily.common.enums.HmilyRoleEnum;
 import org.dromara.hmily.common.exception.HmilyRuntimeException;
+import org.dromara.hmily.common.utils.IdWorkerUtils;
 import org.dromara.hmily.core.context.HmilyContextHolder;
 import org.dromara.hmily.core.context.HmilyTransactionContext;
 import org.dromara.hmily.core.mediator.RpcMediator;
@@ -51,14 +57,39 @@ public class MotanHmilyTransactionFilter implements Filter {
     @Override
     public Response filter(final Caller<?> caller, final Request request) {
         final HmilyTransactionContext context = HmilyContextHolder.get();
-        if (Objects.isNull(context) || HmilyActionEnum.TRYING.getCode() != context.getAction()) {
+        if (Objects.isNull(context)) {
             return caller.call(request);
         }
+        final String interfaceName = request.getInterfaceName();
+        final String methodName = request.getMethodName();
+        try {
+            //他妈的 这里还要拿方法参数类型
+            Class<?> clazz = ReflectUtil.forName(interfaceName);
+            final Method[] methods = clazz.getMethods();
+            Class<?>[] args = Stream.of(methods)
+                    .filter(m -> m.getName().equals(methodName))
+                    .findFirst()
+                    .map(Method::getParameterTypes).get();
+            Method method = clazz.getMethod(methodName, args);
+            Annotation[] annotations = method.getAnnotations();
+            boolean match = Arrays.stream(annotations)
+                    .anyMatch(annotation -> annotation.annotationType().equals(HmilyTCC.class)
+                            || annotation.annotationType().equals(HmilyAC.class));
+            if (!match) {
+                return caller.call(request);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        String participantId = context.getParticipantId();
+        final HmilyParticipant hmilyParticipant = buildParticipant(context, request);
+        Optional.ofNullable(hmilyParticipant).ifPresent(h -> context.setParticipantId(h.getParticipantId()));
+        if (context.getRole() == HmilyRoleEnum.PARTICIPANT.getCode()) {
+            context.setParticipantRefId(participantId);
+        }
         RpcMediator.getInstance().transmit(request::setAttachment, context);
-    
         final Response response = caller.call(request);
         if (null != response.getException()) {
-            final HmilyParticipant hmilyParticipant = buildParticipant(context, request);
             if (context.getRole() == HmilyRoleEnum.PARTICIPANT.getCode()) {
                 HmilyTransactionExecutor.getInstance().registerParticipantByNested(context.getParticipantId(), hmilyParticipant);
             } else {
@@ -70,9 +101,13 @@ public class MotanHmilyTransactionFilter implements Filter {
     
     @SneakyThrows
     private HmilyParticipant buildParticipant(final HmilyTransactionContext context, final Request request) throws HmilyRuntimeException {
+        if (HmilyActionEnum.TRYING.getCode() != context.getAction()) {
+            return null;
+        }
         HmilyParticipant hmilyParticipant = new HmilyParticipant();
         hmilyParticipant.setTransId(context.getTransId());
         hmilyParticipant.setTransType(context.getTransType());
+        hmilyParticipant.setParticipantId(IdWorkerUtils.getInstance().createUUID());
         final String interfaceName = request.getInterfaceName();
         final String methodName = request.getMethodName();
         final Object[] arguments = request.getArguments();

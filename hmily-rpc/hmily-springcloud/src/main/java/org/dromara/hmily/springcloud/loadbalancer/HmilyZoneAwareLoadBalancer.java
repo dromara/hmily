@@ -20,9 +20,9 @@ package org.dromara.hmily.springcloud.loadbalancer;
 import com.google.common.collect.Maps;
 import com.netflix.loadbalancer.Server;
 import com.netflix.loadbalancer.ZoneAvoidanceRule;
+import org.dromara.hmily.core.context.HmilyContextHolder;
 import org.dromara.hmily.core.context.HmilyTransactionContext;
 import org.dromara.hmily.common.enums.HmilyActionEnum;
-import org.dromara.hmily.core.concurrent.threadlocal.HmilyTransactionContextLocal;
 
 import java.util.List;
 import java.util.Map;
@@ -48,7 +48,7 @@ public class HmilyZoneAwareLoadBalancer extends ZoneAvoidanceRule {
         }
         final Server server = super.choose(key);
 
-        final HmilyTransactionContext hmilyTransactionContext = HmilyTransactionContextLocal.getInstance().get();
+        final HmilyTransactionContext hmilyTransactionContext = HmilyContextHolder.get();
 
         if (Objects.isNull(hmilyTransactionContext)) {
             return server;

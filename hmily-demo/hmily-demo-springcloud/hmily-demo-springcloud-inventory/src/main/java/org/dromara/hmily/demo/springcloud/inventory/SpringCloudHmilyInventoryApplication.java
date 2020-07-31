@@ -48,5 +48,4 @@ public class SpringCloudHmilyInventoryApplication {
     public static void main(final String[] args) {
         SpringApplication.run(SpringCloudHmilyInventoryApplication.class, args);
     }
-
 }

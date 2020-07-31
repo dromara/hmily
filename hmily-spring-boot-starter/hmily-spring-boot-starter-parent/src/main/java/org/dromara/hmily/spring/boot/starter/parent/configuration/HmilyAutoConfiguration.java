@@ -54,9 +54,11 @@ public class HmilyAutoConfiguration {
         contextAware.setBufferSize(hmilyConfigProperties.getBufferSize());
         contextAware.setRetryMax(hmilyConfigProperties.getRetryMax());
         contextAware.setRecoverDelayTime(hmilyConfigProperties.getRecoverDelayTime());
+        contextAware.setCleanDelayTime(hmilyConfigProperties.getCleanDelayTime());
         contextAware.setAppName(hmilyConfigProperties.getAppName());
         contextAware.setRepository(hmilyConfigProperties.getRepository());
-        contextAware.setScheduledDelay(hmilyConfigProperties.getScheduledDelay());
+        contextAware.setScheduledRecoveryDelay(hmilyConfigProperties.getScheduledRecoveryDelay());
+        contextAware.setScheduledCleanDelay(hmilyConfigProperties.getScheduledCleanDelay());
         contextAware.setScheduledInitDelay(hmilyConfigProperties.getScheduledInitDelay());
         contextAware.setScheduledThreadMax(hmilyConfigProperties.getScheduledThreadMax());
         contextAware.setSerializer(hmilyConfigProperties.getSerializer());

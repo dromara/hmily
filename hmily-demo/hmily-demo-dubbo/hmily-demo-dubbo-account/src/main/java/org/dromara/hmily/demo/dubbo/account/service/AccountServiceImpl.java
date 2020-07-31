@@ -17,6 +17,7 @@
 
 package org.dromara.hmily.demo.dubbo.account.service;
 
+import java.util.concurrent.atomic.AtomicInteger;
 import org.dromara.hmily.annotation.HmilyTCC;
 import org.dromara.hmily.demo.dubbo.account.api.dto.AccountDTO;
 import org.dromara.hmily.demo.dubbo.account.api.dto.AccountNestedDTO;
@@ -31,8 +32,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * The type Account service.
@@ -105,20 +104,40 @@ public class AccountServiceImpl implements AccountService {
         dto.setAmount(accountNestedDTO.getAmount());
         dto.setUserId(accountNestedDTO.getUserId());
         accountMapper.update(dto);
-
+    
         InventoryDTO inventoryDTO = new InventoryDTO();
-
+    
         inventoryDTO.setCount(accountNestedDTO.getCount());
         inventoryDTO.setProductId(accountNestedDTO.getProductId());
         inventoryService.decrease(inventoryDTO);
         return Boolean.TRUE;
     }
-
+    
+    @Override
+    @HmilyTCC(confirmMethod = "confirmNested", cancelMethod = "cancelNested")
+    @Transactional(rollbackFor = Exception.class)
+    public boolean paymentWithNestedException(AccountNestedDTO accountNestedDTO) {
+        AccountDTO dto = new AccountDTO();
+        dto.setAmount(accountNestedDTO.getAmount());
+        dto.setUserId(accountNestedDTO.getUserId());
+        accountMapper.update(dto);
+        
+        InventoryDTO inventoryDTO = new InventoryDTO();
+        
+        inventoryDTO.setCount(accountNestedDTO.getCount());
+        inventoryDTO.setProductId(accountNestedDTO.getProductId());
+        inventoryService.decrease(inventoryDTO);
+        
+        //下面这个且套服务异常
+        inventoryService.mockWithTryException(inventoryDTO);
+        return Boolean.TRUE;
+    }
+    
     @Override
     public AccountDO findByUserId(String userId) {
         return accountMapper.findByUserId(userId);
     }
-
+    
     /**
      * Confirm nested boolean.
      *

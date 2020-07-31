@@ -22,7 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.dromara.hmily.common.enums.HmilyRoleEnum;
 import org.dromara.hmily.common.utils.LogUtil;
-import org.dromara.hmily.core.concurrent.threadlocal.HmilyTransactionContextLocal;
+import org.dromara.hmily.core.context.HmilyContextHolder;
 import org.dromara.hmily.core.context.HmilyTransactionContext;
 import org.dromara.hmily.core.interceptor.HmilyTransactionInterceptor;
 import org.dromara.hmily.core.mediator.RpcMediator;
@@ -47,7 +47,7 @@ public class SpringCloudHmilyTransactionInterceptor implements HmilyTransactionI
     
     @Override
     public Object interceptor(final ProceedingJoinPoint pjp) throws Throwable {
-        HmilyTransactionContext hmilyTransactionContext = HmilyTransactionContextLocal.getInstance().get();
+        HmilyTransactionContext hmilyTransactionContext = HmilyContextHolder.get();
         if (Objects.nonNull(hmilyTransactionContext)) {
             if (HmilyRoleEnum.START.getCode() == hmilyTransactionContext.getRole()) {
                 hmilyTransactionContext.setRole(HmilyRoleEnum.SPRING_CLOUD.getCode());

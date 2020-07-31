@@ -10,9 +10,9 @@ spring:
         allow-bean-definition-overriding: true
     datasource:
         driver-class-name:  com.mysql.jdbc.Driver
-        url: jdbc:mysql://localhost:3306/soul-open?useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT&failOverReadOnly=false&autoReconnect=true
+        url: jdbc:mysql://127.0.01:3306/tcc_order?useUnicode=true&characterEncoding=utf8
         username: root
-        password: dev-mysql-R3ND7N4zvjYt0Wvw
+        password:
     application:
       name: order-service
 
@@ -28,13 +28,14 @@ eureka:
    prefer-ip-address: true
 
 #Ribbon的负载均衡策略
-hmilyOrder :
-     ribbon:
-        NFLoadBalancerRuleClassName:  com.netflix.loadbalancer.RandomRule
-        MaxAutoRetriesNextServer : 0
+ribbon:
+    NFLoadBalancerRuleClassName:  com.netflix.loadbalancer.RandomRule
+    MaxAutoRetriesNextServer : 0
+    MaxAutoRetries: 0
+    ReadTimeout: 3000
 feign:
   hystrix:
-     enabled : true
+     enabled : false
     # 在feign中开启hystrix功能，默认情况下feign不开启hystrix功能
 
 logging:

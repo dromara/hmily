@@ -135,6 +135,22 @@ public interface HmilyRepository {
     List<HmilyParticipant> listHmilyParticipant(Date date, int limit);
     
     /**
+     * List hmily participant by trans id list.
+     *
+     * @param transId the trans id
+     * @return the list
+     */
+    List<HmilyParticipant> listHmilyParticipantByTransId(String transId);
+    
+    /**
+     * Exist hmily participant by trans id boolean.
+     *
+     * @param transId the trans id
+     * @return the boolean
+     */
+    boolean existHmilyParticipantByTransId(String transId);
+    
+    /**
      * Update hmily participant status int.
      *
      * @param participantId the participant id

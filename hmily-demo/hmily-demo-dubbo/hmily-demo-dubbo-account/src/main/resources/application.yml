@@ -16,7 +16,7 @@ org:
             serializer : kryo
             recoverDelayTime : 60
             retryMax : 30
-            scheduledDelay : 60
+            scheduledRecoveryDelay : 60
             scheduledThreadMax :  10
             repository : mysql
             hmilyDbConfig :
