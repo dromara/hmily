@@ -15,45 +15,27 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.annotation;
+package org.dromara.hmily.tac.core.hook;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Consumer;
 
-/**
- * The enum Trans type enum.
- *
- * @author xiaoyu
- */
-@AllArgsConstructor
-@Getter
-public enum TransTypeEnum {
+public enum Hook {
     
-    /**
-     * Tcc tcc pattern enum.
-     */
-    TCC("try, confirm, cancel"),
+    UNDO;
     
-    /**
-     * The Ac.
-     */
-    TAC("try , auto cancel"),
+    private final List<Consumer<Object>> consumers = new CopyOnWriteArrayList<>();
     
-    /**
-     * The Xa.
-     */
-    XA(" open XA"),
+    @SuppressWarnings("unchecked")
+    public <T> void register(Consumer<T> consumer) {
+        consumers.add((Consumer<Object>) consumer);
+    }
     
-    /**
-     * The Sxa.
-     */
-    SXA("spring XA"),
-    
-    /**
-     * Cc tcc pattern enum.
-     */
-    CC("confirm,cancel");
-    
-    private final String desc;
+    public void run(final Object object) {
+        for (Consumer<Object> each : consumers) {
+            each.accept(object);
+        }
+    }
     
 }

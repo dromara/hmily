@@ -20,7 +20,6 @@ package org.dromara.hmily.core.mediator;
 import java.util.Objects;
 import org.dromara.hmily.core.context.HmilyTransactionContext;
 import org.dromara.hmily.common.constant.CommonConstant;
-import org.dromara.hmily.common.enums.HmilyRoleEnum;
 import org.dromara.hmily.common.utils.GsonUtils;
 import org.dromara.hmily.common.utils.StringUtils;
 
