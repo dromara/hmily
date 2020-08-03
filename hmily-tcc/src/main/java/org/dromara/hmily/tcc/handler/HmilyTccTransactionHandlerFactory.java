@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.core.service.impl;
+package org.dromara.hmily.tcc.handler;
 
 import java.util.EnumMap;
 import java.util.Map;
@@ -23,10 +23,8 @@ import java.util.Objects;
 import org.dromara.hmily.common.enums.HmilyRoleEnum;
 import org.dromara.hmily.core.context.HmilyTransactionContext;
 import org.dromara.hmily.core.service.HmilyTransactionHandler;
-import org.dromara.hmily.core.service.handler.ConsumeHmilyTransactionHandler;
-import org.dromara.hmily.core.service.handler.LocalHmilyTransactionHandler;
-import org.dromara.hmily.core.service.handler.ParticipantHmilyTransactionHandler;
-import org.dromara.hmily.core.service.handler.StarterHmilyTransactionHandler;
+import org.dromara.hmily.core.service.HmilyTransactionHandlerFactory;
+import org.dromara.hmily.spi.HmilySPI;
 
 
 /**
@@ -34,15 +32,16 @@ import org.dromara.hmily.core.service.handler.StarterHmilyTransactionHandler;
  *
  * @author xiaoyu
  */
-public class HmilyTransactionHandlerFactory {
+@HmilySPI("tcc")
+public class HmilyTccTransactionHandlerFactory implements HmilyTransactionHandlerFactory {
     
     private static final Map<HmilyRoleEnum, HmilyTransactionHandler> HANDLER_MAP = new EnumMap<>(HmilyRoleEnum.class);
     
     static {
-        HANDLER_MAP.put(HmilyRoleEnum.START, new StarterHmilyTransactionHandler());
-        HANDLER_MAP.put(HmilyRoleEnum.PARTICIPANT, new ParticipantHmilyTransactionHandler());
-        HANDLER_MAP.put(HmilyRoleEnum.CONSUMER, new ConsumeHmilyTransactionHandler());
-        HANDLER_MAP.put(HmilyRoleEnum.LOCAL, new LocalHmilyTransactionHandler());
+        HANDLER_MAP.put(HmilyRoleEnum.START, new StarterHmilyTccTransactionHandler());
+        HANDLER_MAP.put(HmilyRoleEnum.PARTICIPANT, new ParticipantHmilyTccTransactionHandler());
+        HANDLER_MAP.put(HmilyRoleEnum.CONSUMER, new ConsumeHmilyTccTransactionHandler());
+        HANDLER_MAP.put(HmilyRoleEnum.LOCAL, new LocalHmilyTccTransactionHandler());
     }
     
     /**
@@ -51,7 +50,7 @@ public class HmilyTransactionHandlerFactory {
      * @param context {@linkplain HmilyTransactionContext}
      * @return Class
      */
-    public static HmilyTransactionHandler factoryOf(final HmilyTransactionContext context) {
+    public HmilyTransactionHandler factoryOf(final HmilyTransactionContext context) {
         if (Objects.isNull(context)) {
             return HANDLER_MAP.get(HmilyRoleEnum.START);
         } else {

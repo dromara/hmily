@@ -15,10 +15,14 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.core.service.impl;
+package org.dromara.hmily.core.service;
 
+import java.lang.reflect.Method;
 import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.reflect.MethodSignature;
+import org.dromara.hmily.annotation.HmilyTCC;
 import org.dromara.hmily.core.context.HmilyTransactionContext;
+import org.dromara.hmily.spi.ExtensionLoaderFactory;
 
 /**
  * HmilyTransactionAspectServiceImpl.
@@ -45,6 +49,13 @@ public class HmilyTransactionAspectInvoker {
      * @throws Throwable exception
      */
     public Object invoke(final HmilyTransactionContext hmilyTransactionContext, final ProceedingJoinPoint point) throws Throwable {
-        return HmilyTransactionHandlerFactory.factoryOf(hmilyTransactionContext).handler(point, hmilyTransactionContext);
+        MethodSignature signature = (MethodSignature) point.getSignature();
+        Method method = signature.getMethod();
+        final HmilyTCC hmilyTCC = method.getAnnotation(HmilyTCC.class);
+        if (null != hmilyTCC) {
+            return ExtensionLoaderFactory.load(HmilyTransactionHandlerFactory.class, "tcc").factoryOf(hmilyTransactionContext).handler(point, hmilyTransactionContext);
+        } else {
+           return ExtensionLoaderFactory.load(HmilyTransactionHandlerFactory.class, "tac").factoryOf(hmilyTransactionContext).handler(point, hmilyTransactionContext);
+        }
     }
 }

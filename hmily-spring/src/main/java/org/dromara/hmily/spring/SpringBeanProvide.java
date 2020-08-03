@@ -15,37 +15,28 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.core.helper;
+package org.dromara.hmily.spring;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dromara.hmily.common.utils.AssertUtils;
+import org.dromara.hmily.core.provide.ObjectProvide;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ConfigurableApplicationContext;
 
 /**
- * SpringBeanUtils.
+ * SpringBeanProvide.
  *
  * @author xiaoyu
  */
-public final class SpringBeanUtils {
-
-    private static final SpringBeanUtils INSTANCE = new SpringBeanUtils();
+public final class SpringBeanProvide implements ObjectProvide {
+    
 
     private ConfigurableApplicationContext cfgContext;
-
-    private SpringBeanUtils() {
-        if (INSTANCE != null) {
-            throw new Error("error");
-        }
-    }
-
-    /**
-     * get SpringBeanUtils.
-     *
-     * @return SpringBeanUtils
-     */
-    public static SpringBeanUtils getInstance() {
-        return INSTANCE;
+    
+    
+    @Override
+    public Object provide(final Class<?> clazz) {
+        return getBean(clazz);
     }
 
     /**
@@ -55,7 +46,7 @@ public final class SpringBeanUtils {
      * @param <T>  class
      * @return bean
      */
-    public <T> T getBean(final Class<T> type) {
+    private <T> T getBean(final Class<T> type) {
         AssertUtils.notNull(type);
         T bean;
         try {
@@ -88,20 +79,7 @@ public final class SpringBeanUtils {
         }
         return target.substring(1);
     }
-
-
-    /**
-     * register bean in spring ioc.
-     *
-     * @param beanName bean name
-     * @param obj      bean
-     */
-    public void registerBean(final String beanName, final Object obj) {
-        AssertUtils.notNull(beanName);
-        AssertUtils.notNull(obj);
-        cfgContext.getBeanFactory().registerSingleton(beanName, obj);
-    }
-
+    
     /**
      * set application context.
      *
@@ -110,4 +88,5 @@ public final class SpringBeanUtils {
     public void setCfgContext(final ConfigurableApplicationContext cfgContext) {
         this.cfgContext = cfgContext;
     }
+   
 }
