@@ -24,12 +24,12 @@ import java.lang.annotation.Target;
 
 
 /**
- * The interface HmilyAC.
+ * The interface HmilyTAC.
  *
  * @author xiaoyu
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
-public @interface HmilyAC {
+public @interface HmilyTAC {
 
 }

@@ -32,7 +32,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 import lombok.SneakyThrows;
-import org.dromara.hmily.annotation.HmilyAC;
+import org.dromara.hmily.annotation.HmilyTAC;
 import org.dromara.hmily.annotation.HmilyTCC;
 import org.dromara.hmily.common.enums.HmilyActionEnum;
 import org.dromara.hmily.common.enums.HmilyRoleEnum;
@@ -74,7 +74,7 @@ public class MotanHmilyTransactionFilter implements Filter {
             Annotation[] annotations = method.getAnnotations();
             boolean match = Arrays.stream(annotations)
                     .anyMatch(annotation -> annotation.annotationType().equals(HmilyTCC.class)
-                            || annotation.annotationType().equals(HmilyAC.class));
+                            || annotation.annotationType().equals(HmilyTAC.class));
             if (!match) {
                 return caller.call(request);
             }

@@ -30,7 +30,7 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
-import org.dromara.hmily.annotation.HmilyAC;
+import org.dromara.hmily.annotation.HmilyTAC;
 import org.dromara.hmily.annotation.HmilyTCC;
 import org.dromara.hmily.common.enums.HmilyActionEnum;
 import org.dromara.hmily.common.enums.HmilyRoleEnum;
@@ -72,7 +72,7 @@ public class DubboHmilyTransactionFilter implements Filter {
             Annotation[] annotations = method.getAnnotations();
             boolean match = Arrays.stream(annotations)
                     .anyMatch(annotation -> annotation.annotationType().equals(HmilyTCC.class)
-                            || annotation.annotationType().equals(HmilyAC.class));
+                            || annotation.annotationType().equals(HmilyTAC.class));
             if (!match) {
                 return invoker.invoke(invocation);
             }
