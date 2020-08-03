@@ -20,6 +20,12 @@
         </dependency>
 
         <dependency>
+            <groupId>org.dromara</groupId>
+            <artifactId>hmily-tcc</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>com.netflix.feign</groupId>
             <artifactId>feign-core</artifactId>
             <version>8.18.0</version>

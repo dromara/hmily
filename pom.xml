@@ -20,6 +20,8 @@
         <module>hmily-config</module>
         <module>hmily-spring</module>
         <module>hmily-rpc</module>
+        <module>hmily-tcc</module>
+        <module>hmily-tac</module>
     </modules>
 
     <organization>

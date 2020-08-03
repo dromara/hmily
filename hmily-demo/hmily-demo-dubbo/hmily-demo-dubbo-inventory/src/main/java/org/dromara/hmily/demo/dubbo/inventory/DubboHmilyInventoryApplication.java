@@ -44,6 +44,4 @@ public class DubboHmilyInventoryApplication {
         springApplication.setWebApplicationType(WebApplicationType.NONE);
         springApplication.run(args);
     }
-
-
 }

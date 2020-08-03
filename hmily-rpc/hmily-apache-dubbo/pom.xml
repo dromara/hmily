@@ -25,7 +25,14 @@
 
         <dependency>
             <groupId>org.dromara</groupId>
-            <artifactId>hmily-core</artifactId>
+            <artifactId>hmily-spring</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.dromara</groupId>
+            <artifactId>hmily-tcc</artifactId>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
 

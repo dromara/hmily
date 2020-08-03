@@ -15,29 +15,15 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.demo.dubbo.order;
+package org.dromara.hmily.core.provide;
 
-import org.mybatis.spring.annotation.MapperScan;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.ImportResource;
+import lombok.SneakyThrows;
 
-/**
- * DubboTccOrderApplication.
- *
- * @author xiaoyu
- */
-@SpringBootApplication
-@ImportResource({"classpath:spring-dubbo.xml"})
-@MapperScan("org.dromara.hmily.demo.dubbo.order.mapper")
-public class DubboHmilyOrderApplication {
-
-    /**
-     * main.
-     *
-     * @param args args
-     */
-    public static void main(final String[] args) {
-        SpringApplication.run(DubboHmilyOrderApplication.class, args);
+public class ReflectObject implements ObjectProvide {
+    
+    @Override
+    @SneakyThrows
+    public Object provide(final Class<?> clazz) {
+        return clazz.newInstance();
     }
 }
