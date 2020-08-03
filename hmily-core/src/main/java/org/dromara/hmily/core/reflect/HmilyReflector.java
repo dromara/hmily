@@ -25,7 +25,8 @@ import org.dromara.hmily.common.enums.HmilyActionEnum;
 import org.dromara.hmily.common.enums.HmilyRoleEnum;
 import org.dromara.hmily.core.context.HmilyContextHolder;
 import org.dromara.hmily.core.context.HmilyTransactionContext;
-import org.dromara.hmily.core.helper.SpringBeanUtils;
+import org.dromara.hmily.core.holder.SingletonHolder;
+import org.dromara.hmily.core.provide.ObjectProvide;
 import org.dromara.hmily.repository.spi.entity.HmilyInvocation;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipant;
 
@@ -79,7 +80,7 @@ public class HmilyReflector {
         final Class<?> clazz = Class.forName(className);
         final Object[] args = hmilyInvocation.getArgs();
         final Class<?>[] parameterTypes = hmilyInvocation.getParameterTypes();
-        final Object bean = SpringBeanUtils.getInstance().getBean(clazz);
+        final Object bean = SingletonHolder.INST.get(ObjectProvide.class).provide(clazz);
         return MethodUtils.invokeMethod(bean, methodName, args, parameterTypes);
     }
     
@@ -91,7 +92,7 @@ public class HmilyReflector {
         final String method = hmilyInvocation.getMethodName();
         final Object[] args = hmilyInvocation.getArgs();
         final Class<?>[] parameterTypes = hmilyInvocation.getParameterTypes();
-        final Object bean = SpringBeanUtils.getInstance().getBean(clazz);
+        final Object bean = SingletonHolder.INST.get(ObjectProvide.class).provide(clazz);
         return MethodUtils.invokeMethod(bean, method, args, parameterTypes);
     }
 }

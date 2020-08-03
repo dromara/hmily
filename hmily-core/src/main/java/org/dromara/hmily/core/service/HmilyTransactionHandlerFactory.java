@@ -15,29 +15,20 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.demo.dubbo.order;
+package org.dromara.hmily.core.service;
 
-import org.mybatis.spring.annotation.MapperScan;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.ImportResource;
+import org.dromara.hmily.core.context.HmilyTransactionContext;
 
 /**
- * DubboTccOrderApplication.
- *
- * @author xiaoyu
+ * The interface Hmily transaction handler factory.
  */
-@SpringBootApplication
-@ImportResource({"classpath:spring-dubbo.xml"})
-@MapperScan("org.dromara.hmily.demo.dubbo.order.mapper")
-public class DubboHmilyOrderApplication {
-
+public interface HmilyTransactionHandlerFactory {
+    
     /**
-     * main.
+     * Factory of hmily transaction handler.
      *
-     * @param args args
+     * @param context the context
+     * @return the hmily transaction handler
      */
-    public static void main(final String[] args) {
-        SpringApplication.run(DubboHmilyOrderApplication.class, args);
-    }
+    HmilyTransactionHandler factoryOf(HmilyTransactionContext context);
 }

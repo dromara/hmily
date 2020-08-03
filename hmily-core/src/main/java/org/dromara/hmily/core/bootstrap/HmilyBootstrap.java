@@ -17,10 +17,14 @@
 
 package org.dromara.hmily.core.bootstrap;
 
+import org.dromara.hmily.common.exception.HmilyRuntimeException;
 import org.dromara.hmily.common.utils.LogUtil;
+import org.dromara.hmily.common.utils.StringUtils;
 import org.dromara.hmily.config.HmilyConfig;
 import org.dromara.hmily.core.disruptor.publisher.HmilyRepositoryEventPublisher;
 import org.dromara.hmily.core.hook.HmilyShutdownHook;
+import org.dromara.hmily.core.provide.ObjectProvide;
+import org.dromara.hmily.core.provide.ReflectObject;
 import org.dromara.hmily.core.repository.HmilyRepositoryFacade;
 import org.dromara.hmily.core.holder.SingletonHolder;
 import org.dromara.hmily.core.logo.HmilyLogo;
@@ -54,6 +58,10 @@ public final class HmilyBootstrap {
      */
     public void start(final HmilyConfig hmilyConfig) {
         try {
+            check(hmilyConfig);
+            if (null == SingletonHolder.INST.get(ObjectProvide.class)) {
+                SingletonHolder.INST.register(ObjectProvide.class, new ReflectObject());
+            }
             SingletonHolder.INST.register(HmilyConfig.class, hmilyConfig);
             loadHmilyRepository(hmilyConfig);
             HmilyShutdownHook.getInstance().registerAutoCloseable(new HmilyTransactionSelfRecoveryScheduled());
@@ -65,6 +73,11 @@ public final class HmilyBootstrap {
         new HmilyLogo().logo();
     }
     
+    private void check(final HmilyConfig hmilyConfig) {
+        if (StringUtils.isBlank(hmilyConfig.getAppName())) {
+            throw new HmilyRuntimeException("app name must be config");
+        }
+    }
    
     private void loadHmilyRepository(final HmilyConfig hmilyConfig) {
         HmilySerializer hmilySerializer = ExtensionLoaderFactory.load(HmilySerializer.class, hmilyConfig.getSerializer());

@@ -26,7 +26,7 @@ import org.dromara.hmily.core.context.HmilyContextHolder;
 import org.dromara.hmily.core.context.HmilyTransactionContext;
 import org.dromara.hmily.core.interceptor.HmilyTransactionInterceptor;
 import org.dromara.hmily.core.mediator.RpcMediator;
-import org.dromara.hmily.core.service.impl.HmilyTransactionAspectInvoker;
+import org.dromara.hmily.core.service.HmilyTransactionAspectInvoker;
 import org.springframework.stereotype.Component;
 
 /**

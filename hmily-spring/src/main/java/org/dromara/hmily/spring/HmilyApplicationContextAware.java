@@ -19,7 +19,8 @@ package org.dromara.hmily.spring;
 
 import org.dromara.hmily.config.HmilyConfig;
 import org.dromara.hmily.core.bootstrap.HmilyBootstrap;
-import org.dromara.hmily.core.helper.SpringBeanUtils;
+import org.dromara.hmily.core.holder.SingletonHolder;
+import org.dromara.hmily.core.provide.ObjectProvide;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -35,7 +36,9 @@ public class HmilyApplicationContextAware extends HmilyConfig implements Applica
     
     @Override
     public void setApplicationContext(@NonNull final ApplicationContext applicationContext) throws BeansException {
-        SpringBeanUtils.getInstance().setCfgContext((ConfigurableApplicationContext) applicationContext);
+        SpringBeanProvide objectProvide = new SpringBeanProvide();
+        objectProvide.setCfgContext((ConfigurableApplicationContext) applicationContext);
+        SingletonHolder.INST.register(ObjectProvide.class, objectProvide);
         HmilyBootstrap.getInstance().start(this);
     }
 }

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.core.service.handler;
+package org.dromara.hmily.tcc.handler;
 
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.dromara.hmily.core.context.HmilyTransactionContext;
@@ -26,7 +26,7 @@ import org.dromara.hmily.core.service.HmilyTransactionHandler;
  *
  * @author xiaoyu
  */
-public class ConsumeHmilyTransactionHandler implements HmilyTransactionHandler {
+public class ConsumeHmilyTccTransactionHandler implements HmilyTransactionHandler {
 
     @Override
     public Object handler(final ProceedingJoinPoint point, final HmilyTransactionContext context) throws Throwable {

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.core.service.handler;
+package org.dromara.hmily.tcc.handler;
 
 import java.lang.reflect.Method;
 import java.util.List;
@@ -28,7 +28,7 @@ import org.dromara.hmily.core.cache.HmilyParticipantCacheManager;
 import org.dromara.hmily.core.context.HmilyContextHolder;
 import org.dromara.hmily.core.context.HmilyTransactionContext;
 import org.dromara.hmily.core.service.HmilyTransactionHandler;
-import org.dromara.hmily.core.service.executor.HmilyTransactionExecutor;
+import org.dromara.hmily.tcc.executor.HmilyTransactionExecutor;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipant;
 
 /**
@@ -36,7 +36,7 @@ import org.dromara.hmily.repository.spi.entity.HmilyParticipant;
  *
  * @author xiaoyu
  */
-public class ParticipantHmilyTransactionHandler implements HmilyTransactionHandler {
+public class ParticipantHmilyTccTransactionHandler implements HmilyTransactionHandler {
     
     private final HmilyTransactionExecutor executor = HmilyTransactionExecutor.getInstance();
     
