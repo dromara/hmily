@@ -18,7 +18,6 @@
 package org.dromara.hmily.tac.core.handler;
 
 import org.aspectj.lang.ProceedingJoinPoint;
-import org.dromara.hmily.common.enums.HmilyActionEnum;
 import org.dromara.hmily.core.context.HmilyContextHolder;
 import org.dromara.hmily.core.context.HmilyTransactionContext;
 import org.dromara.hmily.core.disruptor.DisruptorProviderManage;
@@ -38,7 +37,7 @@ public class StarterHmilyTacTransactionHandler implements HmilyTransactionHandle
     
     private final HmilyTacGlobalTransaction globalTransaction = HmilyTacGlobalTransaction.getInstance();
     
-    private DisruptorProviderManage<HmilyTransactionHandlerAlbum> disruptorProviderManage;
+    private final DisruptorProviderManage<HmilyTransactionHandlerAlbum> disruptorProviderManage;
     
     public StarterHmilyTacTransactionHandler() {
         disruptorProviderManage = new DisruptorProviderManage<>(new HmilyTransactionExecutorHandler(),
@@ -55,19 +54,18 @@ public class StarterHmilyTacTransactionHandler implements HmilyTransactionHandle
             try {
                 //execute try
                 returnValue = point.proceed();
-                hmilyTransaction.setStatus(HmilyActionEnum.TRYING.getCode());
             } catch (Throwable throwable) {
                 //if exception ,execute cancel
-//                final HmilyTransaction currentTransaction = executor.getCurrentTransaction();
-//                disruptorProviderManage.getProvider().onData(() -> executor.globalCancel(currentTransaction));
+                final HmilyTransaction currentTransaction = globalTransaction.getHmilyTransaction();
+                disruptorProviderManage.getProvider().onData(() -> globalTransaction.rollback(currentTransaction));
                 throw throwable;
             }
-            //execute confirm
-//            final HmilyTransaction currentTransaction = executor.getCurrentTransaction();
-//            disruptorProviderManage.getProvider().onData(() -> executor.globalConfirm(currentTransaction));
+            // execute confirm
+            final HmilyTransaction currentTransaction = globalTransaction.getHmilyTransaction();
+            disruptorProviderManage.getProvider().onData(() -> globalTransaction.commit(currentTransaction));
         } finally {
             HmilyContextHolder.remove();
-            //executor.remove();
+            globalTransaction.remove();
         }
         return returnValue;
     }

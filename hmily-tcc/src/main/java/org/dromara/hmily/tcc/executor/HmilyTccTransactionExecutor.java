@@ -77,9 +77,9 @@ public final class HmilyTccTransactionExecutor {
     public HmilyTransaction preTry(final ProceedingJoinPoint point) {
         LogUtil.debug(LOGGER, () -> "......hmily tcc transaction starter....");
         //build tccTransaction
-        final HmilyTransaction hmilyTransaction = createHmilyTransaction();
+        HmilyTransaction hmilyTransaction = createHmilyTransaction();
         PUBLISHER.publishEvent(hmilyTransaction, EventTypeEnum.CREATE_HMILY_TRANSACTION.getCode());
-        final HmilyParticipant hmilyParticipant = buildHmilyParticipant(point, null, null, HmilyRoleEnum.START.getCode(), hmilyTransaction.getTransId());
+        HmilyParticipant hmilyParticipant = buildHmilyParticipant(point, null, null, HmilyRoleEnum.START.getCode(), hmilyTransaction.getTransId());
         Optional.ofNullable(hmilyParticipant).ifPresent(h -> PUBLISHER.publishEvent(h, EventTypeEnum.CREATE_HMILY_PARTICIPANT.getCode()));
         hmilyTransaction.registerParticipant(hmilyParticipant);
         //save tccTransaction in threadLocal

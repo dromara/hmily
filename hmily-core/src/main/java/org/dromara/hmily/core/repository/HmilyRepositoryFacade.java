@@ -17,7 +17,6 @@
 
 package org.dromara.hmily.core.repository;
 
-import java.util.Collections;
 import java.util.List;
 import lombok.Setter;
 import org.dromara.hmily.repository.spi.HmilyRepository;
@@ -127,13 +126,33 @@ public class HmilyRepositoryFacade {
     }
     
     /**
+     * Create hmily participant undo boolean.
+     *
+     * @param undo the undo
+     * @return the boolean
+     */
+    public boolean createHmilyParticipantUndo(final HmilyParticipantUndo undo) {
+        return hmilyRepository.createHmilyParticipantUndo(undo) > 0;
+    }
+    
+    /**
      * Find undo by participant id list.
      *
      * @param participantId the participant id
      * @return the list
      */
     public List<HmilyParticipantUndo> findUndoByParticipantId(final String participantId) {
-        return Collections.emptyList();
+        return hmilyRepository.findHmilyParticipantUndoByParticipantId(participantId);
+    }
+    
+    /**
+     * Remove hmily participant undo boolean.
+     *
+     * @param undoId the undo id
+     * @return the boolean
+     */
+    public boolean removeHmilyParticipantUndo(final String undoId) {
+        return hmilyRepository.removeHmilyParticipantUndo(undoId) > 0;
     }
     
 }

@@ -21,6 +21,7 @@ import java.util.Date;
 import java.util.List;
 import org.dromara.hmily.config.HmilyConfig;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipant;
+import org.dromara.hmily.repository.spi.entity.HmilyParticipantUndo;
 import org.dromara.hmily.repository.spi.entity.HmilyTransaction;
 import org.dromara.hmily.repository.spi.exception.HmilyRepositoryException;
 import org.dromara.hmily.serializer.spi.HmilySerializer;
@@ -128,11 +129,12 @@ public interface HmilyRepository {
     /**
      * List hmily participant list.
      *
-     * @param date  the date
-     * @param limit the limit
+     * @param date      the date
+     * @param transType the trans type
+     * @param limit     the limit
      * @return the list
      */
-    List<HmilyParticipant> listHmilyParticipant(Date date, int limit);
+    List<HmilyParticipant> listHmilyParticipant(Date date, String transType, int limit);
     
     /**
      * List hmily participant by trans id list.
@@ -175,5 +177,29 @@ public interface HmilyRepository {
      * @return the boolean
      */
     boolean lockHmilyParticipant(HmilyParticipant hmilyParticipant);
+    
+    /**
+     * Create hmily participant undo int.
+     *
+     * @param hmilyParticipantUndo the hmily participant undo
+     * @return the int
+     */
+    int createHmilyParticipantUndo(HmilyParticipantUndo hmilyParticipantUndo);
+    
+    /**
+     * Find hmily participant undo by participant id list.
+     *
+     * @param participantId the participant id
+     * @return the list
+     */
+    List<HmilyParticipantUndo> findHmilyParticipantUndoByParticipantId(String participantId);
+    
+    /**
+     * Remove hmily participant undo int.
+     *
+     * @param undoId the undo id
+     * @return the int
+     */
+    int removeHmilyParticipantUndo(String undoId);
     
 }

@@ -31,31 +31,36 @@ import java.util.Objects;
 @RequiredArgsConstructor
 @Getter
 public enum HmilyActionEnum {
-
+    
     /**
      * Pre try tcc action enum.
      */
     PRE_TRY(0, "开始执行try"),
-
+    
     /**
      * Trying tcc action enum.
      */
     TRYING(1, "try阶段完成"),
-
+    
     /**
      * Confirming tcc action enum.
      */
     CONFIRMING(2, "confirm阶段"),
-
+    
     /**
      * Canceling tcc action enum.
      */
-    CANCELING(3, "cancel阶段");
-
+    CANCELING(3, "cancel阶段"),
+    
+    /**
+     * Death hmily action enum.
+     */
+    DEATH(4, "不可用");
+    
     private final int code;
 
     private final String desc;
-
+    
     /**
      * Acquire by code tcc action enum.
      *

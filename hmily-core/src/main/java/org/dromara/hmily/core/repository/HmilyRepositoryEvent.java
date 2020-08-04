@@ -20,6 +20,7 @@ package org.dromara.hmily.core.repository;
 import java.io.Serializable;
 import lombok.Data;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipant;
+import org.dromara.hmily.repository.spi.entity.HmilyParticipantUndo;
 import org.dromara.hmily.repository.spi.entity.HmilyTransaction;
 
 /**
@@ -34,6 +35,8 @@ public class HmilyRepositoryEvent implements Serializable {
     
     private HmilyParticipant hmilyParticipant;
     
+    private HmilyParticipantUndo hmilyParticipantUndo;
+    
     private String transId;
     
     private int type;
@@ -44,6 +47,7 @@ public class HmilyRepositoryEvent implements Serializable {
     public void clear() {
         hmilyTransaction = null;
         hmilyParticipant = null;
+        hmilyParticipantUndo = null;
         transId = null;
     }
 }
