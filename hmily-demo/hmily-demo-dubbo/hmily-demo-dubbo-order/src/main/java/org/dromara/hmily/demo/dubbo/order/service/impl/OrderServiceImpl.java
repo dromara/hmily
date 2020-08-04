@@ -65,25 +65,18 @@ public class OrderServiceImpl implements OrderService {
             paymentService.makePayment(order);
             System.out.println("切面耗时：" + (System.currentTimeMillis() - start));
         }
-       /* final long start = System.currentTimeMillis();
-        paymentService.makePayment(new Order());
-        System.out.println("切面耗时：" + (System.currentTimeMillis() - start));*/
         return "success";
     }
 
     @Override
     public String testOrderPay(Integer count, BigDecimal amount) {
-       /* final Order order = buildTestOrder(count, amount);
+        final Order order = buildTestOrder(count, amount);
         final int rows = orderMapper.save(order);
         if (rows > 0) {
             final long start = System.currentTimeMillis();
             paymentService.testMakePayment(order);
             System.out.println("方法耗时：" + (System.currentTimeMillis() - start));
-        }*/
-
-        final long start = System.currentTimeMillis();
-        paymentService.testMakePayment(new Order());
-        System.out.println("方法耗时：" + (System.currentTimeMillis() - start));
+        }
         return "success";
     }
 
