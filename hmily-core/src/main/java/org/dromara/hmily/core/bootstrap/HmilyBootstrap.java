@@ -29,6 +29,7 @@ import org.dromara.hmily.core.repository.HmilyRepositoryFacade;
 import org.dromara.hmily.core.holder.SingletonHolder;
 import org.dromara.hmily.core.logo.HmilyLogo;
 import org.dromara.hmily.core.schedule.HmilyTransactionSelfRecoveryScheduled;
+import org.dromara.hmily.metrics.facade.MetricsTrackerFacade;
 import org.dromara.hmily.repository.spi.HmilyRepository;
 import org.dromara.hmily.serializer.spi.HmilySerializer;
 import org.dromara.hmily.spi.ExtensionLoaderFactory;
@@ -61,6 +62,11 @@ public final class HmilyBootstrap {
             check(hmilyConfig);
             if (null == SingletonHolder.INST.get(ObjectProvide.class)) {
                 SingletonHolder.INST.register(ObjectProvide.class, new ReflectObject());
+            }
+            if(null != hmilyConfig.getHmilyMetricsConfig()) {
+                MetricsTrackerFacade facade = MetricsTrackerFacade.getInstance();
+                facade.start(hmilyConfig.getHmilyMetricsConfig());
+                HmilyShutdownHook.getInstance().registerAutoCloseable(facade);
             }
             SingletonHolder.INST.register(HmilyConfig.class, hmilyConfig);
             loadHmilyRepository(hmilyConfig);

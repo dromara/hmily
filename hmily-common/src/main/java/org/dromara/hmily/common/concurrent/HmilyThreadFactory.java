@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.core.concurrent.threadpool;
+package org.dromara.hmily.common.concurrent;
 
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicLong;
@@ -29,7 +29,7 @@ public final class HmilyThreadFactory implements ThreadFactory {
 
     private static final AtomicLong THREAD_NUMBER = new AtomicLong(1);
 
-    private static final ThreadGroup THREAD_GROUP = new ThreadGroup("hmilyTransaction");
+    private static final ThreadGroup THREAD_GROUP = new ThreadGroup("hmily");
 
     private boolean daemon;
 
