@@ -30,7 +30,7 @@ import java.util.Objects;
  *
  * @author xiaoyu
  */
-public class KryoPoolFactory implements KryoFactory {
+public final class KryoPoolFactory implements KryoFactory {
     
     private static final KryoPoolFactory FACTORY = new KryoPoolFactory();
     

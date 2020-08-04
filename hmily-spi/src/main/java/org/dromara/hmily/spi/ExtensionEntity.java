@@ -21,7 +21,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
- * The type ExtensionEntity
+ * The type ExtensionEntity.
  *
  * @author xiaoyu
  */

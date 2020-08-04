@@ -78,14 +78,22 @@ public class HmilyTransaction implements Serializable {
      * A collection of methods that participate in coordination.
      */
     private List<HmilyParticipant> hmilyParticipants;
-
+    
+    /**
+     * Instantiates a new Hmily transaction.
+     */
     public HmilyTransaction() {
         this.createTime = new Date();
         this.updateTime = new Date();
         hmilyParticipants = Lists.newCopyOnWriteArrayList();
 
     }
-
+    
+    /**
+     * Instantiates a new Hmily transaction.
+     *
+     * @param transId the trans id
+     */
     public HmilyTransaction(final String transId) {
         this.transId = transId;
         this.createTime = new Date();
@@ -104,6 +112,11 @@ public class HmilyTransaction implements Serializable {
         }
     }
     
+    /**
+     * Register participant list.
+     *
+     * @param hmilyParticipantList the hmily participant list
+     */
     public void registerParticipantList(final List<HmilyParticipant> hmilyParticipantList) {
         hmilyParticipants.addAll(hmilyParticipantList);
     }

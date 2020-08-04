@@ -25,15 +25,17 @@ import java.util.Random;
  * @author xiaoyu
  */
 public final class IdWorkerUtils {
-
+    
     private static final Random RANDOM = new Random();
     
+    private static final IdWorkerUtils INSTANCE = new IdWorkerUtils();
+    
     private static final long WORKER_ID_BITS = 10L;
-
+    
     private static final long DATACENTERIDBITS = 5L;
-
+    
     private static final long MAX_WORKER_ID = ~(-1L << WORKER_ID_BITS);
-
+    
     private static final long MAX_DATACENTER_ID = ~(-1L << DATACENTERIDBITS);
     
     private static final long SEQUENCE_BITS = 12L;
@@ -45,8 +47,6 @@ public final class IdWorkerUtils {
     private static final long TIMESTAMP_LEFT_SHIFT = SEQUENCE_BITS + WORKER_ID_BITS + DATACENTERIDBITS;
     
     private static final long SEQUENCE_MASK = ~(-1L << SEQUENCE_BITS);
-    
-    private volatile static IdWorkerUtils INSTANCE = new IdWorkerUtils();
     
     private long workerId;
     
@@ -62,7 +62,7 @@ public final class IdWorkerUtils {
         this(RANDOM.nextInt((int) MAX_WORKER_ID), RANDOM.nextInt((int) MAX_DATACENTER_ID), 1288834974657L);
     }
     
-    public IdWorkerUtils(long workerId) {
+    public IdWorkerUtils(final long workerId) {
         if (workerId > MAX_WORKER_ID || workerId < 0) {
             throw new IllegalArgumentException(
                     String.format("worker Id can't be greater than %d or less than 0", MAX_WORKER_ID));
@@ -132,5 +132,4 @@ public final class IdWorkerUtils {
     public String createUUID() {
         return String.valueOf(INSTANCE.nextId());
     }
-
 }

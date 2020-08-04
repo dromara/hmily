@@ -22,13 +22,12 @@ import com.caucho.hessian.io.HessianProtocolException;
 import com.caucho.hessian.io.Serializer;
 import com.caucho.hessian.io.SerializerFactory;
 
-
 /**
  * The type Hessian serializer factory.
  *
  * @author xiaoyu
  */
-public class HessianSerializerFactory extends SerializerFactory {
+public final class HessianSerializerFactory extends SerializerFactory {
     
     /**
      * The constant INSTANCE.
@@ -49,12 +48,12 @@ public class HessianSerializerFactory extends SerializerFactory {
     }
     
     @Override
-    protected Serializer loadSerializer(Class<?> cl) throws HessianProtocolException {
-        return super.loadSerializer(cl);
+    protected Serializer loadSerializer(final Class<?> clazz) throws HessianProtocolException {
+        return super.loadSerializer(clazz);
     }
     
     @Override
-    protected Deserializer loadDeserializer(Class cl) throws HessianProtocolException {
-        return super.loadDeserializer(cl);
+    protected Deserializer loadDeserializer(final Class clazz) throws HessianProtocolException {
+        return super.loadDeserializer(clazz);
     }
 }
