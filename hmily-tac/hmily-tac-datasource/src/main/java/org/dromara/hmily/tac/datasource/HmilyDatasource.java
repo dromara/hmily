@@ -20,6 +20,7 @@ package org.dromara.hmily.tac.datasource;
 import java.sql.Connection;
 import java.sql.SQLException;
 import javax.sql.DataSource;
+import org.dromara.hmily.tac.datasource.executor.HmilyTacRollbackExecutor;
 import org.dromara.hmily.tac.datasource.manager.HmilyDatasourceManager;
 
 /**
@@ -48,7 +49,7 @@ public class HmilyDatasource extends AbstractHmilyDataSource {
             throw new IllegalStateException("can not init dataSource", e);
         }
         HmilyDatasourceManager.register(this);
-        
+        HmilyTacRollbackExecutor.getInstance();
     }
     
     public String getResourceId() {

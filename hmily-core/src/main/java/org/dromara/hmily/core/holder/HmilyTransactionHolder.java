@@ -58,7 +58,7 @@ public class HmilyTransactionHolder {
      *
      * @param hmilyParticipant {@linkplain HmilyParticipant}
      */
-    public void enlistParticipant(final HmilyParticipant hmilyParticipant) {
+    public void registerStarterParticipant(final HmilyParticipant hmilyParticipant) {
         if (Objects.isNull(hmilyParticipant)) {
             return;
         }
@@ -86,5 +86,12 @@ public class HmilyTransactionHolder {
      */
     public HmilyTransaction getCurrentTransaction() {
         return CURRENT.get();
+    }
+    
+    /**
+     * clean threadLocal help gc.
+     */
+    public void remove() {
+        CURRENT.remove();
     }
 }

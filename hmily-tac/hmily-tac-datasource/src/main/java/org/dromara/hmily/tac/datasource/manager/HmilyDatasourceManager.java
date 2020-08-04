@@ -19,26 +19,32 @@ package org.dromara.hmily.tac.datasource.manager;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import org.dromara.hmily.repository.spi.entity.HmilyParticipantUndo;
-import org.dromara.hmily.tac.core.hook.Hook;
 import org.dromara.hmily.tac.datasource.HmilyDatasource;
 
+/**
+ * The type Hmily datasource manager.
+ */
 public class HmilyDatasourceManager {
     
     private static final Map<String, HmilyDatasource> DATASOURCE_CACHE = new ConcurrentHashMap<>();
     
+    /**
+     * Register.
+     *
+     * @param hmilyDatasource the hmily datasource
+     */
     public static void register(final HmilyDatasource hmilyDatasource) {
         DATASOURCE_CACHE.put(hmilyDatasource.getResourceId(), hmilyDatasource);
     }
     
+    /**
+     * Get hmily datasource.
+     *
+     * @param resourceId the resource id
+     * @return the hmily datasource
+     */
     public static HmilyDatasource get(String resourceId) {
         return DATASOURCE_CACHE.get(resourceId);
     }
     
-    public void hook() {
-        Hook.UNDO.register((HmilyParticipantUndo undo) -> {
-            HmilyDatasource hmilyDatasource = DATASOURCE_CACHE.get(undo.getResourceId());
-            
-        });
-    }
 }
