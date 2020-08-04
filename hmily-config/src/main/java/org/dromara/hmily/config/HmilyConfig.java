@@ -138,15 +138,20 @@ public class HmilyConfig {
      * redis config.
      */
     private HmilyRedisConfig hmilyRedisConfig;
-
+    
     /**
      * zookeeper config.
      */
     private HmilyZookeeperConfig hmilyZookeeperConfig;
-
+    
     /**
      * file config.
      */
     private HmilyFileConfig hmilyFileConfig;
-
+    
+    /**
+     * metrics config.
+     */
+    private HmilyMetricsConfig hmilyMetricsConfig;
+    
 }
