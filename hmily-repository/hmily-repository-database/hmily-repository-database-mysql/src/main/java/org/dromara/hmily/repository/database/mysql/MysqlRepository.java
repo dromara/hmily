@@ -19,8 +19,6 @@ package org.dromara.hmily.repository.database.mysql;
 
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.hmily.repository.database.manager.AbstractHmilyDatabase;
-import org.dromara.hmily.repository.spi.entity.HmilyTransaction;
-import org.dromara.hmily.repository.spi.exception.HmilyRepositoryException;
 import org.dromara.hmily.spi.HmilySPI;
 
 /**

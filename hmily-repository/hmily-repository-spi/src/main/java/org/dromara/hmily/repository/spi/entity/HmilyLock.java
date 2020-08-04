@@ -40,7 +40,7 @@ public class HmilyLock implements Serializable {
     private String transId;
     
     /**
-     * participant id
+     * participant id.
      */
     private String participantId;
     

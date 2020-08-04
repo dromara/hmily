@@ -52,5 +52,5 @@ public @interface HmilySPI {
      *
      * @return the scope type
      */
-    ScopeType scopeType() default  ScopeType.SINGLETON;
+    ScopeType scopeType() default ScopeType.SINGLETON;
 }
