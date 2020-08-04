@@ -15,23 +15,27 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.common.utils.httpclient;
+package org.dromara.hmily.metrics.api;
 
 /**
- * The commonError code .
+ * Metrics tracker.
  *
  * @author xiaoyu
- **/
-public class CommonErrorCode {
-
+ */
+public interface MetricsTracker {
+    
     /**
-     * error code.
+     * Metrics label.
+     *
+     * @return metrics label
      */
-    public static final int ERROR = -2;
-
+    String metricsLabel();
+    
     /**
-     * success code.
+     * Metrics type.
+     *
+     * @return metrics type
      */
-    public static final int SUCCESSFUL = 200;
-
+    String metricsType();
 }
+

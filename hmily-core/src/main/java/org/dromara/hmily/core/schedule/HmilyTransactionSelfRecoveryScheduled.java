@@ -30,7 +30,7 @@ import org.dromara.hmily.common.enums.HmilyActionEnum;
 import org.dromara.hmily.common.utils.CollectionUtils;
 import org.dromara.hmily.common.utils.LogUtil;
 import org.dromara.hmily.config.HmilyConfig;
-import org.dromara.hmily.core.concurrent.threadpool.HmilyThreadFactory;
+import org.dromara.hmily.common.concurrent.HmilyThreadFactory;
 import org.dromara.hmily.core.holder.SingletonHolder;
 import org.dromara.hmily.core.hook.UndoHook;
 import org.dromara.hmily.repository.spi.HmilyRepository;

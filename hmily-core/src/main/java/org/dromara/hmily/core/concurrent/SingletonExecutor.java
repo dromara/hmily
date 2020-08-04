@@ -17,7 +17,7 @@
 
 package org.dromara.hmily.core.concurrent;
 
-import org.dromara.hmily.core.concurrent.threadpool.HmilyThreadFactory;
+import org.dromara.hmily.common.concurrent.HmilyThreadFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
