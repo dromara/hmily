@@ -17,10 +17,12 @@
 
 package org.dromara.hmily.core.repository;
 
+import java.util.Collections;
 import java.util.List;
 import lombok.Setter;
 import org.dromara.hmily.repository.spi.HmilyRepository;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipant;
+import org.dromara.hmily.repository.spi.entity.HmilyParticipantUndo;
 import org.dromara.hmily.repository.spi.entity.HmilyTransaction;
 import org.dromara.hmily.repository.spi.exception.HmilyRepositoryException;
 
@@ -48,6 +50,12 @@ public class HmilyRepositoryFacade {
         return INSTANCE;
     }
     
+    /**
+     * Create hmily transaction string.
+     *
+     * @param hmilyTransaction the hmily transaction
+     * @return the string
+     */
     public String createHmilyTransaction(final HmilyTransaction hmilyTransaction) {
         final int rows = hmilyRepository.createHmilyTransaction(hmilyTransaction);
         if (rows > 0) {
@@ -56,38 +64,76 @@ public class HmilyRepositoryFacade {
         throw new HmilyRepositoryException();
     }
     
+    /**
+     * Update hmily transaction status int.
+     *
+     * @param transId the trans id
+     * @param status  the status
+     * @return the int
+     */
     public int updateHmilyTransactionStatus(final String transId, final Integer status) {
         return hmilyRepository.updateHmilyTransactionStatus(transId, status);
     }
     
-    public HmilyTransaction findHmilyTransactionByTransId(final String transId) {
-        return null;
-    }
-    
+    /**
+     * Remove hmily transaction boolean.
+     *
+     * @param transId the trans id
+     * @return the boolean
+     */
     public boolean removeHmilyTransaction(final String transId) {
         return hmilyRepository.removeHmilyTransaction(transId) > 0;
     }
     
-    public void updateHmilyTransaction(final HmilyTransaction hmilyTransaction) {
-    
-    }
-    
+    /**
+     * Create hmily participant boolean.
+     *
+     * @param hmilyParticipant the hmily participant
+     * @return the boolean
+     */
     public boolean createHmilyParticipant(final HmilyParticipant hmilyParticipant) {
-        //return coordinatorRepository.updateParticipant(hmilyTransaction);
         return hmilyRepository.createHmilyParticipant(hmilyParticipant) > 0;
     }
     
+    /**
+     * Update hmily participant status int.
+     *
+     * @param transId the trans id
+     * @param status  the status
+     * @return the int
+     */
     public int updateHmilyParticipantStatus(final String transId, final Integer status) {
         return hmilyRepository.updateHmilyParticipantStatus(transId, status);
     }
     
+    /**
+     * Remove hmily participant boolean.
+     *
+     * @param participantId the participant id
+     * @return the boolean
+     */
     public boolean removeHmilyParticipant(final String participantId) {
         return hmilyRepository.removeHmilyParticipant(participantId) > 0;
     }
     
-    public List<HmilyParticipant> findHmilyParticipant(String participantId) {
+    /**
+     * Find hmily participant list.
+     *
+     * @param participantId the participant id
+     * @return the list
+     */
+    public List<HmilyParticipant> findHmilyParticipant(final String participantId) {
         return hmilyRepository.findHmilyParticipant(participantId);
     }
     
-   
+    /**
+     * Find undo by participant id list.
+     *
+     * @param participantId the participant id
+     * @return the list
+     */
+    public List<HmilyParticipantUndo> findUndoByParticipantId(final String participantId) {
+        return Collections.emptyList();
+    }
+    
 }

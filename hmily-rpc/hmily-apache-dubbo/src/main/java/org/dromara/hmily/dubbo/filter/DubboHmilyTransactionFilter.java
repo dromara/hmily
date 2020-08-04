@@ -39,10 +39,10 @@ import org.dromara.hmily.common.utils.IdWorkerUtils;
 import org.dromara.hmily.common.utils.LogUtil;
 import org.dromara.hmily.core.context.HmilyContextHolder;
 import org.dromara.hmily.core.context.HmilyTransactionContext;
+import org.dromara.hmily.core.holder.HmilyTransactionHolder;
 import org.dromara.hmily.core.mediator.RpcMediator;
 import org.dromara.hmily.repository.spi.entity.HmilyInvocation;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipant;
-import org.dromara.hmily.tcc.executor.HmilyTransactionExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -90,9 +90,9 @@ public class DubboHmilyTransactionFilter implements Filter {
         //if result has not exception
         if (!result.hasException()) {
             if (context.getRole() == HmilyRoleEnum.PARTICIPANT.getCode()) {
-                HmilyTransactionExecutor.getInstance().registerParticipantByNested(participantId, hmilyParticipant);
+                HmilyTransactionHolder.getInstance().registerParticipantByNested(participantId, hmilyParticipant);
             } else {
-                HmilyTransactionExecutor.getInstance().enlistParticipant(hmilyParticipant);
+                HmilyTransactionHolder.getInstance().registerStarterParticipant(hmilyParticipant);
             }
         } else {
             throw new HmilyRuntimeException("rpc invoke exception{}", result.getException());

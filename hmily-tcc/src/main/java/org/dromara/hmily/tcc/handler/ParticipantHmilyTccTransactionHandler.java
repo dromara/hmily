@@ -28,7 +28,7 @@ import org.dromara.hmily.core.cache.HmilyParticipantCacheManager;
 import org.dromara.hmily.core.context.HmilyContextHolder;
 import org.dromara.hmily.core.context.HmilyTransactionContext;
 import org.dromara.hmily.core.service.HmilyTransactionHandler;
-import org.dromara.hmily.tcc.executor.HmilyTransactionExecutor;
+import org.dromara.hmily.tcc.executor.HmilyTccTransactionExecutor;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipant;
 
 /**
@@ -38,7 +38,7 @@ import org.dromara.hmily.repository.spi.entity.HmilyParticipant;
  */
 public class ParticipantHmilyTccTransactionHandler implements HmilyTransactionHandler {
     
-    private final HmilyTransactionExecutor executor = HmilyTransactionExecutor.getInstance();
+    private final HmilyTccTransactionExecutor executor = HmilyTccTransactionExecutor.getInstance();
     
     @Override
     public Object handler(final ProceedingJoinPoint point, final HmilyTransactionContext context) throws Throwable {
