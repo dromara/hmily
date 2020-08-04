@@ -58,63 +58,128 @@ import org.dromara.hmily.serializer.spi.exception.HmilySerializerException;
 @Slf4j
 public abstract class AbstractHmilyDatabase implements HmilyRepository {
     
+    /**
+     * The constant INSERT_HMILY_TRANSACTION.
+     */
     protected static final String INSERT_HMILY_TRANSACTION = "INSERT INTO hmily_transaction_global (trans_id, app_name, status, trans_type, "
             + "retry, version, create_time, update_time) VALUES(?, ?, ?, ?, ?, ?, ?, ?)";
     
+    /**
+     * The constant SELECT_HMILY_TRANSACTION_COMMON.
+     */
     protected static final String SELECT_HMILY_TRANSACTION_COMMON = "select trans_id, app_name, status, trans_type, retry, version from hmily_transaction_global ";
     
+    /**
+     * The constant SELECT_HMILY_TRANSACTION_DELAY.
+     */
     protected static final String SELECT_HMILY_TRANSACTION_DELAY = SELECT_HMILY_TRANSACTION_COMMON + " where update_time < ? and app_name = ?";
     
+    /**
+     * The constant SELECT_HMILY_TRANSACTION_WITH_TRANS_ID.
+     */
     protected static final String SELECT_HMILY_TRANSACTION_WITH_TRANS_ID = SELECT_HMILY_TRANSACTION_COMMON + " where trans_id = ?";
     
+    /**
+     * The constant UPDATE_HMILY_TRANSACTION_STATUS.
+     */
     protected static final String UPDATE_HMILY_TRANSACTION_STATUS = "update hmily_transaction_global  set status=?  where trans_id = ? ";
     
+    /**
+     * The constant UPDATE_HMILY_TRANSACTION_RETRY_LOCK.
+     */
     protected static final String UPDATE_HMILY_TRANSACTION_RETRY_LOCK = "update hmily_transaction_global set version =?, retry =? where trans_id = ? and version = ? ";
     
+    /**
+     * The constant UPDATE_HMILY_PARTICIPANT_LOCK.
+     */
     protected static final String UPDATE_HMILY_PARTICIPANT_LOCK = "update hmily_transaction_participant set version =?, retry =? where participant_id = ? and version = ? ";
     
+    /**
+     * The constant DELETE_HMILY_TRANSACTION.
+     */
     protected static final String DELETE_HMILY_TRANSACTION = "delete from hmily_transaction_global where trans_id = ? ";
     
+    /**
+     * The constant INSERT_HMILY_PARTICIPANT.
+     */
     protected static final String INSERT_HMILY_PARTICIPANT = "INSERT INTO hmily_transaction_participant (participant_id, participant_ref_id, trans_id, trans_type, status, app_name,"
-            + "role, retry, target_class, target_method, confirm_method, cancel_method, confirm_invocation, cancel_invocation, version, create_time, update_time) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? ,? , ? , ?, ?)";
+            + "role, retry, target_class, target_method, confirm_method, cancel_method, confirm_invocation, cancel_invocation, version, create_time, update_time)"
+            + " VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? ,? , ? , ?, ?)";
     
+    /**
+     * The constant SELECTOR_HMILY_PARTICIPANT_COMMON.
+     */
     protected static final String SELECTOR_HMILY_PARTICIPANT_COMMON = "select participant_id, participant_ref_id, trans_id, trans_type, status, app_name,"
             + "role, retry, target_class, target_method, confirm_method, cancel_method, confirm_invocation, cancel_invocation, version from hmily_transaction_participant ";
     
+    /**
+     * The constant SELECTOR_HMILY_PARTICIPANT_WITH_KEY.
+     */
     protected static final String SELECTOR_HMILY_PARTICIPANT_WITH_KEY = SELECTOR_HMILY_PARTICIPANT_COMMON + " where participant_id = ?";
     
+    /**
+     * The constant SELECTOR_HMILY_PARTICIPANT_WITH_PARTICIPANT_REF_ID.
+     */
     protected static final String SELECTOR_HMILY_PARTICIPANT_WITH_PARTICIPANT_REF_ID = SELECTOR_HMILY_PARTICIPANT_COMMON + " where participant_ref_id = ?";
     
+    /**
+     * The constant SELECTOR_HMILY_PARTICIPANT_WITH_TRANS_ID.
+     */
     protected static final String SELECTOR_HMILY_PARTICIPANT_WITH_TRANS_ID = SELECTOR_HMILY_PARTICIPANT_COMMON + " where trans_id = ?";
     
+    /**
+     * The constant EXIST_HMILY_PARTICIPANT_WITH_TRANS_ID.
+     */
     protected static final String EXIST_HMILY_PARTICIPANT_WITH_TRANS_ID = " select count(*) as count_total from hmily_transaction_participant where trans_id = ? ";
     
-    protected static final String SELECTOR_HMILY_PARTICIPANT_WITH_DELAY_AND_APP_NAME_TRANS_TYPE = SELECTOR_HMILY_PARTICIPANT_COMMON + " where update_time < ? and app_name = ?  and trans_type = ? and status != 4";
+    /**
+     * The constant SELECTOR_HMILY_PARTICIPANT_WITH_DELAY_AND_APP_NAME_TRANS_TYPE.
+     */
+    protected static final String SELECTOR_HMILY_PARTICIPANT_WITH_DELAY_AND_APP_NAME_TRANS_TYPE = SELECTOR_HMILY_PARTICIPANT_COMMON
+            + " where update_time < ? and app_name = ?  and trans_type = ? and status != 4";
     
+    /**
+     * The constant UPDATE_HMILY_PARTICIPANT_STATUS.
+     */
     protected static final String UPDATE_HMILY_PARTICIPANT_STATUS = "update hmily_transaction_participant set status=? where participant_id = ? ";
     
+    /**
+     * The constant DELETE_HMILY_PARTICIPANT.
+     */
     protected static final String DELETE_HMILY_PARTICIPANT = "delete from hmily_transaction_participant where participant_id = ? ";
     
-    protected static final String INSERT_HMILY_PARTICIPANT_UNDO = "INSERT INTO hmily_participant_undo (undo_id, participant_id, trans_id, resource_id, undo_invocation, status, create_time, update_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+    /**
+     * The constant INSERT_HMILY_PARTICIPANT_UNDO.
+     */
+    protected static final String INSERT_HMILY_PARTICIPANT_UNDO = "INSERT INTO hmily_participant_undo"
+            + "(undo_id, participant_id, trans_id, resource_id, undo_invocation, status, create_time, update_time) "
+            + " VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
     
-    protected static final String SELECTOR_HMILY_PARTICIPANT_UNDO_WITH_PARTICIPANT_ID = " select undo_id, participant_id, trans_id, resource_id, undo_invocation, status from hmily_participant_undo where participant_id =? ";
+    /**
+     * The constant SELECTOR_HMILY_PARTICIPANT_UNDO_WITH_PARTICIPANT_ID.
+     */
+    protected static final String SELECTOR_HMILY_PARTICIPANT_UNDO_WITH_PARTICIPANT_ID = " select undo_id, participant_id, trans_id, resource_id, undo_invocation, status "
+            + "from hmily_participant_undo where participant_id =? ";
     
+    /**
+     * The constant REMOVE_HMILY_PARTICIPANT_UNDO.
+     */
     protected static final String REMOVE_HMILY_PARTICIPANT_UNDO = "delete from hmily_participant_undo where undo_id = ?";
     
     /**
      * The data source.
      */
-    protected DataSource dataSource;
+    private DataSource dataSource;
     
     /**
-     * The hmily serializer
+     * The hmily serializer.
      */
-    protected HmilySerializer hmilySerializer;
+    private HmilySerializer hmilySerializer;
     
     /**
      * The App name.
      */
-    protected String appName;
+    private String appName;
     
     /**
      * Sql file path string.
@@ -123,8 +188,20 @@ public abstract class AbstractHmilyDatabase implements HmilyRepository {
      */
     protected abstract String sqlFilePath();
     
+    /**
+     * Hmily transaction limit sql string.
+     *
+     * @param limit the limit
+     * @return the string
+     */
     protected abstract String hmilyTransactionLimitSql(int limit);
     
+    /**
+     * Hmily participant limit sql string.
+     *
+     * @param limit the limit
+     * @return the string
+     */
     protected abstract String hmilyParticipantLimitSql(int limit);
     
     /**
@@ -133,7 +210,7 @@ public abstract class AbstractHmilyDatabase implements HmilyRepository {
      * @param params the params
      * @return the object
      */
-    protected abstract Object convertDataType(final Object params);
+    protected abstract Object convertDataType(Object params);
     
     @Override
     public void init(final HmilyConfig hmilyConfig) {
@@ -196,18 +273,16 @@ public abstract class AbstractHmilyDatabase implements HmilyRepository {
         return executeUpdate(UPDATE_HMILY_TRANSACTION_RETRY_LOCK, hmilyTransaction.getVersion(), hmilyTransaction.getRetry(), hmilyTransaction.getTransId(), currentVersion);
     }
     
-    
-    
     @Override
     public boolean lockHmilyParticipant(final HmilyParticipant hmilyParticipant) {
-        final Integer currentVersion = hmilyParticipant.getVersion();
+        Integer currentVersion = hmilyParticipant.getVersion();
         hmilyParticipant.setVersion(hmilyParticipant.getVersion() + 1);
         hmilyParticipant.setRetry(hmilyParticipant.getRetry() + 1);
         return executeUpdate(UPDATE_HMILY_PARTICIPANT_LOCK, hmilyParticipant.getVersion(), hmilyParticipant.getRetry(), hmilyParticipant.getParticipantId(), currentVersion) > 0;
     }
     
     @Override
-    public boolean existHmilyParticipantByTransId(String transId) {
+    public boolean existHmilyParticipantByTransId(final String transId) {
         List<Map<String, Object>> participantList = executeQuery(EXIST_HMILY_PARTICIPANT_WITH_TRANS_ID, transId);
         if (CollectionUtils.isNotEmpty(participantList)) {
             Long total = participantList.stream()
@@ -219,7 +294,7 @@ public abstract class AbstractHmilyDatabase implements HmilyRepository {
     }
     
     @Override
-    public List<HmilyParticipant> listHmilyParticipantByTransId(String transId) {
+    public List<HmilyParticipant> listHmilyParticipantByTransId(final String transId) {
         List<Map<String, Object>> participantList = executeQuery(SELECTOR_HMILY_PARTICIPANT_WITH_TRANS_ID, transId);
         if (CollectionUtils.isNotEmpty(participantList)) {
             return participantList.stream()
@@ -255,7 +330,6 @@ public abstract class AbstractHmilyDatabase implements HmilyRepository {
         return Collections.emptyList();
     }
     
-    
     @Override
     public int updateHmilyTransactionStatus(final String transId, final Integer status) throws HmilyRepositoryException {
         return executeUpdate(UPDATE_HMILY_TRANSACTION_STATUS, status, transId);
@@ -270,11 +344,12 @@ public abstract class AbstractHmilyDatabase implements HmilyRepository {
     public int createHmilyParticipant(final HmilyParticipant hmilyParticipant) throws HmilyRepositoryException {
         byte[] confirmSerialize = hmilySerializer.serialize(hmilyParticipant.getConfirmHmilyInvocation());
         byte[] cancelSerialize = hmilySerializer.serialize(hmilyParticipant.getCancelHmilyInvocation());
-        return executeUpdate(INSERT_HMILY_PARTICIPANT, hmilyParticipant.getParticipantId(), hmilyParticipant.getParticipantRefId(), hmilyParticipant.getTransId(), hmilyParticipant.getTransType(), hmilyParticipant.getStatus(),
+        return executeUpdate(INSERT_HMILY_PARTICIPANT, hmilyParticipant.getParticipantId(), hmilyParticipant.getParticipantRefId(),
+                hmilyParticipant.getTransId(), hmilyParticipant.getTransType(), hmilyParticipant.getStatus(),
                 appName, hmilyParticipant.getRole(), hmilyParticipant.getRetry(), hmilyParticipant.getTargetClass(), hmilyParticipant.getTargetMethod(),
-                hmilyParticipant.getConfirmMethod(), hmilyParticipant.getCancelMethod(), confirmSerialize, cancelSerialize, hmilyParticipant.getVersion(), hmilyParticipant.getCreateTime(), hmilyParticipant.getUpdateTime());
+                hmilyParticipant.getConfirmMethod(), hmilyParticipant.getCancelMethod(), confirmSerialize, cancelSerialize,
+                hmilyParticipant.getVersion(), hmilyParticipant.getCreateTime(), hmilyParticipant.getUpdateTime());
     }
-    
     
     @Override
     public List<HmilyParticipant> findHmilyParticipant(final String participantId) {
@@ -320,12 +395,10 @@ public abstract class AbstractHmilyDatabase implements HmilyRepository {
         return executeUpdate(REMOVE_HMILY_PARTICIPANT_UNDO, undoId);
     }
     
-    
     @Override
     public int updateHmilyParticipantStatus(final String participantId, final Integer status) {
         return executeUpdate(UPDATE_HMILY_PARTICIPANT_STATUS, status, participantId);
     }
-    
     
     @Override
     public int removeHmilyParticipant(final String participantId) {
@@ -339,7 +412,7 @@ public abstract class AbstractHmilyDatabase implements HmilyRepository {
      * @param params the params
      * @return the int
      */
-    protected int executeUpdate(final String sql, final Object... params) {
+    private int executeUpdate(final String sql, final Object... params) {
         Connection connection = null;
         PreparedStatement ps = null;
         try {
@@ -465,7 +538,7 @@ public abstract class AbstractHmilyDatabase implements HmilyRepository {
         }
     }
     
-    private void executeScript(Connection conn, final String sqlPath) throws Exception {
+    private void executeScript(final Connection conn, final String sqlPath) throws Exception {
         ScriptRunner runner = new ScriptRunner(conn);
         // doesn't print logger
         runner.setLogWriter(null);

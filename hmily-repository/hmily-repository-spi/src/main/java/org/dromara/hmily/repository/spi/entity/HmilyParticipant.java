@@ -22,7 +22,6 @@ import java.util.Date;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-
 /**
  * this hmily transaction participant.
  *
@@ -35,7 +34,7 @@ public class HmilyParticipant implements Serializable {
     private static final long serialVersionUID = -2590970715288987627L;
     
     /**
-     * participant id
+     * participant id.
      */
     private String participantId;
     
@@ -72,7 +71,7 @@ public class HmilyParticipant implements Serializable {
     /**
      * retry.
      */
-    private int retry = 0;
+    private int retry;
     
     /**
      * Call interface name.

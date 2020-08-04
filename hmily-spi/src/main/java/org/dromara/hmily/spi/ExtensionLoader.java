@@ -35,10 +35,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The type Extension loader.
- * This is done by loading the properties file.
- * https://github.com/apache/dubbo/blob/master/dubbo-common/src/main/java/org/apache/dubbo/common/extension/ExtensionLoader.java
+ * The type Extension loader for dubbo ExtensionLoader.
  *
+ * @param <T> the type parameter
  * @author xiaoyu(Myth)
  */
 @SuppressWarnings("all")
@@ -74,7 +73,7 @@ public final class ExtensionLoader<T> {
      *
      * @param <T>   the type parameter
      * @param clazz the clazz
-     * @return the extension loader.
+     * @return the extension loader
      */
     public static <T> ExtensionLoader<T> getExtensionLoader(final Class<T> clazz) {
         if (clazz == null) {
@@ -91,16 +90,37 @@ public final class ExtensionLoader<T> {
         return (ExtensionLoader<T>) LOADERS.get(clazz);
     }
     
+    /**
+     * Load t.
+     *
+     * @param loader the loader
+     * @return the t
+     */
     public T load(final ClassLoader loader) {
-        return loadExtension(loader, null, null);
+        return loadExtension(loader);
     }
     
+    /**
+     * Load t.
+     *
+     * @param name   the name
+     * @param loader the loader
+     * @return the t
+     */
     public T load(final String name, final ClassLoader loader) {
         return loadExtension(name, loader, null, null);
     }
     
+    /**
+     * Load t.
+     *
+     * @param name   the name
+     * @param args   the args
+     * @param loader the loader
+     * @return the t
+     */
     public T load(final String name, final Object[] args, final ClassLoader loader) {
-        Class[] argsType = null;
+        Class<?>[] argsType = null;
         if (args != null && args.length > 0) {
             argsType = new Class[args.length];
             for (int i = 0; i < args.length; i++) {
@@ -110,29 +130,37 @@ public final class ExtensionLoader<T> {
         return loadExtension(name, loader, argsType, args);
     }
     
-    public T load(final String name, final Class[] argsType, final Object[] args, final ClassLoader loader) {
+    /**
+     * Load t.
+     *
+     * @param name     the name
+     * @param argsType the args type
+     * @param args     the args
+     * @param loader   the loader
+     * @return the t
+     */
+    public T load(final String name, final Class<?>[] argsType, final Object[] args, final ClassLoader loader) {
         return loadExtension(name, loader, argsType, args);
     }
     
+    /**
+     * Load all list.
+     *
+     * @param loader the loader
+     * @return the list
+     */
     public List<T> loadAll(final ClassLoader loader) {
         return loadAll(null, null, loader);
     }
     
-    /**
-     * get all implements
-     *
-     * @param argsType the args type
-     * @param args     the args
-     * @return list list
-     */
-    private List<T> loadAll(final Class[] argsType, final Object[] args, final ClassLoader loader) {
+    private List<T> loadAll(final Class<?>[] argsType, final Object[] args, final ClassLoader loader) {
         List<Class<?>> allClazzs = getAllExtensionClass(loader);
         if (allClazzs.isEmpty()) {
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
         return allClazzs.stream().map(t -> {
             ExtensionEntity extensionEntity = classToEntityMap.get(t);
-            return getExtensionInstance(extensionEntity, loader, argsType, args);
+            return getExtensionInstance(extensionEntity, argsType, args);
         }).collect(Collectors.toList());
     }
     
@@ -140,19 +168,19 @@ public final class ExtensionLoader<T> {
         return loadAllExtensionClass(loader);
     }
     
-    private T loadExtension(final ClassLoader loader, final Class<?>[] argTypes, final Object[] args) {
+    private T loadExtension(final ClassLoader loader) {
         loadAllExtensionClass(loader);
         ExtensionEntity extensionEntity = getDefaultExtensionEntity();
-        return getExtensionInstance(extensionEntity, loader, argTypes, args);
+        return getExtensionInstance(extensionEntity, null, null);
     }
     
     private T loadExtension(final String name, final ClassLoader loader, final Class<?>[] argTypes, final Object[] args) {
         loadAllExtensionClass(loader);
         ExtensionEntity extensionEntity = getCachedExtensionEntity(name);
-        return getExtensionInstance(extensionEntity, loader, argTypes, args);
+        return getExtensionInstance(extensionEntity, argTypes, args);
     }
     
-    private T getExtensionInstance(final ExtensionEntity entity, final ClassLoader loader, final Class[] argTypes, final Object[] args) {
+    private T getExtensionInstance(final ExtensionEntity entity, final Class<?>[] argTypes, final Object[] args) {
         if (entity == null) {
             throw new IllegalStateException("not found service provider for : " + clazz.getName());
         }
@@ -164,21 +192,21 @@ public final class ExtensionLoader<T> {
             }
             Object instance = holder.getValue();
             if (instance == null) {
-                synchronized (holder) {
+                synchronized (cachedInstances) {
                     instance = holder.getValue();
                     if (instance == null) {
-                        instance = createNewExtension(entity, loader, argTypes, args);
+                        instance = createNewExtension(entity, argTypes, args);
                         holder.setValue(instance);
                     }
                 }
             }
             return (T) instance;
         } else {
-            return createNewExtension(entity, loader, argTypes, args);
+            return createNewExtension(entity, argTypes, args);
         }
     }
     
-    private T createNewExtension(final ExtensionEntity entity, final ClassLoader loader, final Class<?>[] argTypes, final Object[] args) {
+    private T createNewExtension(final ExtensionEntity entity, final Class<?>[] argTypes, final Object[] args) {
         try {
             return initInstance(entity.getServiceClass(), argTypes, args);
         } catch (Exception t) {
@@ -215,7 +243,6 @@ public final class ExtensionLoader<T> {
     private List<ExtensionEntity> findAllExtensionEntity(final ClassLoader loader) {
         List<ExtensionEntity> entityList = new ArrayList<>();
         loadDirectory(HMILY_DIRECTORY + clazz.getName(), loader, entityList);
-        nameToEntityMap.values().stream().sorted(Comparator.comparing(ExtensionEntity::getOrder)).collect(Collectors.toList());
         return entityList.stream().sorted(Comparator.comparing(ExtensionEntity::getOrder)).collect(Collectors.toList());
     }
     
@@ -233,7 +260,7 @@ public final class ExtensionLoader<T> {
         }
     }
     
-    private void loadResources(final List<ExtensionEntity> entityList, final URL url, final ClassLoader classLoader) throws IOException {
+    private void loadResources(final List<ExtensionEntity> entityList, final URL url, final ClassLoader classLoader) {
         try (InputStream inputStream = url.openStream()) {
             Properties properties = new Properties();
             properties.load(inputStream);
@@ -259,7 +286,7 @@ public final class ExtensionLoader<T> {
                 throw new IllegalStateException("load extension resources error," + clazz + " subtype is not of " + clazz);
             }
             String name = null;
-            Integer order = 0;
+            int order = 0;
             ScopeType scope = ScopeType.SINGLETON;
             HmilySPI hmilySPI = clazz.getAnnotation(HmilySPI.class);
             if (null != hmilySPI) {
@@ -284,8 +311,8 @@ public final class ExtensionLoader<T> {
     
     private T initInstance(final Class<?> implClazz, final Class<?>[] argTypes, final Object[] args)
             throws IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException {
-        T result = null;
-        if (argTypes != null && args != null) {
+        T result;
+        if (null != argTypes && null != args) {
             Constructor<?> constructor = implClazz.getDeclaredConstructor(argTypes);
             result = clazz.cast(constructor.newInstance(args));
         } else {
@@ -300,12 +327,12 @@ public final class ExtensionLoader<T> {
     /**
      * The type Holder.
      *
-     * @param <T> the type parameter.
+     * @param <T> the type parameter
      */
     public static class Holder<T> {
         
         private volatile T value;
-        
+    
         /**
          * Gets value.
          *
@@ -314,7 +341,7 @@ public final class ExtensionLoader<T> {
         public T getValue() {
             return value;
         }
-        
+    
         /**
          * Sets value.
          *
