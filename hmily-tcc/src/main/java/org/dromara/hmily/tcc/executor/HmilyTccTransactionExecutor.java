@@ -39,6 +39,7 @@ import org.dromara.hmily.core.cache.HmilyParticipantCacheManager;
 import org.dromara.hmily.core.context.HmilyContextHolder;
 import org.dromara.hmily.core.context.HmilyTransactionContext;
 import org.dromara.hmily.core.disruptor.publisher.HmilyRepositoryEventPublisher;
+import org.dromara.hmily.core.holder.HmilyTransactionHolder;
 import org.dromara.hmily.core.reflect.HmilyReflector;
 import org.dromara.hmily.repository.spi.entity.HmilyInvocation;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipant;
@@ -52,20 +53,18 @@ import org.slf4j.LoggerFactory;
  *
  * @author xiaoyu
  */
-public final class HmilyTransactionExecutor {
+public final class HmilyTccTransactionExecutor {
     
-    private static final Logger LOGGER = LoggerFactory.getLogger(HmilyTransactionExecutor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(HmilyTccTransactionExecutor.class);
     
-    private static final HmilyTransactionExecutor INSTANCE = new HmilyTransactionExecutor();
+    private static final HmilyTccTransactionExecutor INSTANCE = new HmilyTccTransactionExecutor();
     
     private static final HmilyRepositoryEventPublisher PUBLISHER = HmilyRepositoryEventPublisher.getInstance();
     
-    private static final ThreadLocal<HmilyTransaction> CURRENT = new ThreadLocal<>();
-    
-    private HmilyTransactionExecutor() {
+    private HmilyTccTransactionExecutor() {
     }
     
-    public static HmilyTransactionExecutor getInstance() {
+    public static HmilyTccTransactionExecutor getInstance() {
         return INSTANCE;
     }
     
@@ -84,7 +83,7 @@ public final class HmilyTransactionExecutor {
         Optional.ofNullable(hmilyParticipant).ifPresent(h -> PUBLISHER.publishEvent(h, EventTypeEnum.CREATE_HMILY_PARTICIPANT.getCode()));
         hmilyTransaction.registerParticipant(hmilyParticipant);
         //save tccTransaction in threadLocal
-        CURRENT.set(hmilyTransaction);
+        HmilyTransactionHolder.getInstance().set(hmilyTransaction);
         //set TccTransactionContext this context transfer remote
         HmilyTransactionContext context = new HmilyTransactionContext();
         //set action is try
@@ -271,53 +270,16 @@ public final class HmilyTransactionExecutor {
     }
     
     /**
-     * acquired by threadLocal.
-     *
-     * @return {@linkplain HmilyTransaction}
-     */
-    public HmilyTransaction getCurrentTransaction() {
-        return CURRENT.get();
-    }
-
-
-    /**
      * clean threadLocal help gc.
      */
     public void remove() {
-        CURRENT.remove();
-    }
-
-    /**
-     * add participant.
-     *
-     * @param hmilyParticipant {@linkplain HmilyParticipant}
-     */
-    public void enlistParticipant(final HmilyParticipant hmilyParticipant) {
-        if (Objects.isNull(hmilyParticipant)) {
-            return;
-        }
-        Optional.ofNullable(getCurrentTransaction())
-                .ifPresent(c -> c.registerParticipant(hmilyParticipant));
-    }
-    
-    /**
-     * when nested transaction add participant.
-     *
-     * @param participantId    key
-     * @param hmilyParticipant {@linkplain HmilyParticipant}
-     */
-    public void registerParticipantByNested(final String participantId, final HmilyParticipant hmilyParticipant) {
-        if (Objects.isNull(hmilyParticipant)) {
-            return;
-        }
-        HmilyParticipantCacheManager.getInstance().cacheHmilyParticipant(participantId, hmilyParticipant);
+        HmilyTransactionHolder.getInstance().remove();
     }
     
     private HmilyParticipant filterStartHmilyParticipant(final HmilyTransaction currentTransaction) {
         final List<HmilyParticipant> hmilyParticipants = currentTransaction.getHmilyParticipants();
         return filterStartHmilyParticipant(hmilyParticipants);
     }
-    
     
     private HmilyParticipant filterStartHmilyParticipant(final List<HmilyParticipant> hmilyParticipants) {
         if (CollectionUtils.isNotEmpty(hmilyParticipants)) {

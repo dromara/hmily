@@ -23,9 +23,10 @@ import org.dromara.hmily.core.context.HmilyTransactionContext;
 import org.dromara.hmily.common.enums.HmilyActionEnum;
 import org.dromara.hmily.core.disruptor.DisruptorProviderManage;
 import org.dromara.hmily.core.disruptor.handler.HmilyTransactionExecutorHandler;
+import org.dromara.hmily.core.holder.HmilyTransactionHolder;
 import org.dromara.hmily.core.service.HmilyTransactionHandler;
 import org.dromara.hmily.core.service.HmilyTransactionHandlerAlbum;
-import org.dromara.hmily.tcc.executor.HmilyTransactionExecutor;
+import org.dromara.hmily.tcc.executor.HmilyTccTransactionExecutor;
 import org.dromara.hmily.repository.spi.entity.HmilyTransaction;
 
 
@@ -36,7 +37,7 @@ import org.dromara.hmily.repository.spi.entity.HmilyTransaction;
  */
 public class StarterHmilyTccTransactionHandler implements HmilyTransactionHandler, AutoCloseable {
     
-    private final HmilyTransactionExecutor executor = HmilyTransactionExecutor.getInstance();
+    private final HmilyTccTransactionExecutor executor = HmilyTccTransactionExecutor.getInstance();
     
     private DisruptorProviderManage<HmilyTransactionHandlerAlbum> disruptorProviderManage;
     
@@ -59,12 +60,12 @@ public class StarterHmilyTccTransactionHandler implements HmilyTransactionHandle
                 executor.updateStartStatus(hmilyTransaction);
             } catch (Throwable throwable) {
                 //if exception ,execute cancel
-                final HmilyTransaction currentTransaction = executor.getCurrentTransaction();
+                final HmilyTransaction currentTransaction = HmilyTransactionHolder.getInstance().getCurrentTransaction();
                 disruptorProviderManage.getProvider().onData(() -> executor.globalCancel(currentTransaction));
                 throw throwable;
             }
             //execute confirm
-            final HmilyTransaction currentTransaction = executor.getCurrentTransaction();
+            final HmilyTransaction currentTransaction = HmilyTransactionHolder.getInstance().getCurrentTransaction();
             disruptorProviderManage.getProvider().onData(() -> executor.globalConfirm(currentTransaction));
         } finally {
             HmilyContextHolder.remove();

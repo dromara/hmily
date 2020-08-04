@@ -40,12 +40,12 @@ public class PostgresqlRepository extends AbstractHmilyDatabase {
     }
     
     @Override
-    protected String hmilyTransactionLimitSql() {
+    protected String hmilyTransactionLimitSql(final int limit) {
         return null;
     }
     
     @Override
-    protected String hmilyParticipantLimitSql() {
+    protected String hmilyParticipantLimitSql(final int limit) {
         return null;
     }
     

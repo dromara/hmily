@@ -38,13 +38,13 @@ public class MysqlRepository extends AbstractHmilyDatabase {
     }
     
     @Override
-    protected String hmilyTransactionLimitSql() {
-        return SELECT_HMILY_TRANSACTION_DELAY + " limit ?";
+    protected String hmilyTransactionLimitSql(final int limit) {
+        return SELECT_HMILY_TRANSACTION_DELAY + " limit " + limit;
     }
     
     @Override
-    protected String hmilyParticipantLimitSql() {
-        return SELECTOR_HMILY_PARTICIPANT_WITH_DELAY_AND_APP_NAME + " limit ?";
+    protected String hmilyParticipantLimitSql(final int limit) {
+        return SELECTOR_HMILY_PARTICIPANT_WITH_DELAY_AND_APP_NAME + " limit " + limit;
     }
     
     @Override

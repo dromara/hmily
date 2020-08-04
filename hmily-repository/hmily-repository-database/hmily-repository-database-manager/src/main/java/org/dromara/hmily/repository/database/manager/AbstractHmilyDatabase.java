@@ -115,9 +115,9 @@ public abstract class AbstractHmilyDatabase implements HmilyRepository {
      */
     protected abstract String sqlFilePath();
     
-    protected abstract String hmilyTransactionLimitSql();
+    protected abstract String hmilyTransactionLimitSql(int limit);
     
-    protected abstract String hmilyParticipantLimitSql();
+    protected abstract String hmilyParticipantLimitSql(int limit);
     
     /**
      * Convert data type object.
@@ -222,8 +222,8 @@ public abstract class AbstractHmilyDatabase implements HmilyRepository {
     
     @Override
     public List<HmilyParticipant> listHmilyParticipant(Date date, int limit) {
-        String limitSql = hmilyParticipantLimitSql();
-        List<Map<String, Object>> participantList = executeQuery(limitSql, date, appName, limit);
+        String limitSql = hmilyParticipantLimitSql(limit);
+        List<Map<String, Object>> participantList = executeQuery(limitSql, date, appName);
         if (CollectionUtils.isNotEmpty(participantList)) {
             return participantList.stream()
                     .filter(Objects::nonNull)
@@ -235,8 +235,8 @@ public abstract class AbstractHmilyDatabase implements HmilyRepository {
     
     @Override
     public List<HmilyTransaction> listLimitByDelay(final Date date, final int limit) {
-        String limitSql = hmilyTransactionLimitSql();
-        List<Map<String, Object>> list = executeQuery(limitSql, date, appName, limit);
+        String limitSql = hmilyTransactionLimitSql(limit);
+        List<Map<String, Object>> list = executeQuery(limitSql, date, appName);
         if (CollectionUtils.isNotEmpty(list)) {
             return list.stream().filter(Objects::nonNull)
                     .map(this::buildHmilyTransactionByResultMap)

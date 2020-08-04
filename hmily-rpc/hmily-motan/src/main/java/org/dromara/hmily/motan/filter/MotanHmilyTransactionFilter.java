@@ -40,10 +40,10 @@ import org.dromara.hmily.common.exception.HmilyRuntimeException;
 import org.dromara.hmily.common.utils.IdWorkerUtils;
 import org.dromara.hmily.core.context.HmilyContextHolder;
 import org.dromara.hmily.core.context.HmilyTransactionContext;
+import org.dromara.hmily.core.holder.HmilyTransactionHolder;
 import org.dromara.hmily.core.mediator.RpcMediator;
 import org.dromara.hmily.repository.spi.entity.HmilyInvocation;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipant;
-import org.dromara.hmily.tcc.executor.HmilyTransactionExecutor;
 
 /**
  * The MotanHmilyTransactionFilter.
@@ -91,9 +91,9 @@ public class MotanHmilyTransactionFilter implements Filter {
         final Response response = caller.call(request);
         if (null != response.getException()) {
             if (context.getRole() == HmilyRoleEnum.PARTICIPANT.getCode()) {
-                HmilyTransactionExecutor.getInstance().registerParticipantByNested(context.getParticipantId(), hmilyParticipant);
+                HmilyTransactionHolder.getInstance().registerParticipantByNested(context.getParticipantId(), hmilyParticipant);
             } else {
-                HmilyTransactionExecutor.getInstance().enlistParticipant(hmilyParticipant);
+                HmilyTransactionHolder.getInstance().registerStarterParticipant(hmilyParticipant);
             }
         }
         return response;

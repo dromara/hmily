@@ -75,8 +75,6 @@ public class InventoryServiceImpl implements InventoryService {
     @HmilyTCC(confirmMethod = "confirmMethod", cancelMethod = "cancelMethod")
     public Boolean decrease(InventoryDTO inventoryDTO) {
         inventoryMapper.decrease(inventoryDTO);
-        final int i = tryCount.incrementAndGet();
-        LOGGER.info("调用了inventory  try " + i + " 次");
         return true;
     }
 
