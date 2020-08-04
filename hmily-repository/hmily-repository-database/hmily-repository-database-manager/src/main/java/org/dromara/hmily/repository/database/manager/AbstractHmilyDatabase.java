@@ -45,7 +45,9 @@ import org.dromara.hmily.config.HmilyDbConfig;
 import org.dromara.hmily.repository.spi.HmilyRepository;
 import org.dromara.hmily.repository.spi.entity.HmilyInvocation;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipant;
+import org.dromara.hmily.repository.spi.entity.HmilyParticipantUndo;
 import org.dromara.hmily.repository.spi.entity.HmilyTransaction;
+import org.dromara.hmily.repository.spi.entity.HmilyUndoInvocation;
 import org.dromara.hmily.repository.spi.exception.HmilyRepositoryException;
 import org.dromara.hmily.serializer.spi.HmilySerializer;
 import org.dromara.hmily.serializer.spi.exception.HmilySerializerException;
@@ -87,11 +89,17 @@ public abstract class AbstractHmilyDatabase implements HmilyRepository {
     
     protected static final String EXIST_HMILY_PARTICIPANT_WITH_TRANS_ID = " select count(*) as count_total from hmily_transaction_participant where trans_id = ? ";
     
-    protected static final String SELECTOR_HMILY_PARTICIPANT_WITH_DELAY_AND_APP_NAME = SELECTOR_HMILY_PARTICIPANT_COMMON + " where update_time < ? and app_name = ? ";
+    protected static final String SELECTOR_HMILY_PARTICIPANT_WITH_DELAY_AND_APP_NAME_TRANS_TYPE = SELECTOR_HMILY_PARTICIPANT_COMMON + " where update_time < ? and app_name = ?  and trans_type = ? and status != 4";
     
     protected static final String UPDATE_HMILY_PARTICIPANT_STATUS = "update hmily_transaction_participant set status=? where participant_id = ? ";
     
     protected static final String DELETE_HMILY_PARTICIPANT = "delete from hmily_transaction_participant where participant_id = ? ";
+    
+    protected static final String INSERT_HMILY_PARTICIPANT_UNDO = "INSERT INTO hmily_participant_undo (undo_id, participant_id, trans_id, resource_id, undo_invocation, status, create_time, update_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+    
+    protected static final String SELECTOR_HMILY_PARTICIPANT_UNDO_WITH_PARTICIPANT_ID = " select undo_id, participant_id, trans_id, resource_id, undo_invocation, status from hmily_participant_undo where participant_id =? ";
+    
+    protected static final String REMOVE_HMILY_PARTICIPANT_UNDO = "delete from hmily_participant_undo where undo_id = ?";
     
     /**
      * The data source.
@@ -188,6 +196,8 @@ public abstract class AbstractHmilyDatabase implements HmilyRepository {
         return executeUpdate(UPDATE_HMILY_TRANSACTION_RETRY_LOCK, hmilyTransaction.getVersion(), hmilyTransaction.getRetry(), hmilyTransaction.getTransId(), currentVersion);
     }
     
+    
+    
     @Override
     public boolean lockHmilyParticipant(final HmilyParticipant hmilyParticipant) {
         final Integer currentVersion = hmilyParticipant.getVersion();
@@ -221,9 +231,9 @@ public abstract class AbstractHmilyDatabase implements HmilyRepository {
     }
     
     @Override
-    public List<HmilyParticipant> listHmilyParticipant(Date date, int limit) {
+    public List<HmilyParticipant> listHmilyParticipant(final Date date, final String transType, final int limit) {
         String limitSql = hmilyParticipantLimitSql(limit);
-        List<Map<String, Object>> participantList = executeQuery(limitSql, date, appName);
+        List<Map<String, Object>> participantList = executeQuery(limitSql, date, appName, transType);
         if (CollectionUtils.isNotEmpty(participantList)) {
             return participantList.stream()
                     .filter(Objects::nonNull)
@@ -289,44 +299,27 @@ public abstract class AbstractHmilyDatabase implements HmilyRepository {
         return hmilyParticipantList;
     }
     
-    private HmilyTransaction buildHmilyTransactionByResultMap(final Map<String, Object> map) {
-        HmilyTransaction hmilyTransaction = new HmilyTransaction();
-        hmilyTransaction.setTransId((String) map.get("trans_id"));
-        hmilyTransaction.setTransType((String) map.get("trans_type"));
-        hmilyTransaction.setStatus((Integer) map.get("status"));
-        hmilyTransaction.setAppName((String) map.get("app_ame"));
-        hmilyTransaction.setRetry((Integer) map.get("retry"));
-        hmilyTransaction.setVersion((Integer) map.get("version"));
-        return hmilyTransaction;
+    @Override
+    public int createHmilyParticipantUndo(final HmilyParticipantUndo undo) {
+        byte[] invocation = hmilySerializer.serialize(undo.getUndoInvocation());
+        return executeUpdate(INSERT_HMILY_PARTICIPANT_UNDO, undo.getUndoId(), undo.getParticipantId(), undo.getTransId(), undo.getResourceId(),
+                invocation, undo.getStatus(), undo.getCreateTime(), undo.getUpdateTime());
     }
     
-    private HmilyParticipant buildHmilyParticipantByResultMap(final Map<String, Object> map) {
-        HmilyParticipant hmilyParticipant = new HmilyParticipant();
-        hmilyParticipant.setParticipantId((String) map.get("participant_id"));
-        hmilyParticipant.setParticipantRefId((String) map.get("participant_ref_id"));
-        hmilyParticipant.setTransId((String) map.get("trans_id"));
-        hmilyParticipant.setTransType((String) map.get("trans_type"));
-        hmilyParticipant.setStatus((Integer) map.get("status"));
-        hmilyParticipant.setRole((Integer) map.get("role"));
-        hmilyParticipant.setRetry((Integer) map.get("retry"));
-        hmilyParticipant.setAppName((String) map.get("app_name"));
-        hmilyParticipant.setTargetClass((String) map.get("target_class"));
-        hmilyParticipant.setTargetMethod((String) map.get("target_method"));
-        hmilyParticipant.setConfirmMethod((String) map.get("confirm_method"));
-        hmilyParticipant.setCancelMethod((String) map.get("cancel_method"));
-        byte[] confirmInvocation = (byte[]) map.get("confirm_invocation");
-        byte[] cancelInvocation = (byte[]) map.get("cancel_invocation");
-        try {
-            final HmilyInvocation confirmHmilyInvocation = hmilySerializer.deSerialize(confirmInvocation, HmilyInvocation.class);
-            hmilyParticipant.setConfirmHmilyInvocation(confirmHmilyInvocation);
-            final HmilyInvocation cancelHmilyInvocation = hmilySerializer.deSerialize(cancelInvocation, HmilyInvocation.class);
-            hmilyParticipant.setCancelHmilyInvocation(cancelHmilyInvocation);
-        } catch (HmilySerializerException e) {
-            log.error("hmilySerializer deSerialize have exception:{} ", e.getMessage());
+    @Override
+    public List<HmilyParticipantUndo> findHmilyParticipantUndoByParticipantId(final String participantId) {
+        List<Map<String, Object>> results = executeQuery(SELECTOR_HMILY_PARTICIPANT_UNDO_WITH_PARTICIPANT_ID, participantId);
+        if (CollectionUtils.isEmpty(results)) {
+            return Collections.emptyList();
         }
-        hmilyParticipant.setVersion((Integer) map.get("version"));
-        return hmilyParticipant;
+        return results.stream().map(this::buildHmilyParticipantUndoByResultMap).collect(Collectors.toList());
     }
+    
+    @Override
+    public int removeHmilyParticipantUndo(final String undoId) {
+        return executeUpdate(REMOVE_HMILY_PARTICIPANT_UNDO, undoId);
+    }
+    
     
     @Override
     public int updateHmilyParticipantStatus(final String participantId, final Integer status) {
@@ -396,6 +389,62 @@ public abstract class AbstractHmilyDatabase implements HmilyRepository {
             close(connection, ps, rs);
         }
         return list;
+    }
+    
+    private HmilyTransaction buildHmilyTransactionByResultMap(final Map<String, Object> map) {
+        HmilyTransaction hmilyTransaction = new HmilyTransaction();
+        hmilyTransaction.setTransId((String) map.get("trans_id"));
+        hmilyTransaction.setTransType((String) map.get("trans_type"));
+        hmilyTransaction.setStatus((Integer) map.get("status"));
+        hmilyTransaction.setAppName((String) map.get("app_ame"));
+        hmilyTransaction.setRetry((Integer) map.get("retry"));
+        hmilyTransaction.setVersion((Integer) map.get("version"));
+        return hmilyTransaction;
+    }
+    
+    private HmilyParticipantUndo buildHmilyParticipantUndoByResultMap(final Map<String, Object> map) {
+        HmilyParticipantUndo undo = new HmilyParticipantUndo();
+        undo.setUndoId((String) map.get("undo_id"));
+        undo.setParticipantId((String) map.get("participant_id"));
+        undo.setTransId((String) map.get("trans_id"));
+        undo.setTransId((String) map.get("resource_id"));
+        byte[] undoInvocation = (byte[]) map.get("undo_invocation");
+        try {
+            final HmilyUndoInvocation hmilyUndoInvocation = hmilySerializer.deSerialize(undoInvocation, HmilyUndoInvocation.class);
+            undo.setUndoInvocation(hmilyUndoInvocation);
+        } catch (HmilySerializerException e) {
+            log.error("hmilySerializer deSerialize have exception:{} ", e.getMessage());
+        }
+        undo.setStatus((Integer) map.get("status"));
+        return undo;
+    }
+    
+    private HmilyParticipant buildHmilyParticipantByResultMap(final Map<String, Object> map) {
+        HmilyParticipant hmilyParticipant = new HmilyParticipant();
+        hmilyParticipant.setParticipantId((String) map.get("participant_id"));
+        hmilyParticipant.setParticipantRefId((String) map.get("participant_ref_id"));
+        hmilyParticipant.setTransId((String) map.get("trans_id"));
+        hmilyParticipant.setTransType((String) map.get("trans_type"));
+        hmilyParticipant.setStatus((Integer) map.get("status"));
+        hmilyParticipant.setRole((Integer) map.get("role"));
+        hmilyParticipant.setRetry((Integer) map.get("retry"));
+        hmilyParticipant.setAppName((String) map.get("app_name"));
+        hmilyParticipant.setTargetClass((String) map.get("target_class"));
+        hmilyParticipant.setTargetMethod((String) map.get("target_method"));
+        hmilyParticipant.setConfirmMethod((String) map.get("confirm_method"));
+        hmilyParticipant.setCancelMethod((String) map.get("cancel_method"));
+        byte[] confirmInvocation = (byte[]) map.get("confirm_invocation");
+        byte[] cancelInvocation = (byte[]) map.get("cancel_invocation");
+        try {
+            final HmilyInvocation confirmHmilyInvocation = hmilySerializer.deSerialize(confirmInvocation, HmilyInvocation.class);
+            hmilyParticipant.setConfirmHmilyInvocation(confirmHmilyInvocation);
+            final HmilyInvocation cancelHmilyInvocation = hmilySerializer.deSerialize(cancelInvocation, HmilyInvocation.class);
+            hmilyParticipant.setCancelHmilyInvocation(cancelHmilyInvocation);
+        } catch (HmilySerializerException e) {
+            log.error("hmilySerializer deSerialize have exception:{} ", e.getMessage());
+        }
+        hmilyParticipant.setVersion((Integer) map.get("version"));
+        return hmilyParticipant;
     }
     
     private static void close(final AutoCloseable... closeables) {

@@ -20,6 +20,7 @@ package org.dromara.hmily.core.repository;
 import org.dromara.hmily.common.enums.EventTypeEnum;
 import org.dromara.hmily.core.disruptor.publisher.HmilyRepositoryEventPublisher;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipant;
+import org.dromara.hmily.repository.spi.entity.HmilyParticipantUndo;
 import org.dromara.hmily.repository.spi.entity.HmilyTransaction;
 
 /**
@@ -45,6 +46,15 @@ public class HmilyRepositoryStorage {
      */
     public static void createHmilyParticipant(final HmilyParticipant hmilyParticipant) {
         PUBLISHER.publishEvent(hmilyParticipant, EventTypeEnum.CREATE_HMILY_PARTICIPANT.getCode());
+    }
+    
+    /**
+     * Remove hmily participant undo.
+     *
+     * @param hmilyParticipantUndo the hmily participant undo
+     */
+    public static void removeHmilyParticipantUndo(final HmilyParticipantUndo hmilyParticipantUndo) {
+        PUBLISHER.publishEvent(hmilyParticipantUndo, EventTypeEnum.REMOVE_HMILY_PARTICIPANT_UNDO.getCode());
     }
     
 }

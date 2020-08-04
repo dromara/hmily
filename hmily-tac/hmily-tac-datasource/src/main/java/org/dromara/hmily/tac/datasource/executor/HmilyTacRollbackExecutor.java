@@ -17,7 +17,7 @@
 
 package org.dromara.hmily.tac.datasource.executor;
 
-import org.dromara.hmily.core.hook.Hook;
+import org.dromara.hmily.core.hook.UndoHook;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipantUndo;
 import org.dromara.hmily.tac.datasource.HmilyDatasource;
 import org.dromara.hmily.tac.datasource.manager.HmilyDatasourceManager;
@@ -42,9 +42,10 @@ public class HmilyTacRollbackExecutor {
     }
     
     private void registerRollback() {
-        Hook.UNDO.register((HmilyParticipantUndo undo) -> {
+        UndoHook.INSTANCE.register(undo -> {
             HmilyDatasource hmilyDatasource = HmilyDatasourceManager.get(undo.getResourceId());
             doRollback(hmilyDatasource, undo);
+            return true;
         });
     }
     

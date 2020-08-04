@@ -30,6 +30,7 @@ import org.dromara.hmily.core.holder.SingletonHolder;
 import org.dromara.hmily.core.repository.HmilyRepositoryDispatcher;
 import org.dromara.hmily.core.repository.HmilyRepositoryEvent;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipant;
+import org.dromara.hmily.repository.spi.entity.HmilyParticipantUndo;
 import org.dromara.hmily.repository.spi.entity.HmilyTransaction;
 
 /**
@@ -46,16 +47,14 @@ public class HmilyRepositoryEventPublisher implements AutoCloseable {
     private final HmilyConfig hmilyConfig = SingletonHolder.INST.get(HmilyConfig.class);
     
     private HmilyRepositoryEventPublisher() {
-        if (Objects.nonNull(hmilyConfig) && hmilyConfig.isAsyncRepository()) {
-            start();
-        }
+        start();
     }
     
     public static HmilyRepositoryEventPublisher getInstance() {
         return INSTANCE;
     }
     
-    public void start() {
+    private void start() {
         List<SingletonExecutor> selects = new ArrayList<>();
         for (int i = 0; i < hmilyConfig.getConsumerThreads(); i++) {
             selects.add(new SingletonExecutor("hmily-log-disruptor" + i));
@@ -81,13 +80,12 @@ public class HmilyRepositoryEventPublisher implements AutoCloseable {
         push(event);
     }
     
-    public void publishEvent(final HmilyTransaction hmilyTransaction, final HmilyParticipant hmilyParticipant, final int type) {
+    public void publishEvent(final HmilyParticipantUndo hmilyParticipantUndo, final int type) {
         HmilyRepositoryEvent event = new HmilyRepositoryEvent();
         event.setType(type);
-        event.setTransId(hmilyTransaction.getTransId());
-        event.setHmilyTransaction(hmilyTransaction);
-        event.setHmilyParticipant(hmilyParticipant);
-        push(event);
+        event.setTransId(hmilyParticipantUndo.getTransId());
+        event.setHmilyParticipantUndo(hmilyParticipantUndo);
+        disruptorProviderManage.getProvider().onData(event);
     }
     
     public void publishEvent(final HmilyParticipant hmilyParticipant, final int type) {

@@ -31,6 +31,7 @@ import org.dromara.hmily.config.HmilyConfig;
 import org.dromara.hmily.config.HmilyZookeeperConfig;
 import org.dromara.hmily.repository.spi.HmilyRepository;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipant;
+import org.dromara.hmily.repository.spi.entity.HmilyParticipantUndo;
 import org.dromara.hmily.repository.spi.entity.HmilyTransaction;
 import org.dromara.hmily.repository.spi.exception.HmilyRepositoryException;
 import org.dromara.hmily.serializer.spi.HmilySerializer;
@@ -112,7 +113,7 @@ public class ZookeeperRepository implements HmilyRepository {
     }
     
     @Override
-    public List<HmilyParticipant> listHmilyParticipant(Date date, int limit) {
+    public List<HmilyParticipant> listHmilyParticipant(Date date, String transType, int limit) {
         return null;
     }
     
@@ -139,6 +140,21 @@ public class ZookeeperRepository implements HmilyRepository {
     @Override
     public boolean lockHmilyParticipant(HmilyParticipant hmilyParticipant) {
         return false;
+    }
+    
+    @Override
+    public int createHmilyParticipantUndo(HmilyParticipantUndo hmilyParticipantUndo) {
+        return 0;
+    }
+    
+    @Override
+    public List<HmilyParticipantUndo> findHmilyParticipantUndoByParticipantId(String participantId) {
+        return null;
+    }
+    
+    @Override
+    public int removeHmilyParticipantUndo(String undoId) {
+        return 0;
     }
     
     private void connect(final HmilyZookeeperConfig config) {

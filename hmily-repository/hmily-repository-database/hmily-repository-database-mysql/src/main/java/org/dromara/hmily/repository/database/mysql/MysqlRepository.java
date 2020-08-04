@@ -44,7 +44,7 @@ public class MysqlRepository extends AbstractHmilyDatabase {
     
     @Override
     protected String hmilyParticipantLimitSql(final int limit) {
-        return SELECTOR_HMILY_PARTICIPANT_WITH_DELAY_AND_APP_NAME + " limit " + limit;
+        return SELECTOR_HMILY_PARTICIPANT_WITH_DELAY_AND_APP_NAME_TRANS_TYPE + " limit " + limit;
     }
     
     @Override

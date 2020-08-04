@@ -18,7 +18,9 @@
 package org.dromara.hmily.tac.core.transaction;
 
 import java.util.List;
+import java.util.Objects;
 import org.dromara.hmily.annotation.TransTypeEnum;
+import org.dromara.hmily.common.enums.ExecutorTypeEnum;
 import org.dromara.hmily.common.enums.HmilyActionEnum;
 import org.dromara.hmily.common.enums.HmilyRoleEnum;
 import org.dromara.hmily.common.utils.CollectionUtils;
@@ -26,18 +28,41 @@ import org.dromara.hmily.common.utils.IdWorkerUtils;
 import org.dromara.hmily.core.context.HmilyContextHolder;
 import org.dromara.hmily.core.context.HmilyTransactionContext;
 import org.dromara.hmily.core.holder.HmilyTransactionHolder;
+import org.dromara.hmily.core.hook.UndoHook;
+import org.dromara.hmily.core.reflect.HmilyReflector;
 import org.dromara.hmily.core.repository.HmilyRepositoryStorage;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipant;
+import org.dromara.hmily.repository.spi.entity.HmilyParticipantUndo;
 import org.dromara.hmily.repository.spi.entity.HmilyTransaction;
+import org.dromara.hmily.tac.core.cache.HmilyParticipantUndoCacheManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+/**
+ * The type Hmily tac global transaction.
+ *
+ * @author xiaoyu
+ */
 public class HmilyTacGlobalTransaction {
+    
+    private static final Logger LOGGER = LoggerFactory.getLogger(HmilyTacGlobalTransaction.class);
     
     private static final HmilyTacGlobalTransaction INSTANCE = new HmilyTacGlobalTransaction();
     
+    /**
+     * Gets instance.
+     *
+     * @return the instance
+     */
     public static HmilyTacGlobalTransaction getInstance() {
         return INSTANCE;
     }
     
+    /**
+     * Begin hmily transaction.
+     *
+     * @return the hmily transaction
+     */
     public HmilyTransaction begin() {
         //创建全局的事务，创建一个参与者
         HmilyTransaction globalHmilyTransaction = createHmilyTransaction();
@@ -59,21 +84,87 @@ public class HmilyTacGlobalTransaction {
     }
     
     public void rollback() {
-        HmilyTransaction currentTransaction = HmilyTransactionHolder.getInstance().getCurrentTransaction();
+        rollback(getHmilyTransaction());
+    }
+    
+    public void rollback(final HmilyTransaction currentTransaction) {
+        if (Objects.isNull(currentTransaction)) {
+            return;
+        }
         List<HmilyParticipant> hmilyParticipants = currentTransaction.getHmilyParticipants();
-        if(CollectionUtils.isNotEmpty(hmilyParticipants)) {
-            for (HmilyParticipant participant : hmilyParticipants) {
-                if(participant.getRole() == HmilyRoleEnum.START.getCode()) {
+        if (CollectionUtils.isEmpty(hmilyParticipants)) {
+            return;
+        }
+        for (HmilyParticipant participant : hmilyParticipants) {
+            try {
+                if (participant.getRole() == HmilyRoleEnum.START.getCode()) {
                     //do local
+                    List<HmilyParticipantUndo> undoList = HmilyParticipantUndoCacheManager.getInstance().get(participant.getParticipantId());
+                    for (HmilyParticipantUndo undo : undoList) {
+                        boolean success = UndoHook.INSTANCE.run(undo);
+                        if (success) {
+                            cleanUndo(undo);
+                        }
+                    }
                 } else {
-                    //do rpc
+                    HmilyReflector.executor(HmilyActionEnum.CANCELING, ExecutorTypeEnum.RPC, participant);
                 }
+            } catch (Throwable e) {
+                LOGGER.error("HmilyParticipant rollback exception :{} ", participant.toString());
+            } finally {
+                HmilyContextHolder.remove();
+            }
+        }
+        // maybe remove participant
+    }
+    
+    /**
+     * Commit.
+     */
+    public void commit() {
+        commit(getHmilyTransaction());
+    }
+    
+    public void commit(final HmilyTransaction currentTransaction) {
+        if (Objects.isNull(currentTransaction)) {
+            return;
+        }
+        List<HmilyParticipant> hmilyParticipants = currentTransaction.getHmilyParticipants();
+        if (CollectionUtils.isEmpty(hmilyParticipants)) {
+            return;
+        }
+        for (HmilyParticipant participant : hmilyParticipants) {
+            try {
+                if (participant.getRole() == HmilyRoleEnum.START.getCode()) {
+                    //do local
+                    List<HmilyParticipantUndo> undoList = HmilyParticipantUndoCacheManager.getInstance().get(participant.getParticipantId());
+                    for (HmilyParticipantUndo undo : undoList) {
+                        //clean undo
+                        cleanUndo(undo);
+                    }
+                } else {
+                    HmilyReflector.executor(HmilyActionEnum.CONFIRMING, ExecutorTypeEnum.RPC, participant);
+                }
+            } catch (Throwable e) {
+                LOGGER.error("HmilyParticipant rollback exception :{} ", participant.toString());
+            } finally {
+                HmilyContextHolder.remove();
             }
         }
     }
     
-    public void commit() {
+    public void remove() {
+        HmilyTransactionHolder.getInstance().remove();
+    }
     
+    private void cleanUndo(final HmilyParticipantUndo hmilyParticipantUndo) {
+        //clean undo
+        HmilyRepositoryStorage.removeHmilyParticipantUndo(hmilyParticipantUndo);
+        HmilyParticipantUndoCacheManager.getInstance().removeByKey(hmilyParticipantUndo.getParticipantId());
+    }
+    
+    public HmilyTransaction getHmilyTransaction() {
+        return HmilyTransactionHolder.getInstance().getCurrentTransaction();
     }
     
     private HmilyParticipant buildHmilyParticipant(final String transId) {
@@ -81,7 +172,7 @@ public class HmilyTacGlobalTransaction {
         hmilyParticipant.setParticipantId(IdWorkerUtils.getInstance().createUUID());
         hmilyParticipant.setTransId(transId);
         hmilyParticipant.setTransType(TransTypeEnum.TAC.name());
-        hmilyParticipant.setStatus(HmilyActionEnum.PRE_TRY.getCode());
+        hmilyParticipant.setStatus(HmilyActionEnum.TRYING.getCode());
         hmilyParticipant.setRole(HmilyRoleEnum.START.getCode());
         return hmilyParticipant;
     }
@@ -89,7 +180,7 @@ public class HmilyTacGlobalTransaction {
     private HmilyTransaction createHmilyTransaction() {
         HmilyTransaction hmilyTransaction = new HmilyTransaction();
         hmilyTransaction.setTransId(IdWorkerUtils.getInstance().createUUID());
-        hmilyTransaction.setStatus(HmilyActionEnum.PRE_TRY.getCode());
+        hmilyTransaction.setStatus(HmilyActionEnum.TRYING.getCode());
         hmilyTransaction.setTransType(TransTypeEnum.TAC.name());
         return hmilyTransaction;
     }
