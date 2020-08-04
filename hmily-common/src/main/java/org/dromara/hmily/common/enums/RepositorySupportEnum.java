@@ -27,39 +27,55 @@ import java.util.Optional;
 
 /**
  * RepositorySupportEnum.
+ *
  * @author xiaoyu
  */
 @RequiredArgsConstructor
 @Getter
 public enum RepositorySupportEnum {
-
+    
     /**
-     * Db compensate cache type enum.
+     * Mysql repository support enum.
      */
-    DB("db"),
-
+    MYSQL("mysql"),
+    
+    /**
+     * Oracle repository support enum.
+     */
+    ORACLE("oracle"),
+    
+    /**
+     * Sql server repository support enum.
+     */
+    SQL_SERVER("sqlServer"),
+    
+    /**
+     * Postgresql repository support enum.
+     */
+    POSTGRESQL("postgresql"),
+    
     /**
      * File compensate cache type enum.
      */
     FILE("file"),
-
+    
     /**
      * Redis compensate cache type enum.
      */
     REDIS("redis"),
-
+    
     /**
      * Mongodb compensate cache type enum.
      */
     MONGODB("mongodb"),
-
+    
     /**
      * Zookeeper compensate cache type enum.
      */
     ZOOKEEPER("zookeeper");
 
     private final String support;
-
+    
     /**
      * Acquire compensate cache type compensate cache type enum.
      *
@@ -71,6 +87,6 @@ public enum RepositorySupportEnum {
                 Arrays.stream(RepositorySupportEnum.values())
                         .filter(v -> Objects.equals(v.getSupport(), support))
                         .findFirst();
-        return repositorySupportEnum.orElse(RepositorySupportEnum.DB);
+        return repositorySupportEnum.orElse(RepositorySupportEnum.MYSQL);
     }
 }

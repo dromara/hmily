@@ -19,6 +19,7 @@ package org.dromara.hmily.core.repository;
 
 import org.dromara.hmily.common.enums.EventTypeEnum;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipant;
+import org.dromara.hmily.repository.spi.entity.HmilyParticipantUndo;
 import org.dromara.hmily.repository.spi.entity.HmilyTransaction;
 
 /**
@@ -49,6 +50,7 @@ public class HmilyRepositoryDispatcher {
         EventTypeEnum eventTypeEnum = EventTypeEnum.buildByCode(event.getType());
         HmilyTransaction hmilyTransaction = event.getHmilyTransaction();
         HmilyParticipant hmilyParticipant = event.getHmilyParticipant();
+        HmilyParticipantUndo hmilyParticipantUndo = event.getHmilyParticipantUndo();
         switch (eventTypeEnum) {
             case CREATE_HMILY_TRANSACTION:
                 HmilyRepositoryFacade.getInstance().createHmilyTransaction(event.getHmilyTransaction());
@@ -67,6 +69,9 @@ public class HmilyRepositoryDispatcher {
                 break;
             case REMOVE_HMILY_PARTICIPANT:
                 HmilyRepositoryFacade.getInstance().removeHmilyParticipant(hmilyParticipant.getParticipantId());
+                break;
+            case REMOVE_HMILY_PARTICIPANT_UNDO:
+                HmilyRepositoryFacade.getInstance().removeHmilyParticipantUndo(hmilyParticipantUndo.getUndoId());
                 break;
             default:
                 break;

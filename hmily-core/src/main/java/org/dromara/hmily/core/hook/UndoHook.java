@@ -19,40 +19,42 @@ package org.dromara.hmily.core.hook;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.function.Consumer;
+import java.util.function.Function;
+import org.dromara.hmily.repository.spi.entity.HmilyParticipantUndo;
 
 /**
- * The enum Hook.
+ * The enum Undo hook.
  */
-public enum Hook {
+public enum UndoHook {
     
     /**
-     * Undo hook.
+     * Instance undo hook.
      */
-    UNDO;
+    INSTANCE;
     
-    private final List<Consumer<Object>> consumers = new CopyOnWriteArrayList<>();
+    private final List<Function<HmilyParticipantUndo, Boolean>> consumers = new CopyOnWriteArrayList<>();
     
     /**
      * Register.
      *
-     * @param <T>      the type parameter
-     * @param consumer the consumer
+     * @param function the function
      */
-    @SuppressWarnings("unchecked")
-    public <T> void register(Consumer<T> consumer) {
-        consumers.add((Consumer<Object>) consumer);
+    public void register(Function<HmilyParticipantUndo, Boolean> function) {
+        consumers.add(function);
     }
     
+    
     /**
-     * Run.
+     * Run boolean.
      *
-     * @param object the object
+     * @param undo the undo
+     * @return the boolean
      */
-    public void run(final Object object) {
-        for (Consumer<Object> each : consumers) {
-            each.accept(object);
+    public boolean run(final HmilyParticipantUndo undo) {
+        for (Function<HmilyParticipantUndo, Boolean> each : consumers) {
+            return each.apply(undo);
         }
+        return false;
     }
     
 }
