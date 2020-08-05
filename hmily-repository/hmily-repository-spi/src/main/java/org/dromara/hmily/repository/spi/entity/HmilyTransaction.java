@@ -37,7 +37,7 @@ public class HmilyTransaction implements Serializable {
     /**
      * transaction id.
      */
-    private String transId;
+    private Long transId;
     
     /**
      * app name.
@@ -94,7 +94,7 @@ public class HmilyTransaction implements Serializable {
      *
      * @param transId the trans id
      */
-    public HmilyTransaction(final String transId) {
+    public HmilyTransaction(final long transId) {
         this.transId = transId;
         this.createTime = new Date();
         this.updateTime = new Date();

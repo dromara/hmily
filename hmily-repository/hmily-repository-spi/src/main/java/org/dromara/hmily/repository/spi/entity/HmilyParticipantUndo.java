@@ -36,17 +36,17 @@ public final class HmilyParticipantUndo implements Serializable {
     /**
      * undo id.
      */
-    private String undoId;
+    private Long undoId;
     
     /**
      * participant id.
      */
-    private String participantId;
+    private Long participantId;
     
     /**
      * transaction id.
      */
-    private String transId;
+    private Long transId;
     
     /**
      * resource id.

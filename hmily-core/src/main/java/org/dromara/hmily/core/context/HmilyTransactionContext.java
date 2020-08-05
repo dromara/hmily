@@ -17,7 +17,6 @@
 
 package org.dromara.hmily.core.context;
 
-import java.io.Serializable;
 import lombok.Data;
 import org.dromara.hmily.common.enums.HmilyActionEnum;
 import org.dromara.hmily.common.enums.HmilyRoleEnum;
@@ -28,24 +27,22 @@ import org.dromara.hmily.common.enums.HmilyRoleEnum;
  * @author xiaoyu
  */
 @Data
-public class HmilyTransactionContext implements Serializable {
-
-    private static final long serialVersionUID = -5289080166922118073L;
-
+public class HmilyTransactionContext {
+    
     /**
      * transId.
      */
-    private String transId;
+    private Long transId;
     
     /**
      * participant id.
      */
-    private String participantId;
+    private Long participantId;
     
     /**
      * participant ref id.
      */
-    private String participantRefId;
+    private Long participantRefId;
     
     /**
      * this hmily action. {@linkplain HmilyActionEnum}

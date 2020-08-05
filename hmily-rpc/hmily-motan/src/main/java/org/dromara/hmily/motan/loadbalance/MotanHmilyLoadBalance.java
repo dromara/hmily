@@ -43,7 +43,7 @@ import java.util.Objects;
 @Activation(key = {MotanConstants.NODE_TYPE_SERVICE, MotanConstants.NODE_TYPE_REFERER})
 public class MotanHmilyLoadBalance<T> extends RandomLoadBalance<T> {
 
-    private static final Map<String, URL> URL_MAP = Maps.newConcurrentMap();
+    private static final Map<Long, URL> URL_MAP = Maps.newConcurrentMap();
 
     @Override
     protected Referer<T> doSelect(final Request request) {
@@ -58,7 +58,7 @@ public class MotanHmilyLoadBalance<T> extends RandomLoadBalance<T> {
             return referer;
         }
 
-        final String transId = hmilyTransactionContext.getTransId();
+        final Long transId = hmilyTransactionContext.getTransId();
         //if try
         if (hmilyTransactionContext.getAction() == HmilyActionEnum.TRYING.getCode()) {
             URL_MAP.put(transId, referer.getUrl());

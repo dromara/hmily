@@ -85,7 +85,7 @@ public class HmilyTacParticipantTransaction {
      * @param hmilyParticipantList the hmily participant list
      * @param selfParticipantId    the self participant id
      */
-    public void rollbackParticipant(final List<HmilyParticipant> hmilyParticipantList, final String selfParticipantId) {
+    public void rollbackParticipant(final List<HmilyParticipant> hmilyParticipantList, final Long selfParticipantId) {
         if (CollectionUtils.isEmpty(hmilyParticipantList)) {
             return;
         }
@@ -120,7 +120,7 @@ public class HmilyTacParticipantTransaction {
      * @param hmilyParticipantList the hmily participant list
      * @param selfParticipantId    the self participant id
      */
-    public void commitParticipant(final List<HmilyParticipant> hmilyParticipantList, final String selfParticipantId) {
+    public void commitParticipant(final List<HmilyParticipant> hmilyParticipantList, final Long selfParticipantId) {
         if (CollectionUtils.isEmpty(hmilyParticipantList)) {
             return;
         }
@@ -150,7 +150,7 @@ public class HmilyTacParticipantTransaction {
         HmilyRepositoryStorage.removeHmilyParticipant(hmilyParticipant);
     }
     
-    private HmilyParticipant buildHmilyParticipant(final ProceedingJoinPoint point, final String participantId, final String participantRefId, final String transId) {
+    private HmilyParticipant buildHmilyParticipant(final ProceedingJoinPoint point, final Long participantId, final Long participantRefId, final Long transId) {
         HmilyParticipant hmilyParticipant = new HmilyParticipant();
         if (null == participantId) {
             hmilyParticipant.setParticipantId(IdWorkerUtils.getInstance().createUUID());

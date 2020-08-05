@@ -91,7 +91,7 @@ public class RedisRepository implements HmilyRepository {
     }
     
     @Override
-    public HmilyTransaction findByTransId(String transId) {
+    public HmilyTransaction findByTransId(Long transId) {
         return null;
     }
     
@@ -101,12 +101,12 @@ public class RedisRepository implements HmilyRepository {
     }
     
     @Override
-    public int updateHmilyTransactionStatus(String transId, Integer status) throws HmilyRepositoryException {
+    public int updateHmilyTransactionStatus(Long transId, Integer status) throws HmilyRepositoryException {
         return 0;
     }
     
     @Override
-    public int removeHmilyTransaction(String transId) {
+    public int removeHmilyTransaction(Long transId) {
         return 0;
     }
     
@@ -116,7 +116,7 @@ public class RedisRepository implements HmilyRepository {
     }
     
     @Override
-    public List<HmilyParticipant> findHmilyParticipant(String participantId) {
+    public List<HmilyParticipant> findHmilyParticipant(Long participantId) {
         return null;
     }
     
@@ -126,22 +126,22 @@ public class RedisRepository implements HmilyRepository {
     }
     
     @Override
-    public List<HmilyParticipant> listHmilyParticipantByTransId(String transId) {
+    public List<HmilyParticipant> listHmilyParticipantByTransId(Long transId) {
         return null;
     }
     
     @Override
-    public boolean existHmilyParticipantByTransId(String transId) {
+    public boolean existHmilyParticipantByTransId(Long transId) {
         return false;
     }
     
     @Override
-    public int updateHmilyParticipantStatus(String participantId, Integer status) throws HmilyRepositoryException {
+    public int updateHmilyParticipantStatus(Long participantId, Integer status) throws HmilyRepositoryException {
         return 0;
     }
     
     @Override
-    public int removeHmilyParticipant(String participantId) {
+    public int removeHmilyParticipant(Long participantId) {
         return 0;
     }
     
@@ -156,12 +156,12 @@ public class RedisRepository implements HmilyRepository {
     }
     
     @Override
-    public List<HmilyParticipantUndo> findHmilyParticipantUndoByParticipantId(String participantId) {
+    public List<HmilyParticipantUndo> findHmilyParticipantUndoByParticipantId(Long participantId) {
         return null;
     }
     
     @Override
-    public int removeHmilyParticipantUndo(String undoId) {
+    public int removeHmilyParticipantUndo(Long undoId) {
         return 0;
     }
     

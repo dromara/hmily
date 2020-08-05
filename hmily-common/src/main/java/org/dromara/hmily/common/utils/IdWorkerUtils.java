@@ -129,7 +129,7 @@ public final class IdWorkerUtils {
      *
      * @return the string
      */
-    public String createUUID() {
-        return String.valueOf(INSTANCE.nextId());
+    public long createUUID() {
+        return INSTANCE.nextId();
     }
 }

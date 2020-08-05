@@ -167,7 +167,7 @@ public class HmilyTacStarterTransaction {
         return HmilyTransactionHolder.getInstance().getCurrentTransaction();
     }
     
-    private HmilyParticipant buildHmilyParticipant(final String transId) {
+    private HmilyParticipant buildHmilyParticipant(final Long transId) {
         HmilyParticipant hmilyParticipant = new HmilyParticipant();
         hmilyParticipant.setParticipantId(IdWorkerUtils.getInstance().createUUID());
         hmilyParticipant.setTransId(transId);

@@ -39,7 +39,7 @@ import java.util.Random;
 @SuppressWarnings("all")
 public class DubboHmilyLoadBalance extends AbstractLoadBalance {
 
-    private static final Map<String, URL> URL_MAP = Maps.newConcurrentMap();
+    private static final Map<Long, URL> URL_MAP = Maps.newConcurrentMap();
 
     private final Random random = new Random();
 
@@ -54,7 +54,7 @@ public class DubboHmilyLoadBalance extends AbstractLoadBalance {
             return invoker;
         }
 
-        final String transId = hmilyTransactionContext.getTransId();
+        final Long transId = hmilyTransactionContext.getTransId();
         //if try
         if (hmilyTransactionContext.getAction() == HmilyActionEnum.TRYING.getCode()) {
             URL_MAP.put(transId, invoker.getUrl());

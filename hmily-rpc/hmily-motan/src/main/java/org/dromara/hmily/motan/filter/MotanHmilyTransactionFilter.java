@@ -81,7 +81,7 @@ public class MotanHmilyTransactionFilter implements Filter {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        String participantId = context.getParticipantId();
+        Long participantId = context.getParticipantId();
         final HmilyParticipant hmilyParticipant = buildParticipant(context, request);
         Optional.ofNullable(hmilyParticipant).ifPresent(h -> context.setParticipantId(h.getParticipantId()));
         if (context.getRole() == HmilyRoleEnum.PARTICIPANT.getCode()) {
