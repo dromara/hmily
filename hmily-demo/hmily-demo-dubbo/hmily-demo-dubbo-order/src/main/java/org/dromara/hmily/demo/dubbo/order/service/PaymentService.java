@@ -32,6 +32,9 @@ public interface PaymentService {
      * @param order 订单实体
      */
     void makePayment(Order order);
+    
+    
+    void makePaymentForTAC(Order order);
 
     /**
      * Test make payment.

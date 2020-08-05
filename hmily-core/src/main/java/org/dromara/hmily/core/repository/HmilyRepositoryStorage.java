@@ -17,6 +17,7 @@
 
 package org.dromara.hmily.core.repository;
 
+import java.util.Objects;
 import org.dromara.hmily.common.enums.EventTypeEnum;
 import org.dromara.hmily.core.disruptor.publisher.HmilyRepositoryEventPublisher;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipant;
@@ -46,6 +47,18 @@ public class HmilyRepositoryStorage {
      */
     public static void createHmilyParticipant(final HmilyParticipant hmilyParticipant) {
         PUBLISHER.publishEvent(hmilyParticipant, EventTypeEnum.CREATE_HMILY_PARTICIPANT.getCode());
+    }
+    
+    public static void updateHmilyParticipantStatus(final HmilyParticipant hmilyParticipant) {
+        if (Objects.nonNull(hmilyParticipant)) {
+            PUBLISHER.publishEvent(hmilyParticipant, EventTypeEnum.UPDATE_HMILY_PARTICIPANT_STATUS.getCode());
+        }
+    }
+    
+    public static void removeHmilyParticipant(final HmilyParticipant hmilyParticipant) {
+        if (null != hmilyParticipant) {
+            PUBLISHER.publishEvent(hmilyParticipant, EventTypeEnum.REMOVE_HMILY_PARTICIPANT.getCode());
+        }
     }
     
     /**

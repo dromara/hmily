@@ -54,7 +54,6 @@ public final class HmilyParticipantUndoCacheManager {
                         }
                     });
     
-    
     private HmilyParticipantUndoCacheManager() {
     }
     

@@ -54,6 +54,18 @@ public class OrderController {
         return "";
 
     }
+    
+    @PostMapping(value = "/orderPayTAC")
+    @ApiOperation(value = "测试tac模式")
+    public String orderPayTAC(@RequestParam(value = "count") Integer count,
+                           @RequestParam(value = "amount") BigDecimal amount) {
+        
+        final long start = System.currentTimeMillis();
+        orderService.saveOrderForTAC(count, amount);
+        System.out.println("消耗时间为:" + (System.currentTimeMillis() - start));
+        return "";
+        
+    }
 
     @PostMapping(value = "/testOrderPay")
     @ApiOperation(value = "测试订单支付接口(这里是压测接口不添加分布式事务)")

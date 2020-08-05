@@ -43,18 +43,18 @@ import org.slf4j.LoggerFactory;
  *
  * @author xiaoyu
  */
-public class HmilyTacGlobalTransaction {
+public class HmilyTacStarterTransaction {
     
-    private static final Logger LOGGER = LoggerFactory.getLogger(HmilyTacGlobalTransaction.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(HmilyTacStarterTransaction.class);
     
-    private static final HmilyTacGlobalTransaction INSTANCE = new HmilyTacGlobalTransaction();
+    private static final HmilyTacStarterTransaction INSTANCE = new HmilyTacStarterTransaction();
     
     /**
      * Gets instance.
      *
      * @return the instance
      */
-    public static HmilyTacGlobalTransaction getInstance() {
+    public static HmilyTacStarterTransaction getInstance() {
         return INSTANCE;
     }
     
@@ -78,7 +78,7 @@ public class HmilyTacGlobalTransaction {
         context.setAction(HmilyActionEnum.TRYING.getCode());
         context.setTransId(globalHmilyTransaction.getTransId());
         context.setRole(HmilyRoleEnum.START.getCode());
-        context.setTransType(TransTypeEnum.TCC.name());
+        context.setTransType(TransTypeEnum.TAC.name());
         HmilyContextHolder.set(context);
         return globalHmilyTransaction;
     }

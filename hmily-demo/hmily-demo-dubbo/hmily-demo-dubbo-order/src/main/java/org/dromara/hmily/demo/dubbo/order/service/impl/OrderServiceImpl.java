@@ -17,6 +17,7 @@
 
 package org.dromara.hmily.demo.dubbo.order.service.impl;
 
+import org.dromara.hmily.annotation.HmilyTAC;
 import org.dromara.hmily.common.utils.IdWorkerUtils;
 import org.dromara.hmily.demo.dubbo.order.entity.Order;
 import org.dromara.hmily.demo.dubbo.order.enums.OrderStatusEnum;
@@ -67,7 +68,19 @@ public class OrderServiceImpl implements OrderService {
         }
         return "success";
     }
-
+    
+    @Override
+    public String saveOrderForTAC(Integer count, BigDecimal amount) {
+        final Order order = buildOrder(count, amount);
+        final int rows = orderMapper.save(order);
+        if (rows > 0) {
+            final long start = System.currentTimeMillis();
+            paymentService.makePaymentForTAC(order);
+            System.out.println("切面耗时：" + (System.currentTimeMillis() - start));
+        }
+        return "success";
+    }
+    
     @Override
     public String testOrderPay(Integer count, BigDecimal amount) {
         final Order order = buildTestOrder(count, amount);

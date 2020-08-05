@@ -17,6 +17,7 @@
 
 package org.dromara.hmily.demo.dubbo.account.api.service;
 
+import org.dromara.hmily.annotation.HmilyTAC;
 import org.dromara.hmily.annotation.HmilyTCC;
 import org.dromara.hmily.demo.dubbo.account.api.dto.AccountDTO;
 import org.dromara.hmily.demo.dubbo.account.api.dto.AccountNestedDTO;
@@ -37,6 +38,9 @@ public interface AccountService {
      */
     @HmilyTCC
     void payment(AccountDTO accountDTO);
+    
+    @HmilyTAC
+    boolean paymentTAC(AccountDTO accountDTO);
 
     boolean testPayment(AccountDTO accountDTO);
 
