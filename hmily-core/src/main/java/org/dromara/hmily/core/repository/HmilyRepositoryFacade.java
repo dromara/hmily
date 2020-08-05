@@ -55,12 +55,8 @@ public class HmilyRepositoryFacade {
      * @param hmilyTransaction the hmily transaction
      * @return the string
      */
-    public String createHmilyTransaction(final HmilyTransaction hmilyTransaction) {
-        final int rows = hmilyRepository.createHmilyTransaction(hmilyTransaction);
-        if (rows > 0) {
-            return hmilyTransaction.getTransId();
-        }
-        throw new HmilyRepositoryException();
+    public boolean createHmilyTransaction(final HmilyTransaction hmilyTransaction) {
+        return hmilyRepository.createHmilyTransaction(hmilyTransaction) > 0;
     }
     
     /**
@@ -70,8 +66,8 @@ public class HmilyRepositoryFacade {
      * @param status  the status
      * @return the int
      */
-    public int updateHmilyTransactionStatus(final String transId, final Integer status) {
-        return hmilyRepository.updateHmilyTransactionStatus(transId, status);
+    public boolean updateHmilyTransactionStatus(final Long transId, final Integer status) {
+        return hmilyRepository.updateHmilyTransactionStatus(transId, status) > 0;
     }
     
     /**
@@ -80,7 +76,7 @@ public class HmilyRepositoryFacade {
      * @param transId the trans id
      * @return the boolean
      */
-    public boolean removeHmilyTransaction(final String transId) {
+    public boolean removeHmilyTransaction(final Long transId) {
         return hmilyRepository.removeHmilyTransaction(transId) > 0;
     }
     
@@ -101,8 +97,8 @@ public class HmilyRepositoryFacade {
      * @param status  the status
      * @return the int
      */
-    public int updateHmilyParticipantStatus(final String transId, final Integer status) {
-        return hmilyRepository.updateHmilyParticipantStatus(transId, status);
+    public boolean updateHmilyParticipantStatus(final Long transId, final Integer status) {
+        return hmilyRepository.updateHmilyParticipantStatus(transId, status) > 0;
     }
     
     /**
@@ -111,7 +107,7 @@ public class HmilyRepositoryFacade {
      * @param participantId the participant id
      * @return the boolean
      */
-    public boolean removeHmilyParticipant(final String participantId) {
+    public boolean removeHmilyParticipant(final Long participantId) {
         return hmilyRepository.removeHmilyParticipant(participantId) > 0;
     }
     
@@ -121,7 +117,7 @@ public class HmilyRepositoryFacade {
      * @param participantId the participant id
      * @return the list
      */
-    public List<HmilyParticipant> findHmilyParticipant(final String participantId) {
+    public List<HmilyParticipant> findHmilyParticipant(final Long participantId) {
         return hmilyRepository.findHmilyParticipant(participantId);
     }
     
@@ -141,7 +137,7 @@ public class HmilyRepositoryFacade {
      * @param participantId the participant id
      * @return the list
      */
-    public List<HmilyParticipantUndo> findUndoByParticipantId(final String participantId) {
+    public List<HmilyParticipantUndo> findUndoByParticipantId(final Long participantId) {
         return hmilyRepository.findHmilyParticipantUndoByParticipantId(participantId);
     }
     
@@ -151,8 +147,7 @@ public class HmilyRepositoryFacade {
      * @param undoId the undo id
      * @return the boolean
      */
-    public boolean removeHmilyParticipantUndo(final String undoId) {
+    public boolean removeHmilyParticipantUndo(final Long undoId) {
         return hmilyRepository.removeHmilyParticipantUndo(undoId) > 0;
     }
-    
 }

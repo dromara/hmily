@@ -24,10 +24,10 @@ import com.google.common.cache.Weigher;
 import com.google.common.collect.Lists;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import org.dromara.hmily.common.utils.CollectionUtils;
-import org.dromara.hmily.common.utils.StringUtils;
 import org.dromara.hmily.core.repository.HmilyRepositoryFacade;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipant;
 import org.dromara.hmily.repository.spi.entity.HmilyTransaction;
@@ -41,12 +41,12 @@ public final class HmilyParticipantCacheManager {
     
     private static final int MAX_COUNT = 1000000;
     
-    private final LoadingCache<String, List<HmilyParticipant>> LOADING_CACHE =
+    private final LoadingCache<Long, List<HmilyParticipant>> LOADING_CACHE =
             CacheBuilder.newBuilder().maximumWeight(MAX_COUNT)
-                    .weigher((Weigher<String, List<HmilyParticipant>>) (string, hmilyParticipantList) -> getSize())
-                    .build(new CacheLoader<String, List<HmilyParticipant>>() {
+                    .weigher((Weigher<Long, List<HmilyParticipant>>) (Long, hmilyParticipantList) -> getSize())
+                    .build(new CacheLoader<Long, List<HmilyParticipant>>() {
                         @Override
-                        public List<HmilyParticipant> load(final String key) {
+                        public List<HmilyParticipant> load(final Long key) {
                             return cacheHmilyParticipant(key);
                         }
                     });
@@ -66,11 +66,11 @@ public final class HmilyParticipantCacheManager {
     }
     
     public void cacheHmilyParticipant(final HmilyParticipant hmilyParticipant) {
-        String participantId = hmilyParticipant.getParticipantId();
+        Long participantId = hmilyParticipant.getParticipantId();
         cacheHmilyParticipant(participantId, hmilyParticipant);
     }
     
-    public void cacheHmilyParticipant(final String participantId, final HmilyParticipant hmilyParticipant) {
+    public void cacheHmilyParticipant(final Long participantId, final HmilyParticipant hmilyParticipant) {
         List<HmilyParticipant> existHmilyParticipantList = get(participantId);
         if (CollectionUtils.isEmpty(existHmilyParticipantList)) {
             LOADING_CACHE.put(participantId, Lists.newArrayList(hmilyParticipant));
@@ -86,7 +86,7 @@ public final class HmilyParticipantCacheManager {
      * @param participantId this guava key.
      * @return {@linkplain HmilyTransaction}
      */
-    public List<HmilyParticipant> get(final String participantId) {
+    public List<HmilyParticipant> get(final Long participantId) {
         try {
             return LOADING_CACHE.get(participantId);
         } catch (ExecutionException e) {
@@ -99,8 +99,8 @@ public final class HmilyParticipantCacheManager {
      *
      * @param participantId guava cache key.
      */
-    public void removeByKey(final String participantId) {
-        if (StringUtils.isNoneBlank(participantId)) {
+    public void removeByKey(final Long participantId) {
+        if (Objects.nonNull(participantId)) {
             LOADING_CACHE.invalidate(participantId);
         }
     }
@@ -109,7 +109,7 @@ public final class HmilyParticipantCacheManager {
         return (int) LOADING_CACHE.size();
     }
     
-    private List<HmilyParticipant> cacheHmilyParticipant(final String key) {
+    private List<HmilyParticipant> cacheHmilyParticipant(final Long key) {
         return Optional.ofNullable(HmilyRepositoryFacade.getInstance().findHmilyParticipant(key)).orElse(Collections.emptyList());
     }
 }

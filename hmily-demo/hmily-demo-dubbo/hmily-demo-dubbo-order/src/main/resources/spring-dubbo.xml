@@ -18,11 +18,11 @@
                     charset="UTF-8" threadpool="fixed" threads="500"
                     queues="0" buffer="8192" accepts="0" payload="8388608"/>
 
-    <dubbo:reference timeout="500000"
+    <dubbo:reference timeout="5000"
                      interface="org.dromara.hmily.demo.dubbo.inventory.api.service.InventoryService"
                      id="inventoryService"
                      retries="0" check="false" actives="20" loadbalance="hmily"/>
-    <dubbo:reference timeout="500000"
+    <dubbo:reference timeout="5000"
                      interface="org.dromara.hmily.demo.dubbo.account.api.service.AccountService"
                      id="accountService"
                      retries="0" check="false" actives="20" loadbalance="hmily"/>

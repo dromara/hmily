@@ -249,7 +249,7 @@ public abstract class AbstractHmilyDatabase implements HmilyRepository {
     }
     
     @Override
-    public HmilyTransaction findByTransId(final String transId) {
+    public HmilyTransaction findByTransId(final Long transId) {
         List<Map<String, Object>> list = executeQuery(SELECT_HMILY_TRANSACTION_WITH_TRANS_ID, transId);
         if (CollectionUtils.isNotEmpty(list)) {
             return list.stream().filter(Objects::nonNull)
@@ -282,7 +282,7 @@ public abstract class AbstractHmilyDatabase implements HmilyRepository {
     }
     
     @Override
-    public boolean existHmilyParticipantByTransId(final String transId) {
+    public boolean existHmilyParticipantByTransId(final Long transId) {
         List<Map<String, Object>> participantList = executeQuery(EXIST_HMILY_PARTICIPANT_WITH_TRANS_ID, transId);
         if (CollectionUtils.isNotEmpty(participantList)) {
             Long total = participantList.stream()
@@ -294,7 +294,7 @@ public abstract class AbstractHmilyDatabase implements HmilyRepository {
     }
     
     @Override
-    public List<HmilyParticipant> listHmilyParticipantByTransId(final String transId) {
+    public List<HmilyParticipant> listHmilyParticipantByTransId(final Long transId) {
         List<Map<String, Object>> participantList = executeQuery(SELECTOR_HMILY_PARTICIPANT_WITH_TRANS_ID, transId);
         if (CollectionUtils.isNotEmpty(participantList)) {
             return participantList.stream()
@@ -331,12 +331,12 @@ public abstract class AbstractHmilyDatabase implements HmilyRepository {
     }
     
     @Override
-    public int updateHmilyTransactionStatus(final String transId, final Integer status) throws HmilyRepositoryException {
+    public int updateHmilyTransactionStatus(final Long transId, final Integer status) throws HmilyRepositoryException {
         return executeUpdate(UPDATE_HMILY_TRANSACTION_STATUS, status, transId);
     }
     
     @Override
-    public int removeHmilyTransaction(final String transId) {
+    public int removeHmilyTransaction(final Long transId) {
         return executeUpdate(DELETE_HMILY_TRANSACTION, transId);
     }
     
@@ -358,7 +358,7 @@ public abstract class AbstractHmilyDatabase implements HmilyRepository {
     }
     
     @Override
-    public List<HmilyParticipant> findHmilyParticipant(final String participantId) {
+    public List<HmilyParticipant> findHmilyParticipant(final Long participantId) {
         List<HmilyParticipant> hmilyParticipantList = new ArrayList<>();
         List<Map<String, Object>> result = executeQuery(SELECTOR_HMILY_PARTICIPANT_WITH_KEY, participantId);
         if (CollectionUtils.isNotEmpty(result)) {
@@ -388,7 +388,7 @@ public abstract class AbstractHmilyDatabase implements HmilyRepository {
     }
     
     @Override
-    public List<HmilyParticipantUndo> findHmilyParticipantUndoByParticipantId(final String participantId) {
+    public List<HmilyParticipantUndo> findHmilyParticipantUndoByParticipantId(final Long participantId) {
         List<Map<String, Object>> results = executeQuery(SELECTOR_HMILY_PARTICIPANT_UNDO_WITH_PARTICIPANT_ID, participantId);
         if (CollectionUtils.isEmpty(results)) {
             return Collections.emptyList();
@@ -397,17 +397,17 @@ public abstract class AbstractHmilyDatabase implements HmilyRepository {
     }
     
     @Override
-    public int removeHmilyParticipantUndo(final String undoId) {
+    public int removeHmilyParticipantUndo(final Long undoId) {
         return executeUpdate(REMOVE_HMILY_PARTICIPANT_UNDO, undoId);
     }
     
     @Override
-    public int updateHmilyParticipantStatus(final String participantId, final Integer status) {
+    public int updateHmilyParticipantStatus(final Long participantId, final Integer status) {
         return executeUpdate(UPDATE_HMILY_PARTICIPANT_STATUS, status, participantId);
     }
     
     @Override
-    public int removeHmilyParticipant(final String participantId) {
+    public int removeHmilyParticipant(final Long participantId) {
         return executeUpdate(DELETE_HMILY_PARTICIPANT, participantId);
     }
     
@@ -472,7 +472,7 @@ public abstract class AbstractHmilyDatabase implements HmilyRepository {
     
     private HmilyTransaction buildHmilyTransactionByResultMap(final Map<String, Object> map) {
         HmilyTransaction hmilyTransaction = new HmilyTransaction();
-        hmilyTransaction.setTransId((String) map.get("trans_id"));
+        hmilyTransaction.setTransId((Long) map.get("trans_id"));
         hmilyTransaction.setTransType((String) map.get("trans_type"));
         hmilyTransaction.setStatus((Integer) map.get("status"));
         hmilyTransaction.setAppName((String) map.get("app_ame"));
@@ -483,10 +483,10 @@ public abstract class AbstractHmilyDatabase implements HmilyRepository {
     
     private HmilyParticipantUndo buildHmilyParticipantUndoByResultMap(final Map<String, Object> map) {
         HmilyParticipantUndo undo = new HmilyParticipantUndo();
-        undo.setUndoId((String) map.get("undo_id"));
-        undo.setParticipantId((String) map.get("participant_id"));
-        undo.setTransId((String) map.get("trans_id"));
-        undo.setTransId((String) map.get("resource_id"));
+        undo.setUndoId((Long) map.get("undo_id"));
+        undo.setParticipantId((Long) map.get("participant_id"));
+        undo.setTransId((Long) map.get("trans_id"));
+        undo.setResourceId((String) map.get("resource_id"));
         byte[] undoInvocation = (byte[]) map.get("undo_invocation");
         try {
             final HmilyUndoInvocation hmilyUndoInvocation = hmilySerializer.deSerialize(undoInvocation, HmilyUndoInvocation.class);
@@ -500,9 +500,9 @@ public abstract class AbstractHmilyDatabase implements HmilyRepository {
     
     private HmilyParticipant buildHmilyParticipantByResultMap(final Map<String, Object> map) {
         HmilyParticipant hmilyParticipant = new HmilyParticipant();
-        hmilyParticipant.setParticipantId((String) map.get("participant_id"));
-        hmilyParticipant.setParticipantRefId((String) map.get("participant_ref_id"));
-        hmilyParticipant.setTransId((String) map.get("trans_id"));
+        hmilyParticipant.setParticipantId((Long) map.get("participant_id"));
+        hmilyParticipant.setParticipantRefId((Long) map.get("participant_ref_id"));
+        hmilyParticipant.setTransId((Long) map.get("trans_id"));
         hmilyParticipant.setTransType((String) map.get("trans_type"));
         hmilyParticipant.setStatus((Integer) map.get("status"));
         hmilyParticipant.setRole((Integer) map.get("role"));

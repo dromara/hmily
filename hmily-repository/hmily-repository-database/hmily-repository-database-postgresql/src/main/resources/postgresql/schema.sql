@@ -5,9 +5,9 @@ USE `hmily`;
 
 CREATE TABLE IF NOT EXISTS `hmily_lock`
 (
-    `lock_id`           varchar(128) not null comment '主键id',
-    `trans_id`          varchar(128) not null comment '全局事务id',
-    `participant_id`    varchar(128) not null comment 'hmily参与者id',
+    `lock_id`           bigint(20) not null comment '主键id',
+    `trans_id`          bigint(20) not null comment '全局事务id',
+    `participant_id`    bigint(20) not null comment 'hmily参与者id',
     `resource_id`       varchar(256) not null comment '资源id',
     `target_table_name` varchar(64)  not null comment '锁定目标表名',
     `target_table_pk`   varchar(64)  not null comment '锁定表主键',
@@ -21,9 +21,9 @@ alter table hmily_lock add primary key (lock_id);
 
 create table if not exists `hmily_participant_undo`
 (
-    `undo_id`         varchar(128) not null comment '主键id',
-    `participant_id`  varchar(128) not null comment '参与者id',
-    `trans_id`        varchar(128) not null comment '全局事务id',
+    `undo_id`         bigint(20) not null comment '主键id',
+    `participant_id`  bigint(20) not null comment '参与者id',
+    `trans_id`        bigint(20) not null comment '全局事务id',
     `resource_id`     varchar(256) not null comment '资源id，at模式下为jdbc url',
     `undo_invocation` BYTEA                 comment '回滚调用点',
     `status`          tinyint      not null comment '状态',
@@ -36,7 +36,7 @@ alter table hmily_participant_undo   add primary key (undo_id);
 
 create table if not exists `hmily_transaction_global`
 (
-    `trans_id`    varchar(128)  not null comment '全局事务id',
+    `trans_id`    bigint(20)  not null comment '全局事务id',
     `app_name`    varchar(128)  not null comment '应用名称',
     `status`      tinyint       not null comment '事务状态',
     `trans_type`  varchar(16)   not null comment '事务模式',
@@ -51,9 +51,9 @@ alter table hmily_transaction_global add primary key (trans_id);
 
 create table if not exists `hmily_transaction_participant`
 (
-    `participant_id`     varchar(128)  not null comment '参与者事务id',
-    `participant_ref_id` varchar(128)  not null comment '参与者关联id且套调用时候会存在',
-    `trans_id`           varchar(128)  not null comment '全局事务id',
+    `participant_id`     bigint(20)  not null comment '参与者事务id',
+    `participant_ref_id` bigint(20)  not null comment '参与者关联id且套调用时候会存在',
+    `trans_id`           bigint(20)  not null comment '全局事务id',
     `trans_type`         varchar(16)   not null comment '事务类型',
     `status`             tinyint       not null comment '分支事务状态',
     `app_ame`            varchar(64)   not null comment '应用名称',

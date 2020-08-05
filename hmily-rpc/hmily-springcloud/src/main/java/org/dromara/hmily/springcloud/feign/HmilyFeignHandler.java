@@ -58,7 +58,7 @@ public class HmilyFeignHandler implements InvocationHandler {
                 return this.delegate.invoke(proxy, method, args);
             }
             try {
-                String participantId = context.getParticipantId();
+                Long participantId = context.getParticipantId();
                 final HmilyParticipant hmilyParticipant = buildParticipant(method, args, context);
                 Optional.ofNullable(hmilyParticipant).ifPresent(participant -> context.setParticipantId(participant.getParticipantId()));
                 if (context.getRole() == HmilyRoleEnum.PARTICIPANT.getCode()) {

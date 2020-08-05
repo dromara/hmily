@@ -79,7 +79,7 @@ public class HmilyTransactionRecoveryService {
         }
     }
     
-    private void deleteHmilyParticipant(final String participantId) {
+    private void deleteHmilyParticipant(final Long participantId) {
         hmilyRepository.removeHmilyParticipant(participantId);
     }
 }

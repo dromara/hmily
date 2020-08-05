@@ -149,7 +149,7 @@ public final class HmilyTccTransactionExecutor {
         }
     }
     
-    public Object participantConfirm(final List<HmilyParticipant> hmilyParticipantList, final String selfParticipantId) {
+    public Object participantConfirm(final List<HmilyParticipant> hmilyParticipantList, final Long selfParticipantId) {
         if (CollectionUtils.isEmpty(hmilyParticipantList)) {
             return null;
         }
@@ -204,7 +204,7 @@ public final class HmilyTccTransactionExecutor {
         }
     }
     
-    public Object participantCancel(final List<HmilyParticipant> hmilyParticipants, final String selfParticipantId) {
+    public Object participantCancel(final List<HmilyParticipant> hmilyParticipants, final Long selfParticipantId) {
         LogUtil.debug(LOGGER, () -> "tcc cancel ...........start!");
         if (CollectionUtils.isEmpty(hmilyParticipants)) {
             return null;
@@ -303,7 +303,7 @@ public final class HmilyTccTransactionExecutor {
         return hmilyTransaction;
     }
     
-    private HmilyParticipant buildHmilyParticipant(final ProceedingJoinPoint point, final String participantId, final String participantRefId, final int role, final String transId) {
+    private HmilyParticipant buildHmilyParticipant(final ProceedingJoinPoint point, final Long participantId, final Long participantRefId, final int role, final Long transId) {
         MethodSignature signature = (MethodSignature) point.getSignature();
         Method method = signature.getMethod();
         Class<?> clazz = point.getTarget().getClass();

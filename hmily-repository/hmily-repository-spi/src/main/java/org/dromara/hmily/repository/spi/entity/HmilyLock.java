@@ -32,17 +32,17 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class HmilyLock implements Serializable {
     
-    private String lockId;
+    private Long lockId;
     
     /**
      * transaction id.
      */
-    private String transId;
+    private Long transId;
     
     /**
      * participant id.
      */
-    private String participantId;
+    private Long participantId;
     
     /**
      * resource id.

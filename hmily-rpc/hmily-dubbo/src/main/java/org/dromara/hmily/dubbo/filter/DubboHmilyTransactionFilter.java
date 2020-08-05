@@ -79,7 +79,7 @@ public class DubboHmilyTransactionFilter implements Filter {
         } catch (Exception ex) {
             LogUtil.error(LOGGER, "hmily find method error {} ", ex::getMessage);
         }
-        String participantId = context.getParticipantId();
+        Long participantId = context.getParticipantId();
         final HmilyParticipant hmilyParticipant = buildParticipant(context, invoker, invocation);
         Optional.ofNullable(hmilyParticipant).ifPresent(h -> context.setParticipantId(h.getParticipantId()));
         if (context.getRole() == HmilyRoleEnum.PARTICIPANT.getCode()) {
