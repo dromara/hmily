@@ -17,6 +17,7 @@
 
 package org.dromara.hmily.demo.dubbo.inventory.api.service;
 
+import org.dromara.hmily.annotation.HmilyTAC;
 import org.dromara.hmily.annotation.HmilyTCC;
 import org.dromara.hmily.demo.dubbo.inventory.api.dto.InventoryDTO;
 import org.dromara.hmily.demo.dubbo.inventory.api.entity.InventoryDO;
@@ -40,6 +41,9 @@ public interface InventoryService {
      */
     @HmilyTCC
     Boolean decrease(InventoryDTO inventoryDTO);
+    
+    @HmilyTAC
+    Boolean decreaseTAC(InventoryDTO inventoryDTO);
     
     @HmilyTCC
     List<InventoryDTO> testInLine();

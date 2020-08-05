@@ -30,6 +30,12 @@
             <artifactId>hmily-tcc</artifactId>
             <version>${project.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.dromara</groupId>
+            <artifactId>hmily-tac-datasource</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 
     <build>

@@ -18,6 +18,7 @@
 package org.dromara.hmily.demo.dubbo.order.service.impl;
 
 
+import org.dromara.hmily.annotation.HmilyTAC;
 import org.dromara.hmily.annotation.HmilyTCC;
 import org.dromara.hmily.common.exception.HmilyRuntimeException;
 import org.dromara.hmily.demo.dubbo.account.api.dto.AccountDTO;
@@ -85,7 +86,24 @@ public class PaymentServiceImpl implements PaymentService {
         inventoryDTO.setProductId(order.getProductId());
         inventoryService.decrease(inventoryDTO);
     }
-
+    
+    @Override
+    @HmilyTAC
+    public void makePaymentForTAC(Order order) {
+        order.setStatus(OrderStatusEnum.PAY_SUCCESS.getCode());
+        orderMapper.update(order);
+        //扣除用户余额
+        AccountDTO accountDTO = new AccountDTO();
+        accountDTO.setAmount(order.getTotalAmount());
+        accountDTO.setUserId(order.getUserId());
+        accountService.paymentTAC(accountDTO);
+        //进入扣减库存操作
+        InventoryDTO inventoryDTO = new InventoryDTO();
+        inventoryDTO.setCount(order.getCount());
+        inventoryDTO.setProductId(order.getProductId());
+        inventoryService.decreaseTAC(inventoryDTO);
+    }
+    
     @Override
     public void testMakePayment(Order order) {
         order.setStatus(OrderStatusEnum.PAYING.getCode());

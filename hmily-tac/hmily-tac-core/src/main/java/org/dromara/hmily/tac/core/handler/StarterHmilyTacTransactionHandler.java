@@ -25,7 +25,7 @@ import org.dromara.hmily.core.disruptor.handler.HmilyTransactionExecutorHandler;
 import org.dromara.hmily.core.service.HmilyTransactionHandler;
 import org.dromara.hmily.core.service.HmilyTransactionHandlerAlbum;
 import org.dromara.hmily.repository.spi.entity.HmilyTransaction;
-import org.dromara.hmily.tac.core.transaction.HmilyTacGlobalTransaction;
+import org.dromara.hmily.tac.core.transaction.HmilyTacStarterTransaction;
 
 
 /**
@@ -35,7 +35,7 @@ import org.dromara.hmily.tac.core.transaction.HmilyTacGlobalTransaction;
  */
 public class StarterHmilyTacTransactionHandler implements HmilyTransactionHandler, AutoCloseable {
     
-    private final HmilyTacGlobalTransaction globalTransaction = HmilyTacGlobalTransaction.getInstance();
+    private final HmilyTacStarterTransaction globalTransaction = HmilyTacStarterTransaction.getInstance();
     
     private final DisruptorProviderManage<HmilyTransactionHandlerAlbum> disruptorProviderManage;
     
@@ -50,7 +50,7 @@ public class StarterHmilyTacTransactionHandler implements HmilyTransactionHandle
             throws Throwable {
         Object returnValue;
         try {
-            HmilyTransaction hmilyTransaction = globalTransaction.begin();
+            globalTransaction.begin();
             try {
                 //execute try
                 returnValue = point.proceed();
