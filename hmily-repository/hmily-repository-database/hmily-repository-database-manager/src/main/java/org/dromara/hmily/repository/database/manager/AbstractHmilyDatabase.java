@@ -342,8 +342,14 @@ public abstract class AbstractHmilyDatabase implements HmilyRepository {
     
     @Override
     public int createHmilyParticipant(final HmilyParticipant hmilyParticipant) throws HmilyRepositoryException {
-        byte[] confirmSerialize = hmilySerializer.serialize(hmilyParticipant.getConfirmHmilyInvocation());
-        byte[] cancelSerialize = hmilySerializer.serialize(hmilyParticipant.getCancelHmilyInvocation());
+        byte[] confirmSerialize = null;
+        byte[] cancelSerialize = null;
+        if (Objects.nonNull(hmilyParticipant.getConfirmHmilyInvocation())) {
+            confirmSerialize = hmilySerializer.serialize(hmilyParticipant.getConfirmHmilyInvocation());
+        }
+        if (Objects.nonNull(hmilyParticipant.getCancelHmilyInvocation())) {
+            cancelSerialize = hmilySerializer.serialize(hmilyParticipant.getCancelHmilyInvocation());
+        }
         return executeUpdate(INSERT_HMILY_PARTICIPANT, hmilyParticipant.getParticipantId(), hmilyParticipant.getParticipantRefId(),
                 hmilyParticipant.getTransId(), hmilyParticipant.getTransType(), hmilyParticipant.getStatus(),
                 appName, hmilyParticipant.getRole(), hmilyParticipant.getRetry(), hmilyParticipant.getTargetClass(), hmilyParticipant.getTargetMethod(),
@@ -506,13 +512,17 @@ public abstract class AbstractHmilyDatabase implements HmilyRepository {
         hmilyParticipant.setTargetMethod((String) map.get("target_method"));
         hmilyParticipant.setConfirmMethod((String) map.get("confirm_method"));
         hmilyParticipant.setCancelMethod((String) map.get("cancel_method"));
-        byte[] confirmInvocation = (byte[]) map.get("confirm_invocation");
-        byte[] cancelInvocation = (byte[]) map.get("cancel_invocation");
         try {
-            final HmilyInvocation confirmHmilyInvocation = hmilySerializer.deSerialize(confirmInvocation, HmilyInvocation.class);
-            hmilyParticipant.setConfirmHmilyInvocation(confirmHmilyInvocation);
-            final HmilyInvocation cancelHmilyInvocation = hmilySerializer.deSerialize(cancelInvocation, HmilyInvocation.class);
-            hmilyParticipant.setCancelHmilyInvocation(cancelHmilyInvocation);
+            if(Objects.nonNull(map.get("confirm_invocation"))) {
+                byte[] confirmInvocation = (byte[]) map.get("confirm_invocation");
+                final HmilyInvocation confirmHmilyInvocation = hmilySerializer.deSerialize(confirmInvocation, HmilyInvocation.class);
+                hmilyParticipant.setConfirmHmilyInvocation(confirmHmilyInvocation);
+            }
+            if (Objects.nonNull(map.get("cancel_invocation"))) {
+                byte[] cancelInvocation = (byte[]) map.get("cancel_invocation");
+                final HmilyInvocation cancelHmilyInvocation = hmilySerializer.deSerialize(cancelInvocation, HmilyInvocation.class);
+                hmilyParticipant.setCancelHmilyInvocation(cancelHmilyInvocation);
+            }
         } catch (HmilySerializerException e) {
             log.error("hmilySerializer deSerialize have exception:{} ", e.getMessage());
         }

@@ -17,32 +17,19 @@
 
 package org.dromara.hmily.tac.core.handler;
 
-import java.util.EnumMap;
-import java.util.Map;
-import org.dromara.hmily.common.enums.HmilyRoleEnum;
-import org.dromara.hmily.core.service.AbstractHmilyTransactionHandlerFactory;
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.dromara.hmily.core.context.HmilyTransactionContext;
 import org.dromara.hmily.core.service.HmilyTransactionHandler;
-import org.dromara.hmily.spi.HmilySPI;
-
 
 /**
- * HmilyTransactionFactoryServiceImpl.
+ * ConsumeHmilyTransactionHandler.
  *
  * @author xiaoyu
  */
-@HmilySPI("tac")
-public class HmilyTacTransactionHandlerFactory extends AbstractHmilyTransactionHandlerFactory {
-    
-    private static final Map<HmilyRoleEnum, HmilyTransactionHandler> HANDLER_MAP = new EnumMap<>(HmilyRoleEnum.class);
-    
-    static {
-        HANDLER_MAP.put(HmilyRoleEnum.START, new StarterHmilyTacTransactionHandler());
-        HANDLER_MAP.put(HmilyRoleEnum.PARTICIPANT, new ParticipantHmilyTacTransactionHandler());
-        HANDLER_MAP.put(HmilyRoleEnum.CONSUMER, new ConsumeHmilyTacTransactionHandler());
-    }
-    
+public class ConsumeHmilyTacTransactionHandler implements HmilyTransactionHandler {
+
     @Override
-    protected Map<HmilyRoleEnum, HmilyTransactionHandler> getMap() {
-        return HANDLER_MAP;
+    public Object handler(final ProceedingJoinPoint point, final HmilyTransactionContext context) throws Throwable {
+        return point.proceed();
     }
 }

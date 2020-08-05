@@ -18,6 +18,7 @@
 package org.dromara.hmily.demo.dubbo.inventory.service;
 
 import com.google.common.collect.Lists;
+import org.dromara.hmily.annotation.HmilyTAC;
 import org.dromara.hmily.annotation.HmilyTCC;
 import org.dromara.hmily.common.exception.HmilyRuntimeException;
 import org.dromara.hmily.demo.dubbo.inventory.api.dto.InventoryDTO;
@@ -77,7 +78,14 @@ public class InventoryServiceImpl implements InventoryService {
         inventoryMapper.decrease(inventoryDTO);
         return true;
     }
-
+    
+    @Override
+    @HmilyTAC
+    public Boolean decreaseTAC(InventoryDTO inventoryDTO) {
+        inventoryMapper.decrease(inventoryDTO);
+        return true;
+    }
+    
     @Override
     @HmilyTCC(confirmMethod = "confirmInline", cancelMethod = "cancelInline")
     public List<InventoryDTO> testInLine() {

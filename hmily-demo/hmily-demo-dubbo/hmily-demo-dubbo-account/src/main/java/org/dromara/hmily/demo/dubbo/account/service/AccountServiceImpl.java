@@ -18,6 +18,7 @@
 package org.dromara.hmily.demo.dubbo.account.service;
 
 import java.util.concurrent.atomic.AtomicInteger;
+import org.dromara.hmily.annotation.HmilyTAC;
 import org.dromara.hmily.annotation.HmilyTCC;
 import org.dromara.hmily.demo.dubbo.account.api.dto.AccountDTO;
 import org.dromara.hmily.demo.dubbo.account.api.dto.AccountNestedDTO;
@@ -89,7 +90,14 @@ public class AccountServiceImpl implements AccountService {
         //内嵌 远端的rpc服务  注意如果是内嵌的调用rpc，那么在这次事务里面，不能再调用该RPC
         // inventoryService.testInLine();
     }
-
+    
+    @Override
+    @HmilyTAC
+    public boolean paymentTAC(AccountDTO accountDTO) {
+        accountMapper.update(accountDTO);
+        return true;
+    }
+    
     @Override
     public boolean testPayment(AccountDTO accountDTO) {
         accountMapper.update(accountDTO);
