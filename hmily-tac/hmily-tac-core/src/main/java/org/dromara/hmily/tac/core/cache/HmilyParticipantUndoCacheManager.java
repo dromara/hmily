@@ -24,6 +24,7 @@ import com.google.common.cache.Weigher;
 import com.google.common.collect.Lists;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import org.dromara.hmily.common.utils.CollectionUtils;
@@ -44,12 +45,12 @@ public final class HmilyParticipantUndoCacheManager {
     
     private static final int MAX_COUNT = 1000000;
     
-    private final LoadingCache<String, List<HmilyParticipantUndo>> LOADING_CACHE =
+    private final LoadingCache<Long, List<HmilyParticipantUndo>> LOADING_CACHE =
             CacheBuilder.newBuilder().maximumWeight(MAX_COUNT)
-                    .weigher((Weigher<String, List<HmilyParticipantUndo>>) (string, hmilyParticipantUndoList) -> getSize())
-                    .build(new CacheLoader<String, List<HmilyParticipantUndo>>() {
+                    .weigher((Weigher<Long, List<HmilyParticipantUndo>>) (Long, hmilyParticipantUndoList) -> getSize())
+                    .build(new CacheLoader<Long, List<HmilyParticipantUndo>>() {
                         @Override
-                        public List<HmilyParticipantUndo> load(final String key) {
+                        public List<HmilyParticipantUndo> load(final Long key) {
                             return cacheHmilyParticipantUndo(key);
                         }
                     });
@@ -67,11 +68,11 @@ public final class HmilyParticipantUndoCacheManager {
     }
     
     public void cacheHmilyParticipantUndo(final HmilyParticipantUndo hmilyParticipantUndo) {
-        String participantId = hmilyParticipantUndo.getParticipantId();
+        Long participantId = hmilyParticipantUndo.getParticipantId();
         cacheHmilyParticipantUndo(participantId, hmilyParticipantUndo);
     }
     
-    public void cacheHmilyParticipantUndo(final String participantId, final HmilyParticipantUndo hmilyParticipantUndo) {
+    public void cacheHmilyParticipantUndo(final Long participantId, final HmilyParticipantUndo hmilyParticipantUndo) {
         List<HmilyParticipantUndo> existList = get(participantId);
         if (CollectionUtils.isEmpty(existList)) {
             LOADING_CACHE.put(participantId, Lists.newArrayList(hmilyParticipantUndo));
@@ -87,7 +88,7 @@ public final class HmilyParticipantUndoCacheManager {
      * @param participantId this guava key.
      * @return {@linkplain HmilyTransaction}
      */
-    public List<HmilyParticipantUndo> get(final String participantId) {
+    public List<HmilyParticipantUndo> get(final Long participantId) {
         try {
             return LOADING_CACHE.get(participantId);
         } catch (ExecutionException e) {
@@ -100,8 +101,8 @@ public final class HmilyParticipantUndoCacheManager {
      *
      * @param participantId guava cache key.
      */
-    public void removeByKey(final String participantId) {
-        if (StringUtils.isNoneBlank(participantId)) {
+    public void removeByKey(final Long participantId) {
+        if (Objects.nonNull(participantId)) {
             LOADING_CACHE.invalidate(participantId);
         }
     }
@@ -110,7 +111,7 @@ public final class HmilyParticipantUndoCacheManager {
         return (int) LOADING_CACHE.size();
     }
     
-    private List<HmilyParticipantUndo> cacheHmilyParticipantUndo(final String participantId) {
+    private List<HmilyParticipantUndo> cacheHmilyParticipantUndo(final Long participantId) {
         return Optional.ofNullable(HmilyRepositoryFacade.getInstance().findUndoByParticipantId(participantId)).orElse(Collections.emptyList());
     }
 }

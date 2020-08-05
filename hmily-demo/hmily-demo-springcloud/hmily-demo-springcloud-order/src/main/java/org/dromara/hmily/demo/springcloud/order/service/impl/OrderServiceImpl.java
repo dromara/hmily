@@ -115,7 +115,7 @@ public class OrderServiceImpl implements OrderService {
         LOGGER.debug("构建订单对象");
         Order order = new Order();
         order.setCreateTime(new Date());
-        order.setNumber(IdWorkerUtils.getInstance().createUUID());
+        order.setNumber(String.valueOf(IdWorkerUtils.getInstance().createUUID()));
         //demo中的表里只有商品id为 1的数据
         order.setProductId("1");
         order.setStatus(OrderStatusEnum.NOT_PAY.getCode());

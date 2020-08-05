@@ -72,7 +72,7 @@ public class HmilyTransactionHolder {
      * @param participantId    key
      * @param hmilyParticipant {@linkplain HmilyParticipant}
      */
-    public void registerParticipantByNested(final String participantId, final HmilyParticipant hmilyParticipant) {
+    public void registerParticipantByNested(final Long participantId, final HmilyParticipant hmilyParticipant) {
         if (Objects.isNull(hmilyParticipant)) {
             return;
         }

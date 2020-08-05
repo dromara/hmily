@@ -37,7 +37,7 @@ public class HmilyRepositoryEvent implements Serializable {
     
     private HmilyParticipantUndo hmilyParticipantUndo;
     
-    private String transId;
+    private Long transId;
     
     private int type;
     

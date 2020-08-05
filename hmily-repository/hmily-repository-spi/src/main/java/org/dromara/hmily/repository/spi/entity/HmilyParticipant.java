@@ -36,17 +36,17 @@ public class HmilyParticipant implements Serializable {
     /**
      * participant id.
      */
-    private String participantId;
+    private Long participantId;
     
     /**
      * participant ref id.
      */
-    private String participantRefId;
+    private Long participantRefId;
     
     /**
      * transaction id.
      */
-    private String transId;
+    private Long transId;
     
     /**
      * trans type.

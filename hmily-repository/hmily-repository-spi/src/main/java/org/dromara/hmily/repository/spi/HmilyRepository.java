@@ -80,7 +80,7 @@ public interface HmilyRepository {
      * @param transId the trans id
      * @return the hmily transaction
      */
-    HmilyTransaction findByTransId(String transId);
+    HmilyTransaction findByTransId(Long transId);
     
     /**
      * List limit by delay list.
@@ -99,7 +99,7 @@ public interface HmilyRepository {
      * @return the int
      * @throws HmilyRepositoryException the hmily repository exception
      */
-    int updateHmilyTransactionStatus(String transId, Integer status) throws HmilyRepositoryException;
+    int updateHmilyTransactionStatus(Long transId, Integer status) throws HmilyRepositoryException;
     
     /**
      * Remove hmily transaction int.
@@ -107,7 +107,7 @@ public interface HmilyRepository {
      * @param transId the trans id
      * @return the int
      */
-    int removeHmilyTransaction(String transId);
+    int removeHmilyTransaction(Long transId);
     
     /**
      * Create hmily participant int.
@@ -124,7 +124,7 @@ public interface HmilyRepository {
      * @param participantId the participant id
      * @return the list
      */
-    List<HmilyParticipant> findHmilyParticipant(String participantId);
+    List<HmilyParticipant> findHmilyParticipant(Long participantId);
     
     /**
      * List hmily participant list.
@@ -142,7 +142,7 @@ public interface HmilyRepository {
      * @param transId the trans id
      * @return the list
      */
-    List<HmilyParticipant> listHmilyParticipantByTransId(String transId);
+    List<HmilyParticipant> listHmilyParticipantByTransId(Long transId);
     
     /**
      * Exist hmily participant by trans id boolean.
@@ -150,7 +150,7 @@ public interface HmilyRepository {
      * @param transId the trans id
      * @return the boolean
      */
-    boolean existHmilyParticipantByTransId(String transId);
+    boolean existHmilyParticipantByTransId(Long transId);
     
     /**
      * Update hmily participant status int.
@@ -160,7 +160,7 @@ public interface HmilyRepository {
      * @return the int
      * @throws HmilyRepositoryException the hmily repository exception
      */
-    int updateHmilyParticipantStatus(String participantId, Integer status) throws HmilyRepositoryException;
+    int updateHmilyParticipantStatus(Long participantId, Integer status) throws HmilyRepositoryException;
     
     /**
      * Remove hmily participant int.
@@ -168,7 +168,7 @@ public interface HmilyRepository {
      * @param participantId the participant id
      * @return the int
      */
-    int removeHmilyParticipant(String participantId);
+    int removeHmilyParticipant(Long participantId);
     
     /**
      * Lock hmily participant boolean.
@@ -192,7 +192,7 @@ public interface HmilyRepository {
      * @param participantId the participant id
      * @return the list
      */
-    List<HmilyParticipantUndo> findHmilyParticipantUndoByParticipantId(String participantId);
+    List<HmilyParticipantUndo> findHmilyParticipantUndoByParticipantId(Long participantId);
     
     /**
      * Remove hmily participant undo int.
@@ -200,6 +200,6 @@ public interface HmilyRepository {
      * @param undoId the undo id
      * @return the int
      */
-    int removeHmilyParticipantUndo(String undoId);
+    int removeHmilyParticipantUndo(Long undoId);
     
 }

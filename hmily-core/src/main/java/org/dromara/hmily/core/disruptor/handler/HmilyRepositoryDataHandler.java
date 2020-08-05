@@ -31,8 +31,8 @@ public class HmilyRepositoryDataHandler extends AbstractDisruptorConsumerExecuto
     
     @Override
     public void executor(final HmilyRepositoryEvent event) {
-        String transId = event.getTransId();
-        executor.select(transId).execute(() -> {
+        Long transId = event.getTransId();
+        executor.select(String.valueOf(transId)).execute(() -> {
             HmilyRepositoryDispatcher.getInstance().doDispatcher(event);
             event.clear();
         });

@@ -35,7 +35,7 @@ import java.util.Objects;
  */
 public class HmilyZoneAwareLoadBalancer extends ZoneAvoidanceRule {
 
-    private static final Map<String, Server> SERVER_MAP = Maps.newConcurrentMap();
+    private static final Map<Long, Server> SERVER_MAP = Maps.newConcurrentMap();
 
     public HmilyZoneAwareLoadBalancer() {
     }
@@ -54,7 +54,7 @@ public class HmilyZoneAwareLoadBalancer extends ZoneAvoidanceRule {
             return server;
         }
 
-        final String transId = hmilyTransactionContext.getTransId();
+        final Long transId = hmilyTransactionContext.getTransId();
         //if try
         if (hmilyTransactionContext.getAction() == HmilyActionEnum.TRYING.getCode()) {
             SERVER_MAP.put(transId, server);
