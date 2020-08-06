@@ -28,7 +28,7 @@ import org.dromara.hmily.common.utils.CollectionUtils;
  *
  * @author xiaoyu
  */
-public class HmilyShutdownHook extends Thread {
+public final class HmilyShutdownHook extends Thread {
     
     private static final HmilyShutdownHook INSTANCE = new HmilyShutdownHook("HmilyShutdownHook");
 
@@ -40,7 +40,7 @@ public class HmilyShutdownHook extends Thread {
         Runtime.getRuntime().addShutdownHook(INSTANCE);
     }
 
-    private HmilyShutdownHook(String name) {
+    private HmilyShutdownHook(final String name) {
         super(name);
     }
     

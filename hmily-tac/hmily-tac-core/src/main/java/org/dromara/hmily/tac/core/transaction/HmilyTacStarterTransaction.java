@@ -83,10 +83,18 @@ public class HmilyTacStarterTransaction {
         return globalHmilyTransaction;
     }
     
+    /**
+     * Rollback.
+     */
     public void rollback() {
         rollback(getHmilyTransaction());
     }
     
+    /**
+     * Rollback.
+     *
+     * @param currentTransaction the current transaction
+     */
     public void rollback(final HmilyTransaction currentTransaction) {
         if (Objects.isNull(currentTransaction)) {
             return;
@@ -125,6 +133,11 @@ public class HmilyTacStarterTransaction {
         commit(getHmilyTransaction());
     }
     
+    /**
+     * Commit.
+     *
+     * @param currentTransaction the current transaction
+     */
     public void commit(final HmilyTransaction currentTransaction) {
         if (Objects.isNull(currentTransaction)) {
             return;
@@ -153,6 +166,9 @@ public class HmilyTacStarterTransaction {
         }
     }
     
+    /**
+     * Remove.
+     */
     public void remove() {
         HmilyTransactionHolder.getInstance().remove();
     }
@@ -163,6 +179,11 @@ public class HmilyTacStarterTransaction {
         HmilyParticipantUndoCacheManager.getInstance().removeByKey(hmilyParticipantUndo.getParticipantId());
     }
     
+    /**
+     * Gets hmily transaction.
+     *
+     * @return the hmily transaction
+     */
     public HmilyTransaction getHmilyTransaction() {
         return HmilyTransactionHolder.getInstance().getCurrentTransaction();
     }

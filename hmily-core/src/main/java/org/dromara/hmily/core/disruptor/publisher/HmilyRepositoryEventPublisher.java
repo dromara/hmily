@@ -38,7 +38,7 @@ import org.dromara.hmily.repository.spi.entity.HmilyTransaction;
  *
  * @author xiaoyu(Myth)
  */
-public class HmilyRepositoryEventPublisher implements AutoCloseable {
+public final class HmilyRepositoryEventPublisher implements AutoCloseable {
     
     private static final HmilyRepositoryEventPublisher INSTANCE = new HmilyRepositoryEventPublisher();
     
@@ -50,6 +50,11 @@ public class HmilyRepositoryEventPublisher implements AutoCloseable {
         start();
     }
     
+    /**
+     * Gets instance.
+     *
+     * @return the instance
+     */
     public static HmilyRepositoryEventPublisher getInstance() {
         return INSTANCE;
     }
@@ -65,7 +70,7 @@ public class HmilyRepositoryEventPublisher implements AutoCloseable {
                         new HmilyRepositoryDataHandler(selector), 1, hmilyConfig.getBufferSize());
         disruptorProviderManage.startup();
     }
-
+    
     /**
      * publish disruptor event.
      *
@@ -80,6 +85,12 @@ public class HmilyRepositoryEventPublisher implements AutoCloseable {
         push(event);
     }
     
+    /**
+     * Publish event.
+     *
+     * @param hmilyParticipantUndo the hmily participant undo
+     * @param type                 the type
+     */
     public void publishEvent(final HmilyParticipantUndo hmilyParticipantUndo, final int type) {
         HmilyRepositoryEvent event = new HmilyRepositoryEvent();
         event.setType(type);
@@ -88,6 +99,12 @@ public class HmilyRepositoryEventPublisher implements AutoCloseable {
         disruptorProviderManage.getProvider().onData(event);
     }
     
+    /**
+     * Publish event.
+     *
+     * @param hmilyParticipant the hmily participant
+     * @param type             the type
+     */
     public void publishEvent(final HmilyParticipant hmilyParticipant, final int type) {
         HmilyRepositoryEvent event = new HmilyRepositoryEvent();
         event.setType(type);

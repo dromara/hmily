@@ -45,12 +45,13 @@ public class DisruptorProvider<T> {
      * Instantiates a new Disruptor provider.
      *
      * @param ringBuffer the ring buffer
+     * @param disruptor  the disruptor
      */
     DisruptorProvider(final RingBuffer<DataEvent<T>> ringBuffer, final Disruptor<DataEvent<T>> disruptor) {
         this.ringBuffer = ringBuffer;
         this.disruptor = disruptor;
     }
-
+    
     /**
      * push data to disruptor queue.
      *
@@ -67,6 +68,9 @@ public class DisruptorProvider<T> {
         }
     }
     
+    /**
+     * Shutdown.
+     */
     public void shutdown() {
         if (null != disruptor) {
             disruptor.shutdown();

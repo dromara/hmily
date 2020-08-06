@@ -24,19 +24,17 @@ import com.netflix.hystrix.strategy.concurrency.HystrixConcurrencyStrategy;
 import com.netflix.hystrix.strategy.concurrency.HystrixRequestVariable;
 import com.netflix.hystrix.strategy.concurrency.HystrixRequestVariableLifecycle;
 import com.netflix.hystrix.strategy.eventnotifier.HystrixEventNotifier;
-import com.netflix.hystrix.strategy.executionhook.HystrixCommandExecutionHook;
 import com.netflix.hystrix.strategy.metrics.HystrixMetricsPublisher;
 import com.netflix.hystrix.strategy.properties.HystrixPropertiesStrategy;
 import com.netflix.hystrix.strategy.properties.HystrixProperty;
-import org.dromara.hmily.core.context.HmilyContextHolder;
-import org.dromara.hmily.core.context.HmilyTransactionContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import org.dromara.hmily.core.context.HmilyContextHolder;
+import org.dromara.hmily.core.context.HmilyTransactionContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * HmilyHystrixConcurrencyStrategy.
@@ -55,8 +53,6 @@ public class HmilyHystrixConcurrencyStrategy extends HystrixConcurrencyStrategy 
             if (this.delegate instanceof HmilyHystrixConcurrencyStrategy) {
                 return;
             }
-            HystrixCommandExecutionHook commandExecutionHook = HystrixPlugins
-                    .getInstance().getCommandExecutionHook();
             HystrixEventNotifier eventNotifier = HystrixPlugins.getInstance()
                     .getEventNotifier();
             HystrixMetricsPublisher metricsPublisher = HystrixPlugins.getInstance()
@@ -67,8 +63,7 @@ public class HmilyHystrixConcurrencyStrategy extends HystrixConcurrencyStrategy 
                     eventNotifier, metricsPublisher, propertiesStrategy);
             HystrixPlugins.reset();
             HystrixPlugins.getInstance().registerConcurrencyStrategy(this);
-            HystrixPlugins.getInstance()
-                    .registerCommandExecutionHook(commandExecutionHook);
+            HystrixPlugins.getInstance().registerCommandExecutionHook(HystrixPlugins.getInstance().getCommandExecutionHook());
             HystrixPlugins.getInstance().registerEventNotifier(eventNotifier);
             HystrixPlugins.getInstance().registerMetricsPublisher(metricsPublisher);
             HystrixPlugins.getInstance().registerPropertiesStrategy(propertiesStrategy);
@@ -78,7 +73,7 @@ public class HmilyHystrixConcurrencyStrategy extends HystrixConcurrencyStrategy 
     }
 
     @Override
-    public <T> Callable<T> wrapCallable(Callable<T> callable) {
+    public <T> Callable<T> wrapCallable(final Callable<T> callable) {
         final HmilyTransactionContext hmilyTransactionContext = HmilyContextHolder.get();
         return () -> {
             HmilyContextHolder.set(hmilyTransactionContext);
@@ -87,22 +82,24 @@ public class HmilyHystrixConcurrencyStrategy extends HystrixConcurrencyStrategy 
     }
 
     @Override
-    public ThreadPoolExecutor getThreadPool(final HystrixThreadPoolKey threadPoolKey, HystrixProperty<Integer> corePoolSize, HystrixProperty<Integer> maximumPoolSize, HystrixProperty<Integer> keepAliveTime, TimeUnit unit, BlockingQueue<Runnable> workQueue) {
+    public ThreadPoolExecutor getThreadPool(final HystrixThreadPoolKey threadPoolKey, final HystrixProperty<Integer> corePoolSize,
+                                            final HystrixProperty<Integer> maximumPoolSize, final HystrixProperty<Integer> keepAliveTime,
+                                            final TimeUnit unit, final BlockingQueue<Runnable> workQueue) {
         return this.delegate.getThreadPool(threadPoolKey, corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue);
     }
 
     @Override
-    public ThreadPoolExecutor getThreadPool(HystrixThreadPoolKey threadPoolKey, HystrixThreadPoolProperties threadPoolProperties) {
+    public ThreadPoolExecutor getThreadPool(final HystrixThreadPoolKey threadPoolKey, final HystrixThreadPoolProperties threadPoolProperties) {
         return this.delegate.getThreadPool(threadPoolKey, threadPoolProperties);
     }
 
     @Override
-    public BlockingQueue<Runnable> getBlockingQueue(int maxQueueSize) {
+    public BlockingQueue<Runnable> getBlockingQueue(final int maxQueueSize) {
         return this.delegate.getBlockingQueue(maxQueueSize);
     }
 
     @Override
-    public <T> HystrixRequestVariable<T> getRequestVariable(HystrixRequestVariableLifecycle<T> rv) {
+    public <T> HystrixRequestVariable<T> getRequestVariable(final HystrixRequestVariableLifecycle<T> rv) {
         return this.delegate.getRequestVariable(rv);
     }
 }

@@ -105,7 +105,8 @@ public class HmilyTransactionSelfRecoveryScheduled implements AutoCloseable {
         selfTccRecoveryExecutor
                 .scheduleWithFixedDelay(() -> {
                     try {
-                        List<HmilyParticipant> hmilyParticipantList = hmilyRepository.listHmilyParticipant(acquireDelayData(hmilyConfig.getRecoverDelayTime()), TransTypeEnum.TCC.name(), hmilyConfig.getLimit());
+                        List<HmilyParticipant> hmilyParticipantList =
+                                hmilyRepository.listHmilyParticipant(acquireDelayData(hmilyConfig.getRecoverDelayTime()), TransTypeEnum.TCC.name(), hmilyConfig.getLimit());
                         if (CollectionUtils.isEmpty(hmilyParticipantList)) {
                             return;
                         }
@@ -146,7 +147,9 @@ public class HmilyTransactionSelfRecoveryScheduled implements AutoCloseable {
         selfTacRecoveryExecutor
                 .scheduleWithFixedDelay(() -> {
                     try {
-                        List<HmilyParticipant> hmilyParticipantList = hmilyRepository.listHmilyParticipant(acquireDelayData(hmilyConfig.getRecoverDelayTime()), TransTypeEnum.TAC.name(), hmilyConfig.getLimit());
+                        List<HmilyParticipant> hmilyParticipantList =
+                                hmilyRepository.listHmilyParticipant(acquireDelayData(hmilyConfig.getRecoverDelayTime()), TransTypeEnum.TAC.name(), hmilyConfig.getLimit());
+    
                         if (CollectionUtils.isEmpty(hmilyParticipantList)) {
                             return;
                         }
@@ -209,14 +212,11 @@ public class HmilyTransactionSelfRecoveryScheduled implements AutoCloseable {
                         LOGGER.error(" scheduled clean hmily transaction log is error:", e);
                     }
                 }, hmilyConfig.getScheduledInitDelay(), hmilyConfig.getScheduledCleanDelay(), TimeUnit.SECONDS);
-        
     }
     
     private Date acquireDelayData(final int delayTime) {
-        return new Date(LocalDateTime.now().atZone(ZoneId.systemDefault())
-                .toInstant().toEpochMilli() - (delayTime * 1000));
+        return new Date(LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli() - (delayTime * 1000));
     }
-    
     
     @Override
     public void close() {

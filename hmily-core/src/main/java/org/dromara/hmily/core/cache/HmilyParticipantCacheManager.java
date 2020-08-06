@@ -41,7 +41,9 @@ public final class HmilyParticipantCacheManager {
     
     private static final int MAX_COUNT = 1000000;
     
-    private final LoadingCache<Long, List<HmilyParticipant>> LOADING_CACHE =
+    private static final HmilyParticipantCacheManager INSTANCE = new HmilyParticipantCacheManager();
+    
+    private static final LoadingCache<Long, List<HmilyParticipant>> LOADING_CACHE =
             CacheBuilder.newBuilder().maximumWeight(MAX_COUNT)
                     .weigher((Weigher<Long, List<HmilyParticipant>>) (Long, hmilyParticipantList) -> getSize())
                     .build(new CacheLoader<Long, List<HmilyParticipant>>() {
@@ -51,25 +53,38 @@ public final class HmilyParticipantCacheManager {
                         }
                     });
     
-    private static final HmilyParticipantCacheManager INSTANCE = new HmilyParticipantCacheManager();
-    
     private HmilyParticipantCacheManager() {
     }
     
     /**
      * HmilyTransactionCacheManager.
      *
-     * @return HmilyTransactionCacheManager
+     * @return HmilyTransactionCacheManager instance
      */
     public static HmilyParticipantCacheManager getInstance() {
         return INSTANCE;
     }
     
+    /**
+     * Cache hmily participant.
+     *
+     * @param hmilyParticipant the hmily participant
+     */
     public void cacheHmilyParticipant(final HmilyParticipant hmilyParticipant) {
         Long participantId = hmilyParticipant.getParticipantId();
         cacheHmilyParticipant(participantId, hmilyParticipant);
     }
     
+    private static List<HmilyParticipant> cacheHmilyParticipant(final Long key) {
+        return Optional.ofNullable(HmilyRepositoryFacade.getInstance().findHmilyParticipant(key)).orElse(Collections.emptyList());
+    }
+    
+    /**
+     * Cache hmily participant.
+     *
+     * @param participantId    the participant id
+     * @param hmilyParticipant the hmily participant
+     */
     public void cacheHmilyParticipant(final Long participantId, final HmilyParticipant hmilyParticipant) {
         List<HmilyParticipant> existHmilyParticipantList = get(participantId);
         if (CollectionUtils.isEmpty(existHmilyParticipantList)) {
@@ -105,11 +120,7 @@ public final class HmilyParticipantCacheManager {
         }
     }
     
-    private int getSize() {
+    private static int getSize() {
         return (int) LOADING_CACHE.size();
-    }
-    
-    private List<HmilyParticipant> cacheHmilyParticipant(final Long key) {
-        return Optional.ofNullable(HmilyRepositoryFacade.getInstance().findHmilyParticipant(key)).orElse(Collections.emptyList());
     }
 }

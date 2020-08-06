@@ -93,8 +93,7 @@ public class HmilyFeignHandler implements InvocationHandler {
         return hmilyParticipant;
     }
     
-    void setDelegate(InvocationHandler delegate) {
+    void setDelegate(final InvocationHandler delegate) {
         this.delegate = delegate;
     }
-
 }

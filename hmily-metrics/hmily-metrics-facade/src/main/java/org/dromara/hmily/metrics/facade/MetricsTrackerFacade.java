@@ -30,6 +30,8 @@ import org.dromara.hmily.spi.ExtensionLoaderFactory;
 
 /**
  * Metrics tracker facade.
+ *
+ * @author xiaoyu
  */
 @Slf4j
 public final class MetricsTrackerFacade implements AutoCloseable {
@@ -151,6 +153,7 @@ public final class MetricsTrackerFacade implements AutoCloseable {
             MetricsTrackerHandler.getInstance().summaryObserveDuration(delegate);
         }
     }
+    
     @Override
     public void close() {
         enabled = false;
