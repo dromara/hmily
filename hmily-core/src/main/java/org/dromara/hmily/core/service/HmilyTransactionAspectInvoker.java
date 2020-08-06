@@ -29,13 +29,18 @@ import org.dromara.hmily.spi.ExtensionLoaderFactory;
  *
  * @author xiaoyu
  */
-public class HmilyTransactionAspectInvoker {
+public final class HmilyTransactionAspectInvoker {
     
     private static final HmilyTransactionAspectInvoker INSTANCE = new HmilyTransactionAspectInvoker();
     
     private HmilyTransactionAspectInvoker() {
     }
     
+    /**
+     * Gets instance.
+     *
+     * @return the instance
+     */
     public static HmilyTransactionAspectInvoker getInstance() {
         return INSTANCE;
     }
@@ -45,7 +50,7 @@ public class HmilyTransactionAspectInvoker {
      *
      * @param hmilyTransactionContext {@linkplain  HmilyTransactionContext}
      * @param point                   {@linkplain ProceedingJoinPoint}
-     * @return object  return value
+     * @return object return value
      * @throws Throwable exception
      */
     public Object invoke(final HmilyTransactionContext hmilyTransactionContext, final ProceedingJoinPoint point) throws Throwable {

@@ -19,7 +19,6 @@ package org.dromara.hmily.core.holder;
 
 import java.util.Objects;
 import java.util.Optional;
-import org.dromara.hmily.common.utils.CollectionUtils;
 import org.dromara.hmily.core.cache.HmilyParticipantCacheManager;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipant;
 import org.dromara.hmily.repository.spi.entity.HmilyTransaction;
@@ -27,7 +26,7 @@ import org.dromara.hmily.repository.spi.entity.HmilyTransaction;
 /**
  * The type Hmily transaction holder.
  */
-public class HmilyTransactionHolder {
+public final class HmilyTransactionHolder {
     
     private static final HmilyTransactionHolder INSTANCE = new HmilyTransactionHolder();
     
@@ -50,7 +49,7 @@ public class HmilyTransactionHolder {
      *
      * @param hmilyTransaction the hmily transaction
      */
-    public void set(HmilyTransaction hmilyTransaction) {
+    public void set(final HmilyTransaction hmilyTransaction) {
         CURRENT.set(hmilyTransaction);
     }
     

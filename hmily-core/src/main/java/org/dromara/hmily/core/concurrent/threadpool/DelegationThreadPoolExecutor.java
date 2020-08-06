@@ -35,13 +35,11 @@ import java.util.concurrent.TimeUnit;
  */
 @SuppressWarnings("unused")
 public class DelegationThreadPoolExecutor extends ThreadPoolExecutor {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(DelegationThreadPoolExecutor.class);
-
+    
     /**
      * Define a thread saturation strategy.
      */
-    static final RejectedExecutionHandler HANDLER = (r, executor) -> {
+    protected static final RejectedExecutionHandler HANDLER = (r, executor) -> {
         ((DelegationThreadPoolExecutor) executor).onInitialRejection(r);
         BlockingQueue<Runnable> queue = executor.getQueue();
         while (true) {
@@ -58,7 +56,9 @@ public class DelegationThreadPoolExecutor extends ThreadPoolExecutor {
 
         }
     };
-
+    
+    private static final Logger LOGGER = LoggerFactory.getLogger(DelegationThreadPoolExecutor.class);
+    
     /**
      * Instantiates a new Delegation thread pool executor.
      *

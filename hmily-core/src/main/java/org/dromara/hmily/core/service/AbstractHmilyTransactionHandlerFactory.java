@@ -21,10 +21,11 @@ import java.util.Map;
 import java.util.Objects;
 import org.dromara.hmily.common.enums.HmilyRoleEnum;
 import org.dromara.hmily.core.context.HmilyTransactionContext;
-import org.dromara.hmily.core.holder.HmilyTransactionHolder;
 
 /**
  * The type Abstract hmily transaction handler.
+ *
+ * @author xiaoyu
  */
 public abstract class AbstractHmilyTransactionHandlerFactory implements HmilyTransactionHandlerFactory {
     
@@ -36,7 +37,7 @@ public abstract class AbstractHmilyTransactionHandlerFactory implements HmilyTra
     protected abstract Map<HmilyRoleEnum, HmilyTransactionHandler> getMap();
     
     @Override
-    public HmilyTransactionHandler factoryOf(HmilyTransactionContext context) {
+    public HmilyTransactionHandler factoryOf(final HmilyTransactionContext context) {
         if (Objects.isNull(context)) {
             return getMap().get(HmilyRoleEnum.START);
         } else {
