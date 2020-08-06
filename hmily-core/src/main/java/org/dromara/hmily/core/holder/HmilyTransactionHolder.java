@@ -19,6 +19,7 @@ package org.dromara.hmily.core.holder;
 
 import java.util.Objects;
 import java.util.Optional;
+import org.dromara.hmily.common.utils.CollectionUtils;
 import org.dromara.hmily.core.cache.HmilyParticipantCacheManager;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipant;
 import org.dromara.hmily.repository.spi.entity.HmilyTransaction;
@@ -64,6 +65,18 @@ public class HmilyTransactionHolder {
         }
         Optional.ofNullable(getCurrentTransaction())
                 .ifPresent(c -> c.registerParticipant(hmilyParticipant));
+    }
+    
+    /**
+     * Cache hmily participant.
+     *
+     * @param hmilyParticipant the hmily participant
+     */
+    public void cacheHmilyParticipant(final HmilyParticipant hmilyParticipant) {
+        if (Objects.isNull(hmilyParticipant)) {
+            return;
+        }
+        HmilyParticipantCacheManager.getInstance().cacheHmilyParticipant(hmilyParticipant);
     }
     
     /**

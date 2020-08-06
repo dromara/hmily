@@ -21,12 +21,10 @@ import com.google.common.collect.Lists;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.dromara.hmily.annotation.HmilyTCC;
 import org.dromara.hmily.annotation.TransTypeEnum;
-import org.dromara.hmily.common.enums.EventTypeEnum;
 import org.dromara.hmily.common.enums.ExecutorTypeEnum;
 import org.dromara.hmily.common.enums.HmilyActionEnum;
 import org.dromara.hmily.common.enums.HmilyRoleEnum;
@@ -38,15 +36,14 @@ import org.dromara.hmily.common.utils.StringUtils;
 import org.dromara.hmily.core.cache.HmilyParticipantCacheManager;
 import org.dromara.hmily.core.context.HmilyContextHolder;
 import org.dromara.hmily.core.context.HmilyTransactionContext;
-import org.dromara.hmily.core.disruptor.publisher.HmilyRepositoryEventPublisher;
 import org.dromara.hmily.core.holder.HmilyTransactionHolder;
 import org.dromara.hmily.core.reflect.HmilyReflector;
+import org.dromara.hmily.core.repository.HmilyRepositoryStorage;
 import org.dromara.hmily.repository.spi.entity.HmilyInvocation;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipant;
 import org.dromara.hmily.repository.spi.entity.HmilyTransaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 
 /**
  * this is hmily transaction manager.
@@ -58,8 +55,6 @@ public final class HmilyTccTransactionExecutor {
     private static final Logger LOGGER = LoggerFactory.getLogger(HmilyTccTransactionExecutor.class);
     
     private static final HmilyTccTransactionExecutor INSTANCE = new HmilyTccTransactionExecutor();
-    
-    private static final HmilyRepositoryEventPublisher PUBLISHER = HmilyRepositoryEventPublisher.getInstance();
     
     private HmilyTccTransactionExecutor() {
     }
@@ -78,9 +73,9 @@ public final class HmilyTccTransactionExecutor {
         LogUtil.debug(LOGGER, () -> "......hmily tcc transaction starter....");
         //build tccTransaction
         HmilyTransaction hmilyTransaction = createHmilyTransaction();
-        PUBLISHER.publishEvent(hmilyTransaction, EventTypeEnum.CREATE_HMILY_TRANSACTION.getCode());
+        HmilyRepositoryStorage.createHmilyTransaction(hmilyTransaction);
         HmilyParticipant hmilyParticipant = buildHmilyParticipant(point, null, null, HmilyRoleEnum.START.getCode(), hmilyTransaction.getTransId());
-        Optional.ofNullable(hmilyParticipant).ifPresent(h -> PUBLISHER.publishEvent(h, EventTypeEnum.CREATE_HMILY_PARTICIPANT.getCode()));
+        HmilyRepositoryStorage.createHmilyParticipant(hmilyParticipant);
         hmilyTransaction.registerParticipant(hmilyParticipant);
         //save tccTransaction in threadLocal
         HmilyTransactionHolder.getInstance().set(hmilyTransaction);
@@ -105,11 +100,8 @@ public final class HmilyTccTransactionExecutor {
     public HmilyParticipant preTryParticipant(final HmilyTransactionContext context, final ProceedingJoinPoint point) {
         LogUtil.debug(LOGGER, "participant hmily tcc transaction start..：{}", context::toString);
         final HmilyParticipant hmilyParticipant = buildHmilyParticipant(point, context.getParticipantId(), context.getParticipantRefId(), HmilyRoleEnum.PARTICIPANT.getCode(), context.getTransId());
-        //cache by guava
-        if (Objects.nonNull(hmilyParticipant)) {
-            HmilyParticipantCacheManager.getInstance().cacheHmilyParticipant(hmilyParticipant);
-            PUBLISHER.publishEvent(hmilyParticipant, EventTypeEnum.CREATE_HMILY_PARTICIPANT.getCode());
-        }
+        HmilyTransactionHolder.getInstance().cacheHmilyParticipant(hmilyParticipant);
+        HmilyRepositoryStorage.createHmilyParticipant(hmilyParticipant);
         //publishEvent
         //Nested transaction support
         context.setRole(HmilyRoleEnum.PARTICIPANT.getCode());
@@ -131,13 +123,13 @@ public final class HmilyTccTransactionExecutor {
             return;
         }
         currentTransaction.setStatus(HmilyActionEnum.CONFIRMING.getCode());
-        updateHmilyTransactionStatus(currentTransaction);
+        HmilyRepositoryStorage.updateHmilyTransactionStatus(currentTransaction);
         final List<HmilyParticipant> hmilyParticipants = currentTransaction.getHmilyParticipants();
         for (HmilyParticipant hmilyParticipant : hmilyParticipants) {
             try {
                 if (hmilyParticipant.getRole() == HmilyRoleEnum.START.getCode()) {
                     HmilyReflector.executor(HmilyActionEnum.CONFIRMING, ExecutorTypeEnum.LOCAL, hmilyParticipant);
-                    removeHmilyParticipant(hmilyParticipant);
+                    HmilyRepositoryStorage.removeHmilyParticipant(hmilyParticipant);
                 } else {
                     HmilyReflector.executor(HmilyActionEnum.CONFIRMING, ExecutorTypeEnum.RPC, hmilyParticipant);
                 }
@@ -159,7 +151,7 @@ public final class HmilyTccTransactionExecutor {
                 if (hmilyParticipant.getParticipantId().equals(selfParticipantId)) {
                     final Object result = HmilyReflector.executor(HmilyActionEnum.CONFIRMING, ExecutorTypeEnum.LOCAL, hmilyParticipant);
                     results.add(result);
-                    removeHmilyParticipant(hmilyParticipant);
+                    HmilyRepositoryStorage.removeHmilyParticipant(hmilyParticipant);
                 } else {
                     final Object result = HmilyReflector.executor(HmilyActionEnum.CONFIRMING, ExecutorTypeEnum.RPC, hmilyParticipant);
                     results.add(result);
@@ -186,13 +178,13 @@ public final class HmilyTccTransactionExecutor {
         }
         currentTransaction.setStatus(HmilyActionEnum.CANCELING.getCode());
         //update cancel
-        updateHmilyTransactionStatus(currentTransaction);
+        HmilyRepositoryStorage.updateHmilyTransactionStatus(currentTransaction);
         final List<HmilyParticipant> hmilyParticipants = currentTransaction.getHmilyParticipants();
         for (HmilyParticipant hmilyParticipant : hmilyParticipants) {
             try {
                 if (hmilyParticipant.getRole() == HmilyRoleEnum.START.getCode()) {
                     HmilyReflector.executor(HmilyActionEnum.CANCELING, ExecutorTypeEnum.LOCAL, hmilyParticipant);
-                    removeHmilyParticipant(hmilyParticipant);
+                    HmilyRepositoryStorage.removeHmilyParticipant(hmilyParticipant);
                 } else {
                     HmilyReflector.executor(HmilyActionEnum.CANCELING, ExecutorTypeEnum.RPC, hmilyParticipant);
                 }
@@ -214,7 +206,7 @@ public final class HmilyTccTransactionExecutor {
         HmilyParticipant selfHmilyParticipant = filterSelfHmilyParticipant(hmilyParticipants);
         if (Objects.nonNull(selfHmilyParticipant)) {
             selfHmilyParticipant.setStatus(HmilyActionEnum.CANCELING.getCode());
-            updateHmilyParticipantStatus(selfHmilyParticipant);
+            HmilyRepositoryStorage.updateHmilyParticipantStatus(selfHmilyParticipant);
         }
         List<Object> results = Lists.newArrayListWithCapacity(hmilyParticipants.size());
         for (HmilyParticipant hmilyParticipant : hmilyParticipants) {
@@ -222,7 +214,7 @@ public final class HmilyTccTransactionExecutor {
                 if (hmilyParticipant.getParticipantId().equals(selfParticipantId)) {
                     final Object result = HmilyReflector.executor(HmilyActionEnum.CANCELING, ExecutorTypeEnum.LOCAL, hmilyParticipant);
                     results.add(result);
-                    removeHmilyParticipant(hmilyParticipant);
+                    HmilyRepositoryStorage.removeHmilyParticipant(hmilyParticipant);
                 } else {
                     final Object result = HmilyReflector.executor(HmilyActionEnum.CANCELING, ExecutorTypeEnum.RPC, hmilyParticipant);
                     results.add(result);
@@ -243,29 +235,11 @@ public final class HmilyTccTransactionExecutor {
      * @param hmilyTransaction {@linkplain HmilyTransaction}
      */
     public void updateStartStatus(final HmilyTransaction hmilyTransaction) {
-        updateHmilyTransactionStatus(hmilyTransaction);
+        HmilyRepositoryStorage.updateHmilyTransactionStatus(hmilyTransaction);
         HmilyParticipant hmilyParticipant = filterStartHmilyParticipant(hmilyTransaction);
         if (Objects.nonNull(hmilyParticipant)) {
             hmilyParticipant.setStatus(hmilyTransaction.getStatus());
-            updateHmilyParticipantStatus(hmilyParticipant);
-        }
-    }
-    
-    public void updateHmilyTransactionStatus(final HmilyTransaction hmilyTransaction) {
-        if (Objects.nonNull(hmilyTransaction)) {
-            PUBLISHER.publishEvent(hmilyTransaction, EventTypeEnum.UPDATE_HMILY_TRANSACTION_STATUS.getCode());
-        }
-    }
-    
-    public void updateHmilyParticipantStatus(final HmilyParticipant hmilyParticipant) {
-        if (Objects.nonNull(hmilyParticipant)) {
-            PUBLISHER.publishEvent(hmilyParticipant, EventTypeEnum.UPDATE_HMILY_PARTICIPANT_STATUS.getCode());
-        }
-    }
-    
-    public void removeHmilyParticipant(final HmilyParticipant hmilyParticipant) {
-        if (null != hmilyParticipant) {
-            PUBLISHER.publishEvent(hmilyParticipant, EventTypeEnum.REMOVE_HMILY_PARTICIPANT.getCode());
+            HmilyRepositoryStorage.updateHmilyParticipantStatus(hmilyParticipant);
         }
     }
     
