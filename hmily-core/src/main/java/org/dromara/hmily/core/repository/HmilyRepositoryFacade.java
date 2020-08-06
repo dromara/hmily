@@ -19,11 +19,11 @@ package org.dromara.hmily.core.repository;
 
 import java.util.List;
 import lombok.Setter;
+import org.dromara.hmily.common.enums.HmilyActionEnum;
 import org.dromara.hmily.repository.spi.HmilyRepository;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipant;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipantUndo;
 import org.dromara.hmily.repository.spi.entity.HmilyTransaction;
-import org.dromara.hmily.repository.spi.exception.HmilyRepositoryException;
 
 /**
  * The type Hmily coordinator facade.
@@ -36,6 +36,9 @@ public class HmilyRepositoryFacade {
     
     @Setter
     private HmilyRepository hmilyRepository;
+    
+    @Setter
+    private boolean phyDeleted;
     
     private HmilyRepositoryFacade() {
     }
@@ -77,7 +80,11 @@ public class HmilyRepositoryFacade {
      * @return the boolean
      */
     public boolean removeHmilyTransaction(final Long transId) {
-        return hmilyRepository.removeHmilyTransaction(transId) > 0;
+        if (phyDeleted) {
+            return hmilyRepository.removeHmilyTransaction(transId) > 0;
+        } else {
+            return updateHmilyTransactionStatus(transId, HmilyActionEnum.DELETE.getCode());
+        }
     }
     
     /**
@@ -108,7 +115,11 @@ public class HmilyRepositoryFacade {
      * @return the boolean
      */
     public boolean removeHmilyParticipant(final Long participantId) {
-        return hmilyRepository.removeHmilyParticipant(participantId) > 0;
+        if (phyDeleted) {
+            return hmilyRepository.removeHmilyParticipant(participantId) > 0;
+        } else {
+            return updateHmilyParticipantStatus(participantId, HmilyActionEnum.DELETE.getCode());
+        }
     }
     
     /**
@@ -148,6 +159,21 @@ public class HmilyRepositoryFacade {
      * @return the boolean
      */
     public boolean removeHmilyParticipantUndo(final Long undoId) {
-        return hmilyRepository.removeHmilyParticipantUndo(undoId) > 0;
+        if (phyDeleted) {
+            return hmilyRepository.removeHmilyParticipantUndo(undoId) > 0;
+        } else {
+            return updateHmilyParticipantUndoStatus(undoId, HmilyActionEnum.DELETE.getCode());
+        }
+    }
+    
+    /**
+     * Update hmily participant undo status boolean.
+     *
+     * @param undoId the undo id
+     * @param status the status
+     * @return the boolean
+     */
+    public boolean updateHmilyParticipantUndoStatus(final Long undoId, final Integer status) {
+        return hmilyRepository.updateHmilyParticipantUndoStatus(undoId, status) > 0;
     }
 }

@@ -19,6 +19,11 @@ package org.dromara.hmily.core.provide;
 
 import lombok.SneakyThrows;
 
+/**
+ * The type Reflect object.
+ *
+ * @author xiaoyu
+ */
 public class ReflectObject implements ObjectProvide {
     
     @Override

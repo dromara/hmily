@@ -26,11 +26,11 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import org.dromara.hmily.annotation.TransTypeEnum;
+import org.dromara.hmily.common.concurrent.HmilyThreadFactory;
 import org.dromara.hmily.common.enums.HmilyActionEnum;
 import org.dromara.hmily.common.utils.CollectionUtils;
 import org.dromara.hmily.common.utils.LogUtil;
 import org.dromara.hmily.config.HmilyConfig;
-import org.dromara.hmily.common.concurrent.HmilyThreadFactory;
 import org.dromara.hmily.core.holder.SingletonHolder;
 import org.dromara.hmily.core.hook.UndoHook;
 import org.dromara.hmily.repository.spi.HmilyRepository;
@@ -54,13 +54,15 @@ public class HmilyTransactionSelfRecoveryScheduled implements AutoCloseable {
     
     private final HmilyRepository hmilyRepository;
     
-    private ScheduledExecutorService selfTccRecoveryExecutor;
+    private final ScheduledExecutorService selfTccRecoveryExecutor;
     
-    private ScheduledExecutorService cleanHmilyTransactionExecutor;
+    private final ScheduledExecutorService cleanHmilyTransactionExecutor;
     
-    private ScheduledExecutorService selfTacRecoveryExecutor;
+    private final ScheduledExecutorService selfTacRecoveryExecutor;
     
-    private HmilyTransactionRecoveryService hmilyTransactionRecoveryService;
+    private ScheduledExecutorService phyDeletedExecutor;
+    
+    private final HmilyTransactionRecoveryService hmilyTransactionRecoveryService;
     
     public HmilyTransactionSelfRecoveryScheduled() {
         hmilyRepository = ExtensionLoaderFactory.load(HmilyRepository.class, hmilyConfig.getRepository());
@@ -73,10 +75,30 @@ public class HmilyTransactionSelfRecoveryScheduled implements AutoCloseable {
         this.cleanHmilyTransactionExecutor =
                 new ScheduledThreadPoolExecutor(1,
                         HmilyThreadFactory.create("hmily-transaction-clean", true));
-        hmilyTransactionRecoveryService = new HmilyTransactionRecoveryService(hmilyRepository);
+        hmilyTransactionRecoveryService = new HmilyTransactionRecoveryService();
         selfTccRecovery();
         selfTacRecovery();
         cleanHmilyTransaction();
+        phyDeleted();
+    }
+    
+    private void phyDeleted() {
+        if (!hmilyConfig.isPhyDeleted()) {
+            int seconds = hmilyConfig.getStoreDays() * 24 * 60 * 60;
+            phyDeletedExecutor =
+                    new ScheduledThreadPoolExecutor(1,
+                            HmilyThreadFactory.create("hmily-phyDeleted-clean", true));
+            phyDeletedExecutor
+                    .scheduleWithFixedDelay(() -> {
+                        try {
+                            hmilyRepository.removeHmilyTransactionByData(acquireDelayData(seconds));
+                            hmilyRepository.removeHmilyParticipantByData(acquireDelayData(seconds));
+                            hmilyRepository.removeHmilyParticipantUndoByData(acquireDelayData(seconds));
+                        } catch (Exception e) {
+                            LOGGER.error(" scheduled hmily phyDeleted log is error:", e);
+                        }
+                    }, hmilyConfig.getScheduledInitDelay(), hmilyConfig.getScheduledPhyDeletedDelay(), TimeUnit.SECONDS);
+        }
     }
     
     private void selfTccRecovery() {
@@ -90,7 +112,7 @@ public class HmilyTransactionSelfRecoveryScheduled implements AutoCloseable {
                         for (HmilyParticipant hmilyParticipant : hmilyParticipantList) {
                             // if the try is not completed, no compensation will be provided (to prevent various exceptions in the try phase)
                             if (hmilyParticipant.getRetry() > hmilyConfig.getRetryMax()) {
-                                LogUtil.error(LOGGER, "This transaction exceeds the maximum number of retries and no retries will occur：{}", () -> hmilyParticipant);
+                                LogUtil.error(LOGGER, "This tcc transaction exceeds the maximum number of retries and no retries will occur：{}", () -> hmilyParticipant);
                                 hmilyRepository.updateHmilyParticipantStatus(hmilyParticipant.getParticipantId(), HmilyActionEnum.DEATH.getCode());
                                 continue;
                             }
@@ -131,7 +153,7 @@ public class HmilyTransactionSelfRecoveryScheduled implements AutoCloseable {
                         for (HmilyParticipant hmilyParticipant : hmilyParticipantList) {
                             // if the try is not completed, no compensation will be provided (to prevent various exceptions in the try phase)
                             if (hmilyParticipant.getRetry() > hmilyConfig.getRetryMax()) {
-                                LogUtil.error(LOGGER, "This transaction exceeds the maximum number of retries and no retries will occur：{}", () -> hmilyParticipant);
+                                LogUtil.error(LOGGER, "This tac transaction exceeds the maximum number of retries and no retries will occur：{}", () -> hmilyParticipant);
                                 hmilyRepository.updateHmilyParticipantStatus(hmilyParticipant.getParticipantId(), HmilyActionEnum.DEATH.getCode());
                                 continue;
                             }
@@ -201,5 +223,8 @@ public class HmilyTransactionSelfRecoveryScheduled implements AutoCloseable {
         selfTccRecoveryExecutor.shutdown();
         selfTacRecoveryExecutor.shutdown();
         cleanHmilyTransactionExecutor.shutdown();
+        if (Objects.nonNull(phyDeletedExecutor)) {
+            phyDeletedExecutor.shutdown();
+        }
     }
 }

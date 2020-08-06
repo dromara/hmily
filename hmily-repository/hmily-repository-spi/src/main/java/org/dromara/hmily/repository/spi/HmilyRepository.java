@@ -110,6 +110,14 @@ public interface HmilyRepository {
     int removeHmilyTransaction(Long transId);
     
     /**
+     * Remove hmily transaction by data int.
+     *
+     * @param date the date
+     * @return the int
+     */
+    int removeHmilyTransactionByData(Date date);
+    
+    /**
      * Create hmily participant int.
      *
      * @param hmilyParticipant the hmily participant
@@ -171,6 +179,14 @@ public interface HmilyRepository {
     int removeHmilyParticipant(Long participantId);
     
     /**
+     * Remove hmily participant by data int.
+     *
+     * @param date the date
+     * @return the int
+     */
+    int removeHmilyParticipantByData(Date date);
+    
+    /**
      * Lock hmily participant boolean.
      *
      * @param hmilyParticipant the hmily participant
@@ -201,5 +217,22 @@ public interface HmilyRepository {
      * @return the int
      */
     int removeHmilyParticipantUndo(Long undoId);
+    
+    /**
+     * Remove hmily participant undo by data int.
+     *
+     * @param date the date
+     * @return the int
+     */
+    int removeHmilyParticipantUndoByData(Date date);
+    
+    /**
+     * Update hmily participant undo status int.
+     *
+     * @param undoId the undo id
+     * @param status the status
+     * @return the int
+     */
+    int updateHmilyParticipantUndoStatus(Long undoId, Integer status);
     
 }
