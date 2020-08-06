@@ -39,6 +39,9 @@ public class StarterHmilyTacTransactionHandler implements HmilyTransactionHandle
     
     private final DisruptorProviderManage<HmilyTransactionHandlerAlbum> disruptorProviderManage;
     
+    /**
+     * Instantiates a new Starter hmily tac transaction handler.
+     */
     public StarterHmilyTacTransactionHandler() {
         disruptorProviderManage = new DisruptorProviderManage<>(new HmilyTransactionExecutorHandler(),
                 Runtime.getRuntime().availableProcessors() << 1, DisruptorProviderManage.DEFAULT_SIZE);

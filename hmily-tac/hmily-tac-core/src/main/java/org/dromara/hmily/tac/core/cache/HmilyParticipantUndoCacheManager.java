@@ -28,9 +28,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import org.dromara.hmily.common.utils.CollectionUtils;
-import org.dromara.hmily.common.utils.StringUtils;
 import org.dromara.hmily.core.repository.HmilyRepositoryFacade;
-import org.dromara.hmily.repository.spi.entity.HmilyParticipant;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipantUndo;
 import org.dromara.hmily.repository.spi.entity.HmilyTransaction;
 
@@ -45,7 +43,7 @@ public final class HmilyParticipantUndoCacheManager {
     
     private static final int MAX_COUNT = 1000000;
     
-    private final LoadingCache<Long, List<HmilyParticipantUndo>> LOADING_CACHE =
+    private final LoadingCache<Long, List<HmilyParticipantUndo>> loadingCache =
             CacheBuilder.newBuilder().maximumWeight(MAX_COUNT)
                     .weigher((Weigher<Long, List<HmilyParticipantUndo>>) (Long, hmilyParticipantUndoList) -> getSize())
                     .build(new CacheLoader<Long, List<HmilyParticipantUndo>>() {
@@ -61,25 +59,40 @@ public final class HmilyParticipantUndoCacheManager {
     /**
      * HmilyTransactionCacheManager.
      *
-     * @return HmilyTransactionCacheManager
+     * @return HmilyTransactionCacheManager instance
      */
     public static HmilyParticipantUndoCacheManager getInstance() {
         return INSTANCE;
     }
     
+    /**
+     * Cache hmily participant undo.
+     *
+     * @param hmilyParticipantUndo the hmily participant undo
+     */
     public void cacheHmilyParticipantUndo(final HmilyParticipantUndo hmilyParticipantUndo) {
         Long participantId = hmilyParticipantUndo.getParticipantId();
         cacheHmilyParticipantUndo(participantId, hmilyParticipantUndo);
     }
     
+    /**
+     * Cache hmily participant undo.
+     *
+     * @param participantId        the participant id
+     * @param hmilyParticipantUndo the hmily participant undo
+     */
     public void cacheHmilyParticipantUndo(final Long participantId, final HmilyParticipantUndo hmilyParticipantUndo) {
         List<HmilyParticipantUndo> existList = get(participantId);
         if (CollectionUtils.isEmpty(existList)) {
-            LOADING_CACHE.put(participantId, Lists.newArrayList(hmilyParticipantUndo));
+            loadingCache.put(participantId, Lists.newArrayList(hmilyParticipantUndo));
         } else {
             existList.add(hmilyParticipantUndo);
-            LOADING_CACHE.put(participantId, existList);
+            loadingCache.put(participantId, existList);
         }
+    }
+    
+    private List<HmilyParticipantUndo> cacheHmilyParticipantUndo(final Long participantId) {
+        return Optional.ofNullable(HmilyRepositoryFacade.getInstance().findUndoByParticipantId(participantId)).orElse(Collections.emptyList());
     }
     
     /**
@@ -90,7 +103,7 @@ public final class HmilyParticipantUndoCacheManager {
      */
     public List<HmilyParticipantUndo> get(final Long participantId) {
         try {
-            return LOADING_CACHE.get(participantId);
+            return loadingCache.get(participantId);
         } catch (ExecutionException e) {
             return Collections.emptyList();
         }
@@ -103,15 +116,11 @@ public final class HmilyParticipantUndoCacheManager {
      */
     public void removeByKey(final Long participantId) {
         if (Objects.nonNull(participantId)) {
-            LOADING_CACHE.invalidate(participantId);
+            loadingCache.invalidate(participantId);
         }
     }
     
     private int getSize() {
-        return (int) LOADING_CACHE.size();
-    }
-    
-    private List<HmilyParticipantUndo> cacheHmilyParticipantUndo(final Long participantId) {
-        return Optional.ofNullable(HmilyRepositoryFacade.getInstance().findUndoByParticipantId(participantId)).orElse(Collections.emptyList());
+        return (int) loadingCache.size();
     }
 }

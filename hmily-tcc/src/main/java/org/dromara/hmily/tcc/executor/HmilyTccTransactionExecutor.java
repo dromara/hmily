@@ -59,6 +59,11 @@ public final class HmilyTccTransactionExecutor {
     private HmilyTccTransactionExecutor() {
     }
     
+    /**
+     * Gets instance.
+     *
+     * @return the instance
+     */
     public static HmilyTccTransactionExecutor getInstance() {
         return INSTANCE;
     }
@@ -141,6 +146,13 @@ public final class HmilyTccTransactionExecutor {
         }
     }
     
+    /**
+     * Participant confirm object.
+     *
+     * @param hmilyParticipantList the hmily participant list
+     * @param selfParticipantId    the self participant id
+     * @return the object
+     */
     public Object participantConfirm(final List<HmilyParticipant> hmilyParticipantList, final Long selfParticipantId) {
         if (CollectionUtils.isEmpty(hmilyParticipantList)) {
             return null;
@@ -196,6 +208,13 @@ public final class HmilyTccTransactionExecutor {
         }
     }
     
+    /**
+     * Participant cancel object.
+     *
+     * @param hmilyParticipants the hmily participants
+     * @param selfParticipantId the self participant id
+     * @return the object
+     */
     public Object participantCancel(final List<HmilyParticipant> hmilyParticipants, final Long selfParticipantId) {
         LogUtil.debug(LOGGER, () -> "tcc cancel ...........start!");
         if (CollectionUtils.isEmpty(hmilyParticipants)) {
@@ -262,9 +281,9 @@ public final class HmilyTccTransactionExecutor {
         return null;
     }
     
-    private HmilyParticipant filterSelfHmilyParticipant(List<HmilyParticipant> hmilyParticipants) {
-        if (CollectionUtils.isNotEmpty(hmilyParticipants)) {
-            return hmilyParticipants.stream().filter(e -> e.getParticipantRefId() != null).findFirst().orElse(null);
+    private HmilyParticipant filterSelfHmilyParticipant(final List<HmilyParticipant> hmilyParticipantList) {
+        if (CollectionUtils.isNotEmpty(hmilyParticipantList)) {
+            return hmilyParticipantList.stream().filter(e -> e.getParticipantRefId() != null).findFirst().orElse(null);
         }
         return null;
     }
@@ -280,7 +299,6 @@ public final class HmilyTccTransactionExecutor {
     private HmilyParticipant buildHmilyParticipant(final ProceedingJoinPoint point, final Long participantId, final Long participantRefId, final int role, final Long transId) {
         MethodSignature signature = (MethodSignature) point.getSignature();
         Method method = signature.getMethod();
-        Class<?> clazz = point.getTarget().getClass();
         Object[] args = point.getArgs();
         final HmilyTCC hmilyTCC = method.getAnnotation(HmilyTCC.class);
         String confirmMethodName = hmilyTCC.confirmMethod();
@@ -297,6 +315,7 @@ public final class HmilyTccTransactionExecutor {
         if (null != participantRefId) {
             hmilyParticipant.setParticipantRefId(participantRefId);
         }
+        Class<?> clazz = point.getTarget().getClass();
         hmilyParticipant.setTransId(transId);
         hmilyParticipant.setTransType(TransTypeEnum.TCC.name());
         hmilyParticipant.setStatus(HmilyActionEnum.PRE_TRY.getCode());

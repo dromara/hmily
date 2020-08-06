@@ -22,12 +22,12 @@ import org.dromara.hmily.common.utils.LogUtil;
 import org.dromara.hmily.common.utils.StringUtils;
 import org.dromara.hmily.config.HmilyConfig;
 import org.dromara.hmily.core.disruptor.publisher.HmilyRepositoryEventPublisher;
+import org.dromara.hmily.core.holder.SingletonHolder;
 import org.dromara.hmily.core.hook.HmilyShutdownHook;
+import org.dromara.hmily.core.logo.HmilyLogo;
 import org.dromara.hmily.core.provide.ObjectProvide;
 import org.dromara.hmily.core.provide.ReflectObject;
 import org.dromara.hmily.core.repository.HmilyRepositoryFacade;
-import org.dromara.hmily.core.holder.SingletonHolder;
-import org.dromara.hmily.core.logo.HmilyLogo;
 import org.dromara.hmily.core.schedule.HmilyTransactionSelfRecoveryScheduled;
 import org.dromara.hmily.metrics.facade.MetricsTrackerFacade;
 import org.dromara.hmily.repository.spi.HmilyRepository;
@@ -37,6 +37,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * The type Hmily bootstrap.
+ *
  * @author xiaoyu
  */
 public final class HmilyBootstrap {
@@ -48,6 +50,11 @@ public final class HmilyBootstrap {
     private HmilyBootstrap() {
     }
     
+    /**
+     * Gets instance.
+     *
+     * @return the instance
+     */
     public static HmilyBootstrap getInstance() {
         return INSTANCE;
     }
@@ -63,7 +70,7 @@ public final class HmilyBootstrap {
             if (null == SingletonHolder.INST.get(ObjectProvide.class)) {
                 SingletonHolder.INST.register(ObjectProvide.class, new ReflectObject());
             }
-            if(null != hmilyConfig.getHmilyMetricsConfig()) {
+            if (null != hmilyConfig.getHmilyMetricsConfig()) {
                 MetricsTrackerFacade facade = MetricsTrackerFacade.getInstance();
                 facade.start(hmilyConfig.getHmilyMetricsConfig());
                 HmilyShutdownHook.getInstance().registerAutoCloseable(facade);

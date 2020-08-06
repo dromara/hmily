@@ -60,7 +60,7 @@ public class RpcMediator {
      * @param rpcAcquire the rpc acquire
      * @return the hmily transaction context
      */
-    public HmilyTransactionContext acquire(RpcAcquire rpcAcquire) {
+    public HmilyTransactionContext acquire(final RpcAcquire rpcAcquire) {
         HmilyTransactionContext hmilyTransactionContext = null;
         final String context = rpcAcquire.acquire(CommonConstant.HMILY_TRANSACTION_CONTEXT);
         if (StringUtils.isNoneBlank(context)) {

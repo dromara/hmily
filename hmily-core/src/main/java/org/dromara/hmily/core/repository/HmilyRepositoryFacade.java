@@ -30,7 +30,7 @@ import org.dromara.hmily.repository.spi.entity.HmilyTransaction;
  *
  * @author xiaoyu
  */
-public class HmilyRepositoryFacade {
+public final class HmilyRepositoryFacade {
     
     private static final HmilyRepositoryFacade INSTANCE = new HmilyRepositoryFacade();
     

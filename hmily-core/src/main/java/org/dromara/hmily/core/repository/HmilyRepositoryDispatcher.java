@@ -25,7 +25,7 @@ import org.dromara.hmily.repository.spi.entity.HmilyTransaction;
 /**
  * The type Hmily repository dispatcher.
  */
-public class HmilyRepositoryDispatcher {
+public final class HmilyRepositoryDispatcher {
     
     private static final HmilyRepositoryDispatcher INSTANCE = new HmilyRepositoryDispatcher();
     

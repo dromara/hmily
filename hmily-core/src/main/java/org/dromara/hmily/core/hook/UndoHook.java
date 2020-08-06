@@ -39,7 +39,7 @@ public enum UndoHook {
      *
      * @param function the function
      */
-    public void register(Function<HmilyParticipantUndo, Boolean> function) {
+    public void register(final Function<HmilyParticipantUndo, Boolean> function) {
         consumers.add(function);
     }
     

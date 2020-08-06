@@ -44,7 +44,7 @@ public class HmilyContextHolder {
      *
      * @param context the context
      */
-    public static void set(HmilyTransactionContext context) {
+    public static void set(final HmilyTransactionContext context) {
         hmilyContext.set(context);
     }
     

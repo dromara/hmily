@@ -31,7 +31,7 @@ public class TransmittableThreadLocalHmilyContext implements HmilyContext {
     private static final TransmittableThreadLocal<HmilyTransactionContext> LOCAL = new TransmittableThreadLocal<>();
     
     @Override
-    public void set(HmilyTransactionContext context) {
+    public void set(final HmilyTransactionContext context) {
         LOCAL.set(context);
     }
     
