@@ -51,26 +51,32 @@ public class HmilyAutoConfiguration {
     @Primary
     public HmilyApplicationContextAware hmilyTransactionBootstrap() {
         final HmilyApplicationContextAware contextAware = new HmilyApplicationContextAware();
-        contextAware.setBufferSize(hmilyConfigProperties.getBufferSize());
-        contextAware.setRetryMax(hmilyConfigProperties.getRetryMax());
-        contextAware.setRecoverDelayTime(hmilyConfigProperties.getRecoverDelayTime());
-        contextAware.setCleanDelayTime(hmilyConfigProperties.getCleanDelayTime());
         contextAware.setAppName(hmilyConfigProperties.getAppName());
-        contextAware.setRepository(hmilyConfigProperties.getRepository());
+        contextAware.setSerializer(hmilyConfigProperties.getSerializer());
+        contextAware.setContextTransmittalMode(hmilyConfigProperties.getContextTransmittalMode());
+        contextAware.setScheduledThreadMax(hmilyConfigProperties.getScheduledThreadMax());
         contextAware.setScheduledRecoveryDelay(hmilyConfigProperties.getScheduledRecoveryDelay());
         contextAware.setScheduledCleanDelay(hmilyConfigProperties.getScheduledCleanDelay());
+        contextAware.setScheduledPhyDeletedDelay(hmilyConfigProperties.getScheduledPhyDeletedDelay());
         contextAware.setScheduledInitDelay(hmilyConfigProperties.getScheduledInitDelay());
-        contextAware.setScheduledThreadMax(hmilyConfigProperties.getScheduledThreadMax());
-        contextAware.setSerializer(hmilyConfigProperties.getSerializer());
-        contextAware.setHmilyFileConfig(hmilyConfigProperties.getHmilyFileConfig());
+        contextAware.setRecoverDelayTime(hmilyConfigProperties.getRecoverDelayTime());
+        contextAware.setCleanDelayTime(hmilyConfigProperties.getCleanDelayTime());
+        contextAware.setLimit(hmilyConfigProperties.getLimit());
+        contextAware.setRetryMax(hmilyConfigProperties.getRetryMax());
+        contextAware.setBufferSize(hmilyConfigProperties.getBufferSize());
+        contextAware.setConsumerThreads(hmilyConfigProperties.getConsumerThreads());
+        contextAware.setAsyncThreads(hmilyConfigProperties.getAsyncThreads());
+        contextAware.setAsyncRepository(hmilyConfigProperties.isAsyncRepository());
+        contextAware.setAutoSql(hmilyConfigProperties.isAutoSql());
+        contextAware.setPhyDeleted(hmilyConfigProperties.isPhyDeleted());
+        contextAware.setStoreDays(hmilyConfigProperties.getStoreDays());
+        contextAware.setRepository(hmilyConfigProperties.getRepository());
         contextAware.setHmilyDbConfig(hmilyConfigProperties.getHmilyDbConfig());
         contextAware.setHmilyRedisConfig(hmilyConfigProperties.getHmilyRedisConfig());
         contextAware.setHmilyZookeeperConfig(hmilyConfigProperties.getHmilyZookeeperConfig());
         contextAware.setHmilyMongoConfig(hmilyConfigProperties.getHmilyMongoConfig());
-        contextAware.setConsumerThreads(hmilyConfigProperties.getConsumerThreads());
-        contextAware.setLoadFactor(hmilyConfigProperties.getLoadFactor());
-        contextAware.setAsyncThreads(hmilyConfigProperties.getAsyncThreads());
-        contextAware.setConcurrencyScale(hmilyConfigProperties.getConcurrencyScale());
+        contextAware.setHmilyFileConfig(hmilyConfigProperties.getHmilyFileConfig());
+        contextAware.setHmilyMetricsConfig(hmilyConfigProperties.getHmilyMetricsConfig());
         return contextAware;
     }
 }

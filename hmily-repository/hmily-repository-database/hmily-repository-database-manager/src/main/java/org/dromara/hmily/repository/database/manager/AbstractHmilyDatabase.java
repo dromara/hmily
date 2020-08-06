@@ -100,6 +100,11 @@ public abstract class AbstractHmilyDatabase implements HmilyRepository {
     protected static final String DELETE_HMILY_TRANSACTION = "delete from hmily_transaction_global where trans_id = ? ";
     
     /**
+     * The constant DELETE_HMILY_TRANSACTION_WITH_DATA.
+     */
+    protected static final String DELETE_HMILY_TRANSACTION_WITH_DATA = "delete from hmily_transaction_global where update_time < ? and status = 4";
+    
+    /**
      * The constant INSERT_HMILY_PARTICIPANT.
      */
     protected static final String INSERT_HMILY_PARTICIPANT = "INSERT INTO hmily_transaction_participant (participant_id, participant_ref_id, trans_id, trans_type, status, app_name,"
@@ -136,7 +141,7 @@ public abstract class AbstractHmilyDatabase implements HmilyRepository {
      * The constant SELECTOR_HMILY_PARTICIPANT_WITH_DELAY_AND_APP_NAME_TRANS_TYPE.
      */
     protected static final String SELECTOR_HMILY_PARTICIPANT_WITH_DELAY_AND_APP_NAME_TRANS_TYPE = SELECTOR_HMILY_PARTICIPANT_COMMON
-            + " where update_time < ? and app_name = ?  and trans_type = ? and status != 4";
+            + " where update_time < ? and app_name = ?  and trans_type = ? and status not in (4, 8) ";
     
     /**
      * The constant UPDATE_HMILY_PARTICIPANT_STATUS.
@@ -147,6 +152,11 @@ public abstract class AbstractHmilyDatabase implements HmilyRepository {
      * The constant DELETE_HMILY_PARTICIPANT.
      */
     protected static final String DELETE_HMILY_PARTICIPANT = "delete from hmily_transaction_participant where participant_id = ? ";
+    
+    /**
+     * The constant DELETE_HMILY_PARTICIPANT_WITH_DATA.
+     */
+    protected static final String DELETE_HMILY_PARTICIPANT_WITH_DATA = "delete from hmily_transaction_participant where update_time < ? and status = 4";
     
     /**
      * The constant INSERT_HMILY_PARTICIPANT_UNDO.
@@ -164,7 +174,17 @@ public abstract class AbstractHmilyDatabase implements HmilyRepository {
     /**
      * The constant REMOVE_HMILY_PARTICIPANT_UNDO.
      */
-    protected static final String REMOVE_HMILY_PARTICIPANT_UNDO = "delete from hmily_participant_undo where undo_id = ?";
+    protected static final String DELETE_HMILY_PARTICIPANT_UNDO = "delete from hmily_participant_undo where undo_id = ?";
+    
+    /**
+     * The constant DELETE_HMILY_PARTICIPANT_UNDO_WITH_DATA.
+     */
+    protected static final String DELETE_HMILY_PARTICIPANT_UNDO_WITH_DATA = "delete from hmily_participant_undo where update_time < ? and status = 4";
+    
+    /**
+     * The constant UPDATE_HMILY_PARTICIPANT_UNDO_STATUS.
+     */
+    protected static final String UPDATE_HMILY_PARTICIPANT_UNDO_STATUS = "update hmily_participant_undo set status=? where undo_id = ? ";
     
     /**
      * The data source.
@@ -397,8 +417,28 @@ public abstract class AbstractHmilyDatabase implements HmilyRepository {
     }
     
     @Override
+    public int updateHmilyParticipantUndoStatus(final Long undoId, final Integer status) {
+        return executeUpdate(UPDATE_HMILY_PARTICIPANT_UNDO_STATUS, status, undoId);
+    }
+    
+    @Override
+    public int removeHmilyTransactionByData(final Date date) {
+        return executeUpdate(DELETE_HMILY_TRANSACTION_WITH_DATA, date);
+    }
+    
+    @Override
+    public int removeHmilyParticipantByData(final Date date) {
+        return executeUpdate(DELETE_HMILY_PARTICIPANT_WITH_DATA, date);
+    }
+    
+    @Override
+    public int removeHmilyParticipantUndoByData(final Date date) {
+        return executeUpdate(DELETE_HMILY_PARTICIPANT_UNDO_WITH_DATA, date);
+    }
+    
+    @Override
     public int removeHmilyParticipantUndo(final Long undoId) {
-        return executeUpdate(REMOVE_HMILY_PARTICIPANT_UNDO, undoId);
+        return executeUpdate(DELETE_HMILY_PARTICIPANT_UNDO, undoId);
     }
     
     @Override

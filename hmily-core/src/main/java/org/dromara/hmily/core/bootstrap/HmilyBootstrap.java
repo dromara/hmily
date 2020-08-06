@@ -91,5 +91,6 @@ public final class HmilyBootstrap {
         hmilyRepository.setSerializer(hmilySerializer);
         hmilyRepository.init(hmilyConfig);
         HmilyRepositoryFacade.getInstance().setHmilyRepository(hmilyRepository);
+        HmilyRepositoryFacade.getInstance().setPhyDeleted(hmilyConfig.isPhyDeleted());
     }
 }
