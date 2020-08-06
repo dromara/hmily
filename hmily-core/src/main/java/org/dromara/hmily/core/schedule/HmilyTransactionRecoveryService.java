@@ -20,7 +20,7 @@ package org.dromara.hmily.core.schedule;
 import org.dromara.hmily.common.enums.ExecutorTypeEnum;
 import org.dromara.hmily.common.enums.HmilyActionEnum;
 import org.dromara.hmily.core.reflect.HmilyReflector;
-import org.dromara.hmily.repository.spi.HmilyRepository;
+import org.dromara.hmily.core.repository.HmilyRepositoryFacade;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,17 +34,6 @@ public class HmilyTransactionRecoveryService {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(HmilyTransactionRecoveryService.class);
     
-    private HmilyRepository hmilyRepository;
-    
-    /**
-     * Instantiates a new Hmily transaction recovery service.
-     *
-     * @param hmilyRepository the hmily repository
-     */
-    public HmilyTransactionRecoveryService(final HmilyRepository hmilyRepository) {
-        this.hmilyRepository = hmilyRepository;
-    }
-    
     /**
      * Cancel.
      *
@@ -54,8 +43,7 @@ public class HmilyTransactionRecoveryService {
     public boolean cancel(final HmilyParticipant hmilyParticipant) {
         try {
             HmilyReflector.executor(HmilyActionEnum.CANCELING, ExecutorTypeEnum.LOCAL, hmilyParticipant);
-            deleteHmilyParticipant(hmilyParticipant.getParticipantId());
-            return true;
+            return removeHmilyParticipant(hmilyParticipant.getParticipantId());
         } catch (Exception e) {
             LOGGER.error("hmily Recovery executor cancel exception:", e);
             return false;
@@ -71,15 +59,14 @@ public class HmilyTransactionRecoveryService {
     public boolean confirm(final HmilyParticipant hmilyParticipant) {
         try {
             HmilyReflector.executor(HmilyActionEnum.CONFIRMING, ExecutorTypeEnum.LOCAL, hmilyParticipant);
-            deleteHmilyParticipant(hmilyParticipant.getParticipantId());
-            return true;
+            return removeHmilyParticipant(hmilyParticipant.getParticipantId());
         } catch (Exception e) {
             LOGGER.error("hmily Recovery executor confirm exception:", e);
             return false;
         }
     }
     
-    private void deleteHmilyParticipant(final Long participantId) {
-        hmilyRepository.removeHmilyParticipant(participantId);
+    private boolean removeHmilyParticipant(final Long participantId) {
+        return HmilyRepositoryFacade.getInstance().removeHmilyParticipant(participantId);
     }
 }

@@ -53,9 +53,14 @@ public enum HmilyActionEnum {
     CANCELING(3, "cancel阶段"),
     
     /**
+     * DELETE hmily action enum.
+     */
+    DELETE(4, "删除状态"),
+    
+    /**
      * Death hmily action enum.
      */
-    DEATH(4, "不可用");
+    DEATH(8, "超过最大重试次数状态");
     
     private final int code;
 

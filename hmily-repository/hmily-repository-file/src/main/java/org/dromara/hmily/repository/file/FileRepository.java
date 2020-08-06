@@ -93,6 +93,11 @@ public class FileRepository implements HmilyRepository {
     }
     
     @Override
+    public int removeHmilyTransactionByData(Date date) {
+        return 0;
+    }
+    
+    @Override
     public int createHmilyParticipant(HmilyParticipant hmilyParticipant) throws HmilyRepositoryException {
         return 0;
     }
@@ -128,6 +133,11 @@ public class FileRepository implements HmilyRepository {
     }
     
     @Override
+    public int removeHmilyParticipantByData(Date date) {
+        return 0;
+    }
+    
+    @Override
     public boolean lockHmilyParticipant(HmilyParticipant hmilyParticipant) {
         return false;
     }
@@ -144,6 +154,16 @@ public class FileRepository implements HmilyRepository {
     
     @Override
     public int removeHmilyParticipantUndo(Long undoId) {
+        return 0;
+    }
+    
+    @Override
+    public int removeHmilyParticipantUndoByData(Date date) {
+        return 0;
+    }
+    
+    @Override
+    public int updateHmilyParticipantUndoStatus(Long undoId, Integer status) {
         return 0;
     }
     
