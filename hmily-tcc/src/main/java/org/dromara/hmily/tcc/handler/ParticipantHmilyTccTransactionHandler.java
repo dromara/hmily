@@ -27,6 +27,7 @@ import org.dromara.hmily.common.utils.DefaultValueUtils;
 import org.dromara.hmily.core.cache.HmilyParticipantCacheManager;
 import org.dromara.hmily.core.context.HmilyContextHolder;
 import org.dromara.hmily.core.context.HmilyTransactionContext;
+import org.dromara.hmily.core.repository.HmilyRepositoryStorage;
 import org.dromara.hmily.core.service.HmilyTransactionHandler;
 import org.dromara.hmily.tcc.executor.HmilyTccTransactionExecutor;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipant;
@@ -50,14 +51,14 @@ public class ParticipantHmilyTccTransactionHandler implements HmilyTransactionHa
                     final Object proceed = point.proceed();
                     hmilyParticipant.setStatus(HmilyActionEnum.TRYING.getCode());
                     //update log status to try
-                    executor.updateHmilyParticipantStatus(hmilyParticipant);
+                    HmilyRepositoryStorage.updateHmilyParticipantStatus(hmilyParticipant);
                     return proceed;
                 } catch (Throwable throwable) {
                     //if exception ,delete log.
                     if (Objects.nonNull(hmilyParticipant)) {
                         HmilyParticipantCacheManager.getInstance().removeByKey(hmilyParticipant.getParticipantId());
                     }
-                    executor.removeHmilyParticipant(hmilyParticipant);
+                    HmilyRepositoryStorage.removeHmilyParticipant(hmilyParticipant);
                     throw throwable;
                 } finally {
                     HmilyContextHolder.remove();

@@ -37,7 +37,20 @@ public class HmilyRepositoryStorage {
      * @param hmilyTransaction the hmily transaction
      */
     public static void createHmilyTransaction(final HmilyTransaction hmilyTransaction) {
-        PUBLISHER.publishEvent(hmilyTransaction, EventTypeEnum.CREATE_HMILY_TRANSACTION.getCode());
+        if (Objects.nonNull(hmilyTransaction)) {
+            PUBLISHER.publishEvent(hmilyTransaction, EventTypeEnum.CREATE_HMILY_TRANSACTION.getCode());
+        }
+    }
+    
+    /**
+     * Update hmily transaction status.
+     *
+     * @param hmilyTransaction the hmily transaction
+     */
+    public static void updateHmilyTransactionStatus(final HmilyTransaction hmilyTransaction) {
+        if (Objects.nonNull(hmilyTransaction)) {
+            PUBLISHER.publishEvent(hmilyTransaction, EventTypeEnum.UPDATE_HMILY_TRANSACTION_STATUS.getCode());
+        }
     }
     
     /**
@@ -46,17 +59,29 @@ public class HmilyRepositoryStorage {
      * @param hmilyParticipant the hmily participant
      */
     public static void createHmilyParticipant(final HmilyParticipant hmilyParticipant) {
-        PUBLISHER.publishEvent(hmilyParticipant, EventTypeEnum.CREATE_HMILY_PARTICIPANT.getCode());
+        if (Objects.nonNull(hmilyParticipant)) {
+            PUBLISHER.publishEvent(hmilyParticipant, EventTypeEnum.CREATE_HMILY_PARTICIPANT.getCode());
+        }
     }
     
+    /**
+     * Update hmily participant status.
+     *
+     * @param hmilyParticipant the hmily participant
+     */
     public static void updateHmilyParticipantStatus(final HmilyParticipant hmilyParticipant) {
         if (Objects.nonNull(hmilyParticipant)) {
             PUBLISHER.publishEvent(hmilyParticipant, EventTypeEnum.UPDATE_HMILY_PARTICIPANT_STATUS.getCode());
         }
     }
     
+    /**
+     * Remove hmily participant.
+     *
+     * @param hmilyParticipant the hmily participant
+     */
     public static void removeHmilyParticipant(final HmilyParticipant hmilyParticipant) {
-        if (null != hmilyParticipant) {
+        if (Objects.nonNull(hmilyParticipant)) {
             PUBLISHER.publishEvent(hmilyParticipant, EventTypeEnum.REMOVE_HMILY_PARTICIPANT.getCode());
         }
     }
