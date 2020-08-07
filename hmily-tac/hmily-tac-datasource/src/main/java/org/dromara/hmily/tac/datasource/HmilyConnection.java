@@ -34,7 +34,7 @@ public class HmilyConnection extends AbstractHmilyConnection {
      * @param hmilyDatasource  the hmily datasource
      * @param targetConnection the target connection
      */
-    public HmilyConnection(HmilyDatasource hmilyDatasource, Connection targetConnection) {
+    public HmilyConnection(HmilyTacDatasource hmilyDatasource, Connection targetConnection) {
         super(hmilyDatasource, targetConnection);
     }
     
