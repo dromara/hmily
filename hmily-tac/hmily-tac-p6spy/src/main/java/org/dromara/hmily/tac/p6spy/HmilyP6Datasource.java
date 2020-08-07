@@ -15,31 +15,33 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.tac.datasource;
+package org.dromara.hmily.tac.p6spy;
 
+import com.p6spy.engine.spy.P6DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 import javax.sql.DataSource;
-import org.dromara.hmily.tac.datasource.executor.HmilyTacRollbackExecutor;
-import org.dromara.hmily.tac.datasource.manager.HmilyDatasourceManager;
+import org.dromara.hmily.tac.common.HmilyResourceManager;
+import org.dromara.hmily.tac.common.HmilyTacResource;
+import org.dromara.hmily.tac.common.HmilyTacRollbackExecutor;
 
 /**
- * The type Hmily datasource.
+ * The type Hmily p 6 datasource.
  *
  * @author xiaoyu
  */
-public class HmilyDatasource extends AbstractHmilyDataSource {
+public class HmilyP6Datasource extends P6DataSource implements HmilyTacResource {
     
     private String jdbcUrl;
     
     /**
-     * Instantiates a new Abstract data source proxy.
+     * Instantiates a new Hmily p 6 datasource.
      *
-     * @param targetDataSource the target data source
+     * @param delegate the delegate
      */
-    public HmilyDatasource(final DataSource targetDataSource) {
-        super(targetDataSource);
-        init(targetDataSource);
+    public HmilyP6Datasource(final DataSource delegate) {
+        super(delegate);
+        init(delegate);
     }
     
     private void init(final DataSource dataSource) {
@@ -48,27 +50,16 @@ public class HmilyDatasource extends AbstractHmilyDataSource {
         } catch (SQLException e) {
             throw new IllegalStateException("can not init dataSource", e);
         }
-        HmilyDatasourceManager.register(this);
+        HmilyResourceManager.register(this);
         HmilyTacRollbackExecutor.getInstance();
     }
     
+    @Override
     public String getResourceId() {
         if (jdbcUrl.contains("?")) {
             return jdbcUrl.substring(0, jdbcUrl.indexOf('?'));
         } else {
             return jdbcUrl;
         }
-    }
-    
-    @Override
-    public Connection getConnection() throws SQLException {
-        Connection targetConnection = targetDataSource.getConnection();
-        return new HmilyConnection(this, targetConnection);
-    }
-    
-    @Override
-    public Connection getConnection(final String username, final String password) throws SQLException {
-        Connection targetConnection = targetDataSource.getConnection(username, password);
-        return new HmilyConnection(this, targetConnection);
     }
 }
