@@ -15,35 +15,34 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.tac.datasource.manager;
+package org.dromara.hmily.tac.common;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import org.dromara.hmily.tac.datasource.HmilyDatasource;
 
 /**
- * The type Hmily datasource manager.
+ * The type Hmily resource manager.
  */
-public class HmilyDatasourceManager {
+public class HmilyResourceManager {
     
-    private static final Map<String, HmilyDatasource> DATASOURCE_CACHE = new ConcurrentHashMap<>();
+    private static final Map<String, HmilyTacResource> DATASOURCE_CACHE = new ConcurrentHashMap<>();
     
     /**
      * Register.
      *
-     * @param hmilyDatasource the hmily datasource
+     * @param hmilyTacResource the hmily resource
      */
-    public static void register(final HmilyDatasource hmilyDatasource) {
-        DATASOURCE_CACHE.put(hmilyDatasource.getResourceId(), hmilyDatasource);
+    public static void register(final HmilyTacResource hmilyTacResource) {
+        DATASOURCE_CACHE.put(hmilyTacResource.getResourceId(), hmilyTacResource);
     }
     
     /**
-     * Get hmily datasource.
+     * Get hmily resource.
      *
      * @param resourceId the resource id
-     * @return the hmily datasource
+     * @return the hmily resource
      */
-    public static HmilyDatasource get(String resourceId) {
+    public static HmilyTacResource get(String resourceId) {
         return DATASOURCE_CACHE.get(resourceId);
     }
     

@@ -48,7 +48,7 @@ public abstract class AbstractHmilyConnection implements Connection {
     /**
      * The Hmily datasource.
      */
-    protected HmilyDatasource hmilyDatasource;
+    protected HmilyTacDatasource hmilyDatasource;
     
     /**
      * The Target connection.
@@ -61,7 +61,7 @@ public abstract class AbstractHmilyConnection implements Connection {
      * @param dataSourceProxy  the data source proxy
      * @param targetConnection the target connection
      */
-    public AbstractHmilyConnection(final HmilyDatasource dataSourceProxy, final Connection targetConnection) {
+    public AbstractHmilyConnection(final HmilyTacDatasource dataSourceProxy, final Connection targetConnection) {
         this.hmilyDatasource = dataSourceProxy;
         this.targetConnection = targetConnection;
     }
