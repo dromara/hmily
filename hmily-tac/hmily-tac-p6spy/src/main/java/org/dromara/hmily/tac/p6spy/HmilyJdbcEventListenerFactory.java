@@ -18,7 +18,6 @@
 package org.dromara.hmily.tac.p6spy;
 
 import com.p6spy.engine.event.JdbcEventListener;
-import com.p6spy.engine.spy.DefaultJdbcEventListenerFactory;
 import com.p6spy.engine.spy.JdbcEventListenerFactory;
 
 /**
@@ -33,7 +32,7 @@ public class HmilyJdbcEventListenerFactory implements JdbcEventListenerFactory {
     @Override
     public JdbcEventListener createJdbcEventListener() {
         if (jdbcEventListener == null) {
-            synchronized (DefaultJdbcEventListenerFactory.class) {
+            synchronized (HmilyJdbcEventListenerFactory.class) {
                 if (jdbcEventListener == null) {
                     jdbcEventListener = new HmilyJdbcEventListener();
                 }
