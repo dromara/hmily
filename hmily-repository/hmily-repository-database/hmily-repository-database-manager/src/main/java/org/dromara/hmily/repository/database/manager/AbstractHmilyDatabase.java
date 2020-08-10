@@ -19,8 +19,6 @@ package org.dromara.hmily.repository.database.manager;
 
 import com.google.common.collect.Maps;
 import com.zaxxer.hikari.HikariDataSource;
-import java.io.Reader;
-import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -37,8 +35,6 @@ import java.util.stream.Collectors;
 import javax.sql.DataSource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.ibatis.io.Resources;
-import org.apache.ibatis.jdbc.ScriptRunner;
 import org.dromara.hmily.common.utils.CollectionUtils;
 import org.dromara.hmily.config.HmilyConfig;
 import org.dromara.hmily.config.HmilyDbConfig;
@@ -561,7 +557,7 @@ public abstract class AbstractHmilyDatabase implements HmilyRepository {
         hmilyParticipant.setConfirmMethod((String) map.get("confirm_method"));
         hmilyParticipant.setCancelMethod((String) map.get("cancel_method"));
         try {
-            if(Objects.nonNull(map.get("confirm_invocation"))) {
+            if (Objects.nonNull(map.get("confirm_invocation"))) {
                 byte[] confirmInvocation = (byte[]) map.get("confirm_invocation");
                 final HmilyInvocation confirmHmilyInvocation = hmilySerializer.deSerialize(confirmInvocation, HmilyInvocation.class);
                 hmilyParticipant.setConfirmHmilyInvocation(confirmHmilyInvocation);
