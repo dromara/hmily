@@ -18,10 +18,20 @@
 package org.dromara.hmily.repository.database.oracle;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.ibatis.io.Resources;
+import org.apache.ibatis.jdbc.ScriptRunner;
 import org.dromara.hmily.repository.database.manager.AbstractHmilyDatabase;
-import org.dromara.hmily.repository.spi.entity.HmilyTransaction;
-import org.dromara.hmily.repository.spi.exception.HmilyRepositoryException;
 import org.dromara.hmily.spi.HmilySPI;
+
+import java.io.Reader;
+import java.sql.Blob;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
+
 
 /**
  * The type Oracle repository.
@@ -31,24 +41,60 @@ import org.dromara.hmily.spi.HmilySPI;
 @HmilySPI(value = "oracle")
 @Slf4j
 public class OracleRepository extends AbstractHmilyDatabase {
-    
+
     @Override
     protected String sqlFilePath() {
         return "oracle/schema.sql";
     }
-    
+
     @Override
-    protected String hmilyTransactionLimitSql(final int limit) {
-        return null;
+    protected String hmilyTransactionLimitSql(int limit) {
+        return SELECT_HMILY_TRANSACTION_DELAY  + " and rownum <= "+limit;
     }
-    
+
     @Override
-    protected String hmilyParticipantLimitSql(final int limit) {
-        return null;
+    protected String hmilyParticipantLimitSql(int limit) {
+        return SELECTOR_HMILY_PARTICIPANT_WITH_DELAY_AND_APP_NAME_TRANS_TYPE+ "and rownum <= "+limit;
     }
-    
+
+    @Override
+    protected void executeScript(Connection conn, final String sqlPath) throws Exception {
+        ScriptRunner runner = new ScriptRunner(conn);
+        final String delimiter = "/";
+        // doesn't print logger
+        runner.setLogWriter(null);
+        // doesn't print Error logger
+        runner.setErrorLogWriter(null);
+        runner.setAutoCommit(false);
+        runner.setFullLineDelimiter(true);
+        runner.setDelimiter(delimiter);
+        try {
+            Reader read = Resources.getResourceAsReader(sqlPath);
+            runner.runScript(read);
+            conn.commit();
+        } catch (Exception ignored) {
+
+        } finally {
+            runner.closeConnection();
+            conn.close();
+        }
+    }
+
     @Override
     protected Object convertDataType(final Object params) {
+        if (params instanceof java.util.Date) {
+            return LocalDateTime.ofInstant(Instant.ofEpochMilli(((Date) params).getTime()), ZoneId.systemDefault());
+        }
+        if (params instanceof java.sql.Blob) {
+            try {
+                return ((Blob) params).getBytes(1,((Number)((Blob)params).length()).intValue());
+            } catch (SQLException ex) {
+                log.error("convertDataType-> fail to conver dataType Blob to byte[],{}",ex.getSQLState(),ex.getNextException());
+            }
+        }
+        if (params instanceof java.math.BigDecimal) {
+            return ((Number)params).longValue();
+        }
         return params;
     }
 }
