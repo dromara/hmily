@@ -12,7 +12,6 @@
         <module>hmily-common</module>
         <module>hmily-core</module>
         <module>hmily-annotation</module>
-<!--        <module>hmily-admin</module>-->
         <module>hmily-spring-boot-starter</module>
         <module>hmily-spi</module>
         <module>hmily-serializer</module>
@@ -38,9 +37,9 @@
         </license>
     </licenses>
     <scm>
-        <url>https://github.com/yu199195/hmily.git</url>
-        <connection>scm:git:https://github.com/yu199195/hmily</connection>
-        <developerConnection>scm:git:git@github.com:yu199195/hmily</developerConnection>
+        <url>https://github.com/dromara/hmily.git</url>
+        <connection>scm:git:https://github.com/dromara/hmily</connection>
+        <developerConnection>scm:git:git@github.com:dromara/hmily</developerConnection>
         <tag>${project.version}</tag>
     </scm>
 
@@ -52,7 +51,7 @@
 
     <issueManagement>
         <system>GitHub Issues</system>
-        <url>https://github.com/yu199195/hmily/issues</url>
+        <url>https://github.com/dromara/hmily/issues</url>
     </issueManagement>
 
     <developers>
@@ -62,7 +61,7 @@
             <email>549477611@qq.com</email>
             <organization>dromara.org</organization>
             <roles>
-                <role>Developer</role>
+                <role>author</role>
             </roles>
         </developer>
     </developers>
