@@ -54,7 +54,7 @@ public class PostgresqlRepository extends AbstractHmilyDatabase {
     }
 
     @Override
-    protected void executeScript(Connection conn, String sqlPath) throws Exception {
+    protected void executeScript(final Connection conn, final String sqlPath) throws Exception {
         ScriptRunner runner = new ScriptRunner(conn);
         final String delimiter = "/";
         // doesn't print logger

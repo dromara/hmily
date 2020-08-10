@@ -52,7 +52,7 @@ public class MysqlRepository extends AbstractHmilyDatabase {
     }
 
     @Override
-    public void executeScript(Connection conn, final String sqlPath) throws Exception {
+    public void executeScript(final Connection conn, final String sqlPath) throws Exception {
         ScriptRunner runner = new ScriptRunner(conn);
         // doesn't print logger
         runner.setLogWriter(null);
