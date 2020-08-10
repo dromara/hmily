@@ -18,8 +18,13 @@
 package org.dromara.hmily.repository.database.sqlserver;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.ibatis.io.Resources;
+import org.apache.ibatis.jdbc.ScriptRunner;
 import org.dromara.hmily.repository.database.manager.AbstractHmilyDatabase;
 import org.dromara.hmily.spi.HmilySPI;
+
+import java.io.Reader;
+import java.sql.Connection;
 
 /**
  * The type Postgresql repository.
@@ -34,15 +39,34 @@ public class SqlserverRepository extends AbstractHmilyDatabase {
     protected String sqlFilePath() {
         return "sqlserver/schema.sql";
     }
-    
+
     @Override
     protected String hmilyTransactionLimitSql(final int limit) {
-        return null;
+        return SELECT_HMILY_TRANSACTION_DELAY.replace("select","select top "+limit) ;
     }
-    
+
     @Override
     protected String hmilyParticipantLimitSql(final int limit) {
-        return null;
+        return SELECTOR_HMILY_PARTICIPANT_WITH_DELAY_AND_APP_NAME_TRANS_TYPE.replace("select","select top "+limit);
+    }
+
+    @Override
+    protected void executeScript(Connection conn, String sqlPath) throws Exception {
+        ScriptRunner runner = new ScriptRunner(conn);
+        final String delimiter = "/";
+        // doesn't print logger
+        runner.setLogWriter(null);
+        // doesn't print Error logger
+        runner.setErrorLogWriter(null);
+        runner.setAutoCommit(false);
+        runner.setFullLineDelimiter(true);
+        runner.setDelimiter(delimiter);
+        Reader read = Resources.getResourceAsReader(sqlPath);
+        runner.runScript(read);
+        conn.commit();
+        runner.closeConnection();
+        conn.close();
+
     }
     
     @Override
