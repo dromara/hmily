@@ -230,7 +230,7 @@ public abstract class AbstractHmilyDatabase implements HmilyRepository {
      * @param conn the hmily conn
      * @param sqlPath schema.sql path
      */
-    protected abstract void executeScript(Connection conn, final String sqlPath) throws Exception;
+    protected abstract void executeScript(Connection conn, String sqlPath) throws Exception;
     
     /**
      * Convert data type object.
