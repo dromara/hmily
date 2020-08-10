@@ -6,70 +6,65 @@ Hmily
 [![Maven Central](https://img.shields.io/maven-central/v/org.dromara/hmily.svg?label=maven%20central)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.dromara%22%20AND%20hmily)
 [![QQ群](https://img.shields.io/badge/chat-on%20QQ-ff69b4.svg?style=flat-square)](https://shang.qq.com/wpa/qunwpa?idkey=2e9e353fa10924812bc58c10ab46de0ca6bef80e34168bccde275f7ca0cafd85)
 
-#### High-Performance distributed transaction solution (Try Confirm cancel).
+#### 分布式柔性事务解决方案
+ ![](https://yu199195.github.io/images/hmily/hmily.png) 
 
+#  功能
+   
+   *  支持 `Dubbo`, `SpringCloud`,`Montan` 等RPC框架进行分布式事务
+   
+   *  支持事务异常回滚，超时异常恢复，防止事务悬挂
+   
+   *  支持且套事务，支持RPC且套调用
+   
+   *  提供`spring namespace`, `springboot` 快速集成方式
+   
+   *  事务日志存储支持 `mysql`, `oracle`, `mongodb`, `redis`, `zookeeper` 等方式
+   
+   *  高性能，支持微服务集群部署
+   
+   *  提供后台管理可视化,以及metrics相关性能监控
+   
 
-# Modules
+# 必要前提 
 
-  * hmily-admin: Transaction log management background
+  * 必须使用 `JDK8+` 
   
-  * hmily-annotation : Framework common annotations
+  * 必须要使用一款 `RPC` 框架, 比如 : `Dubbo`, `SpringCloud`,`Montan`
   
-  * hmily-apache-dubbo : Support for the dubbo rpc framework 2.7.X
 
-  * hmily-common :  Framework common class
-  
-  * hmily-core : Framework core package (annotation processing, log storage...)              
-  
-  * hmily-dashboard : Management background front-end
-  
-  * hmily-dubbo : Support for the dubbo framework Less than 2.7 version
-  
-  * hmily-motan : Support for the motan rpc framework
-  
-  * hmily-springcloud : Support for the spring cloud rpc framework
-  
-  * hmily-spring-boot-starter : Support for the spring boot starter
-  
-  * hmily-demo : Examples using the hmily framework
+# TCC模式
+
+ ![](https://yu199195.github.io/images/hmily/hmily-tcc.png) 
  
-#  Features
-   
-   *  All spring versions are supported and Seamless integration
-   
-   *  Provides support for the springcloud dubbo motan RPC framework
-   
-   *  Provides integration of the spring boot starter approach
-   
-   *  Support Nested transaction 
-   
-   *  Local transaction storage support :  redis mongodb zookeeper file mysql
-   
-   *  Transaction log serialization support : java hessian kryo protostuff
-   
-   *  Spi extension : Users can customize the storage of serialization and transaction logs
+   当使用`TCC`模式的时候,用户根据自身业务需求提供 `try`, `confirm`, `cancel` 等三个方法，
+   并且 `confirm`, `cancel` 方法由自身完成实现，框架只是负责来调用，来达到事务的一致性。
 
-# Prerequisite 
+# TAC模式  
 
-  * You must use jdk1.8 +
-  
-  * You must be a user of the spring framework
-  
-  * You must use one of the dubbo, motan, and springcloud RPC frameworks 
-  
-# About 
+   当用户使用`TAC`模式的时候，用户必须使用关系型数据库来进行业务操作，框架会自动生成`回滚SQL`,
+   当业务异常的时候，会执行`回滚SQL`来达到事务的一致性。
+   
+# 文档
 
-   Hmily is a TCC solution for distributed transactions, Its rapid integration, zero penetration high performance has been run by a number of companies including my own company in the production environment.
+   如果你想使用，你可以参考[Quick Start](http://dromara.org/website/zh-cn/docs/hmily/index.html)   
   
-   Its performance is nearly lossless compared to your RPC framework, its confrim cancel, and its log store is conducted asynchronously using a disruptor.
+# 关于Hmily 
+    
+   Hmily是柔性分布式事务解决方案，提供了`TCC` 与 `TAC` 模式。它以零侵入以及快速集成方式能够方便的被业务进行整合，
+   
+   在性能上，日志存储异步（可选）以及使用异步执行的方式，不损耗业务方法方法。
+   
+   目前由京东数科技术研发人员来主导，未来会成为京东数科柔性分布式事务解决方案。
+
   
-   If you want to use it or get a quick look at it. [Quick Start](http://dromara.org/website/zh-cn/docs/hmily/index.html)
-  
-# Stargazers
+# 关注趋势
 
 [![Stargazers over time](https://starchart.cc/yu199195/hmily.svg)](https://starchart.cc/yu199195/hmily) 
  
-# Support
+# 用户墙
+ 
+# 支持
 
   ![](https://yu199195.github.io/images/qq.png)    ![](https://yu199195.github.io/images/public.jpg)
  
