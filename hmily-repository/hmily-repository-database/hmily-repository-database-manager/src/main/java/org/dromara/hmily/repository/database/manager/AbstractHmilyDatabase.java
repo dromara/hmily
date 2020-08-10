@@ -223,6 +223,14 @@ public abstract class AbstractHmilyDatabase implements HmilyRepository {
      * @return the string
      */
     protected abstract String hmilyParticipantLimitSql(int limit);
+
+    /**
+     * Execte schema.sql by different database.
+     *
+     * @param conn the hmily conn
+     * @param sqlPath schema.sql path
+     */
+    protected abstract void executeScript(Connection conn, final String sqlPath) throws Exception;
     
     /**
      * Convert data type object.
@@ -498,7 +506,7 @@ public abstract class AbstractHmilyDatabase implements HmilyRepository {
             while (rs.next()) {
                 Map<String, Object> rowData = Maps.newHashMap();
                 for (int i = 1; i <= columnCount; i++) {
-                    rowData.put(md.getColumnName(i), rs.getObject(i));
+                    rowData.put(md.getColumnName(i).toLowerCase(), convertDataType(rs.getObject(i)));
                 }
                 list.add(rowData);
             }
@@ -514,10 +522,10 @@ public abstract class AbstractHmilyDatabase implements HmilyRepository {
         HmilyTransaction hmilyTransaction = new HmilyTransaction();
         hmilyTransaction.setTransId((Long) map.get("trans_id"));
         hmilyTransaction.setTransType((String) map.get("trans_type"));
-        hmilyTransaction.setStatus((Integer) map.get("status"));
-        hmilyTransaction.setAppName((String) map.get("app_ame"));
-        hmilyTransaction.setRetry((Integer) map.get("retry"));
-        hmilyTransaction.setVersion((Integer) map.get("version"));
+        hmilyTransaction.setStatus(Integer.parseInt((map.get("status").toString())));
+        hmilyTransaction.setAppName((String) map.get("app_name"));
+        hmilyTransaction.setRetry(Integer.parseInt((map.get("retry").toString())));
+        hmilyTransaction.setVersion(Integer.parseInt((map.get("version")).toString()));
         return hmilyTransaction;
     }
     
@@ -534,7 +542,7 @@ public abstract class AbstractHmilyDatabase implements HmilyRepository {
         } catch (HmilySerializerException e) {
             log.error("hmilySerializer deSerialize have exception:{} ", e.getMessage());
         }
-        undo.setStatus((Integer) map.get("status"));
+        undo.setStatus(Integer.parseInt((map.get("status")).toString()));
         return undo;
     }
     
@@ -544,9 +552,9 @@ public abstract class AbstractHmilyDatabase implements HmilyRepository {
         hmilyParticipant.setParticipantRefId((Long) map.get("participant_ref_id"));
         hmilyParticipant.setTransId((Long) map.get("trans_id"));
         hmilyParticipant.setTransType((String) map.get("trans_type"));
-        hmilyParticipant.setStatus((Integer) map.get("status"));
-        hmilyParticipant.setRole((Integer) map.get("role"));
-        hmilyParticipant.setRetry((Integer) map.get("retry"));
+        hmilyParticipant.setStatus(Integer.parseInt((map.get("status")).toString()));
+        hmilyParticipant.setRole(Integer.parseInt((map.get("role")).toString()));
+        hmilyParticipant.setRetry(Integer.parseInt((map.get("retry")).toString()));
         hmilyParticipant.setAppName((String) map.get("app_name"));
         hmilyParticipant.setTargetClass((String) map.get("target_class"));
         hmilyParticipant.setTargetMethod((String) map.get("target_method"));
@@ -566,7 +574,7 @@ public abstract class AbstractHmilyDatabase implements HmilyRepository {
         } catch (HmilySerializerException e) {
             log.error("hmilySerializer deSerialize have exception:{} ", e.getMessage());
         }
-        hmilyParticipant.setVersion((Integer) map.get("version"));
+        hmilyParticipant.setVersion(Integer.parseInt((map.get("version")).toString()));
         return hmilyParticipant;
     }
     
@@ -586,18 +594,5 @@ public abstract class AbstractHmilyDatabase implements HmilyRepository {
                 log.error(e.getMessage());
             }
         }
-    }
-    
-    private void executeScript(final Connection conn, final String sqlPath) throws Exception {
-        ScriptRunner runner = new ScriptRunner(conn);
-        // doesn't print logger
-        runner.setLogWriter(null);
-        runner.setAutoCommit(false);
-        Resources.setCharset(StandardCharsets.UTF_8);
-        Reader read = Resources.getResourceAsReader(sqlPath);
-        runner.runScript(read);
-        conn.commit();
-        runner.closeConnection();
-        conn.close();
     }
 }
