@@ -18,8 +18,14 @@
 package org.dromara.hmily.repository.database.mysql;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.ibatis.io.Resources;
+import org.apache.ibatis.jdbc.ScriptRunner;
 import org.dromara.hmily.repository.database.manager.AbstractHmilyDatabase;
 import org.dromara.hmily.spi.HmilySPI;
+
+import java.io.Reader;
+import java.nio.charset.StandardCharsets;
+import java.sql.Connection;
 
 /**
  * The type Mysql repository.
@@ -44,7 +50,21 @@ public class MysqlRepository extends AbstractHmilyDatabase {
     protected String hmilyParticipantLimitSql(final int limit) {
         return SELECTOR_HMILY_PARTICIPANT_WITH_DELAY_AND_APP_NAME_TRANS_TYPE + " limit " + limit;
     }
-    
+
+    @Override
+    public void executeScript(final Connection conn, final String sqlPath) throws Exception {
+        ScriptRunner runner = new ScriptRunner(conn);
+        // doesn't print logger
+        runner.setLogWriter(null);
+        runner.setAutoCommit(false);
+        Resources.setCharset(StandardCharsets.UTF_8);
+        Reader read = Resources.getResourceAsReader(sqlPath);
+        runner.runScript(read);
+        conn.commit();
+        runner.closeConnection();
+        conn.close();
+    }
+
     @Override
     protected Object convertDataType(final Object params) {
         return params;
