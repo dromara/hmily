@@ -49,12 +49,12 @@ public class OracleRepository extends AbstractHmilyDatabase {
 
     @Override
     protected String hmilyTransactionLimitSql(final int limit) {
-        return SELECT_HMILY_TRANSACTION_DELAY  + " and rownum <= "+limit;
+        return SELECT_HMILY_TRANSACTION_DELAY  + " and rownum <= " + limit;
     }
 
     @Override
     protected String hmilyParticipantLimitSql(final int limit) {
-        return SELECTOR_HMILY_PARTICIPANT_WITH_DELAY_AND_APP_NAME_TRANS_TYPE+ "and rownum <= "+limit;
+        return SELECTOR_HMILY_PARTICIPANT_WITH_DELAY_AND_APP_NAME_TRANS_TYPE+ "and rownum <= " + limit;
     }
 
     @Override
