@@ -65,7 +65,6 @@ public class HmilyAutoConfiguration {
         contextAware.setRetryMax(hmilyConfigProperties.getRetryMax());
         contextAware.setBufferSize(hmilyConfigProperties.getBufferSize());
         contextAware.setConsumerThreads(hmilyConfigProperties.getConsumerThreads());
-        contextAware.setAsyncThreads(hmilyConfigProperties.getAsyncThreads());
         contextAware.setAsyncRepository(hmilyConfigProperties.isAsyncRepository());
         contextAware.setAutoSql(hmilyConfigProperties.isAutoSql());
         contextAware.setPhyDeleted(hmilyConfigProperties.isPhyDeleted());
