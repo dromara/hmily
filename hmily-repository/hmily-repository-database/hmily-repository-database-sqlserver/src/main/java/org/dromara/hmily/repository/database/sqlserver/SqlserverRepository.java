@@ -57,20 +57,26 @@ public class SqlserverRepository extends AbstractHmilyDatabase {
         // doesn't print logger
         runner.setLogWriter(null);
         // doesn't print Error logger
-        runner.setErrorLogWriter(null);
+       /* runner.setErrorLogWriter(null);*/
         runner.setAutoCommit(false);
         runner.setFullLineDelimiter(true);
         runner.setDelimiter(delimiter);
-        Reader read = Resources.getResourceAsReader(sqlPath);
-        runner.runScript(read);
-        conn.commit();
-        runner.closeConnection();
-        conn.close();
+        try {
+            Reader read = Resources.getResourceAsReader(sqlPath);
+            runner.runScript(read);
+            conn.commit();
+        } catch (Exception ignored) {
 
-    }
+        } finally {
+            runner.closeConnection();
+            conn.close();
+        }    }
     
     @Override
     protected Object convertDataType(final Object params) {
+        if (params instanceof java.lang.Integer) {
+            return ((Number)params).longValue();
+        }
         return params;
     }
 }
