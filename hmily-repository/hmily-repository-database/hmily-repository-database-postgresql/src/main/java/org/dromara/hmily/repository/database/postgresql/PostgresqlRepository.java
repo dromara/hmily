@@ -18,6 +18,7 @@
 package org.dromara.hmily.repository.database.postgresql;
 
 import java.io.Reader;
+import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -56,14 +57,11 @@ public class PostgresqlRepository extends AbstractHmilyDatabase {
     @Override
     protected void executeScript(final Connection conn, final String sqlPath) throws Exception {
         ScriptRunner runner = new ScriptRunner(conn);
-        final String delimiter = "/";
         // doesn't print logger
         runner.setLogWriter(null);
-        // doesn't print Error logger
-        runner.setErrorLogWriter(null);
         runner.setAutoCommit(false);
-        runner.setFullLineDelimiter(true);
-        runner.setDelimiter(delimiter);
+        runner.setSendFullScript(true);
+        Resources.setCharset(StandardCharsets.UTF_8);
         Reader read = Resources.getResourceAsReader(sqlPath);
         runner.runScript(read);
         conn.commit();
