@@ -22,9 +22,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-
 /**
- * The interface HmilyXA.
+ * The annotation HmilyXA.
  *
  * @author xiaoyu
  */

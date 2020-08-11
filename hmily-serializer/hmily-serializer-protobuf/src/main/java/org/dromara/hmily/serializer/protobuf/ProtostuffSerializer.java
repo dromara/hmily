@@ -34,7 +34,7 @@ import org.objenesis.ObjenesisStd;
  *
  * @author xiaoyu
  */
-@SuppressWarnings("unchecked")
+@SuppressWarnings("all")
 @HmilySPI("protostuff")
 public class ProtostuffSerializer implements HmilySerializer {
 

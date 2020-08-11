@@ -40,8 +40,6 @@
          <property name="scheduledRecoveryDelay" value="60"/>
          <property name="scheduledThreadMax" value="4"/>
          <property name="repository" value="mysql"/>
-         <property name="asyncThreads" value="200"/>
-         <property name="started" value="true"/>
          <property name="hmilyDbConfig">
              <bean class="org.dromara.hmily.config.HmilyDbConfig">
                  <property name="url"

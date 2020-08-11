@@ -58,5 +58,4 @@ public class HmilyTransactionContext {
      * transType.
      */
     private String transType;
-    
 }
