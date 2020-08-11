@@ -46,12 +46,12 @@ public class PostgresqlRepository extends AbstractHmilyDatabase {
 
     @Override
     protected String hmilyTransactionLimitSql(final int limit) {
-        return SELECT_HMILY_TRANSACTION_DELAY + " limit "+limit;
+        return SELECT_HMILY_TRANSACTION_DELAY + " limit " + limit;
     }
 
     @Override
     protected String hmilyParticipantLimitSql(final int limit) {
-        return SELECTOR_HMILY_PARTICIPANT_WITH_DELAY_AND_APP_NAME_TRANS_TYPE + " limit "+limit;
+        return SELECTOR_HMILY_PARTICIPANT_WITH_DELAY_AND_APP_NAME_TRANS_TYPE + " limit " + limit;
     }
 
     @Override
