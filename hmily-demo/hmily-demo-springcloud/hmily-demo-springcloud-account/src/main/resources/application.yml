@@ -26,7 +26,6 @@ org:
             scheduled-recovery-delay: 60
             scheduledThreadMax :  10
             repository : mysql
-            started: false
             hmilyDbConfig :
                  driverClassName  : com.mysql.jdbc.Driver
                  url: jdbc:mysql://127.0.0.1:3306/hmily?useUnicode=true&characterEncoding=utf8

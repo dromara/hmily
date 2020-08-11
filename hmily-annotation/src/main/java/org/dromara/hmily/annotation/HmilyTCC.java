@@ -24,7 +24,7 @@ import java.lang.annotation.Target;
 
 
 /**
- * The interface Hmily.
+ * The annotation HmilyTAC.
  *
  * @author xiaoyu
  */
