@@ -17,14 +17,13 @@
 
 package org.dromara.hmily.repository.database.sqlserver;
 
+import java.io.Reader;
+import java.sql.Connection;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.jdbc.ScriptRunner;
 import org.dromara.hmily.repository.database.manager.AbstractHmilyDatabase;
 import org.dromara.hmily.spi.HmilySPI;
-
-import java.io.Reader;
-import java.sql.Connection;
 
 /**
  * The type Postgresql repository.
@@ -42,7 +41,7 @@ public class SqlserverRepository extends AbstractHmilyDatabase {
 
     @Override
     protected String hmilyTransactionLimitSql(final int limit) {
-        return SELECT_HMILY_TRANSACTION_DELAY.replace("select","select top "+limit) ;
+        return SELECT_HMILY_TRANSACTION_DELAY.replace("select","select top " + limit) ;
     }
 
     @Override
@@ -66,11 +65,12 @@ public class SqlserverRepository extends AbstractHmilyDatabase {
             runner.runScript(read);
             conn.commit();
         } catch (Exception ignored) {
-
+        
         } finally {
             runner.closeConnection();
             conn.close();
-        }    }
+        }
+    }
     
     @Override
     protected Object convertDataType(final Object params) {
