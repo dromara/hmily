@@ -8,10 +8,10 @@ spring:
     main:
         allow-bean-definition-overriding: true
     datasource:
-        driver-class-name:  com.mysql.jdbc.Driver
-        url: jdbc:mysql://127.0.01:3306/tcc_stock?useUnicode=true&characterEncoding=utf8
-        username: root
-        password:
+      driver-class-name:  com.mysql.jdbc.Driver
+      url: jdbc:mysql://127.0.0.1:3306/tcc_stock?useUnicode=true&characterEncoding=utf8
+      username: root
+      password: 123456
     application:
       name: inventory-service
 

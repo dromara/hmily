@@ -21,12 +21,12 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.mongodb.MongoCredential;
 import com.mongodb.ServerAddress;
-import java.net.InetSocketAddress;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import javafx.util.Pair;
 import org.dromara.hmily.config.HmilyConfig;
 import org.dromara.hmily.config.HmilyMongoConfig;
+import org.dromara.hmily.repository.mongodb.entity.ParticipantMongoAdapter;
+import org.dromara.hmily.repository.mongodb.entity.TransactionMongoAdapter;
+import org.dromara.hmily.repository.mongodb.entity.UndoMongoAdapter;
 import org.dromara.hmily.repository.spi.HmilyRepository;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipant;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipantUndo;
@@ -37,7 +37,14 @@ import org.dromara.hmily.spi.HmilySPI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.MongoClientFactoryBean;
-import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+
+import java.net.InetSocketAddress;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * mongo impl.
@@ -51,18 +58,19 @@ public class MongodbRepository implements HmilyRepository {
     
     private HmilySerializer hmilySerializer;
     
-    private MongoTemplate template;
-    
-    private String collectionName;
-    
+    private MongodbTemplateService service;
+
+    private String appName;
+
     @Override
     public void init(final HmilyConfig hmilyConfig) {
-        collectionName = hmilyConfig.getAppName();
+        appName = hmilyConfig.getAppName();
         final HmilyMongoConfig hmilyMongoConfig = hmilyConfig.getHmilyMongoConfig();
         MongoClientFactoryBean clientFactoryBean = buildMongoClientFactoryBean(hmilyMongoConfig);
         try {
             clientFactoryBean.afterPropertiesSet();
-            template = new MongoTemplate(Objects.requireNonNull(clientFactoryBean.getObject()), hmilyMongoConfig.getMongoDbName());
+            service = new MongodbTemplateService(Objects.requireNonNull(clientFactoryBean.getObject()),
+                    hmilyMongoConfig.getMongoDbName());
         } catch (Exception e) {
             LOGGER.error("mongo init error please check you config:{}", e.getMessage());
             throw new HmilyRepositoryException(e);
@@ -92,107 +100,166 @@ public class MongodbRepository implements HmilyRepository {
     }
     
     @Override
-    public int createHmilyTransaction(HmilyTransaction hmilyTransaction) throws HmilyRepositoryException {
-        return 0;
+    public int createHmilyTransaction(HmilyTransaction hmilyTransaction) {
+        return service.insertc(TransactionMongoAdapter.create(hmilyTransaction,appName));
     }
-    
+
+
+
     @Override
     public int updateRetryByLock(HmilyTransaction hmilyTransaction) {
-        return 0;
+        return service.update(TransactionMongoAdapter.class,
+                Criteria.where("trans_id").is(hmilyTransaction.getTransId())
+                .and("version").is(hmilyTransaction.getVersion()),
+                set("version",hmilyTransaction.getVersion() + 1),
+                set("retry",hmilyTransaction.getRetry() + 1)
+                );
     }
     
     @Override
     public HmilyTransaction findByTransId(Long transId) {
-        return null;
+        return service.find(TransactionMongoAdapter.class,Criteria.where("trans_id").is(transId))
+                .stream().map(e->e.convert()).findFirst().orElse(null);
     }
     
     @Override
     public List<HmilyTransaction> listLimitByDelay(Date date, int limit) {
-        return null;
+        return service.find(TransactionMongoAdapter.class,
+                Criteria.where("update_time").lt(date)
+                .and("app_name").is(appName),limit)
+                .stream().filter(Objects::nonNull).map(e->e.convert())
+                .collect(Collectors.toList());
     }
     
     @Override
     public int updateHmilyTransactionStatus(Long transId, Integer status) throws HmilyRepositoryException {
-        return 0;
+        return service.update(TransactionMongoAdapter.class,
+                Criteria.where("trans_id").is(transId),
+                set("status",status));
     }
-    
+
     @Override
-    public int removeHmilyTransaction(Long transId) {
-        return 0;
+    public int removeHmilyTransaction(final Long transId) {
+        return service.delete(TransactionMongoAdapter.class,Criteria.where("trans_id").is(transId));
     }
-    
+
     @Override
-    public int removeHmilyTransactionByData(Date date) {
-        return 0;
+    public int createHmilyParticipant(final HmilyParticipant hmilyParticipant) throws HmilyRepositoryException {
+        return service.insertc(ParticipantMongoAdapter.create(hmilyParticipant,hmilySerializer,appName));
     }
-    
+
     @Override
-    public int createHmilyParticipant(HmilyParticipant hmilyParticipant) throws HmilyRepositoryException {
-        return 0;
+    public List<HmilyParticipant> findHmilyParticipant(final Long participantId) {
+        List<HmilyParticipant> hmilyParticipantList = new ArrayList<>();
+        HmilyParticipant hmilyParticipant = service.find(ParticipantMongoAdapter.class,
+                Criteria.where("participant_id").is(participantId))
+                .stream().filter(Objects::nonNull)
+                .map(e -> e.convert(hmilySerializer))
+                .findFirst().orElse(null);
+        if (hmilyParticipant != null) {
+
+            hmilyParticipantList.add(hmilyParticipant);
+            service.find(ParticipantMongoAdapter.class,
+                    Criteria.where("participant_ref_id").is(participantId))
+                    .stream().filter(Objects::nonNull)
+                    .map(e->e.convert(hmilySerializer))
+                    .collect(Collectors.toCollection(()->hmilyParticipantList));
+        }
+        return hmilyParticipantList;
     }
-    
+
+
     @Override
-    public List<HmilyParticipant> findHmilyParticipant(Long participantId) {
-        return null;
+    public List<HmilyParticipant> listHmilyParticipant(final Date date, final String transType, final int limit) {
+        return service.find(ParticipantMongoAdapter.class,
+                Criteria.where("update_time").lt(date)
+                    .and("app_name").is(appName)
+                    .and("trans_type").is(transType)
+                    .and("status").nin(4,8),limit
+                )
+                .stream().filter(Objects::nonNull).map(e->e.convert(hmilySerializer))
+                .collect(Collectors.toList());
     }
-    
+
+
     @Override
-    public List<HmilyParticipant> listHmilyParticipant(Date date, String transType, int limit) {
-        return null;
+    public List<HmilyParticipant> listHmilyParticipantByTransId(final Long transId) {
+        return service.find(ParticipantMongoAdapter.class,
+                Criteria.where("trans_id").is(transId))
+                .stream().filter(Objects::nonNull).map(e->e.convert(hmilySerializer))
+                .collect(Collectors.toList());
     }
-    
+
     @Override
-    public List<HmilyParticipant> listHmilyParticipantByTransId(Long transId) {
-        return null;
+    public boolean existHmilyParticipantByTransId(final Long transId) {
+        return service.count(ParticipantMongoAdapter.class,Criteria.where("trans_id").is(transId))>0;
     }
-    
+
     @Override
-    public boolean existHmilyParticipantByTransId(Long transId) {
-        return false;
+    public int createHmilyParticipantUndo(final HmilyParticipantUndo undo) {
+        return service.insertc(UndoMongoAdapter.create(undo,hmilySerializer));
     }
-    
+
+
+
     @Override
-    public int updateHmilyParticipantStatus(Long participantId, Integer status) throws HmilyRepositoryException {
-        return 0;
+    public List<HmilyParticipantUndo> findHmilyParticipantUndoByParticipantId(final Long participantId) {
+        return service.find(UndoMongoAdapter.class, Criteria.where("participant_id").is(participantId))
+                .stream().map(e->e.convert(hmilySerializer)).collect(Collectors.toList());
     }
-    
+
     @Override
-    public int removeHmilyParticipant(Long participantId) {
-        return 0;
+    public int updateHmilyParticipantUndoStatus(final Long undoId, final Integer status) {
+        return service.update(UndoMongoAdapter.class,Criteria.where("undo_id").is(undoId),set("status",status));
     }
-    
+
     @Override
-    public int removeHmilyParticipantByData(Date date) {
-        return 0;
+    public int removeHmilyTransactionByData(final Date date) {
+        return service.delete(TransactionMongoAdapter.class,
+                Criteria.where("update_time").lt(date).and("status").is(4));
     }
-    
+
+    @Override
+    public int removeHmilyParticipantByData(final Date date) {
+        return service.delete(ParticipantMongoAdapter.class,
+                Criteria.where("update_time").lt(date).and("status").is(4));
+    }
+
     @Override
     public boolean lockHmilyParticipant(HmilyParticipant hmilyParticipant) {
-        return false;
+        return service.update(ParticipantMongoAdapter.class,
+                Criteria.where("participant_id").is(hmilyParticipant.getParticipantId())
+                .and("version").is(hmilyParticipant.getVersion()),
+                set("version",hmilyParticipant.getVersion() + 1),
+                set("retry",hmilyParticipant.getRetry() + 1))>0;
     }
-    
+
     @Override
-    public int createHmilyParticipantUndo(HmilyParticipantUndo hmilyParticipantUndo) {
-        return 0;
+    public int removeHmilyParticipantUndoByData(final Date date) {
+        return service.delete(UndoMongoAdapter.class,
+                Criteria.where("update_time").lt(date).and("status").is(4));
     }
-    
+
     @Override
-    public List<HmilyParticipantUndo> findHmilyParticipantUndoByParticipantId(Long participantId) {
-        return null;
+    public int removeHmilyParticipantUndo(final Long undoId) {
+        return service.delete(UndoMongoAdapter.class,
+                Criteria.where("undo_id").is(undoId));
     }
-    
+
     @Override
-    public int removeHmilyParticipantUndo(Long undoId) {
-        return 0;
+    public int updateHmilyParticipantStatus(final Long participantId, final Integer status) {
+        return service.update(ParticipantMongoAdapter.class,
+                Criteria.where("participant_id").is(participantId),
+                set("status",status));
     }
-    
+
     @Override
-    public int removeHmilyParticipantUndoByData(Date date) {
-        return 0;
+    public int removeHmilyParticipant(final Long participantId) {
+        return service.delete(ParticipantMongoAdapter.class,
+                Criteria.where("participant_id").is(participantId));
     }
-    
-    @Override
-    public int updateHmilyParticipantUndoStatus(Long undoId, Integer status) {
-        return 0;
+    private Pair<String, Object> set(String key, Object value) {
+        return new Pair<>(key, value);
     }
+
 }
