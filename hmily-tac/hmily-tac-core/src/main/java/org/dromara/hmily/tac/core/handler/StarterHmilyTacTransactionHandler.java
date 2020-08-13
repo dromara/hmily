@@ -17,13 +17,21 @@
 
 package org.dromara.hmily.tac.core.handler;
 
+import java.util.Optional;
+import java.util.function.Supplier;
 import org.aspectj.lang.ProceedingJoinPoint;
+import org.dromara.hmily.annotation.TransTypeEnum;
+import org.dromara.hmily.common.enums.HmilyActionEnum;
+import org.dromara.hmily.common.enums.HmilyRoleEnum;
 import org.dromara.hmily.core.context.HmilyContextHolder;
 import org.dromara.hmily.core.context.HmilyTransactionContext;
 import org.dromara.hmily.core.disruptor.DisruptorProviderManage;
 import org.dromara.hmily.core.disruptor.handler.HmilyTransactionExecutorHandler;
 import org.dromara.hmily.core.service.HmilyTransactionHandler;
 import org.dromara.hmily.core.service.HmilyTransactionHandlerAlbum;
+import org.dromara.hmily.metrics.enums.MetricsLabelEnum;
+import org.dromara.hmily.metrics.spi.MetricsHandlerFacade;
+import org.dromara.hmily.metrics.spi.MetricsHandlerFacadeEngine;
 import org.dromara.hmily.repository.spi.entity.HmilyTransaction;
 import org.dromara.hmily.tac.core.transaction.HmilyTacStarterTransaction;
 
@@ -52,7 +60,13 @@ public class StarterHmilyTacTransactionHandler implements HmilyTransactionHandle
     public Object handler(final ProceedingJoinPoint point, final HmilyTransactionContext context)
             throws Throwable {
         Object returnValue;
+        Supplier<Boolean> histogramSupplier = null;
+        Optional<MetricsHandlerFacade> handlerFacade = MetricsHandlerFacadeEngine.load();
         try {
+            if (handlerFacade.isPresent()) {
+                handlerFacade.get().counterIncrement(MetricsLabelEnum.TRANSACTION_TOTAL.getName(), TransTypeEnum.TAC.name());
+                histogramSupplier = handlerFacade.get().histogramStartTimer(MetricsLabelEnum.TRANSACTION_LATENCY.getName(), TransTypeEnum.TAC.name());
+            }
             globalTransaction.begin();
             try {
                 //execute try
@@ -60,15 +74,26 @@ public class StarterHmilyTacTransactionHandler implements HmilyTransactionHandle
             } catch (Throwable throwable) {
                 //if exception ,execute cancel
                 final HmilyTransaction currentTransaction = globalTransaction.getHmilyTransaction();
-                disruptorProviderManage.getProvider().onData(() -> globalTransaction.rollback(currentTransaction));
+                disruptorProviderManage.getProvider().onData(() -> {
+                    handlerFacade.ifPresent(metricsHandlerFacade -> metricsHandlerFacade.counterIncrement(MetricsLabelEnum.TRANSACTION_STATUS.getName(),
+                            TransTypeEnum.TAC.name(), HmilyRoleEnum.START.name(), HmilyActionEnum.CANCELING.name()));
+                    globalTransaction.rollback(currentTransaction);
+                });
                 throw throwable;
             }
             // execute confirm
             final HmilyTransaction currentTransaction = globalTransaction.getHmilyTransaction();
-            disruptorProviderManage.getProvider().onData(() -> globalTransaction.commit(currentTransaction));
+            disruptorProviderManage.getProvider().onData(() -> {
+                handlerFacade.ifPresent(metricsHandlerFacade -> metricsHandlerFacade.counterIncrement(MetricsLabelEnum.TRANSACTION_STATUS.getName(),
+                        TransTypeEnum.TAC.name(), HmilyRoleEnum.START.name(), HmilyActionEnum.CONFIRMING.name()));
+                globalTransaction.commit(currentTransaction);
+            });
         } finally {
             HmilyContextHolder.remove();
             globalTransaction.remove();
+            if (null != histogramSupplier) {
+                histogramSupplier.get();
+            }
         }
         return returnValue;
     }

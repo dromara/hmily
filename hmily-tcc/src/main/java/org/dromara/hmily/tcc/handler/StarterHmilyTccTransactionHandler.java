@@ -17,17 +17,24 @@
 
 package org.dromara.hmily.tcc.handler;
 
+import java.util.Optional;
+import java.util.function.Supplier;
 import org.aspectj.lang.ProceedingJoinPoint;
+import org.dromara.hmily.annotation.TransTypeEnum;
+import org.dromara.hmily.common.enums.HmilyActionEnum;
+import org.dromara.hmily.common.enums.HmilyRoleEnum;
 import org.dromara.hmily.core.context.HmilyContextHolder;
 import org.dromara.hmily.core.context.HmilyTransactionContext;
-import org.dromara.hmily.common.enums.HmilyActionEnum;
 import org.dromara.hmily.core.disruptor.DisruptorProviderManage;
 import org.dromara.hmily.core.disruptor.handler.HmilyTransactionExecutorHandler;
 import org.dromara.hmily.core.holder.HmilyTransactionHolder;
 import org.dromara.hmily.core.service.HmilyTransactionHandler;
 import org.dromara.hmily.core.service.HmilyTransactionHandlerAlbum;
-import org.dromara.hmily.tcc.executor.HmilyTccTransactionExecutor;
+import org.dromara.hmily.metrics.enums.MetricsLabelEnum;
+import org.dromara.hmily.metrics.spi.MetricsHandlerFacade;
+import org.dromara.hmily.metrics.spi.MetricsHandlerFacadeEngine;
 import org.dromara.hmily.repository.spi.entity.HmilyTransaction;
+import org.dromara.hmily.tcc.executor.HmilyTccTransactionExecutor;
 
 
 /**
@@ -51,7 +58,13 @@ public class StarterHmilyTccTransactionHandler implements HmilyTransactionHandle
     public Object handler(final ProceedingJoinPoint point, final HmilyTransactionContext context)
             throws Throwable {
         Object returnValue;
+        Supplier<Boolean> histogramSupplier = null;
+        Optional<MetricsHandlerFacade> handlerFacade = MetricsHandlerFacadeEngine.load();
         try {
+            if (handlerFacade.isPresent()) {
+                handlerFacade.get().counterIncrement(MetricsLabelEnum.TRANSACTION_TOTAL.getName(), TransTypeEnum.TCC.name());
+                histogramSupplier = handlerFacade.get().histogramStartTimer(MetricsLabelEnum.TRANSACTION_LATENCY.getName(), TransTypeEnum.TCC.name());
+            }
             HmilyTransaction hmilyTransaction = executor.preTry(point);
             try {
                 //execute try
@@ -61,15 +74,26 @@ public class StarterHmilyTccTransactionHandler implements HmilyTransactionHandle
             } catch (Throwable throwable) {
                 //if exception ,execute cancel
                 final HmilyTransaction currentTransaction = HmilyTransactionHolder.getInstance().getCurrentTransaction();
-                disruptorProviderManage.getProvider().onData(() -> executor.globalCancel(currentTransaction));
+                disruptorProviderManage.getProvider().onData(() -> {
+                    handlerFacade.ifPresent(metricsHandlerFacade -> metricsHandlerFacade.counterIncrement(MetricsLabelEnum.TRANSACTION_STATUS.getName(),
+                            TransTypeEnum.TCC.name(), HmilyRoleEnum.START.name(), HmilyActionEnum.CANCELING.name()));
+                    executor.globalCancel(currentTransaction);
+                });
                 throw throwable;
             }
             //execute confirm
             final HmilyTransaction currentTransaction = HmilyTransactionHolder.getInstance().getCurrentTransaction();
-            disruptorProviderManage.getProvider().onData(() -> executor.globalConfirm(currentTransaction));
+            disruptorProviderManage.getProvider().onData(() -> {
+                handlerFacade.ifPresent(metricsHandlerFacade -> metricsHandlerFacade.counterIncrement(MetricsLabelEnum.TRANSACTION_STATUS.getName(),
+                        TransTypeEnum.TCC.name(), HmilyRoleEnum.START.name(), HmilyActionEnum.CONFIRMING.name()));
+                executor.globalConfirm(currentTransaction);
+            });
         } finally {
             HmilyContextHolder.remove();
             executor.remove();
+            if (null != histogramSupplier) {
+                histogramSupplier.get();
+            }
         }
         return returnValue;
     }
