@@ -33,6 +33,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import javax.sql.DataSource;
 import lombok.extern.slf4j.Slf4j;
+import org.dromara.hmily.common.exception.HmilyRuntimeException;
 import org.dromara.hmily.common.utils.CollectionUtils;
 import org.dromara.hmily.config.HmilyConfig;
 import org.dromara.hmily.config.HmilyDbConfig;
@@ -251,7 +252,7 @@ public abstract class AbstractHmilyDatabase implements HmilyRepository {
             }
         } catch (Exception e) {
             log.error("hmily jdbc log init exception please check config:{}", e.getMessage());
-            throw new RuntimeException(e);
+            throw new HmilyRuntimeException(e.getMessage());
         }
     }
     
