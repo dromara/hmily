@@ -20,7 +20,6 @@ package org.dromara.hmily.repository.database.manager;
 import com.google.common.collect.Maps;
 import com.zaxxer.hikari.HikariDataSource;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -34,7 +33,6 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import javax.sql.DataSource;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.dromara.hmily.common.exception.HmilyRuntimeException;
 import org.dromara.hmily.common.utils.CollectionUtils;
 import org.dromara.hmily.config.HmilyConfig;
@@ -199,13 +197,6 @@ public abstract class AbstractHmilyDatabase implements HmilyRepository {
     private String appName;
     
     /**
-     * Sql file path string.
-     *
-     * @return the string
-     */
-    protected abstract String sqlFilePath();
-    
-    /**
      * Hmily transaction limit sql string.
      *
      * @param limit the limit
@@ -220,14 +211,13 @@ public abstract class AbstractHmilyDatabase implements HmilyRepository {
      * @return the string
      */
     protected abstract String hmilyParticipantLimitSql(int limit);
-
+    
     /**
      * Execte schema.sql by different database.
      *
-     * @param conn the hmily conn
-     * @param sqlPath schema.sql path
+     * @param hmilyDbConfig the hmilyDbConfig
      */
-    protected abstract void executeScript(Connection conn, String sqlPath) throws Exception;
+    protected abstract void initScript(HmilyDbConfig hmilyDbConfig) throws Exception;
     
     /**
      * Convert data type object.
@@ -258,9 +248,7 @@ public abstract class AbstractHmilyDatabase implements HmilyRepository {
             this.dataSource = hikariDataSource;
             this.appName = hmilyConfig.getAppName();
             if (hmilyConfig.isAutoSql()) {
-                String jdbcUrl = StringUtils.replace(hmilyDbConfig.getUrl(), "/hmily?", "?");
-                Connection connection = DriverManager.getConnection(jdbcUrl, hmilyDbConfig.getUsername(), hmilyDbConfig.getPassword());
-                this.executeScript(connection, sqlFilePath());
+                this.initScript(hmilyDbConfig);
             }
         } catch (Exception e) {
             log.error("hmily jdbc log init exception please check config:{}", e.getMessage());
@@ -519,9 +507,9 @@ public abstract class AbstractHmilyDatabase implements HmilyRepository {
         HmilyTransaction hmilyTransaction = new HmilyTransaction();
         hmilyTransaction.setTransId((Long) map.get("trans_id"));
         hmilyTransaction.setTransType((String) map.get("trans_type"));
-        hmilyTransaction.setStatus(Integer.parseInt((map.get("status").toString())));
+        hmilyTransaction.setStatus(Integer.parseInt(map.get("status").toString()));
         hmilyTransaction.setAppName((String) map.get("app_name"));
-        hmilyTransaction.setRetry(Integer.parseInt((map.get("retry").toString())));
+        hmilyTransaction.setRetry(Integer.parseInt(map.get("retry").toString()));
         hmilyTransaction.setVersion(Integer.parseInt((map.get("version")).toString()));
         return hmilyTransaction;
     }
