@@ -10,7 +10,7 @@ spring:
         driver-class-name:  com.mysql.jdbc.Driver
         url: jdbc:mysql://127.0.0.1:3306/tcc_account?useUnicode=true&characterEncoding=utf8
         username: root
-        password: 123456
+        password:
     application:
       name: account-service
     main:
@@ -25,12 +25,12 @@ org:
             retryMax : 30
             scheduled-recovery-delay: 60
             scheduledThreadMax :  10
-            repository : mongodb
-#            hmilyDbConfig :
-#                 driverClassName  : com.mysql.jdbc.Driver
-#                 url: jdbc:mysql://127.0.0.1:3306/hmily?useUnicode=true&characterEncoding=utf8
-#                 username : root
-#                 password :
+            repository : mysql
+            hmilyDbConfig :
+                 driverClassName  : com.mysql.jdbc.Driver
+                 url: jdbc:mysql://127.0.0.1:3306/hmily?useUnicode=true&characterEncoding=utf8
+                 username : root
+                 password :
 
 
 
@@ -45,11 +45,11 @@ org:
        #         sessionTimeOut      :  100000
        #         rootPath  : /tcc
 
-            hmilyMongoConfig :
-              mongoDbUrl  : 127.0.0.1:27017
-              mongoDbName  :  admin
-              mongoUserName  : root
-              mongoUserPwd   : 123456
+#            hmilyMongoConfig :
+#              mongoDbUrl  : 127.0.0.1:27017
+#              mongoDbName  :  admin
+#              mongoUserName  : root
+#              mongoUserPwd   : 123456
 
        # repositorySupport : file
        #         path      : /account

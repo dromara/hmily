@@ -39,25 +39,25 @@
         <property name="retryMax" value="3"/>
         <property name="scheduledRecoveryDelay" value="60"/>
         <property name="scheduledThreadMax" value="4"/>
-        <property name="repository" value="mongodb"/>
-        <property name="hmilyMongoConfig">
-            <bean class="org.dromara.hmily.config.HmilyMongoConfig">
-                <property name="mongoDbName" value="admin"/>
-                <property name="mongoDbUrl" value="127.0.0.1:27017"/>
-                <property name="mongoUserName" value="root"/>
-                <property name="mongoUserPwd" value="123456"/>
+        <property name="repository" value="mysql"/>
+        <property name="hmilyDbConfig">
+            <bean class="org.dromara.hmily.config.HmilyDbConfig">
+                <property name="url"
+                          value="jdbc:mysql://127.0.0.1:3306/hmily?useUnicode=true&amp;characterEncoding=utf8"/>
+                <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+                <property name="username" value="root"/>
+                <property name="password" value=""/>
             </bean>
         </property>
-<!--        -->
-<!--        <property name="hmilyDbConfig">-->
-<!--            <bean class="org.dromara.hmily.config.HmilyDbConfig">-->
-<!--                <property name="url"-->
-<!--                          value="jdbc:mysql://127.0.0.1:3306/hmily?useUnicode=true&amp;characterEncoding=utf8"/>-->
-<!--                <property name="driverClassName" value="com.mysql.jdbc.Driver"/>-->
-<!--                <property name="username" value="root"/>-->
-<!--                <property name="password" value=""/>-->
+<!--        <property name="hmilyMongoConfig">-->
+<!--            <bean class="org.dromara.hmily.config.HmilyMongoConfig">-->
+<!--                <property name="mongoDbName" value="admin"/>-->
+<!--                <property name="mongoDbUrl" value="127.0.0.1:27017"/>-->
+<!--                <property name="mongoUserName" value="root"/>-->
+<!--                <property name="mongoUserPwd" value="123456"/>-->
 <!--            </bean>-->
 <!--        </property>-->
+<!--        -->
     </bean>
 
     <!--
