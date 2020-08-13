@@ -24,12 +24,14 @@ import org.dromara.hmily.metrics.facade.handler.MetricsTrackerHandler;
 import org.dromara.hmily.metrics.spi.MetricsInit;
 import org.dromara.hmily.metrics.spi.MetricsTrackerManager;
 import org.dromara.hmily.spi.ExtensionLoaderFactory;
+import org.dromara.hmily.spi.HmilySPI;
 
 /**
  * The type Metrics init facade.
  *
  * @author xiaoyu
  */
+@HmilySPI(value = "metricsInit")
 public class MetricsInitFacade implements MetricsInit {
     
     private static volatile boolean enabled;
@@ -70,7 +72,7 @@ public class MetricsInitFacade implements MetricsInit {
         Preconditions.checkNotNull(metricsTrackerManager, "Can not find metrics tracker manager with metrics name in metrics configuration.");
         metricsTrackerManager.start(metricsConfig);
         Integer threadCount = Optional.ofNullable(metricsConfig.getThreadCount()).orElse(Runtime.getRuntime().availableProcessors());
-        MetricsTrackerHandler.getInstance().init(metricsConfig.getAsync(), threadCount, metricsTrackerManager);
+        MetricsTrackerHandler.getInstance().init(metricsConfig.isAsync(), threadCount, metricsTrackerManager);
         enabled = true;
     }
 }

@@ -32,6 +32,7 @@ import java.util.Objects;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,6 +43,7 @@ import org.slf4j.LoggerFactory;
  * @author xiaoyu(Myth)
  */
 @SuppressWarnings("all")
+@Slf4j
 public final class ExtensionLoader<T> {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(ExtensionLoader.class);
@@ -183,7 +185,8 @@ public final class ExtensionLoader<T> {
     
     private T getExtensionInstance(final ExtensionEntity entity, final Class<?>[] argTypes, final Object[] args) {
         if (entity == null) {
-            throw new IllegalStateException("not found service provider for : " + clazz.getName());
+            log.error("not found service provider for : " + clazz.getName());
+            return null;
         }
         if (ScopeType.SINGLETON.equals(entity.getScopeType())) {
             Holder<Object> holder = cachedInstances.get(entity.getName());

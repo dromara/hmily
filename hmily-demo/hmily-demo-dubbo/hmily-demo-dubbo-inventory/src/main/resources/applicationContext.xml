@@ -32,6 +32,12 @@
                 <property name="password" value=""/>
             </bean>
         </property>
+        <property name="hmilyMetricsConfig">
+            <bean class="org.dromara.hmily.config.HmilyMetricsConfig">
+                <property name="metricsName"  value="prometheus"/>
+                <property name="port" value="9092"/>
+            </bean>
+        </property>
     </bean>
 
     <import resource="spring-dubbo.xml"/>

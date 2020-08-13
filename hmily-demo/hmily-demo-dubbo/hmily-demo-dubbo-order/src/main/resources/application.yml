@@ -21,13 +21,14 @@ org:
             scheduledRecoveryDelay : 60
             scheduledThreadMax :  10
             repository : mysql
-            async-threads: 16
             hmilyDbConfig :
                  driverClassName  : com.mysql.jdbc.Driver
                  url :  jdbc:mysql://127.0.0.1:3306/hmily?useUnicode=true&characterEncoding=utf8
                  username : root
                  password :
-
+            hmilyMetricsConfig:
+              metricsName: prometheus
+              port :  9093
         #repositorySupport : redis
         #tccRedisConfig:
                 # masterName: mymaster

@@ -24,6 +24,7 @@ import org.dromara.hmily.metrics.api.HistogramMetricsTrackerDelegate;
 import org.dromara.hmily.metrics.api.SummaryMetricsTrackerDelegate;
 import org.dromara.hmily.metrics.facade.handler.MetricsTrackerHandler;
 import org.dromara.hmily.metrics.spi.MetricsHandlerFacade;
+import org.dromara.hmily.spi.HmilySPI;
 
 /**
  * Metrics tracker facade.
@@ -31,6 +32,7 @@ import org.dromara.hmily.metrics.spi.MetricsHandlerFacade;
  * @author xiaoyu
  */
 @Slf4j
+@HmilySPI(value = "metricsTrackerHandlerFacade")
 public final class MetricsTrackerHandlerFacade implements MetricsHandlerFacade {
     
     @Override
