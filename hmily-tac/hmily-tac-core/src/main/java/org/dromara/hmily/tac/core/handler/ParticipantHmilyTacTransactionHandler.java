@@ -22,13 +22,17 @@ import java.util.List;
 import java.util.Objects;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.dromara.hmily.annotation.TransTypeEnum;
 import org.dromara.hmily.common.enums.HmilyActionEnum;
+import org.dromara.hmily.common.enums.HmilyRoleEnum;
 import org.dromara.hmily.common.utils.DefaultValueUtils;
 import org.dromara.hmily.core.cache.HmilyParticipantCacheManager;
 import org.dromara.hmily.core.context.HmilyContextHolder;
 import org.dromara.hmily.core.context.HmilyTransactionContext;
 import org.dromara.hmily.core.repository.HmilyRepositoryStorage;
 import org.dromara.hmily.core.service.HmilyTransactionHandler;
+import org.dromara.hmily.metrics.enums.MetricsLabelEnum;
+import org.dromara.hmily.metrics.spi.MetricsHandlerFacadeEngine;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipant;
 import org.dromara.hmily.tac.core.transaction.HmilyTacParticipantTransaction;
 
@@ -64,10 +68,14 @@ public class ParticipantHmilyTacTransactionHandler implements HmilyTransactionHa
                     HmilyContextHolder.remove();
                 }
             case CONFIRMING:
+                MetricsHandlerFacadeEngine.load().ifPresent(metricsHandlerFacade -> metricsHandlerFacade.counterIncrement(MetricsLabelEnum.TRANSACTION_STATUS.getName(),
+                        TransTypeEnum.TAC.name(), HmilyRoleEnum.PARTICIPANT.name(), HmilyActionEnum.CONFIRMING.name()));
                 List<HmilyParticipant> confirmList = HmilyParticipantCacheManager.getInstance().get(context.getParticipantId());
                 executor.commitParticipant(confirmList, context.getParticipantId());
                 break;
             case CANCELING:
+                MetricsHandlerFacadeEngine.load().ifPresent(metricsHandlerFacade -> metricsHandlerFacade.counterIncrement(MetricsLabelEnum.TRANSACTION_STATUS.getName(),
+                        TransTypeEnum.TAC.name(), HmilyRoleEnum.PARTICIPANT.name(), HmilyActionEnum.CANCELING.name()));
                 List<HmilyParticipant> cancelList = HmilyParticipantCacheManager.getInstance().get(context.getParticipantId());
                 executor.rollbackParticipant(cancelList, context.getParticipantId());
                 break;

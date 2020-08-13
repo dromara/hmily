@@ -22,23 +22,23 @@ import org.dromara.hmily.metrics.api.CounterMetricsTracker;
 import org.dromara.hmily.metrics.enums.MetricsLabelEnum;
 
 /**
- * Request total counter metrics tracker.
+ * Transaction counter metrics tracker.
  */
-public final class RequestTotalCounterMetricsTracker implements CounterMetricsTracker {
+public final class TransactionStatusCounterMetricsTracker implements CounterMetricsTracker {
     
-    private static final Counter REQUEST_TOTAL = Counter.build()
-            .name("request_total")
-            .help("soul request total count")
+    private static final Counter TRANSACTION_STATUS = Counter.build()
+            .name("transaction")
+            .labelNames("type", "role", "status")
+            .help("collect transaction status count")
             .register();
     
     @Override
     public void inc(final double amount, final String... labelValues) {
-        REQUEST_TOTAL.inc(amount);
+        TRANSACTION_STATUS.labels(labelValues).inc(amount);
     }
     
     @Override
     public String metricsLabel() {
-        return MetricsLabelEnum.REQUEST_TOTAL.getName();
+        return MetricsLabelEnum.TRANSACTION_STATUS.getName();
     }
 }
-

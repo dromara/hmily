@@ -15,34 +15,21 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.metrics.enums;
+package org.dromara.hmily.metrics.spi;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import org.dromara.hmily.config.HmilyMetricsConfig;
 
 /**
- * Metrics label enum.
+ * The interface Metrics init.
  *
  * @author xiaoyu
  */
-@RequiredArgsConstructor
-@Getter
-public enum MetricsLabelEnum {
+public interface MetricsInit extends AutoCloseable {
     
     /**
-     * transaction total metrics label.
+     * Init.
+     *
+     * @param metricsConfig the metrics config
      */
-    TRANSACTION_TOTAL("transaction_total"),
-    
-    /**
-     * transaction latency metrics label.
-     */
-    TRANSACTION_LATENCY("transaction_latency"),
-    
-    /**
-     * Transaction status metrics label enum.
-     */
-    TRANSACTION_STATUS("transaction_status");
-    
-    private final String name;
+    void init(HmilyMetricsConfig metricsConfig);
 }
