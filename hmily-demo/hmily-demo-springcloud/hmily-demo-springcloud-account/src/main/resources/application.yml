@@ -45,11 +45,11 @@ org:
        #         sessionTimeOut      :  100000
        #         rootPath  : /tcc
 
-       # repositorySupport : mongodb
-       #       mongoDbUrl  : 192.168.1.68:27017
-       #       mongoDbName  :  happylife
-       #       mongoUserName  : xiaoyu
-       #       mongoUserPwd   : 123456
+#            hmilyMongoConfig :
+#              mongoDbUrl  : 127.0.0.1:27017
+#              mongoDbName  :  admin
+#              mongoUserName  : root
+#              mongoUserPwd   : 123456
 
        # repositorySupport : file
        #         path      : /account
