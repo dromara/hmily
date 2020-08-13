@@ -44,19 +44,19 @@ import java.util.Date;
 @HmilySPI(value = "oracle")
 @Slf4j
 public class OracleRepository extends AbstractHmilyDatabase {
-
+    
     private static final String SQL_FILE_PATH = "oracle/schema.sql";
-
+    
     @Override
     protected String hmilyTransactionLimitSql(final int limit) {
         return SELECT_HMILY_TRANSACTION_DELAY + " and rownum <= " + limit;
     }
-
+    
     @Override
     protected String hmilyParticipantLimitSql(final int limit) {
         return SELECTOR_HMILY_PARTICIPANT_WITH_DELAY_AND_APP_NAME_TRANS_TYPE + "and rownum <= " + limit;
     }
-
+    
     @Override
     protected void initScript(final HmilyDbConfig hmilyDbConfig) throws Exception {
         String jdbcUrl = StringUtils.replace(hmilyDbConfig.getUrl(), "/hmily", "/");
@@ -81,7 +81,7 @@ public class OracleRepository extends AbstractHmilyDatabase {
             conn.close();
         }
     }
-
+    
     @Override
     protected Object convertDataType(final Object params) {
         if (params instanceof java.util.Date) {

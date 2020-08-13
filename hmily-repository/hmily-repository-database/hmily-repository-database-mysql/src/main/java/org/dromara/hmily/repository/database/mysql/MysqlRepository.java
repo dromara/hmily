@@ -38,7 +38,7 @@ import java.sql.DriverManager;
 @HmilySPI(value = "mysql")
 @Slf4j
 public class MysqlRepository extends AbstractHmilyDatabase {
-
+    
     private static final String SQL_FILE_PATH = "mysql/schema.sql";
     
     @Override
@@ -50,7 +50,7 @@ public class MysqlRepository extends AbstractHmilyDatabase {
     protected String hmilyParticipantLimitSql(final int limit) {
         return SELECTOR_HMILY_PARTICIPANT_WITH_DELAY_AND_APP_NAME_TRANS_TYPE + " limit " + limit;
     }
-
+    
     @Override
     protected void initScript(final HmilyDbConfig hmilyDbConfig) throws Exception {
         String jdbcUrl = StringUtils.replace(hmilyDbConfig.getUrl(), "/hmily", "/");
@@ -66,7 +66,7 @@ public class MysqlRepository extends AbstractHmilyDatabase {
         runner.closeConnection();
         conn.close();
     }
-
+    
     @Override
     protected Object convertDataType(final Object params) {
         return params;

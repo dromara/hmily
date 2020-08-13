@@ -45,19 +45,19 @@ import org.dromara.hmily.spi.HmilySPI;
 @HmilySPI(value = "postgresql")
 @Slf4j
 public class PostgresqlRepository extends AbstractHmilyDatabase {
-
+    
     private static final String SQL_FILE_PATH = "postgresql/schema.sql";
-
+    
     @Override
     protected String hmilyTransactionLimitSql(final int limit) {
         return SELECT_HMILY_TRANSACTION_DELAY + " limit " + limit;
     }
-
+    
     @Override
     protected String hmilyParticipantLimitSql(final int limit) {
         return SELECTOR_HMILY_PARTICIPANT_WITH_DELAY_AND_APP_NAME_TRANS_TYPE + " limit " + limit;
     }
-
+    
     @Override
     protected void initScript(final HmilyDbConfig hmilyDbConfig) throws Exception {
         String jdbcUrl = StringUtils.replace(hmilyDbConfig.getUrl(), "/hmily", "/");
@@ -76,7 +76,7 @@ public class PostgresqlRepository extends AbstractHmilyDatabase {
         runner.closeConnection();
         conn.close();
     }
-
+    
     @Override
     protected Object convertDataType(final Object params) {
         //https://jdbc.postgresql.org/documentation/head/8-date-time.html
@@ -85,7 +85,7 @@ public class PostgresqlRepository extends AbstractHmilyDatabase {
         }
         return params;
     }
-
+    
     private Reader fillInfoToSqlFile(final String userName, final String password) throws IOException {
         final BufferedReader reader = new BufferedReader(Resources.getResourceAsReader(SQL_FILE_PATH));
         final StringBuilder builder = new StringBuilder();

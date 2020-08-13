@@ -37,19 +37,19 @@ import java.sql.DriverManager;
 @HmilySPI(value = "sqlserver")
 @Slf4j
 public class SqlserverRepository extends AbstractHmilyDatabase {
-
+    
     private static final String SQL_FILE_PATH = "sqlserver/schema.sql";
-
+    
     @Override
     protected String hmilyTransactionLimitSql(final int limit) {
         return SELECT_HMILY_TRANSACTION_DELAY.replace("select", "select top " + limit);
     }
-
+    
     @Override
     protected String hmilyParticipantLimitSql(final int limit) {
         return SELECTOR_HMILY_PARTICIPANT_WITH_DELAY_AND_APP_NAME_TRANS_TYPE.replace("select", "select top " + limit);
     }
-
+    
     @Override
     protected void initScript(final HmilyDbConfig hmilyDbConfig) throws Exception {
         String jdbcUrl = StringUtils.replace(hmilyDbConfig.getUrl(), "database=hmily", "");
