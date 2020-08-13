@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Enumeration;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -215,11 +216,7 @@ public final class ExtensionLoader<T> {
     }
     
     private ExtensionEntity getDefaultExtensionEntity() {
-        List<ExtensionEntity> entitiesHolderValue = entitiesHolder.getValue();
-        if (null != entitiesHolderValue && entitiesHolderValue.size() > 0) {
-            return entitiesHolderValue.get(entitiesHolderValue.size() - 1);
-        }
-        return null;
+        return entitiesHolder.getValue().stream().findFirst().orElse(null);
     }
     
     private ExtensionEntity getCachedExtensionEntity(final String name) {
@@ -243,7 +240,7 @@ public final class ExtensionLoader<T> {
     private List<ExtensionEntity> findAllExtensionEntity(final ClassLoader loader) {
         List<ExtensionEntity> entityList = new ArrayList<>();
         loadDirectory(HMILY_DIRECTORY + clazz.getName(), loader, entityList);
-        return entityList.stream().sorted(Comparator.comparing(ExtensionEntity::getOrder)).collect(Collectors.toList());
+        return entityList.stream().sorted(Comparator.comparing(ExtensionEntity::getOrder)).collect(Collectors.toCollection(LinkedList::new));
     }
     
     private void loadDirectory(final String dir, final ClassLoader classLoader, final List<ExtensionEntity> entityList) {

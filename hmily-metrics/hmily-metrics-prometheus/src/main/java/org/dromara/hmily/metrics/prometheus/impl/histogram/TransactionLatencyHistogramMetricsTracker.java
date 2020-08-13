@@ -23,25 +23,26 @@ import org.dromara.hmily.metrics.api.HistogramMetricsTrackerDelegate;
 import org.dromara.hmily.metrics.enums.MetricsLabelEnum;
 
 /**
- * Request latency histogram metrics tracker.
+ * Transaction latency histogram metrics tracker.
  *
  * @author xiaoyu
  */
-public final class RequestLatencyHistogramMetricsTracker implements HistogramMetricsTracker {
+public final class TransactionLatencyHistogramMetricsTracker implements HistogramMetricsTracker {
     
-    private static final Histogram REQUEST_LATENCY = Histogram.build()
-            .name("requests_latency_histogram_millis").help("Requests Latency Histogram Millis (ms)")
+    private static final Histogram TRANSACTION_LATENCY = Histogram.build()
+            .labelNames("type")
+            .name("transaction_latency_histogram_millis").help("Transaction Latency Histogram Millis (ms)")
             .register();
     
     @Override
     public HistogramMetricsTrackerDelegate startTimer(final String... labelValues) {
-        Histogram.Timer timer = REQUEST_LATENCY.startTimer();
+        Histogram.Timer timer = TRANSACTION_LATENCY.labels(labelValues).startTimer();
         return new PrometheusHistogramMetricsTrackerDelegate(timer);
     }
     
     @Override
     public String metricsLabel() {
-        return MetricsLabelEnum.REQUEST_LATENCY.getName();
+        return MetricsLabelEnum.TRANSACTION_LATENCY.getName();
     }
 }
 

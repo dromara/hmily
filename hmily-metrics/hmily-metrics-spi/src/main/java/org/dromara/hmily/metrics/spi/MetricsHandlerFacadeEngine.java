@@ -15,34 +15,24 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.metrics.enums;
+package org.dromara.hmily.metrics.spi;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import java.util.Optional;
+import org.dromara.hmily.spi.ExtensionLoaderFactory;
 
 /**
- * Metrics label enum.
+ * The type Metrics handler facade engine.
  *
  * @author xiaoyu
  */
-@RequiredArgsConstructor
-@Getter
-public enum MetricsLabelEnum {
+public final class MetricsHandlerFacadeEngine {
     
     /**
-     * transaction total metrics label.
+     * Load MetricsHandlerFacade optional.
+     *
+     * @return the optional
      */
-    TRANSACTION_TOTAL("transaction_total"),
-    
-    /**
-     * transaction latency metrics label.
-     */
-    TRANSACTION_LATENCY("transaction_latency"),
-    
-    /**
-     * Transaction status metrics label enum.
-     */
-    TRANSACTION_STATUS("transaction_status");
-    
-    private final String name;
+    public static Optional<MetricsHandlerFacade> load() {
+        return Optional.ofNullable(ExtensionLoaderFactory.load(MetricsHandlerFacade.class));
+    }
 }

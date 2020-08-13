@@ -22,10 +22,10 @@ import java.util.Collection;
 import java.util.Optional;
 import org.dromara.hmily.metrics.api.MetricsTracker;
 import org.dromara.hmily.metrics.api.MetricsTrackerFactory;
-import org.dromara.hmily.metrics.prometheus.impl.counter.HttpRequestCounterMetricsTracker;
-import org.dromara.hmily.metrics.prometheus.impl.counter.RequestTotalCounterMetricsTracker;
-import org.dromara.hmily.metrics.prometheus.impl.histogram.RequestLatencyHistogramMetricsTracker;
-import org.dromara.hmily.metrics.prometheus.impl.summary.RequestLatencySummaryMetricsTracker;
+import org.dromara.hmily.metrics.prometheus.impl.counter.TransactionStatusCounterMetricsTracker;
+import org.dromara.hmily.metrics.prometheus.impl.counter.TransactionTotalCounterMetricsTracker;
+import org.dromara.hmily.metrics.prometheus.impl.histogram.TransactionLatencyHistogramMetricsTracker;
+import org.dromara.hmily.metrics.prometheus.impl.summary.TransactionLatencySummaryMetricsTracker;
 
 /**
  * Prometheus metrics tracker factory.
@@ -37,10 +37,10 @@ public final class PrometheusMetricsTrackerFactory implements MetricsTrackerFact
     private static final Collection<MetricsTracker> REGISTER = new ArrayList<>();
     
     static {
-        REGISTER.add(new RequestTotalCounterMetricsTracker());
-        REGISTER.add(new HttpRequestCounterMetricsTracker());
-        REGISTER.add(new RequestLatencyHistogramMetricsTracker());
-        REGISTER.add(new RequestLatencySummaryMetricsTracker());
+        REGISTER.add(new TransactionTotalCounterMetricsTracker());
+        REGISTER.add(new TransactionStatusCounterMetricsTracker());
+        REGISTER.add(new TransactionLatencyHistogramMetricsTracker());
+        REGISTER.add(new TransactionLatencySummaryMetricsTracker());
     }
     
     @Override

@@ -24,14 +24,15 @@ import org.dromara.hmily.metrics.api.SummaryMetricsTrackerDelegate;
 import org.dromara.hmily.metrics.enums.MetricsLabelEnum;
 
 /**
- * Request latency summary metrics tracker.
+ * Transaction latency summary metrics tracker.
  *
  * @author xiaoyu
  */
-public final class RequestLatencySummaryMetricsTracker implements SummaryMetricsTracker {
+public final class TransactionLatencySummaryMetricsTracker implements SummaryMetricsTracker {
     
-    private static final Summary REQUEST_LATENCY = Summary.build()
-            .name("requests_latency_summary_millis").help("Requests Latency Summary Millis (ms)")
+    private static final Summary TRANSACTION_LATENCY = Summary.build()
+            .name("transaction_latency_summary_millis").labelNames("type")
+            .help("Requests Latency Summary Millis (ms)")
             .quantile(0.5, 0.05)
             .quantile(0.95, 0.01)
             .quantile(0.99, 0.001)
@@ -41,13 +42,13 @@ public final class RequestLatencySummaryMetricsTracker implements SummaryMetrics
     
     @Override
     public SummaryMetricsTrackerDelegate startTimer(final String... labelValues) {
-        Summary.Timer timer = REQUEST_LATENCY.startTimer();
+        Summary.Timer timer = TRANSACTION_LATENCY.labels(labelValues).startTimer();
         return new PrometheusSummaryMetricsTrackerDelegate(timer);
     }
     
     @Override
     public String metricsLabel() {
-        return MetricsLabelEnum.REQUEST_LATENCY.getName();
+        return MetricsLabelEnum.TRANSACTION_LATENCY.getName();
     }
 }
 
