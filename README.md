@@ -41,7 +41,8 @@ Hmily
    并且 `confirm`, `cancel` 方法由自身完成实现，框架只是负责来调用，来达到事务的一致性。
 
 # TAC模式  
-
+   ![](https://yu199195.github.io/images/hmily/hmily-tac.png) 
+   
    当用户使用`TAC`模式的时候，用户必须使用关系型数据库来进行业务操作，框架会自动生成`回滚SQL`,
    当业务异常的时候，会执行`回滚SQL`来达到事务的一致性。
    
