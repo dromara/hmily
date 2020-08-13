@@ -18,6 +18,7 @@
 package org.dromara.hmily.common.utils;
 
 import java.util.Random;
+import org.dromara.hmily.common.exception.HmilyRuntimeException;
 
 /**
  * snow flow .
@@ -94,7 +95,7 @@ public final class IdWorkerUtils {
     private synchronized long nextId() {
         long timestamp = timeGen();
         if (timestamp < lastTimestamp) {
-            throw new RuntimeException(String.format("Clock moved backwards.  Refusing to generate id for %d milliseconds", lastTimestamp - timestamp));
+            throw new HmilyRuntimeException(String.format("Clock moved backwards.  Refusing to generate id for %d milliseconds", lastTimestamp - timestamp));
         }
         if (lastTimestamp == timestamp) {
             sequence = (sequence + 1) & SEQUENCE_MASK;

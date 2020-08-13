@@ -6,31 +6,31 @@ Hmily
 [![Maven Central](https://img.shields.io/maven-central/v/org.dromara/hmily.svg?label=maven%20central)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.dromara%22%20AND%20hmily)
 [![QQ群](https://img.shields.io/badge/chat-on%20QQ-ff69b4.svg?style=flat-square)](https://shang.qq.com/wpa/qunwpa?idkey=2e9e353fa10924812bc58c10ab46de0ca6bef80e34168bccde275f7ca0cafd85)
 
-#### 分布式柔性事务解决方案
+#### 分布式事务解决方案全景图
  ![](https://yu199195.github.io/images/hmily/hmily.png) 
 
 #  功能
+
+   *  高可靠性 ：支持分布式场景下，事务异常回滚，超时异常恢复，防止事务悬挂
    
-   *  支持 `Dubbo`, `SpringCloud`,`Montan` 等RPC框架进行分布式事务
+   *  易用性 ：提供零侵入性式的 `Spring-Boot`, `Spring-Namespace` 快速与业务系统集成
    
-   *  支持事务异常回滚，超时异常恢复，防止事务悬挂
+   *  高性能 ：去中心化设计，与业务系统完全融合，天然支持集群部署
    
-   *  支持且套事务，支持RPC且套调用
+   *  可观测性 ：Metrics多项指标性能监控，以及admin管理后台UI展示
    
-   *  提供`spring namespace`, `springboot` 快速集成方式
+   *  多种RPC ： 支持 `Dubbo`, `SpringCloud`,`Montan` 等知名RPC框架
    
-   *  事务日志存储支持 `mysql`, `oracle`, `mongodb`, `redis`, `zookeeper` 等方式
+   *  日志存储 ： 支持 `mysql`, `oracle`, `mongodb`, `redis`, `zookeeper` 等方式
    
-   *  高性能，支持微服务集群部署
-   
-   *  提供后台管理可视化,以及metrics相关性能监控
+   *  复杂场景 ： 支持RPC嵌套调用事务
    
 
 # 必要前提 
 
   * 必须使用 `JDK8+` 
   
-  * 必须要使用一款 `RPC` 框架, 比如 : `Dubbo`, `SpringCloud`,`Montan`
+  * TCC模式必须要使用一款 `RPC` 框架, 比如 : `Dubbo`, `SpringCloud`,`Montan`
   
 
 # TCC模式
@@ -51,11 +51,13 @@ Hmily
   
 # 关于Hmily 
     
-   Hmily是柔性分布式事务解决方案，提供了`TCC` 与 `TAC` 模式。它以零侵入以及快速集成方式能够方便的被业务进行整合，
+   Hmily是柔性分布式事务解决方案，提供了`TCC` 与 `TAC` 模式。
+   
+   它以零侵入以及快速集成方式能够方便的被业务进行整合。
    
    在性能上，日志存储异步（可选）以及使用异步执行的方式，不损耗业务方法方法。
    
-   目前由京东数科技术研发人员来主导，未来会成为京东数科柔性分布式事务解决方案。
+   之前是由我个人开发，目前由我在京东数科已经重新启动，未来将会是金融场景的分布式事务解决方案。
 
   
 # 关注趋势

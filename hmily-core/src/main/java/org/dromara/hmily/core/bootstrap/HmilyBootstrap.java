@@ -81,7 +81,7 @@ public final class HmilyBootstrap {
             HmilyShutdownHook.getInstance().registerAutoCloseable(HmilyRepositoryEventPublisher.getInstance());
         } catch (Exception ex) {
             LogUtil.error(LOGGER, " hmily init exception:{}", ex::getMessage);
-            System.exit(1);
+            System.exit(0);
         }
         new HmilyLogo().logo();
     }

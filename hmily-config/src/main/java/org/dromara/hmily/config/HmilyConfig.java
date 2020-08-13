@@ -102,11 +102,6 @@ public class HmilyConfig {
     private int consumerThreads = Runtime.getRuntime().availableProcessors() << 1;
     
     /**
-     * this is hmily async execute cancel or confirm thread size.
-     */
-    private int asyncThreads = Runtime.getRuntime().availableProcessors() << 1;
-    
-    /**
      * asyncRepository.
      */
     private boolean asyncRepository = true;

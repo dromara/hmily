@@ -16,7 +16,7 @@
  */
 
 package org.dromara.hmily.spring.boot.starter.parent.config;
-;
+
 import org.dromara.hmily.config.HmilyConfig;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
