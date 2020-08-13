@@ -18,14 +18,17 @@
 package org.dromara.hmily.repository.database.oracle;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.jdbc.ScriptRunner;
+import org.dromara.hmily.config.HmilyDbConfig;
 import org.dromara.hmily.repository.database.manager.AbstractHmilyDatabase;
 import org.dromara.hmily.spi.HmilySPI;
 
 import java.io.Reader;
 import java.sql.Blob;
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -41,24 +44,23 @@ import java.util.Date;
 @HmilySPI(value = "oracle")
 @Slf4j
 public class OracleRepository extends AbstractHmilyDatabase {
-
-    @Override
-    protected String sqlFilePath() {
-        return "oracle/schema.sql";
-    }
-
+    
+    private static final String SQL_FILE_PATH = "oracle/schema.sql";
+    
     @Override
     protected String hmilyTransactionLimitSql(final int limit) {
-        return SELECT_HMILY_TRANSACTION_DELAY  + " and rownum <= " + limit;
+        return SELECT_HMILY_TRANSACTION_DELAY + " and rownum <= " + limit;
     }
-
+    
     @Override
     protected String hmilyParticipantLimitSql(final int limit) {
-        return SELECTOR_HMILY_PARTICIPANT_WITH_DELAY_AND_APP_NAME_TRANS_TYPE+ "and rownum <= " + limit;
+        return SELECTOR_HMILY_PARTICIPANT_WITH_DELAY_AND_APP_NAME_TRANS_TYPE + "and rownum <= " + limit;
     }
-
+    
     @Override
-    protected void executeScript(final Connection conn, final String sqlPath) throws Exception {
+    protected void initScript(final HmilyDbConfig hmilyDbConfig) throws Exception {
+        String jdbcUrl = StringUtils.replace(hmilyDbConfig.getUrl(), "/hmily", "/");
+        Connection conn = DriverManager.getConnection(jdbcUrl, hmilyDbConfig.getUsername(), hmilyDbConfig.getPassword());
         ScriptRunner runner = new ScriptRunner(conn);
         final String delimiter = "/";
         // doesn't print logger
@@ -69,7 +71,7 @@ public class OracleRepository extends AbstractHmilyDatabase {
         runner.setFullLineDelimiter(true);
         runner.setDelimiter(delimiter);
         try {
-            Reader read = Resources.getResourceAsReader(sqlPath);
+            Reader read = Resources.getResourceAsReader(SQL_FILE_PATH);
             runner.runScript(read);
             conn.commit();
         } catch (Exception ignored) {
@@ -79,7 +81,7 @@ public class OracleRepository extends AbstractHmilyDatabase {
             conn.close();
         }
     }
-
+    
     @Override
     protected Object convertDataType(final Object params) {
         if (params instanceof java.util.Date) {
@@ -87,13 +89,13 @@ public class OracleRepository extends AbstractHmilyDatabase {
         }
         if (params instanceof java.sql.Blob) {
             try {
-                return ((Blob) params).getBytes(1,((Number)((Blob)params).length()).intValue());
+                return ((Blob) params).getBytes(1, ((Number) ((Blob) params).length()).intValue());
             } catch (SQLException ex) {
-                log.error("convertDataType-> fail to conver dataType Blob to byte[],{}",ex.getSQLState(),ex.getNextException());
+                log.error("convertDataType-> fail to conver dataType Blob to byte[],{}", ex.getSQLState(), ex.getNextException());
             }
         }
         if (params instanceof java.math.BigDecimal) {
-            return ((Number)params).longValue();
+            return ((Number) params).longValue();
         }
         return params;
     }
