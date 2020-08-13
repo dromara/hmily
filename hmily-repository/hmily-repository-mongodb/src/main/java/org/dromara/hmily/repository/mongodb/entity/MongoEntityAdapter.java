@@ -19,7 +19,6 @@ package org.dromara.hmily.repository.mongodb.entity;
 
 import java.io.Serializable;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import org.bson.types.ObjectId;
 
 /**
