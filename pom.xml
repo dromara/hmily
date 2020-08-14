@@ -89,6 +89,7 @@
         <disruptor.version>3.4.0</disruptor.version>
         <hikaricp.version>3.2.0</hikaricp.version>
         <prometheus-java-client.version>0.6.0</prometheus-java-client.version>
+        <cobertura-maven-plugin.version>2.7</cobertura-maven-plugin.version>
     </properties>
 
     <dependencyManagement>
@@ -590,6 +591,35 @@
                 <configuration>
                     <!-- 略过整个单元测试的执行，不推荐 -->
                     <skip>true</skip>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>cobertura-maven-plugin</artifactId>
+                <version>${cobertura-maven-plugin.version}</version>
+                <configuration>
+                    <check>
+                        <!--<branchRate>85</branchRate>-->
+                        <!--<lineRate>85</lineRate>-->
+                        <!--<haltOnFailure>true</haltOnFailure>-->
+                        <!--<totalBranchRate>85</totalBranchRate>-->
+                        <!--<totalLineRate>85</totalLineRate>-->
+                        <!--<packageLineRate>85</packageLineRate>-->
+                        <!--<packageBranchRate>85</packageBranchRate>-->
+                    </check>
+                    <aggregate>true</aggregate>
+                    <encoding>${project.build.sourceEncoding}</encoding>
+                    <quiet>true</quiet>
+                    <format>xml</format>
+                    <instrumentation>
+                        <ignoreTrivial>true</ignoreTrivial>
+                        <ignoreMethodAnnotations>
+                            <ignoreMethodAnnotation>lombok.Generated</ignoreMethodAnnotation>
+                        </ignoreMethodAnnotations>
+                        <excludes>
+                            <exclude>org/dromara/hmily/**/*Test.class</exclude>
+                        </excludes>
+                    </instrumentation>
                 </configuration>
             </plugin>
 <!--            <plugin>-->
