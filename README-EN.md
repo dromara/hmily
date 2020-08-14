@@ -1,5 +1,7 @@
 Hmily
 ================
+[![Build Status](https://api.travis-ci.org/dromara/hmily.svg?branch=master&status=created)](https://travis-ci.org/github/dromara/hmily)
+[![codecov](https://codecov.io/gh/dromara/hmily/branch/master/graph/badge.svg)](https://codecov.io/gh/dromara/hmily)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/2f0a0191b02448e6919aca6ce12a1584)](https://app.codacy.com/app/Dromara/hmily?utm_source=github.com&utm_medium=referral&utm_content=Dromara/hmily&utm_campaign=Badge_Grade_Settings)
 [![Total lines](https://tokei.rs/b1/github/Dromara/hmily?category=lines)](https://github.com/yu199195/hmily)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg?label=license)](https://github.com/Dromara/hmily/blob/master/LICENSE)
