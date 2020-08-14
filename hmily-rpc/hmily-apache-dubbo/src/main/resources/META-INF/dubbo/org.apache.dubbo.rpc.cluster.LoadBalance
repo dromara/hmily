@@ -1,1 +1,4 @@
-hmily=org.dromara.hmily.dubbo.loadbalance.DubboHmilyLoadBalance
+hmilyConsistenHash=org.dromara.hmily.dubbo.loadbalance.HmilyConsistenHashDubboLoadBalance
+hmilyLeastActive=org.dromara.hmily.dubbo.loadbalance.HmilyLeastActiveDubboLoadBalance
+hmilyRandom=org.dromara.hmily.dubbo.loadbalance.HmilyRandomDubboLoadBalance
+hmilyRoundRobin=org.dromara.hmily.dubbo.loadbalance.HmilyRoundRobinDubboLoadBalance

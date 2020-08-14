@@ -26,7 +26,7 @@ org:
                  password :
             hmilyMetricsConfig:
                  metricsName: prometheus
-                 port :  9091
+                 port :  9081
 
 
 #            repository-support: file
