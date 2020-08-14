@@ -22,6 +22,6 @@
     <dubbo:reference timeout="20000"
                      interface="org.dromara.hmily.demo.dubbo.inventory.api.service.InventoryService"
                      id="inventoryService"
-                     retries="0" check="false" loadbalance="hmily"/>
+                     retries="0" check="false" loadbalance="hmilyRandom"/>
 
 </beans>

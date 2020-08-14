@@ -17,54 +17,38 @@
 
 package org.dromara.hmily.dubbo.loadbalance;
 
-import com.alibaba.dubbo.common.URL;
-import com.alibaba.dubbo.rpc.Invocation;
-import com.alibaba.dubbo.rpc.Invoker;
-import com.alibaba.dubbo.rpc.cluster.loadbalance.AbstractLoadBalance;
 import com.google.common.collect.Maps;
-import org.dromara.hmily.core.context.HmilyContextHolder;
-import org.dromara.hmily.core.context.HmilyTransactionContext;
-import org.dromara.hmily.common.enums.HmilyActionEnum;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Random;
+import org.apache.dubbo.common.URL;
+import org.apache.dubbo.rpc.Invoker;
+import org.dromara.hmily.common.enums.HmilyActionEnum;
+import org.dromara.hmily.core.context.HmilyContextHolder;
+import org.dromara.hmily.core.context.HmilyTransactionContext;
 
 /**
- * The type Dubbo hmily load balance.
+ * The type hmily load balance utils.
  *
  * @author xiaoyu(Myth)
  */
-@SuppressWarnings("all")
-public class DubboHmilyLoadBalance extends AbstractLoadBalance {
+public class HmilyLoadBalanceUtils {
 
-    private static final Map<Long, URL> URL_MAP = Maps.newConcurrentMap();
-
-    private final Random random = new Random();
-
-    @Override
-    protected <T> Invoker<T> doSelect(final List<Invoker<T>> invokers, final URL url, final Invocation invocation) {
-
-        final Invoker<T> invoker = invokers.get(random.nextInt(invokers.size()));
-
+    private static final Map<String, URL> URL_MAP = Maps.newConcurrentMap();
+    
+    public static <T> Invoker<T> doSelect(final Invoker<T> defaultInvoker, final List<Invoker<T>> invokers) {
         final HmilyTransactionContext hmilyTransactionContext = HmilyContextHolder.get();
-
         if (Objects.isNull(hmilyTransactionContext)) {
-            return invoker;
+            return defaultInvoker;
         }
-
-        final Long transId = hmilyTransactionContext.getTransId();
         //if try
+        String key = defaultInvoker.getInterface().getName();
         if (hmilyTransactionContext.getAction() == HmilyActionEnum.TRYING.getCode()) {
-            URL_MAP.put(transId, invoker.getUrl());
-            return invoker;
+            URL_MAP.put(key, defaultInvoker.getUrl());
+            return defaultInvoker;
         }
-
-        final URL orlUrl = URL_MAP.get(transId);
-
-        URL_MAP.remove(transId);
-
+        final URL orlUrl = URL_MAP.get(key);
+        URL_MAP.remove(key);
         if (Objects.nonNull(orlUrl)) {
             for (Invoker<T> inv : invokers) {
                 if (Objects.equals(inv.getUrl(), orlUrl)) {
@@ -72,6 +56,6 @@ public class DubboHmilyLoadBalance extends AbstractLoadBalance {
                 }
             }
         }
-        return invoker;
+        return defaultInvoker;
     }
 }
