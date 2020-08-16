@@ -17,12 +17,14 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Random;
 
-import static org.junit.Assert.*;
-
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 /**
  * Author:   lilang
  * Date:     2020-08-16 10:58
- * Description: 依赖于zookeeper的特性，所以暂不进行mock
+ * Description: zookeeper repository test crud
  **/
 public class ZookeeperRepositoryTest {
 

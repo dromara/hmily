@@ -23,8 +23,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
-import org.apache.zookeeper.*;
+import org.apache.zookeeper.CreateMode;
+import org.apache.zookeeper.KeeperException;
+import org.apache.zookeeper.ZooDefs;
+import org.apache.zookeeper.ZooKeeper;
 import org.apache.zookeeper.data.Stat;
+import org.apache.zookeeper.Watcher;
 import org.dromara.hmily.common.exception.HmilyException;
 import org.dromara.hmily.common.exception.HmilyRuntimeException;
 import org.dromara.hmily.common.utils.CollectionUtils;
@@ -56,22 +60,20 @@ public class ZookeeperRepository implements HmilyRepository {
 
     private static final CountDownLatch LATCH = new CountDownLatch(1);
 
-    private HmilySerializer hmilySerializer;
-
-    private String rootPathPrefix = "/hmily";
-
-    private String appName = "default";
-
     private static final String HMILY_TRANSACTION_GLOBAL = "hmily_transaction_global";
 
     private static final String HMILY_TRANSACTION_PRTICIPANT = "hmily_transaction_participant";
 
     private static final String HMILY_PARTICIPANT_UNDO = "hmily_participant_undo";
 
+    private HmilySerializer hmilySerializer;
+
+    private String rootPathPrefix = "/hmily";
+
+    private String appName = "default";
 
     @Override
     public void init(final HmilyConfig hmilyConfig) {
-//        rootPathPrefix = hmilyConfig.getAppName();
         appName = hmilyConfig.getAppName();
         try {
             connect(hmilyConfig.getHmilyZookeeperConfig());
@@ -87,7 +89,7 @@ public class ZookeeperRepository implements HmilyRepository {
     }
 
     @Override
-    public int createHmilyTransaction(HmilyTransaction hmilyTransaction) throws HmilyRepositoryException {
+    public int createHmilyTransaction(final HmilyTransaction hmilyTransaction) throws HmilyRepositoryException {
         String path = rootPathPrefix + "/" + appName + "/" + HMILY_TRANSACTION_GLOBAL;
         try {
             create(path);
@@ -114,7 +116,7 @@ public class ZookeeperRepository implements HmilyRepository {
     }
 
     @Override
-    public int updateRetryByLock(HmilyTransaction hmilyTransaction) {
+    public int updateRetryByLock(final HmilyTransaction hmilyTransaction) {
         final int currentVersion = hmilyTransaction.getVersion();
         String path = rootPathPrefix + "/" + appName + "/" + HMILY_TRANSACTION_GLOBAL + "/" + hmilyTransaction.getTransId();
         try {
@@ -124,8 +126,8 @@ public class ZookeeperRepository implements HmilyRepository {
                 return HmilyRepository.FAIL_ROWS;
             }
             if (currentVersion != stat.getVersion()) {
-                LOGGER.warn("current transaction data version different from zookeeper server. " +
-                        "current version: {}, server data version:  {}", currentVersion, stat.getVersion());
+                LOGGER.warn("current transaction data version different from zookeeper server. "
+                        + "current version: {}, server data version:  {}", currentVersion, stat.getVersion());
             }
             hmilyTransaction.setVersion(currentVersion + 1);
             hmilyTransaction.setRetry(hmilyTransaction.getRetry() + 1);
@@ -141,7 +143,7 @@ public class ZookeeperRepository implements HmilyRepository {
     }
 
     @Override
-    public HmilyTransaction findByTransId(Long transId) {
+    public HmilyTransaction findByTransId(final Long transId) {
         String path = rootPathPrefix + "/" + appName + "/" + HMILY_TRANSACTION_GLOBAL + "/" + transId;
         try {
             byte[] data = zooKeeper.getData(path, false, null);
@@ -159,7 +161,7 @@ public class ZookeeperRepository implements HmilyRepository {
     }
 
     @Override
-    public List<HmilyTransaction> listLimitByDelay(Date date, int limit) {
+    public List<HmilyTransaction> listLimitByDelay(final Date date, final int limit) {
         String path = rootPathPrefix + "/" + appName + "/" + HMILY_TRANSACTION_GLOBAL;
         List<HmilyTransaction> result = listByFilter(path, HmilyTransaction.class, (hmilyTransaction, params) -> {
             Date dateParam = (Date) params[0];
@@ -175,7 +177,7 @@ public class ZookeeperRepository implements HmilyRepository {
     }
 
     @Override
-    public int updateHmilyTransactionStatus(Long transId, Integer status) throws HmilyRepositoryException {
+    public int updateHmilyTransactionStatus(final Long transId, final Integer status) throws HmilyRepositoryException {
         String path = rootPathPrefix + "/" + appName + "/" + HMILY_TRANSACTION_GLOBAL + "/" + transId;
         Stat stat = new Stat();
         try {
@@ -200,7 +202,7 @@ public class ZookeeperRepository implements HmilyRepository {
     }
 
     @Override
-    public int removeHmilyTransaction(Long transId) {
+    public int removeHmilyTransaction(final Long transId) {
         String path = rootPathPrefix + "/" + appName + "/" + HMILY_TRANSACTION_GLOBAL + "/" + transId;
         try {
             zooKeeper.delete(path, -1);
@@ -215,16 +217,16 @@ public class ZookeeperRepository implements HmilyRepository {
     }
 
     @Override
-    public int removeHmilyTransactionByData(Date date) {
+    public int removeHmilyTransactionByData(final Date date) {
         String path = rootPathPrefix + "/" + appName + "/" + HMILY_TRANSACTION_GLOBAL;
-        return removeByDate(path, HmilyTransaction.class, ((hmilyTransaction, params) -> {
+        return removeByFilter(path, HmilyTransaction.class, (hmilyTransaction, params) -> {
             Date dateParam = (Date) params[0];
             return dateParam.before(hmilyTransaction.getUpdateTime()) && hmilyTransaction.getStatus() == 4;
-        }), date);
+        }, date);
     }
 
     @Override
-    public int createHmilyParticipant(HmilyParticipant hmilyParticipant) throws HmilyRepositoryException {
+    public int createHmilyParticipant(final HmilyParticipant hmilyParticipant) throws HmilyRepositoryException {
         try {
             String path = rootPathPrefix + "/" + appName + "/" + HMILY_TRANSACTION_PRTICIPANT;
             create(path);
@@ -251,7 +253,7 @@ public class ZookeeperRepository implements HmilyRepository {
     }
 
     @Override
-    public List<HmilyParticipant> findHmilyParticipant(Long participantId) {
+    public List<HmilyParticipant> findHmilyParticipant(final Long participantId) {
         String path = rootPathPrefix + "/" + appName + "/" + HMILY_TRANSACTION_PRTICIPANT;
         List<HmilyParticipant> result = listByFilter(path, HmilyParticipant.class, (hmilyParticipant, params) -> {
             Long participantIdParam = (Long) params[0];
@@ -262,35 +264,33 @@ public class ZookeeperRepository implements HmilyRepository {
     }
 
     @Override
-    public List<HmilyParticipant> listHmilyParticipant(Date date, String transType, int limit) {
+    public List<HmilyParticipant> listHmilyParticipant(final Date date, final String transType, final int limit) {
         String path = rootPathPrefix + "/" + appName + "/" + HMILY_TRANSACTION_PRTICIPANT;
-        List<HmilyParticipant> result = listByFilter(path, HmilyParticipant.class,
-                (hmilyParticipant, params) -> {
-                    Date dateParam = (Date) params[0];
-                    String transTypeParam = (String) params[1];
-                    int limitParam = (int) params[2];
-                    boolean filterResult = dateParam.before(hmilyParticipant.getUpdateTime()) && appName.equals(hmilyParticipant.getAppName())
-                            && transTypeParam.equals(hmilyParticipant.getTransType())
-                            && (hmilyParticipant.getStatus().compareTo(4) != 0 && hmilyParticipant.getStatus().compareTo(8) != 0)
-                            && limitParam-- > 0;
-                    params[2] = limitParam;
-                    return filterResult;
-                },
-                date, transType, limit);
+        List<HmilyParticipant> result = listByFilter(path, HmilyParticipant.class, (hmilyParticipant, params) -> {
+            Date dateParam = (Date) params[0];
+            String transTypeParam = (String) params[1];
+            int limitParam = (int) params[2];
+            boolean filterResult = dateParam.before(hmilyParticipant.getUpdateTime()) && appName.equals(hmilyParticipant.getAppName())
+                    && transTypeParam.equals(hmilyParticipant.getTransType())
+                    && (hmilyParticipant.getStatus().compareTo(4) != 0 && hmilyParticipant.getStatus().compareTo(8) != 0)
+                    && limitParam-- > 0;
+            params[2] = limitParam;
+            return filterResult;
+        }, date, transType, limit);
         return result;
     }
 
     @Override
-    public List<HmilyParticipant> listHmilyParticipantByTransId(Long transId) {
+    public List<HmilyParticipant> listHmilyParticipantByTransId(final Long transId) {
         String path = rootPathPrefix + "/" + appName + "/" + HMILY_TRANSACTION_PRTICIPANT;
         List<HmilyParticipant> result = listByFilter(path, HmilyParticipant.class,
-                (hmilyParticipant, params) -> transId.compareTo(hmilyParticipant.getTransId()) == 0,
-                transId);
+            (hmilyParticipant, params) -> transId.compareTo(hmilyParticipant.getTransId()) == 0,
+            transId);
         return result;
     }
 
     @Override
-    public boolean existHmilyParticipantByTransId(Long transId) {
+    public boolean existHmilyParticipantByTransId(final Long transId) {
         String path = rootPathPrefix + "/" + appName + "/" + HMILY_TRANSACTION_PRTICIPANT;
         return existByFilter(path, HmilyParticipant.class, (hmilyParticipant, params) -> {
             Long transIdParam = (Long) params[0];
@@ -299,7 +299,7 @@ public class ZookeeperRepository implements HmilyRepository {
     }
 
     @Override
-    public int updateHmilyParticipantStatus(Long participantId, Integer status) throws HmilyRepositoryException {
+    public int updateHmilyParticipantStatus(final Long participantId, final Integer status) throws HmilyRepositoryException {
         String path = rootPathPrefix + "/" + appName + "/" + HMILY_TRANSACTION_PRTICIPANT + "/" + participantId;
         try {
             Stat stat = new Stat();
@@ -324,7 +324,7 @@ public class ZookeeperRepository implements HmilyRepository {
     }
 
     @Override
-    public int removeHmilyParticipant(Long participantId) {
+    public int removeHmilyParticipant(final Long participantId) {
         String path = rootPathPrefix + "/" + appName + "/" + HMILY_TRANSACTION_PRTICIPANT + "/" + participantId;
         try {
             zooKeeper.delete(path, -1);
@@ -338,16 +338,16 @@ public class ZookeeperRepository implements HmilyRepository {
     }
 
     @Override
-    public int removeHmilyParticipantByData(Date date) {
+    public int removeHmilyParticipantByData(final Date date) {
         String path = rootPathPrefix + "/" + appName + "/" + HMILY_TRANSACTION_PRTICIPANT;
-        return removeByDate(path, HmilyParticipant.class, (hmilyParticipant, params) -> {
+        return removeByFilter(path, HmilyParticipant.class, (hmilyParticipant, params) -> {
             Date dateParam = (Date) params[0];
             return dateParam.before(hmilyParticipant.getUpdateTime()) && hmilyParticipant.getStatus().compareTo(4) == 0;
         }, date);
     }
 
     @Override
-    public boolean lockHmilyParticipant(HmilyParticipant hmilyParticipant) {
+    public boolean lockHmilyParticipant(final HmilyParticipant hmilyParticipant) {
         final int currentVersion = hmilyParticipant.getVersion();
         String path = rootPathPrefix + "/" + appName + "/" + HMILY_TRANSACTION_PRTICIPANT + "/" + hmilyParticipant.getParticipantId();
         try {
@@ -357,8 +357,8 @@ public class ZookeeperRepository implements HmilyRepository {
                 return false;
             }
             if (currentVersion != stat.getVersion()) {
-                LOGGER.warn("current transaction participant data version different from zookeeper server. " +
-                        "current version: {}, server data version:  {}", currentVersion, stat.getVersion());
+                LOGGER.warn("current transaction participant data version different from zookeeper server. "
+                        + "current version: {}, server data version:  {}", currentVersion, stat.getVersion());
             }
             hmilyParticipant.setVersion(currentVersion + 1);
             hmilyParticipant.setRetry(hmilyParticipant.getRetry() + 1);
@@ -374,7 +374,7 @@ public class ZookeeperRepository implements HmilyRepository {
     }
 
     @Override
-    public int createHmilyParticipantUndo(HmilyParticipantUndo hmilyParticipantUndo) {
+    public int createHmilyParticipantUndo(final HmilyParticipantUndo hmilyParticipantUndo) {
         String path = rootPathPrefix + "/" + appName + "/" + HMILY_PARTICIPANT_UNDO;
         try {
             create(path);
@@ -398,7 +398,7 @@ public class ZookeeperRepository implements HmilyRepository {
     }
 
     @Override
-    public List<HmilyParticipantUndo> findHmilyParticipantUndoByParticipantId(Long participantId) {
+    public List<HmilyParticipantUndo> findHmilyParticipantUndoByParticipantId(final Long participantId) {
         String path = rootPathPrefix + "/" + appName + "/" + HMILY_PARTICIPANT_UNDO;
         return listByFilter(path, HmilyParticipantUndo.class, (undo, params) -> {
             Long participantIdParam = (Long) params[0];
@@ -407,7 +407,7 @@ public class ZookeeperRepository implements HmilyRepository {
     }
 
     @Override
-    public int removeHmilyParticipantUndo(Long undoId) {
+    public int removeHmilyParticipantUndo(final Long undoId) {
         String path = rootPathPrefix + "/" + appName + "/" + HMILY_PARTICIPANT_UNDO + "/" + undoId;
         try {
             zooKeeper.delete(path, -1);
@@ -421,16 +421,16 @@ public class ZookeeperRepository implements HmilyRepository {
     }
 
     @Override
-    public int removeHmilyParticipantUndoByData(Date date) {
+    public int removeHmilyParticipantUndoByData(final Date date) {
         String path = rootPathPrefix + "/" + appName + "/" + HMILY_PARTICIPANT_UNDO;
-        return removeByDate(path, HmilyParticipantUndo.class, (undo, params) -> {
+        return removeByFilter(path, HmilyParticipantUndo.class, (undo, params) -> {
             Date dateParam = (Date) params[0];
             return dateParam.before(undo.getUpdateTime()) && undo.getStatus().compareTo(4) == 0;
         }, date);
     }
 
     @Override
-    public int updateHmilyParticipantUndoStatus(Long undoId, Integer status) {
+    public int updateHmilyParticipantUndoStatus(final Long undoId, final Integer status) {
         String path = rootPathPrefix + "/" + appName + "/" + HMILY_PARTICIPANT_UNDO + "/" + undoId;
         try {
             Stat stat = new Stat();
@@ -470,7 +470,7 @@ public class ZookeeperRepository implements HmilyRepository {
         }
     }
 
-    private void create(String path) throws KeeperException, InterruptedException {
+    private void create(final String path) throws KeeperException, InterruptedException {
         PathTokenizer pathTokenizer = new PathTokenizer(path);
         while (pathTokenizer.hasNext()) {
             String nextPath = pathTokenizer.nextPath();
@@ -483,7 +483,7 @@ public class ZookeeperRepository implements HmilyRepository {
         }
     }
 
-    private <T> List<T> listByFilter(String path, Class<T> deserializeClass, Filter<T> filter, Object... params) {
+    private <T> List<T> listByFilter(final String path, final Class<T> deserializeClass, final Filter<T> filter, final Object... params) {
         try {
             List<String> children = zooKeeper.getChildren(path, false);
             if (CollectionUtils.isEmpty(children)) {
@@ -510,7 +510,7 @@ public class ZookeeperRepository implements HmilyRepository {
         return Collections.emptyList();
     }
 
-    private <T> boolean existByFilter(String path, Class<T> deserializeClass, Filter<T> filter, Object... params) {
+    private <T> boolean existByFilter(final String path, final Class<T> deserializeClass, final Filter<T> filter, final Object... params) {
         try {
             List<String> children = zooKeeper.getChildren(path, false);
             if (CollectionUtils.isEmpty(children)) {
@@ -535,7 +535,7 @@ public class ZookeeperRepository implements HmilyRepository {
         return false;
     }
 
-    private <T> int removeByDate(String path, Class<T> deserializeClass, Filter<T> filter, Object... params) {
+    private <T> int removeByFilter(final String path, final Class<T> deserializeClass, final Filter<T> filter, final Object... params) {
         try {
             List<String> children = zooKeeper.getChildren(path, false);
             if (CollectionUtils.isEmpty(children)) {
@@ -557,19 +557,24 @@ public class ZookeeperRepository implements HmilyRepository {
             }
             return count;
         } catch (KeeperException e) {
-            LOGGER.error("removeByDate occur a exception", e);
+            LOGGER.error("removeByFilter occur a exception", e);
         } catch (InterruptedException e) {
-            LOGGER.error("removeByDate occur a exception", e);
+            LOGGER.error("removeByFilter occur a exception", e);
         }
         return HmilyRepository.FAIL_ROWS;
     }
 
     class PathTokenizer {
-        String path = "";
-        String[] nodes;
-        int index = 0;
+        private String path = "";
 
-        PathTokenizer(String path) {
+        private String[] nodes;
+
+        private int index;
+
+        PathTokenizer(final String path) {
+            if (path == null) {
+                throw new IllegalArgumentException("path cannot be null.");
+            }
             nodes = path.split("/");
             if (path.startsWith("/")) {
                 index = 1;
