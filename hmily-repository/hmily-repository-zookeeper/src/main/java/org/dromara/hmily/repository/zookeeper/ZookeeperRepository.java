@@ -499,7 +499,7 @@ public class ZookeeperRepository implements HmilyRepository {
         }
     }
 
-    private boolean checkAndInitPath(final String path, boolean needCreate) throws KeeperException, InterruptedException {
+    private boolean checkAndInitPath(final String path, final boolean needCreate) throws KeeperException, InterruptedException {
         Stat stat = zooKeeper.exists(path, false);
         if (stat != null) {
             return true;
