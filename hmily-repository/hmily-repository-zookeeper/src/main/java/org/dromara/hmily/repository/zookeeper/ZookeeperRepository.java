@@ -23,6 +23,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.KeeperException;
 import org.apache.zookeeper.ZooDefs;
@@ -52,6 +53,7 @@ import org.slf4j.LoggerFactory;
  * @author xiaoyu
  */
 @HmilySPI("zookeeper")
+@Slf4j
 public class ZookeeperRepository implements HmilyRepository {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ZookeeperRepository.class);
@@ -120,6 +122,9 @@ public class ZookeeperRepository implements HmilyRepository {
         final int currentVersion = hmilyTransaction.getVersion();
         String path = rootPathPrefix + "/" + appName + "/" + HMILY_TRANSACTION_GLOBAL + "/" + hmilyTransaction.getTransId();
         try {
+            if (!checkAndInitPath(path, true)) {
+                return FAIL_ROWS;
+            }
             Stat stat = zooKeeper.exists(path, false);
             if (stat == null) {
                 LOGGER.warn("path {} is not exists.", path);
@@ -146,6 +151,10 @@ public class ZookeeperRepository implements HmilyRepository {
     public HmilyTransaction findByTransId(final Long transId) {
         String path = rootPathPrefix + "/" + appName + "/" + HMILY_TRANSACTION_GLOBAL + "/" + transId;
         try {
+            if (!checkAndInitPath(path, true)) {
+                return null;
+            }
+
             byte[] data = zooKeeper.getData(path, false, null);
             if (data == null) {
                 return null;
@@ -181,6 +190,10 @@ public class ZookeeperRepository implements HmilyRepository {
         String path = rootPathPrefix + "/" + appName + "/" + HMILY_TRANSACTION_GLOBAL + "/" + transId;
         Stat stat = new Stat();
         try {
+            if (!checkAndInitPath(path, true)) {
+                return FAIL_ROWS;
+            }
+
             byte[] data = zooKeeper.getData(path, false, stat);
             if (data == null) {
                 return HmilyRepository.FAIL_ROWS;
@@ -205,6 +218,9 @@ public class ZookeeperRepository implements HmilyRepository {
     public int removeHmilyTransaction(final Long transId) {
         String path = rootPathPrefix + "/" + appName + "/" + HMILY_TRANSACTION_GLOBAL + "/" + transId;
         try {
+            if (!checkAndInitPath(path, false)) {
+                return FAIL_ROWS;
+            }
             zooKeeper.delete(path, -1);
             return HmilyRepository.ROWS;
         } catch (InterruptedException e) {
@@ -258,7 +274,7 @@ public class ZookeeperRepository implements HmilyRepository {
         List<HmilyParticipant> result = listByFilter(path, HmilyParticipant.class, (hmilyParticipant, params) -> {
             Long participantIdParam = (Long) params[0];
             return participantIdParam.compareTo(hmilyParticipant.getParticipantId()) == 0
-                    || participantIdParam.compareTo(hmilyParticipant.getParticipantRefId()) == 0;
+                    || (hmilyParticipant.getParticipantRefId() != null && participantIdParam.compareTo(hmilyParticipant.getParticipantRefId()) == 0);
         }, participantId);
         return result;
     }
@@ -302,6 +318,7 @@ public class ZookeeperRepository implements HmilyRepository {
     public int updateHmilyParticipantStatus(final Long participantId, final Integer status) throws HmilyRepositoryException {
         String path = rootPathPrefix + "/" + appName + "/" + HMILY_TRANSACTION_PRTICIPANT + "/" + participantId;
         try {
+            checkAndInitPath(path, true);
             Stat stat = new Stat();
             byte[] data = zooKeeper.getData(path, false, stat);
             if (data == null) {
@@ -327,6 +344,9 @@ public class ZookeeperRepository implements HmilyRepository {
     public int removeHmilyParticipant(final Long participantId) {
         String path = rootPathPrefix + "/" + appName + "/" + HMILY_TRANSACTION_PRTICIPANT + "/" + participantId;
         try {
+            if (!checkAndInitPath(path, false)) {
+                return FAIL_ROWS;
+            }
             zooKeeper.delete(path, -1);
             return HmilyRepository.ROWS;
         } catch (InterruptedException e) {
@@ -351,6 +371,9 @@ public class ZookeeperRepository implements HmilyRepository {
         final int currentVersion = hmilyParticipant.getVersion();
         String path = rootPathPrefix + "/" + appName + "/" + HMILY_TRANSACTION_PRTICIPANT + "/" + hmilyParticipant.getParticipantId();
         try {
+            if (!checkAndInitPath(path, false)) {
+                return false;
+            }
             Stat stat = zooKeeper.exists(path, false);
             if (stat == null) {
                 LOGGER.warn("path {} is not exists.", path);
@@ -410,6 +433,9 @@ public class ZookeeperRepository implements HmilyRepository {
     public int removeHmilyParticipantUndo(final Long undoId) {
         String path = rootPathPrefix + "/" + appName + "/" + HMILY_PARTICIPANT_UNDO + "/" + undoId;
         try {
+            if (!checkAndInitPath(path, false)) {
+                return FAIL_ROWS;
+            }
             zooKeeper.delete(path, -1);
             return HmilyRepository.ROWS;
         } catch (InterruptedException e) {
@@ -433,6 +459,9 @@ public class ZookeeperRepository implements HmilyRepository {
     public int updateHmilyParticipantUndoStatus(final Long undoId, final Integer status) {
         String path = rootPathPrefix + "/" + appName + "/" + HMILY_PARTICIPANT_UNDO + "/" + undoId;
         try {
+            if (!checkAndInitPath(path, false)) {
+                return FAIL_ROWS;
+            }
             Stat stat = new Stat();
             byte[] data = zooKeeper.getData(path, false, stat);
             if (data == null) {
@@ -470,6 +499,17 @@ public class ZookeeperRepository implements HmilyRepository {
         }
     }
 
+    private boolean checkAndInitPath(final String path, boolean needCreate) throws KeeperException, InterruptedException {
+        Stat stat = zooKeeper.exists(path, false);
+        if (stat != null) {
+            return true;
+        }
+        if (needCreate) {
+            create(path);
+        }
+        return needCreate;
+    }
+
     private void create(final String path) throws KeeperException, InterruptedException {
         PathTokenizer pathTokenizer = new PathTokenizer(path);
         while (pathTokenizer.hasNext()) {
@@ -485,6 +525,9 @@ public class ZookeeperRepository implements HmilyRepository {
 
     private <T> List<T> listByFilter(final String path, final Class<T> deserializeClass, final Filter<T> filter, final Object... params) {
         try {
+            if (!checkAndInitPath(path, false)) {
+                return Collections.emptyList();
+            }
             List<String> children = zooKeeper.getChildren(path, false);
             if (CollectionUtils.isEmpty(children)) {
                 return Collections.emptyList();
@@ -512,6 +555,9 @@ public class ZookeeperRepository implements HmilyRepository {
 
     private <T> boolean existByFilter(final String path, final Class<T> deserializeClass, final Filter<T> filter, final Object... params) {
         try {
+            if (!checkAndInitPath(path, false)) {
+                return false;
+            }
             List<String> children = zooKeeper.getChildren(path, false);
             if (CollectionUtils.isEmpty(children)) {
                 return false;
@@ -537,6 +583,9 @@ public class ZookeeperRepository implements HmilyRepository {
 
     private <T> int removeByFilter(final String path, final Class<T> deserializeClass, final Filter<T> filter, final Object... params) {
         try {
+            if (checkAndInitPath(path, false)) {
+                return FAIL_ROWS;
+            }
             List<String> children = zooKeeper.getChildren(path, false);
             if (CollectionUtils.isEmpty(children)) {
                 return HmilyRepository.FAIL_ROWS;
