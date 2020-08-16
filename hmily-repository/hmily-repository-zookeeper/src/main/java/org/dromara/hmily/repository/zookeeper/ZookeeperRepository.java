@@ -318,7 +318,9 @@ public class ZookeeperRepository implements HmilyRepository {
     public int updateHmilyParticipantStatus(final Long participantId, final Integer status) throws HmilyRepositoryException {
         String path = rootPathPrefix + "/" + appName + "/" + HMILY_TRANSACTION_PRTICIPANT + "/" + participantId;
         try {
-            checkAndInitPath(path, true);
+            if (!checkAndInitPath(path, false)) {
+                return FAIL_ROWS;
+            }
             Stat stat = new Stat();
             byte[] data = zooKeeper.getData(path, false, stat);
             if (data == null) {
