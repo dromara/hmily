@@ -64,9 +64,9 @@ public class ZookeeperRepositoryTest {
             zooKeeper.delete("/hmily/" + appName + "/" + HMILY_TRANSACTION_PRTICIPANT, stat.getVersion());
         }
 
-        stat = zooKeeper.exists("/hmily/" + appName + "/" + HMILY_TRANSACTION_PRTICIPANT, false);
+        stat = zooKeeper.exists("/hmily/" + appName + "/" + HMILY_PARTICIPANT_UNDO, false);
         if (stat != null) {
-            zooKeeper.delete("/hmily/" + appName + "/" + HMILY_TRANSACTION_PRTICIPANT, stat.getVersion());
+            zooKeeper.delete("/hmily/" + appName + "/" + HMILY_PARTICIPANT_UNDO, stat.getVersion());
         }
     }
 
