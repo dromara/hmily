@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.dubbo.loadbalance;
+package org.dromara.hmily.motan.loadbalance;
 
-import com.alibaba.dubbo.common.URL;
-import com.alibaba.dubbo.rpc.Invoker;
 import com.google.common.collect.Maps;
+import com.weibo.api.motan.rpc.Referer;
+import com.weibo.api.motan.rpc.URL;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -37,33 +37,33 @@ public class HmilyLoadBalanceUtils {
     private static final Map<String, URL> URL_MAP = Maps.newConcurrentMap();
     
     /**
-     * Do select invoker.
+     * Do select referer.
      *
      * @param <T>            the type parameter
-     * @param defaultInvoker the default invoker
-     * @param invokers       the invokers
-     * @return the invoker
+     * @param defaultReferer the default referer
+     * @param refererList    the referer list
+     * @return the referer
      */
-    public static <T> Invoker<T> doSelect(final Invoker<T> defaultInvoker, final List<Invoker<T>> invokers) {
+    public static <T> Referer<T> doSelect(final Referer<T> defaultReferer, final List<Referer<T>> refererList) {
         final HmilyTransactionContext hmilyTransactionContext = HmilyContextHolder.get();
         if (Objects.isNull(hmilyTransactionContext)) {
-            return defaultInvoker;
+            return defaultReferer;
         }
         //if try
-        String key = defaultInvoker.getInterface().getName();
+        String key = defaultReferer.getInterface().getName();
         if (hmilyTransactionContext.getAction() == HmilyActionEnum.TRYING.getCode()) {
-            URL_MAP.put(key, defaultInvoker.getUrl());
-            return defaultInvoker;
+            URL_MAP.put(key, defaultReferer.getUrl());
+            return defaultReferer;
         }
         final URL orlUrl = URL_MAP.get(key);
         URL_MAP.remove(key);
         if (Objects.nonNull(orlUrl)) {
-            for (Invoker<T> inv : invokers) {
+            for (Referer<T> inv : refererList) {
                 if (Objects.equals(inv.getUrl(), orlUrl)) {
                     return inv;
                 }
             }
         }
-        return defaultInvoker;
+        return defaultReferer;
     }
 }
