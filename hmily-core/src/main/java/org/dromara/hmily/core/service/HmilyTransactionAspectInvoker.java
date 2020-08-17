@@ -18,14 +18,16 @@
 package org.dromara.hmily.core.service;
 
 import java.lang.reflect.Method;
+import java.util.EnumMap;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.dromara.hmily.annotation.HmilyTCC;
+import org.dromara.hmily.annotation.TransTypeEnum;
 import org.dromara.hmily.core.context.HmilyTransactionContext;
 import org.dromara.hmily.spi.ExtensionLoaderFactory;
 
 /**
- * HmilyTransactionAspectServiceImpl.
+ * The type Hmily transaction aspect invoker.
  *
  * @author xiaoyu
  */
@@ -33,7 +35,11 @@ public final class HmilyTransactionAspectInvoker {
     
     private static final HmilyTransactionAspectInvoker INSTANCE = new HmilyTransactionAspectInvoker();
     
+    private static final EnumMap<TransTypeEnum, HmilyTransactionHandlerFactory> FACTORY_MAP = new EnumMap<>(TransTypeEnum.class);
+    
     private HmilyTransactionAspectInvoker() {
+        FACTORY_MAP.put(TransTypeEnum.TCC, ExtensionLoaderFactory.load(HmilyTransactionHandlerFactory.class, "tcc"));
+        FACTORY_MAP.put(TransTypeEnum.TAC, ExtensionLoaderFactory.load(HmilyTransactionHandlerFactory.class, "tac"));
     }
     
     /**
@@ -58,9 +64,9 @@ public final class HmilyTransactionAspectInvoker {
         Method method = signature.getMethod();
         final HmilyTCC hmilyTCC = method.getAnnotation(HmilyTCC.class);
         if (null != hmilyTCC) {
-            return ExtensionLoaderFactory.load(HmilyTransactionHandlerFactory.class, "tcc").factoryOf(hmilyTransactionContext).handler(point, hmilyTransactionContext);
+            return FACTORY_MAP.get(TransTypeEnum.TCC).factoryOf(hmilyTransactionContext).handler(point, hmilyTransactionContext);
         } else {
-            return ExtensionLoaderFactory.load(HmilyTransactionHandlerFactory.class, "tac").factoryOf(hmilyTransactionContext).handler(point, hmilyTransactionContext);
+            return FACTORY_MAP.get(TransTypeEnum.TAC).factoryOf(hmilyTransactionContext).handler(point, hmilyTransactionContext);
         }
     }
 }
