@@ -15,27 +15,18 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.dubbo.interceptor;
+package org.dromara.hmily.spring.aop;
 
-import org.aspectj.lang.annotation.Aspect;
-import org.dromara.hmily.core.interceptor.AbstractHmilyTransactionAspect;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.dromara.hmily.core.aspect.AbstractHmilyTransactionAspect;
 import org.springframework.core.Ordered;
-import org.springframework.stereotype.Component;
 
 /**
- * dubbo impl aspect.
+ * The type Spring hmily transaction aspect.
+ *
  * @author xiaoyu
  */
-@Aspect
-@Component
-public class DubboHmilyTransactionAspect extends AbstractHmilyTransactionAspect implements Ordered {
-
-    @Autowired
-    public DubboHmilyTransactionAspect(final DubboHmilyTransactionInterceptor dubboHmilyTransactionInterceptor) {
-        super.setHmilyTransactionInterceptor(dubboHmilyTransactionInterceptor);
-    }
-
+public class SpringHmilyTransactionAspect extends AbstractHmilyTransactionAspect implements Ordered {
+    
     @Override
     public int getOrder() {
         return Ordered.HIGHEST_PRECEDENCE;

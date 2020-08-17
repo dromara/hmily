@@ -15,29 +15,26 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.dubbo.interceptor;
+package org.dromara.hmily.dubbo.parameter;
 
-import org.aspectj.lang.annotation.Aspect;
-import org.dromara.hmily.core.interceptor.AbstractHmilyTransactionAspect;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.Ordered;
-import org.springframework.stereotype.Component;
+import com.alibaba.dubbo.rpc.RpcContext;
+import java.util.Optional;
+import org.dromara.hmily.core.context.HmilyContextHolder;
+import org.dromara.hmily.core.context.HmilyTransactionContext;
+import org.dromara.hmily.core.mediator.RpcMediator;
+import org.dromara.hmily.core.mediator.RpcParameterLoader;
+import org.dromara.hmily.spi.HmilySPI;
 
 /**
- * dubbo impl aspect.
+ * The type Dubbo parameter loader.
+ *
  * @author xiaoyu
  */
-@Aspect
-@Component
-public class DubboHmilyTransactionAspect extends AbstractHmilyTransactionAspect implements Ordered {
-
-    @Autowired
-    public DubboHmilyTransactionAspect(final DubboHmilyTransactionInterceptor dubboHmilyTransactionInterceptor) {
-        super.setHmilyTransactionInterceptor(dubboHmilyTransactionInterceptor);
-    }
-
+@HmilySPI(value = "dubbo")
+public class DubboParameterLoader implements RpcParameterLoader {
+    
     @Override
-    public int getOrder() {
-        return Ordered.HIGHEST_PRECEDENCE;
+    public HmilyTransactionContext load() {
+        return Optional.ofNullable(RpcMediator.getInstance().acquire(RpcContext.getContext()::getAttachment)).orElse(HmilyContextHolder.get());
     }
 }

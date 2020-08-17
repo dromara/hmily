@@ -18,12 +18,12 @@
 package org.dromara.hmily.spring.boot.starter.parent.configuration;
 
 import org.dromara.hmily.spring.HmilyApplicationContextAware;
+import org.dromara.hmily.spring.aop.SpringHmilyTransactionAspect;
 import org.dromara.hmily.spring.boot.starter.parent.config.HmilyConfigProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.Primary;
@@ -36,16 +36,35 @@ import org.springframework.context.annotation.Primary;
 @Configuration
 @EnableAspectJAutoProxy(proxyTargetClass = true)
 @EnableConfigurationProperties({HmilyConfigProperties.class})
-@ComponentScan(basePackages = {"org.dromara.hmily"})
 public class HmilyAutoConfiguration {
-
+    
     private final HmilyConfigProperties hmilyConfigProperties;
-
+    
+    /**
+     * Instantiates a new Hmily auto configuration.
+     *
+     * @param hmilyConfigProperties the hmily config properties
+     */
     @Autowired(required = false)
     public HmilyAutoConfiguration(HmilyConfigProperties hmilyConfigProperties) {
         this.hmilyConfigProperties = hmilyConfigProperties;
     }
-
+    
+    /**
+     * Hmily transaction aspect spring boot hmily transaction aspect.
+     *
+     * @return the spring boot hmily transaction aspect
+     */
+    @Bean
+    public SpringHmilyTransactionAspect hmilyTransactionAspect() {
+        return new SpringHmilyTransactionAspect();
+    }
+    
+    /**
+     * Hmily transaction bootstrap hmily application context aware.
+     *
+     * @return the hmily application context aware
+     */
     @Bean
     @Qualifier("hmilyTransactionBootstrap")
     @Primary

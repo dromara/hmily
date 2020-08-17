@@ -15,43 +15,35 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.motan.interceptor;
+package org.dromara.hmily.motan.parameter;
 
 import com.weibo.api.motan.rpc.Request;
 import com.weibo.api.motan.rpc.RpcContext;
 import java.util.Map;
-import java.util.Objects;
-import org.aspectj.lang.ProceedingJoinPoint;
+import java.util.Optional;
 import org.dromara.hmily.core.context.HmilyContextHolder;
 import org.dromara.hmily.core.context.HmilyTransactionContext;
-import org.dromara.hmily.core.interceptor.HmilyTransactionInterceptor;
 import org.dromara.hmily.core.mediator.RpcMediator;
-import org.dromara.hmily.core.service.HmilyTransactionAspectInvoker;
-import org.springframework.stereotype.Component;
+import org.dromara.hmily.core.mediator.RpcParameterLoader;
+import org.dromara.hmily.spi.HmilySPI;
 
 /**
- * The motan HmilyTransactionInterceptor.
+ * The type motan parameter loader.
  *
  * @author xiaoyu
  */
-@Component
-public class MotanHmilyTransactionInterceptor implements HmilyTransactionInterceptor {
+@HmilySPI(value = "motan")
+public class MotanParameterLoader implements RpcParameterLoader {
     
     @Override
-    public Object interceptor(final ProceedingJoinPoint pjp) throws Throwable {
-        HmilyTransactionContext hmilyTransactionContext = RpcMediator.getInstance().acquire(key -> {
+    public HmilyTransactionContext load() {
+       return Optional.ofNullable(RpcMediator.getInstance().acquire(key -> {
             final Request request = RpcContext.getContext().getRequest();
-            if (Objects.nonNull(request)) {
-                final Map<String, String> attachments = request.getAttachments();
-                if (attachments != null && !attachments.isEmpty()) {
-                    return attachments.get(key);
-                }
+            final Map<String, String> attachments = request.getAttachments();
+            if (attachments != null && !attachments.isEmpty()) {
+                return attachments.get(key);
             }
             return "";
-        });
-        if (Objects.isNull(hmilyTransactionContext)) {
-            hmilyTransactionContext = HmilyContextHolder.get();
-        }
-        return HmilyTransactionAspectInvoker.getInstance().invoke(hmilyTransactionContext, pjp);
+        })).orElse(HmilyContextHolder.get());
     }
 }

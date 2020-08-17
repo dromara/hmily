@@ -15,13 +15,15 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.core.interceptor;
+package org.dromara.hmily.core.aspect;
 
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.dromara.hmily.annotation.HmilyTCC;
+import org.dromara.hmily.core.interceptor.HmilyGlobalInterceptor;
+import org.dromara.hmily.core.interceptor.HmilyTransactionInterceptor;
 
 /**
  * this is aspect handler.
@@ -31,16 +33,7 @@ import org.dromara.hmily.annotation.HmilyTCC;
 @Aspect
 public abstract class AbstractHmilyTransactionAspect {
 
-    private HmilyTransactionInterceptor hmilyTransactionInterceptor;
-
-    /**
-     * Sets hmily transaction interceptor.
-     *
-     * @param hmilyTransactionInterceptor the hmily transaction interceptor
-     */
-    protected void setHmilyTransactionInterceptor(final HmilyTransactionInterceptor hmilyTransactionInterceptor) {
-        this.hmilyTransactionInterceptor = hmilyTransactionInterceptor;
-    }
+    private final HmilyTransactionInterceptor interceptor = new HmilyGlobalInterceptor();
 
     /**
      * this is point cut with {@linkplain HmilyTCC }.
@@ -58,13 +51,6 @@ public abstract class AbstractHmilyTransactionAspect {
      */
     @Around("hmilyInterceptor()")
     public Object interceptTccMethod(final ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
-        return hmilyTransactionInterceptor.interceptor(proceedingJoinPoint);
+        return interceptor.interceptor(proceedingJoinPoint);
     }
-
-    /**
-     * spring Order.
-     *
-     * @return int order
-     */
-    public abstract int getOrder();
 }
