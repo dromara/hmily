@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.spring;
+package org.dromara.hmily.spring.provide;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dromara.hmily.common.utils.AssertUtils;
@@ -30,9 +30,7 @@ import org.springframework.context.ConfigurableApplicationContext;
  */
 public final class SpringBeanProvide implements ObjectProvide {
     
-
     private ConfigurableApplicationContext cfgContext;
-    
     
     @Override
     public Object provide(final Class<?> clazz) {
@@ -88,5 +86,4 @@ public final class SpringBeanProvide implements ObjectProvide {
     public void setCfgContext(final ConfigurableApplicationContext cfgContext) {
         this.cfgContext = cfgContext;
     }
-   
 }

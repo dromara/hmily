@@ -15,33 +15,32 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.dubbo.interceptor;
+package org.dromara.hmily.core.interceptor;
 
-import com.alibaba.dubbo.rpc.RpcContext;
-import java.util.Objects;
+import java.util.Optional;
 import org.aspectj.lang.ProceedingJoinPoint;
-import org.dromara.hmily.core.context.HmilyContextHolder;
 import org.dromara.hmily.core.context.HmilyTransactionContext;
-import org.dromara.hmily.core.interceptor.HmilyTransactionInterceptor;
-import org.dromara.hmily.core.mediator.RpcMediator;
+import org.dromara.hmily.core.mediator.LocalParameterLoader;
+import org.dromara.hmily.core.mediator.RpcParameterLoader;
 import org.dromara.hmily.core.service.HmilyTransactionAspectInvoker;
-import org.springframework.stereotype.Component;
+import org.dromara.hmily.spi.ExtensionLoaderFactory;
 
 /**
- * The DubboHmilyTransactionInterceptor.
+ * The type Hmily global interceptor.
  *
  * @author xiaoyu
  */
-@Component
-public class DubboHmilyTransactionInterceptor implements HmilyTransactionInterceptor {
-
+public class HmilyGlobalInterceptor implements HmilyTransactionInterceptor {
+    
+    private static RpcParameterLoader parameterLoader;
+    
+    static {
+        parameterLoader = Optional.ofNullable(ExtensionLoaderFactory.load(RpcParameterLoader.class)).orElse(new LocalParameterLoader());
+    }
+    
     @Override
     public Object interceptor(final ProceedingJoinPoint pjp) throws Throwable {
-        HmilyTransactionContext hmilyTransactionContext =
-                RpcMediator.getInstance().acquire(RpcContext.getContext()::getAttachment);
-        if (Objects.isNull(hmilyTransactionContext)) {
-            hmilyTransactionContext = HmilyContextHolder.get();
-        }
-        return HmilyTransactionAspectInvoker.getInstance().invoke(hmilyTransactionContext, pjp);
+        HmilyTransactionContext context = parameterLoader.load();
+        return HmilyTransactionAspectInvoker.getInstance().invoke(context, pjp);
     }
 }
