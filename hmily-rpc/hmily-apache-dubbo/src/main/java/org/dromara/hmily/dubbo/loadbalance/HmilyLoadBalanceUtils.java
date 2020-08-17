@@ -36,6 +36,14 @@ public class HmilyLoadBalanceUtils {
 
     private static final Map<String, URL> URL_MAP = Maps.newConcurrentMap();
     
+    /**
+     * Do select invoker.
+     *
+     * @param <T>            the type parameter
+     * @param defaultInvoker the default invoker
+     * @param invokers       the invokers
+     * @return the invoker
+     */
     public static <T> Invoker<T> doSelect(final Invoker<T> defaultInvoker, final List<Invoker<T>> invokers) {
         final HmilyTransactionContext hmilyTransactionContext = HmilyContextHolder.get();
         if (Objects.isNull(hmilyTransactionContext)) {

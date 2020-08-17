@@ -1,1 +1,6 @@
-org.dromara.hmily.motan.loadbalance.MotanHmilyLoadBalance
+org.dromara.hmily.motan.loadbalance.HmilyRandomMotanLoadBalance
+org.dromara.hmily.motan.loadbalance.HmilyRoundRobinMotanLoadBalance
+org.dromara.hmily.motan.loadbalance.HmilyConsistentHashMotanLoadBalance
+org.dromara.hmily.motan.loadbalance.HmilyActiveWeightMotanLoadBalance
+org.dromara.hmily.motan.loadbalance.HmilyConfigurableWeightMotanLoadBalance
+org.dromara.hmily.motan.loadbalance.HmilyLocalFirstMotanLoadBalance
