@@ -17,66 +17,28 @@
 
 package org.dromara.hmily.motan.loadbalance;
 
-import com.google.common.collect.Maps;
 import com.weibo.api.motan.cluster.loadbalance.RandomLoadBalance;
 import com.weibo.api.motan.common.MotanConstants;
 import com.weibo.api.motan.core.extension.Activation;
 import com.weibo.api.motan.core.extension.SpiMeta;
 import com.weibo.api.motan.rpc.Referer;
 import com.weibo.api.motan.rpc.Request;
-import com.weibo.api.motan.rpc.URL;
-import org.dromara.hmily.core.context.HmilyContextHolder;
-import org.dromara.hmily.core.context.HmilyTransactionContext;
-import org.dromara.hmily.common.enums.HmilyActionEnum;
-
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 
 /**
- * The type Motan hmily load balance.
+ * The type Hmily random motan load balance.
  *
  * @param <T> the type parameter
  * @author xiaoyu(Myth)
  */
-@SpiMeta(name = "hmily")
-@Activation(key = {MotanConstants.NODE_TYPE_SERVICE, MotanConstants.NODE_TYPE_REFERER})
-public class MotanHmilyLoadBalance<T> extends RandomLoadBalance<T> {
-
-    private static final Map<Long, URL> URL_MAP = Maps.newConcurrentMap();
-
+@SpiMeta(name = "hmilyRandom")
+@Activation(key = {MotanConstants.NODE_TYPE_REFERER})
+public class HmilyRandomMotanLoadBalance<T> extends RandomLoadBalance<T> {
+    
     @Override
     protected Referer<T> doSelect(final Request request) {
-
-        final Referer<T> referer = super.doSelect(request);
-
-        final List<Referer<T>> refererList = getReferers();
-
-        final HmilyTransactionContext hmilyTransactionContext = HmilyContextHolder.get();
-
-        if (Objects.isNull(hmilyTransactionContext)) {
-            return referer;
-        }
-
-        final Long transId = hmilyTransactionContext.getTransId();
-        //if try
-        if (hmilyTransactionContext.getAction() == HmilyActionEnum.TRYING.getCode()) {
-            URL_MAP.put(transId, referer.getUrl());
-            return referer;
-        }
-
-        final URL orlUrl = URL_MAP.get(transId);
-
-        URL_MAP.remove(transId);
-
-        if (Objects.nonNull(orlUrl)) {
-            for (Referer<T> inv : refererList) {
-                if (Objects.equals(inv.getUrl(), orlUrl)) {
-                    return inv;
-                }
-            }
-        }
-        return referer;
+        final Referer<T> defaultReferer = super.doSelect(request);
+        return HmilyLoadBalanceUtils.doSelect(defaultReferer, getReferers());
     }
 
     @Override

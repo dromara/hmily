@@ -28,7 +28,7 @@ import org.apache.dubbo.rpc.cluster.loadbalance.ConsistentHashLoadBalance;
  *
  * @author xiaoyu(Myth)
  */
-public class HmilyConsistenHashDubboLoadBalance extends ConsistentHashLoadBalance {
+public class HmilyConsistentHashDubboLoadBalance extends ConsistentHashLoadBalance {
     
     @Override
     protected <T> Invoker<T> doSelect(final List<Invoker<T>> invokers, final URL url, final Invocation invocation) {
