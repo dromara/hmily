@@ -15,38 +15,34 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.springcloud.interceptor;
+package org.dromara.hmily.springcloud.parameter;
 
 import java.util.Objects;
-import javax.servlet.http.HttpServletRequest;
-import org.aspectj.lang.ProceedingJoinPoint;
 import org.dromara.hmily.common.enums.HmilyRoleEnum;
 import org.dromara.hmily.common.utils.LogUtil;
 import org.dromara.hmily.core.context.HmilyContextHolder;
 import org.dromara.hmily.core.context.HmilyTransactionContext;
-import org.dromara.hmily.core.interceptor.HmilyTransactionInterceptor;
 import org.dromara.hmily.core.mediator.RpcMediator;
-import org.dromara.hmily.core.service.HmilyTransactionAspectInvoker;
+import org.dromara.hmily.core.mediator.RpcParameterLoader;
+import org.dromara.hmily.spi.HmilySPI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-
 /**
- * SpringCloudHmilyTransactionInterceptor.
+ * The type Dubbo parameter loader.
  *
  * @author xiaoyu
  */
-@Component
-public class SpringCloudHmilyTransactionInterceptor implements HmilyTransactionInterceptor {
+@HmilySPI(value = "springCloud")
+public class SpringCloudParameterLoader implements RpcParameterLoader {
     
-    private static final Logger LOGGER = LoggerFactory.getLogger(SpringCloudHmilyTransactionInterceptor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SpringCloudParameterLoader.class);
     
     @Override
-    public Object interceptor(final ProceedingJoinPoint pjp) throws Throwable {
+    public HmilyTransactionContext load() {
         HmilyTransactionContext hmilyTransactionContext = HmilyContextHolder.get();
         if (Objects.nonNull(hmilyTransactionContext)) {
             if (HmilyRoleEnum.START.getCode() == hmilyTransactionContext.getRole()) {
@@ -55,15 +51,11 @@ public class SpringCloudHmilyTransactionInterceptor implements HmilyTransactionI
         } else {
             try {
                 final RequestAttributes requestAttributes = RequestContextHolder.currentRequestAttributes();
-                hmilyTransactionContext = RpcMediator.getInstance().acquire(key -> {
-                    HttpServletRequest request = ((ServletRequestAttributes) requestAttributes).getRequest();
-                    return request.getHeader(key);
-                });
+                hmilyTransactionContext = RpcMediator.getInstance().acquire(key -> ((ServletRequestAttributes) requestAttributes).getRequest().getHeader(key));
             } catch (IllegalStateException ex) {
                 LogUtil.warn(LOGGER, () -> "can not acquire request info:" + ex.getLocalizedMessage());
             }
         }
-        return HmilyTransactionAspectInvoker.getInstance().invoke(hmilyTransactionContext, pjp);
+        return hmilyTransactionContext;
     }
-
 }

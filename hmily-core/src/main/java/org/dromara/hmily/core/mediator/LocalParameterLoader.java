@@ -15,29 +15,20 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.motan.interceptor;
+package org.dromara.hmily.core.mediator;
 
-import org.aspectj.lang.annotation.Aspect;
-import org.dromara.hmily.core.interceptor.AbstractHmilyTransactionAspect;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.Ordered;
-import org.springframework.stereotype.Component;
+import org.dromara.hmily.core.context.HmilyContextHolder;
+import org.dromara.hmily.core.context.HmilyTransactionContext;
 
 /**
- * MotanHmilyTransactionAspect.
+ * The type Local parameter loader.
+ *
  * @author xiaoyu
  */
-@Aspect
-@Component
-public class MotanHmilyTransactionAspect extends AbstractHmilyTransactionAspect implements Ordered {
-
-    @Autowired
-    public MotanHmilyTransactionAspect(final MotanHmilyTransactionInterceptor motanHmilyTransactionInterceptor) {
-        super.setHmilyTransactionInterceptor(motanHmilyTransactionInterceptor);
-    }
-
+public class LocalParameterLoader implements RpcParameterLoader {
+    
     @Override
-    public int getOrder() {
-        return Ordered.HIGHEST_PRECEDENCE;
+    public HmilyTransactionContext load() {
+        return HmilyContextHolder.get();
     }
 }

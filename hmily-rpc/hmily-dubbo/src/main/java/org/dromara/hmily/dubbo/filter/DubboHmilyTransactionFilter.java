@@ -51,7 +51,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author xiaoyu
  */
-@Activate(group = {Constants.SERVER_KEY, Constants.CONSUMER})
+@Activate(group = {Constants.CONSUMER})
 public class DubboHmilyTransactionFilter implements Filter {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(DubboHmilyTransactionFilter.class);
