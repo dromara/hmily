@@ -108,6 +108,26 @@
             <version>5.1.47</version>
         </dependency>
 
+        <!-- if you want to use oracle,please import and open this-->
+        <!-- <dependency>
+             <groupId>com.oracle</groupId>
+             <artifactId>ojdbc7</artifactId>
+             <version>12.1.0.2</version>
+             <scope>runtime</scope>
+         </dependency>-->
+        <!-- if you want to use postgresql,please import and open this-->
+        <!-- <dependency>
+             <groupId>org.postgresql</groupId>
+             <artifactId>postgresql</artifactId>
+             <version>9.4.1212</version>
+         </dependency>-->
+        <!-- if you want to use sqlserver,please import and open this-->
+        <!-- <dependency>
+             <groupId>com.microsoft.sqlserver</groupId>
+             <artifactId>sqljdbc4</artifactId>
+             <version>6.0</version>
+         </dependency>-->
+
         <dependency>
             <groupId>org.mybatis.spring.boot</groupId>
             <artifactId>mybatis-spring-boot-starter</artifactId>
