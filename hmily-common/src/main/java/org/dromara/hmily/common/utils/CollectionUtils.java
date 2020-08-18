@@ -18,7 +18,21 @@
 
 package org.dromara.hmily.common.utils;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.EnumMap;
+import java.util.EnumSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.NavigableMap;
+import java.util.NavigableSet;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.SortedSet;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 /**
  * The type Collection utils.
@@ -26,6 +40,15 @@ import java.util.Collection;
  * @author xiaoyu(Myth)
  */
 public class CollectionUtils {
+    
+    /**
+     * Create factory collection factory.
+     *
+     * @return the collection factory
+     */
+    public static CollectionFactory createFactory() {
+        return new CollectionFactory();
+    }
 
     /**
      * Is empty boolean.
@@ -45,5 +68,122 @@ public class CollectionUtils {
      */
     public static boolean isNotEmpty(final Collection<?> coll) {
         return !isEmpty(coll);
+    }
+    
+    /**
+     * The type Collection factory.
+     */
+    public static class CollectionFactory {
+        
+        /**
+         * Create collection.
+         *
+         * @param <E>            the type parameter
+         * @param collectionType the collection type
+         * @param capacity       the capacity
+         * @return the collection
+         */
+        public <E> Collection<E> create(final Class<?> collectionType, final int capacity) {
+            return create(collectionType, null, capacity);
+        }
+        
+        /**
+         * Create collection.
+         *
+         * @param <E>            the type parameter
+         * @param collectionType the collection type
+         * @param elementType    the element type
+         * @param capacity       the capacity
+         * @return the collection
+         */
+        @SuppressWarnings("unchecked")
+        public <E> Collection<E> create(final Class<?> collectionType, final Class<?> elementType, final int capacity) {
+            if (collectionType.isInterface()) {
+                if (Set.class == collectionType || Collection.class == collectionType) {
+                    return new LinkedHashSet<>(capacity);
+                } else if (List.class == collectionType) {
+                    return new ArrayList<>(capacity);
+                } else if (SortedSet.class == collectionType || NavigableSet.class == collectionType) {
+                    return new TreeSet<>();
+                } else {
+                    throw new IllegalArgumentException("Unsupported Collection interface: " + collectionType.getName());
+                }
+            } else if (EnumSet.class == collectionType) {
+                // Cast is necessary for compilation in Eclipse 4.4.1.
+                return (Collection<E>) EnumSet.noneOf(asEnumType(elementType));
+            } else {
+                if (!Collection.class.isAssignableFrom(collectionType)) {
+                    throw new IllegalArgumentException("Unsupported Collection type: " + collectionType.getName());
+                }
+                try {
+                    return (Collection<E>) collectionType.newInstance();
+                } catch (Throwable ex) {
+                    throw new IllegalArgumentException(
+                            "Could not instantiate Collection type: " + collectionType.getName(), ex);
+                }
+            }
+        }
+        
+        /**
+         * Create map map.
+         *
+         * @param <K>      the type parameter
+         * @param <V>      the type parameter
+         * @param mapType  the map type
+         * @param capacity the capacity
+         * @return the map
+         */
+        public <K, V> Map<K, V> createMap(final Class<?> mapType, final int capacity) {
+            return createMap(mapType, null, capacity);
+        }
+        
+        /**
+         * Cast the given type to a subtype of {@link Enum}.
+         *
+         * @param enumType the enum type, never {@code null}
+         * @return the given type as subtype of {@link Enum}
+         * @throws IllegalArgumentException if the given type is not a subtype of {@link Enum}
+         */
+        @SuppressWarnings("rawtypes")
+        private Class<? extends Enum> asEnumType(final Class<?> enumType) {
+            if (!Enum.class.isAssignableFrom(enumType)) {
+                throw new IllegalArgumentException("Supplied type is not an enum: " + enumType.getName());
+            }
+            return enumType.asSubclass(Enum.class);
+        }
+        
+        /**
+         * Create map map.
+         *
+         * @param <K>     the type parameter
+         * @param <V>     the type parameter
+         * @param mapType the map type
+         * @param keyType the key type
+         * @param size    the size
+         * @return the map
+         */
+        @SuppressWarnings({"unchecked", "rawtypes"})
+        <K, V> Map<K, V> createMap(final Class<?> mapType, final Class<?> keyType, final int size) {
+            if (mapType.isInterface()) {
+                if (Map.class == mapType) {
+                    return new LinkedHashMap<>(size);
+                } else if (SortedMap.class == mapType || NavigableMap.class == mapType) {
+                    return new TreeMap<>();
+                } else {
+                    throw new IllegalArgumentException("Unsupported Map interface: " + mapType.getName());
+                }
+            } else if (EnumMap.class == mapType) {
+                return new EnumMap(asEnumType(keyType));
+            } else {
+                if (!Map.class.isAssignableFrom(mapType)) {
+                    throw new IllegalArgumentException("Unsupported Map type: " + mapType.getName());
+                }
+                try {
+                    return (Map<K, V>) mapType.newInstance();
+                } catch (Throwable ex) {
+                    throw new IllegalArgumentException("Could not instantiate Map type: " + mapType.getName(), ex);
+                }
+            }
+        }
     }
 }
