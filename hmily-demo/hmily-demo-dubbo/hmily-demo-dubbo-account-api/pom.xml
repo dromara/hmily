@@ -34,8 +34,8 @@
         <dependency>
             <groupId>org.dromara</groupId>
             <artifactId>hmily-annotation</artifactId>
+            <version>${hmily.version}</version>
         </dependency>
-
 
         <dependency>
             <groupId>org.projectlombok</groupId>
