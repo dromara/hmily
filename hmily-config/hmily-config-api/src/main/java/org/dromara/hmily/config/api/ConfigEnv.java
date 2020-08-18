@@ -56,37 +56,15 @@ public final class ConfigEnv {
         return INST;
     }
     
-    /**
-     * Add a class Path that needs to be processed.
-     *
-     * @param classPath class path.
-     */
-    public void addConfigClassPath(String classPath) {
-        if (classPath.startsWith("java.")) {
-            logger.warn("config class path Ignore {}", classPath);
-            return;
-        }
-        try {
-            Class<?> clazz = Class.forName(classPath);
-            addConfigClass(clazz);
-        } catch (ClassNotFoundException e) {
-            throw new ConfigException(e);
-        }
-    }
     
     /**
-     * Add config class.
+     * Register config.
      *
-     * @param clazz the clazz
+     * @param config the config
      */
-    public void addConfigClass(Class<?> clazz) {
-        if (clazz.getSuperclass().isAssignableFrom(AbstractConfig.class)) {
-            try {
-                AbstractConfig configParent = (AbstractConfig) clazz.newInstance();
-                putBean(configParent);
-            } catch (IllegalAccessException | InstantiationException e) {
-                throw new ConfigException(e);
-            }
+    public void registerConfig(final Config config) {
+        if (config.getClass().getSuperclass().isAssignableFrom(AbstractConfig.class)) {
+            putBean(config);
         }
     }
     
@@ -98,7 +76,7 @@ public final class ConfigEnv {
      * @return the config
      */
     @SuppressWarnings("unchecked")
-    public <T extends Config> T getConfig(Class<T> clazz) {
+    public <T extends Config> T getConfig(final Class<T> clazz) {
         return (T) configBeans.get(clazz);
     }
     
@@ -107,7 +85,7 @@ public final class ConfigEnv {
      *
      * @param parent parent.
      */
-    public void putBean(Config parent) {
+    public void putBean(final Config parent) {
         if (parent != null && StringUtils.isNotBlank(parent.prefix())) {
             if (configBeans.containsKey(parent.getClass())) {
                 return;

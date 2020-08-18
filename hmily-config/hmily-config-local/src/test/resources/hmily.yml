@@ -1,0 +1,11 @@
+hmily:
+  server:
+    configMode: local
+    appName: xiaoyu
+  #  如果server.mode eq local 的时候才会读取到这里的配置信息.
+  config:
+    serializer: kryo
+    contextTransmittalMode: threadLocal
+    scheduledRecoveryDelay: 120
+    limit : 200
+
