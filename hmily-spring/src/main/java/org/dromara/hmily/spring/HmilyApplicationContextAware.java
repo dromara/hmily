@@ -21,6 +21,7 @@ import org.dromara.hmily.config.HmilyConfig;
 import org.dromara.hmily.core.bootstrap.HmilyBootstrap;
 import org.dromara.hmily.core.holder.SingletonHolder;
 import org.dromara.hmily.core.provide.ObjectProvide;
+import org.dromara.hmily.spring.provide.SpringBeanProvide;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;

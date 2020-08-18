@@ -30,19 +30,19 @@ import lombok.RequiredArgsConstructor;
 public enum MetricsLabelEnum {
     
     /**
-     * Request total metrics label.
+     * transaction total metrics label.
      */
-    REQUEST_TOTAL("request_total"),
+    TRANSACTION_TOTAL("transaction_total"),
     
     /**
-     * http request total metrics label.
+     * transaction latency metrics label.
      */
-    HTTP_REQUEST_TOTAL("http_request_total"),
+    TRANSACTION_LATENCY("transaction_latency"),
     
     /**
-     * Request latency metrics label.
+     * Transaction status metrics label enum.
      */
-    REQUEST_LATENCY("request_latency");
+    TRANSACTION_STATUS("transaction_status");
     
     private final String name;
 }

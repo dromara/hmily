@@ -44,6 +44,11 @@
             <artifactId>hmily-spi</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.dromara</groupId>
+            <artifactId>hmily-metrics-promethues</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 
 </project>

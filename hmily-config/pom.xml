@@ -27,6 +27,15 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>hmily-config</artifactId>
+    <packaging>pom</packaging>
+    <modules>
+        <module>hmily-config-api</module>
+        <module>hmily-config-loader</module>
+        <module>hmily-config-local</module>
+        <module>hmily-config-nacos</module>
+        <module>hmily-config-apollo</module>
+        <module>hmily-config-zookeeper</module>
+    </modules>
 
 
 </project>

@@ -13,9 +13,9 @@
         http://www.springframework.org/schema/aop/spring-aop-3.0.xsd"
        default-autowire="byName">
 
-    <context:component-scan base-package="org.dromara.hmily.*"/>
     <aop:aspectj-autoproxy expose-proxy="true"/>
-    <bean id="hmilyApplicationContextAware" class="org.dromara.hmily.spring.HmilyApplicationContextAware">
+    <bean id = "hmilyTransactionAspect" class="org.dromara.hmily.spring.aop.SpringHmilyTransactionAspect"/>
+    <bean id = "hmilyApplicationContextAware" class="org.dromara.hmily.spring.HmilyApplicationContextAware">
         <property name="appName" value="inventory"/>
         <property name="serializer" value="kryo"/>
         <property name="recoverDelayTime" value="60"/>
@@ -30,6 +30,12 @@
                 <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
                 <property name="username" value="root"/>
                 <property name="password" value=""/>
+            </bean>
+        </property>
+        <property name="hmilyMetricsConfig">
+            <bean class="org.dromara.hmily.config.HmilyMetricsConfig">
+                <property name="metricsName"  value="prometheus"/>
+                <property name="port" value="9082"/>
             </bean>
         </property>
     </bean>

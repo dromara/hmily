@@ -27,20 +27,18 @@ import lombok.EqualsAndHashCode;
  *
  * @author xiaoyu
  */
-@AllArgsConstructor
 @Data
-@EqualsAndHashCode
 public final class HmilyMetricsConfig {
     
     private String metricsName;
     
     private String host;
     
-    private Integer port;
+    private Integer port = 9091;
     
-    private Boolean async;
+    private boolean async = true;
     
-    private Integer threadCount;
+    private Integer threadCount = Runtime.getRuntime().availableProcessors() << 1;
     
     private String jmxConfig;
     

@@ -24,8 +24,9 @@ org:
                  url :  jdbc:mysql://127.0.0.1:3306/hmily?useUnicode=true&characterEncoding=utf8
                  username : root
                  password :
-
-
+            hmilyMetricsConfig:
+                 metricsName: prometheus
+                 port :  9081
 
 
 #            repository-support: file
