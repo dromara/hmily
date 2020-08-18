@@ -22,7 +22,6 @@ package org.dromara.hmily.config.loader.yaml;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -37,15 +36,9 @@ import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.reader.UnicodeReader;
 
 /**
- * Base class for YAML factories.
- * <p>
- * Requires SnakeYAML 1.18 or higher, as of Spring Framework 5.0.6.
- * ref: org.springframework.beans.factory.config.YamlProcessor
+ * The type Yaml processor.
  *
- * @author Dave Syer
- * @author Juergen Hoeller
  * @author xiaoyu
- * @since 4.1
  */
 public abstract class YamlProcessor {
     
@@ -54,78 +47,22 @@ public abstract class YamlProcessor {
     private Logger logger = LoggerFactory.getLogger(YamlProcessor.class);
 
     private List<DocumentMatcher> documentMatchers = Collections.emptyList();
-
-    private boolean matchDefault = true;
-
+    
     private InputStream[] resources = new InputStream[0];
-
+    
     /**
-     * A map of document matchers allowing callers to selectively use only
-     * some of the documents in a YAML resource. In YAML documents are
-     * separated by <code>---<code> lines, and each document is converted
-     * to properties before the match is made. E.g.
-     * <pre class="code">
-     * environment: dev
-     * url: http://dev.bar.com
-     * name: Developer Setup
-     * ---
-     * environment: prod
-     * url:http://foo.bar.com
-     * name: My Cool App
-     * </pre>
-     * when mapped with
-     * <pre class="code">
-     * setDocumentMatchers(properties ->
-     *     ("prod".equals(properties.getProperty("environment")) ? MatchStatus.FOUND : MatchStatus.NOT_FOUND));
-     * </pre>
-     * would end up as
-     * <pre class="code">
-     * environment=prod
-     * url=http://foo.bar.com
-     * name=My Cool App
-     * </pre>
-     */
-    public void setDocumentMatchers(final DocumentMatcher... matchers) {
-        this.documentMatchers = Arrays.asList(matchers);
-    }
-
-    /**
-     * Flag indicating that a document for which all the
-     * {@link #setDocumentMatchers(DocumentMatcher...) document matchers} abstain will
-     * nevertheless match. Default is {@code true}.
-     */
-    public void setMatchDefault(final boolean matchDefault) {
-        this.matchDefault = matchDefault;
-    }
-
-    /**
-     * Method to use for resolving resources. Each resource will be converted to a Map,
-     * so this property is used to decide which map entries to keep in the final output
-     * from this factory. Default is {@link ResolutionMethod#OVERRIDE}.
-     */
-    public void setResolutionMethod(final ResolutionMethod resolutionMethod) {
-        this.resolutionMethod = resolutionMethod;
-    }
-
-    /**
-     * Set locations of YAML {@link InputStream resources} to be loaded.
+     * Sets resources.
      *
-     * @see ResolutionMethod
+     * @param resources the resources
      */
     public void setResources(final InputStream... resources) {
         this.resources = resources;
     }
-
+    
     /**
-     * Provide an opportunity for subclasses to process the Yaml parsed from the supplied
-     * resources. Each resource is parsed in turn and the documents inside checked against
-     * the {@link #setDocumentMatchers(DocumentMatcher...) matchers}. If a document
-     * matches it is passed into the callback, along with its representation as Properties.
-     * Depending on the {@link #setResolutionMethod(ResolutionMethod)} not all of the
-     * documents will be parsed.
+     * Process.
      *
-     * @param callback a callback to delegate to once matching documents are found
-     * @see #createYaml()
+     * @param callback the callback
      */
     protected void process(final MatchCallback callback) {
         Yaml yaml = createYaml();
@@ -136,13 +73,11 @@ public abstract class YamlProcessor {
             }
         }
     }
-
+    
     /**
-     * Create the {@link Yaml} instance to use.
-     * <p>The default implementation sets the "allowDuplicateKeys" flag to {@code false},
-     * enabling built-in duplicate key handling in SnakeYAML 1.18+.
+     * Create yaml yaml.
      *
-     * @see LoaderOptions#setAllowDuplicateKeys(boolean)
+     * @return the yaml
      */
     protected Yaml createYaml() {
         LoaderOptions options = new LoaderOptions();
@@ -233,8 +168,7 @@ public abstract class YamlProcessor {
                 return true;
             }
         }
-
-        if (result == MatchStatus.ABSTAIN && this.matchDefault) {
+        if (result == MatchStatus.ABSTAIN) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Matched document with default matcher: " + map);
             }
@@ -247,16 +181,12 @@ public abstract class YamlProcessor {
         }
         return false;
     }
-
+    
     /**
-     * Return a flattened version of the given map, recursively following any nested Map
-     * or Collection values. Entries from the resulting map retain the same order as the
-     * source. When called with the Map from a {@link MatchCallback} the result will
-     * contain the same values as the {@link MatchCallback} Properties.
+     * Gets flattened map.
      *
-     * @param source the source map
-     * @return a flattened map
-     * @since 4.1.3
+     * @param source the source
+     * @return the flattened map
      */
     protected final Map<String, Object> getFlattenedMap(final Map<String, Object> source) {
         Map<String, Object> result = new LinkedHashMap<>();
@@ -298,30 +228,28 @@ public abstract class YamlProcessor {
             }
         });
     }
-
-
+    
+    
     /**
      * Callback interface used to process the YAML parsing results.
      */
     public interface MatchCallback {
-
+    
         /**
          * Process the given representation of the parsing results.
          *
-         * @param properties the properties to process (as a flattened
-         *                   representation with indexed keys in case of a collection or map)
-         * @param map        the result map (preserving the original value structure
-         *                   in the YAML document)
+         * @param properties the properties to process (as a flattened                   representation with indexed keys in case of a collection or map)
+         * @param map        the result map (preserving the original value structure                   in the YAML document)
          */
         void process(Properties properties, Map<String, Object> map);
     }
-
-
+    
+    
     /**
      * Strategy interface used to test if properties match.
      */
     public interface DocumentMatcher {
-
+    
         /**
          * Test if the given properties match.
          *
@@ -330,47 +258,51 @@ public abstract class YamlProcessor {
          */
         MatchStatus matches(Properties properties);
     }
-
-
+    
+    
     /**
      * Status returned from {@link DocumentMatcher#matches(Properties)}
      */
     public enum MatchStatus {
-
+    
         /**
          * A match was found.
          */
         FOUND,
-
+    
         /**
          * The matcher should not be considered.
          */
         ABSTAIN;
-
+    
         /**
          * Compare two {@link MatchStatus} items, returning the most specific status.
+         *
+         * @param a the a
+         * @param b the b
+         * @return the most specific
          */
         public static MatchStatus getMostSpecific(MatchStatus a, MatchStatus b) {
             return (a.ordinal() < b.ordinal() ? a : b);
         }
     }
-
-
+    
+    
     /**
      * Method to use for resolving resources.
      */
     public enum ResolutionMethod {
-
+    
         /**
          * Replace values from earlier in the list.
          */
         OVERRIDE,
-
+    
         /**
          * Replace values from earlier in the list, ignoring any failures.
          */
         OVERRIDE_AND_IGNORE,
-
+    
         /**
          * Take the first resource in the list that exists and use just that.
          */
