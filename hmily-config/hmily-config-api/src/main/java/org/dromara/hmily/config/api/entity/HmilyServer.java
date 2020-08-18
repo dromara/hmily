@@ -15,31 +15,28 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.metrics.prometheus.impl.counter;
+package org.dromara.hmily.config.api.entity;
 
-import io.prometheus.client.Counter;
-import org.dromara.hmily.metrics.api.CounterMetricsTracker;
-import org.dromara.hmily.metrics.enums.MetricsLabelEnum;
+import lombok.Data;
+import org.dromara.hmily.config.api.AbstractConfig;
+import org.dromara.hmily.config.api.constant.PrefixConstants;
+import org.dromara.hmily.spi.HmilySPI;
 
 /**
- * Request total counter metrics tracker.
+ * The type Hmily server.
+ *
+ * @author xiaoyu
  */
-public final class TransactionTotalCounterMetricsTracker implements CounterMetricsTracker {
+@Data
+@HmilySPI("hmilyServer")
+public class HmilyServer extends AbstractConfig {
     
-    private static final Counter TRANSACTION_TOTAL = Counter.build()
-            .name("transaction_total")
-            .labelNames("type")
-            .help("hmily request total count")
-            .register();
+    private String appName;
     
-    @Override
-    public void inc(final double amount, final String... labelValues) {
-        TRANSACTION_TOTAL.labels(labelValues).inc(amount);
-    }
+    private String configMode;
     
     @Override
-    public String metricsLabel() {
-        return MetricsLabelEnum.TRANSACTION_TOTAL.getName();
+    public String prefix() {
+        return PrefixConstants.SERVER_PREFIX;
     }
 }
-
