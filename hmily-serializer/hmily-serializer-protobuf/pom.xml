@@ -47,5 +47,9 @@
             <groupId>org.objenesis</groupId>
             <artifactId>objenesis</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+        </dependency>
     </dependencies>
 </project>
