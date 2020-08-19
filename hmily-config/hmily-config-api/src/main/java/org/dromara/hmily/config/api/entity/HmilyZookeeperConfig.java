@@ -23,28 +23,22 @@ import org.dromara.hmily.config.api.constant.PrefixConstants;
 import org.dromara.hmily.spi.HmilySPI;
 
 /**
- * The type Hmily server.
+ * The zookeeper config.
  *
  * @author xiaoyu
  */
 @Data
-@HmilySPI("hmilyServer")
-public class HmilyServer extends AbstractConfig {
-    
-    /**
-     * Resource suffix this parameter please fill in about is the transaction store path.
-     * If it's a table store this is a table suffix, it's stored the same way.
-     * If this parameter is not filled in, the applicationName of the application is retrieved by default
-     */
-    private String appName;
-    
-    /**
-     * local,nacos,zookeeper,apollo.
-     */
-    private String configMode;
+@HmilySPI("hmilyZookeeperConfig")
+public class HmilyZookeeperConfig extends AbstractConfig {
+
+    private String host;
+
+    private int sessionTimeOut = 1000;
+
+    private String rootPath = "/hmily";
     
     @Override
     public String prefix() {
-        return PrefixConstants.SERVER_PREFIX;
+        return PrefixConstants.ZOOKEEPER_PREFIX;
     }
 }

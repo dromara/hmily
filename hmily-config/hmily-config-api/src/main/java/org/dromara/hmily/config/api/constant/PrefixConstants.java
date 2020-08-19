@@ -37,6 +37,36 @@ public interface PrefixConstants {
     String CONFIG_PREFIX = "hmily.config";
     
     /**
+     * The constant DATABASE_PREFIX.
+     */
+    String DATABASE_PREFIX = "repository.database";
+    
+    /**
+     * The constant FILE_PREFIX.
+     */
+    String FILE_PREFIX = "repository.file";
+    
+    /**
+     * The constant MONGO_PREFIX.
+     */
+    String MONGO_PREFIX = "repository.mongo";
+    
+    /**
+     * The constant REDIS_PREFIX.
+     */
+    String REDIS_PREFIX = "repository.redis";
+    
+    /**
+     * The constant ZOOKEEPER_PREFIX.
+     */
+    String ZOOKEEPER_PREFIX = "repository.zookeeper";
+    
+    /**
+     * The constant METRICS_PREFIX.
+     */
+    String METRICS_PREFIX = "metrics";
+    
+    /**
      * The constant APOLLO_PREFIX.
      */
     String APOLLO_PREFIX = "hmily.apollo";

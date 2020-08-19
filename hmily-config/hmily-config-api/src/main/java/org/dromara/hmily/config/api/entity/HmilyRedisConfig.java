@@ -23,28 +23,66 @@ import org.dromara.hmily.config.api.constant.PrefixConstants;
 import org.dromara.hmily.spi.HmilySPI;
 
 /**
- * The type Hmily server.
+ * The HmilyRedisConfig.
  *
  * @author xiaoyu
  */
 @Data
-@HmilySPI("hmilyServer")
-public class HmilyServer extends AbstractConfig {
-    
+@HmilySPI("hmilyRedisConfig")
+public class HmilyRedisConfig extends AbstractConfig {
+
+    private boolean cluster = false;
+
+    private boolean sentinel = false;
+
     /**
-     * Resource suffix this parameter please fill in about is the transaction store path.
-     * If it's a table store this is a table suffix, it's stored the same way.
-     * If this parameter is not filled in, the applicationName of the application is retrieved by default
+     * cluster url example:ip:port;ip:port.
      */
-    private String appName;
-    
+    private String clusterUrl;
+
     /**
-     * local,nacos,zookeeper,apollo.
+     * sentinel url example:ip:port;ip:port.
      */
-    private String configMode;
+    private String sentinelUrl;
+
+    private String masterName;
+
+    private String hostName;
+
+    private int port;
+
+    private String password;
+
+    private int maxTotal = 8;
+
+    private int maxIdle = 8;
+
+    private int minIdle;
+
+    private long maxWaitMillis = -1;
+
+    private long minEvictableIdleTimeMillis = 1800000;
+
+    private long softMinEvictableIdleTimeMillis = 1800000;
+
+    private int numTestsPerEvictionRun = 3;
+
+    private boolean testOnCreate = false;
+
+    private boolean testOnBorrow = false;
+
+    private boolean testOnReturn = false;
+
+    private boolean testWhileIdle = false;
+
+    private long timeBetweenEvictionRunsMillis = -1;
+
+    private boolean blockWhenExhausted = true;
+
+    private int timeOut = 10000;
     
     @Override
     public String prefix() {
-        return PrefixConstants.SERVER_PREFIX;
+        return PrefixConstants.REDIS_PREFIX;
     }
 }

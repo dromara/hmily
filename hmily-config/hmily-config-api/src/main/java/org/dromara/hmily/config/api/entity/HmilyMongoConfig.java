@@ -23,28 +23,36 @@ import org.dromara.hmily.config.api.constant.PrefixConstants;
 import org.dromara.hmily.spi.HmilySPI;
 
 /**
- * The type Hmily server.
+ * The mongo config.
  *
  * @author xiaoyu
  */
 @Data
-@HmilySPI("hmilyServer")
-public class HmilyServer extends AbstractConfig {
-    
+@HmilySPI("hmilyMongoConfig")
+public class HmilyMongoConfig extends AbstractConfig {
+
     /**
-     * Resource suffix this parameter please fill in about is the transaction store path.
-     * If it's a table store this is a table suffix, it's stored the same way.
-     * If this parameter is not filled in, the applicationName of the application is retrieved by default
+     * mongo db name .
      */
-    private String appName;
-    
+    private String databaseName;
+
     /**
-     * local,nacos,zookeeper,apollo.
+     * mongo url.
      */
-    private String configMode;
+    private String url;
+
+    /**
+     * mongo user name .
+     */
+    private String userName;
+
+    /**
+     * mongo password.
+     */
+    private String password;
     
     @Override
     public String prefix() {
-        return PrefixConstants.SERVER_PREFIX;
+        return PrefixConstants.MONGO_PREFIX;
     }
 }
