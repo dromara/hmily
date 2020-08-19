@@ -32,7 +32,7 @@ import java.util.Optional;
  */
 @Getter
 @Setter
-public final class UpdateStatement extends org.dromara.hmily.tac.sqlparser.model.statement.dml.DMLStatement {
+public final class UpdateStatement extends DMLStatement {
     
     private final Collection<SimpleTableSegment> tables = new LinkedList<>();
     
