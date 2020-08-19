@@ -16,45 +16,6 @@ spring:
     main:
         allow-bean-definition-overriding: true
 
-org:
-    dromara:
-         hmily :
-            app-name: sc-account
-            serializer : kryo
-            recoverDelayTime : 128
-            retryMax : 30
-            scheduled-recovery-delay: 60
-            scheduledThreadMax :  10
-            repository : mysql
-            hmilyDbConfig :
-                 driverClassName  : com.mysql.jdbc.Driver
-                 url: jdbc:mysql://127.0.0.1:3306/hmily?useUnicode=true&characterEncoding=utf8
-                 username : root
-                 password :
-
-
-
-      # repositorySupport : redis
-       #         hostName  : 192.168.1.68
-       #         port      :  6379
-       #         password  :
-
-
-       # repositorySupport : zookeeper
-       #         host      : 92.168.1.73:2181
-       #         sessionTimeOut      :  100000
-       #         rootPath  : /tcc
-
-#            hmilyMongoConfig :
-#              mongoDbUrl  : 127.0.0.1:27017
-#              mongoDbName  :  admin
-#              mongoUserName  : root
-#              mongoUserPwd   : 123456
-
-       # repositorySupport : file
-       #         path      : /account
-       #         prefix    :  account
-
 mybatis:
   type-aliases-package: org.dromara.hmily.demo.springcloud.account.entity
   config-location: classpath:mybatis/mybatis-config.xml
