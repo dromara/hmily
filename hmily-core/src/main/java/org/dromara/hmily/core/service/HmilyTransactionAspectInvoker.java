@@ -37,9 +37,12 @@ public final class HmilyTransactionAspectInvoker {
     
     private static final EnumMap<TransTypeEnum, HmilyTransactionHandlerFactory> FACTORY_MAP = new EnumMap<>(TransTypeEnum.class);
     
-    private HmilyTransactionAspectInvoker() {
+    static {
         FACTORY_MAP.put(TransTypeEnum.TCC, ExtensionLoaderFactory.load(HmilyTransactionHandlerFactory.class, "tcc"));
         FACTORY_MAP.put(TransTypeEnum.TAC, ExtensionLoaderFactory.load(HmilyTransactionHandlerFactory.class, "tac"));
+    }
+    
+    private HmilyTransactionAspectInvoker() {
     }
     
     /**
