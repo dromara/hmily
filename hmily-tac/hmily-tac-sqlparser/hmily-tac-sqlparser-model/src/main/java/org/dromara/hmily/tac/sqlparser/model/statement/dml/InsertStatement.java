@@ -40,7 +40,7 @@ import java.util.Optional;
  */
 @Getter
 @Setter
-public final class InsertStatement extends org.dromara.hmily.tac.sqlparser.model.statement.dml.DMLStatement {
+public final class InsertStatement extends DMLStatement {
     
     private SimpleTableSegment table;
     
