@@ -27,8 +27,6 @@ import java.util.stream.Collectors;
 import org.dromara.hmily.common.utils.LogUtil;
 import org.dromara.hmily.common.utils.StringUtils;
 import org.dromara.hmily.config.api.ConfigEnv;
-import org.dromara.hmily.config.api.entity.HmilyConfig;
-import org.dromara.hmily.config.api.entity.HmilyFileConfig;
 import org.dromara.hmily.config.api.entity.HmilyRedisConfig;
 import org.dromara.hmily.repository.redis.jedis.JedisClient;
 import org.dromara.hmily.repository.redis.jedis.JedisClientCluster;
@@ -65,10 +63,11 @@ public class RedisRepository implements HmilyRepository {
     
     private String keyPrefix;
     
+    private String appName;
+    
     @Override
-    public void init() {
-        HmilyConfig config = ConfigEnv.getInstance().getConfig(HmilyConfig.class);
-        keyPrefix = config.getAppName();
+    public void init(final String appName) {
+        this.appName = appName;
         HmilyRedisConfig hmilyRedisConfig = ConfigEnv.getInstance().getConfig(HmilyRedisConfig.class);
         try {
             buildJedisPool(hmilyRedisConfig);

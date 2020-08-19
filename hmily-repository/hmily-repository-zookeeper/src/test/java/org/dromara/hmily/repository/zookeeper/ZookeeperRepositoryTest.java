@@ -71,7 +71,7 @@ public class ZookeeperRepositoryTest {
         hmilyZookeeperConfig.setHost("127.0.0.1:2181");
         hmilyZookeeperConfig.setSessionTimeOut(300000);
         
-        zookeeperRepository.init();
+        zookeeperRepository.init("default");
         zookeeperRepository.setSerializer(new KryoSerializer());
         
         

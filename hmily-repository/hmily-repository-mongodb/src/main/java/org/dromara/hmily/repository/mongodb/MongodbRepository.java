@@ -21,10 +21,14 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.mongodb.MongoCredential;
 import com.mongodb.ServerAddress;
+import java.net.InetSocketAddress;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.tuple.Pair;
 import org.dromara.hmily.config.api.ConfigEnv;
-import org.dromara.hmily.config.api.entity.HmilyConfig;
-import org.dromara.hmily.config.api.entity.HmilyFileConfig;
 import org.dromara.hmily.config.api.entity.HmilyMongoConfig;
 import org.dromara.hmily.repository.mongodb.entity.ParticipantMongoEntity;
 import org.dromara.hmily.repository.mongodb.entity.TransactionMongoEntity;
@@ -40,13 +44,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.MongoClientFactoryBean;
 import org.springframework.data.mongodb.core.query.Criteria;
-
-import java.net.InetSocketAddress;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 /**
  * mongo impl.
@@ -65,9 +62,8 @@ public class MongodbRepository implements HmilyRepository {
     private String appName;
 
     @Override
-    public void init() {
-        HmilyConfig config = ConfigEnv.getInstance().getConfig(HmilyConfig.class);
-        appName = config.getAppName();
+    public void init(final String appName) {
+        this.appName = appName;
         HmilyMongoConfig hmilyMongoConfig = ConfigEnv.getInstance().getConfig(HmilyMongoConfig.class);
         MongoClientFactoryBean clientFactoryBean = buildMongoClientFactoryBean(hmilyMongoConfig);
         try {

@@ -72,12 +72,11 @@ public class ZookeeperRepository implements HmilyRepository {
 
     private String rootPathPrefix = "/hmily";
 
-    private String appName = "default";
+    private String appName;
 
     @Override
-    public void init() {
-        HmilyConfig config = ConfigEnv.getInstance().getConfig(HmilyConfig.class);
-        appName = config.getAppName();
+    public void init(final String appName) {
+        this.appName = appName;
         HmilyZookeeperConfig zookeeperConfig = ConfigEnv.getInstance().getConfig(HmilyZookeeperConfig.class);
         try {
             connect(zookeeperConfig);

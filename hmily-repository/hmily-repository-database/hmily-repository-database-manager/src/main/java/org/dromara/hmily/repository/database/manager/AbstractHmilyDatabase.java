@@ -229,7 +229,8 @@ public abstract class AbstractHmilyDatabase implements HmilyRepository {
     protected abstract Object convertDataType(Object params);
     
     @Override
-    public void init() {
+    public void init(final String appName) {
+        this.appName = appName;
         try {
             HmilyConfig hmilyConfig = ConfigEnv.getInstance().getConfig(HmilyConfig.class);
             HmilyDatabaseConfig hmilyDatabaseConfig = ConfigEnv.getInstance().getConfig(HmilyDatabaseConfig.class);
@@ -248,7 +249,6 @@ public abstract class AbstractHmilyDatabase implements HmilyRepository {
                 hmilyDatabaseConfig.getPropertyMap().forEach(hikariDataSource::addDataSourceProperty);
             }
             this.dataSource = hikariDataSource;
-            this.appName = hmilyConfig.getAppName();
             if (hmilyConfig.isAutoSql()) {
                 this.initScript(hmilyDatabaseConfig);
             }
