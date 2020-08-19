@@ -9,52 +9,6 @@ spring:
         url: jdbc:mysql://127.0.0.1:3306/tcc_account?useUnicode=true&characterEncoding=utf8
         username: root
         password:
-org:
-    dromara:
-         hmily :
-            app-name: account
-            serializer : kryo
-            recoverDelayTime : 60
-            retryMax : 30
-            scheduledRecoveryDelay : 60
-            scheduledThreadMax :  10
-            repository : mysql
-            hmilyDbConfig :
-                 driverClassName : com.mysql.jdbc.Driver
-                 url :  jdbc:mysql://127.0.0.1:3306/hmily?useUnicode=true&characterEncoding=utf8
-                 username : root
-                 password :
-            hmilyMetricsConfig:
-                 metricsName: prometheus
-                 port :  9081
-
-
-#            repository-support: file
-#            hmily-file-config:
-#                     path      : /account
-#                     prefix    :  account
-#
-
-#           repository-support:  mongodb
-#           hmily-mongo-config:
-#               mongoDbUrl  : 192.168.1.68:27017
-#               mongoDbName  :  happylife
-#               mongoUserName  : xiaoyu
-#               mongoUserPwd   : 123456
-
-
-#           repository-support: zookeeper
-#           hmily-zookeeper-config:
-#                    host      : 92.168.1.73:2181
-#                    sessionTimeOut      :  100000
-#                    rootPath  : /tcc
-
-#            repository-support: redis
-#            hmily-redis-config:
-#                 masterName: mymaster
-#                 sentinel : true
-#                 sentinelUrl : 192.168.1.91:26379;192.168.1.92:26379;192.168.1.93:26379
-#                 password  : foobaredbbexONE123
 
 mybatis:
   type-aliases-package: com.hmily.tcc.demo.dubbo.account.api.entity
