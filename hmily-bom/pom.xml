@@ -37,7 +37,7 @@
         <mongo.driver.version>3.8.0</mongo.driver.version>
         <mysql-connector-java>5.1.46</mysql-connector-java>
         <commons-lang3.version>3.3.2</commons-lang3.version>
-        <guava.version>21.0</guava.version>
+        <guava.version>29.0-jre</guava.version>
         <spring.data.mongodb.version>2.1.3.RELEASE</spring.data.mongodb.version>
         <hessian.version>4.0.38</hessian.version>
         <protostuff.version>1.0.8</protostuff.version>
@@ -230,7 +230,6 @@
                 <artifactId>commons-lang3</artifactId>
                 <version>${commons-lang3.version}</version>
             </dependency>
-
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>

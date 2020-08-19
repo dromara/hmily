@@ -17,11 +17,11 @@
 
 package org.dromara.hmily.repository.spi.entity;
 
-import com.google.common.collect.Lists;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.CopyOnWriteArrayList;
 import lombok.Data;
 
 /**
@@ -85,7 +85,7 @@ public class HmilyTransaction implements Serializable {
     public HmilyTransaction() {
         this.createTime = new Date();
         this.updateTime = new Date();
-        hmilyParticipants = Lists.newCopyOnWriteArrayList();
+        hmilyParticipants = new CopyOnWriteArrayList<>();
 
     }
     
@@ -98,7 +98,7 @@ public class HmilyTransaction implements Serializable {
         this.transId = transId;
         this.createTime = new Date();
         this.updateTime = new Date();
-        hmilyParticipants = Lists.newCopyOnWriteArrayList();
+        hmilyParticipants = new CopyOnWriteArrayList<>();;
     }
     
     /**
