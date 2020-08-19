@@ -17,7 +17,15 @@
 
 package org.dromara.hmily.tac.common;
 
+/**
+ * The interface Hmily tac resource.
+ */
 public interface HmilyTacResource {
     
+    /**
+     * Gets resource id.
+     *
+     * @return the resource id
+     */
     String getResourceId();
 }

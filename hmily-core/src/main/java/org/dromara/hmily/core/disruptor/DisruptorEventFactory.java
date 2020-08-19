@@ -26,6 +26,7 @@ import org.dromara.hmily.core.disruptor.event.DataEvent;
  * @author chenbin sixh
  */
 public class DisruptorEventFactory<T> implements EventFactory<DataEvent<T>> {
+    
     @Override
     public DataEvent<T> newInstance() {
         return new DataEvent<>();

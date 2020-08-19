@@ -22,8 +22,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 import org.apache.commons.lang3.StringUtils;
 import org.dromara.hmily.config.api.exception.ConfigException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * The type Config env.
@@ -32,8 +30,6 @@ import org.slf4j.LoggerFactory;
  */
 public final class ConfigEnv {
     
-    private static final Logger logger = LoggerFactory.getLogger(ConfigEnv.class);
-
     private final Map<Class<?>, Config> configBeans = new ConcurrentHashMap<>();
     
     private static final ConfigEnv INST = new ConfigEnv();

@@ -19,12 +19,13 @@ package org.dromara.hmily.repository.spi;
 
 import java.util.Date;
 import java.util.List;
-import org.dromara.hmily.config.HmilyConfig;
+import org.dromara.hmily.config.api.entity.HmilyConfig;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipant;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipantUndo;
 import org.dromara.hmily.repository.spi.entity.HmilyTransaction;
 import org.dromara.hmily.repository.spi.exception.HmilyRepositoryException;
 import org.dromara.hmily.serializer.spi.HmilySerializer;
+import org.dromara.hmily.spi.InitializeSPI;
 
 /**
  * The interface Hmily repository.
@@ -45,10 +46,8 @@ public interface HmilyRepository {
     
     /**
      * Init.
-     *
-     * @param hmilyConfig the hmily config
      */
-    void init(HmilyConfig hmilyConfig);
+    void init();
     
     /**
      * Sets serializer.

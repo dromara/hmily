@@ -34,8 +34,9 @@ import org.dromara.hmily.common.exception.HmilyRuntimeException;
 import org.dromara.hmily.common.utils.CollectionUtils;
 import org.dromara.hmily.common.utils.LogUtil;
 import org.dromara.hmily.common.utils.StringUtils;
-import org.dromara.hmily.config.HmilyConfig;
-import org.dromara.hmily.config.HmilyZookeeperConfig;
+import org.dromara.hmily.config.api.ConfigEnv;
+import org.dromara.hmily.config.api.entity.HmilyConfig;
+import org.dromara.hmily.config.api.entity.HmilyZookeeperConfig;
 import org.dromara.hmily.repository.spi.HmilyRepository;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipant;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipantUndo;
@@ -74,10 +75,12 @@ public class ZookeeperRepository implements HmilyRepository {
     private String appName = "default";
 
     @Override
-    public void init(final HmilyConfig hmilyConfig) {
-        appName = hmilyConfig.getAppName();
+    public void init() {
+        HmilyConfig config = ConfigEnv.getInstance().getConfig(HmilyConfig.class);
+        appName = config.getAppName();
+        HmilyZookeeperConfig zookeeperConfig = ConfigEnv.getInstance().getConfig(HmilyZookeeperConfig.class);
         try {
-            connect(hmilyConfig.getHmilyZookeeperConfig());
+            connect(zookeeperConfig);
         } catch (Exception e) {
             LogUtil.error(LOGGER, "zookeeper init error please check you config:{}", e::getMessage);
             throw new HmilyRuntimeException(e.getMessage());

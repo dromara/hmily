@@ -34,7 +34,7 @@ import java.util.regex.Pattern;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 import org.dromara.hmily.common.utils.GsonUtils;
-import org.dromara.hmily.config.HmilyJmxConfig;
+import org.dromara.hmily.config.api.entity.HmilyMetricsConfig;
 
 /**
  * The type Jmx collector.
@@ -45,7 +45,7 @@ public class JmxCollector extends Collector implements Collector.Describable {
     
     private static final Logger LOGGER = Logger.getLogger(JmxCollector.class.getName());
     
-    private HmilyJmxConfig config;
+    private HmilyMetricsConfig.HmilyJmxConfig config;
     
     private long createTimeNanoSecs = System.nanoTime();
     
@@ -61,8 +61,8 @@ public class JmxCollector extends Collector implements Collector.Describable {
         config = loadConfig(GsonUtils.getInstance().toObjectMap(json));
     }
     
-    private HmilyJmxConfig loadConfig(final Map<String, Object> paramMap) throws MalformedObjectNameException {
-        HmilyJmxConfig cfg = new HmilyJmxConfig();
+    private HmilyMetricsConfig.HmilyJmxConfig loadConfig(final Map<String, Object> paramMap) throws MalformedObjectNameException {
+        HmilyMetricsConfig.HmilyJmxConfig cfg = new HmilyMetricsConfig.HmilyJmxConfig();
         if (paramMap == null || paramMap.size() == 0) {
             return cfg;
         }
@@ -119,7 +119,7 @@ public class JmxCollector extends Collector implements Collector.Describable {
         if (paramMap.containsKey("rules")) {
             List<Map<String, Object>> configRules = GsonUtils.getInstance().toListMap(paramMap.get("rules").toString());
             for (Map<String, Object> ruleObject : configRules) {
-                HmilyJmxConfig.Rule rule = new HmilyJmxConfig.Rule();
+                HmilyMetricsConfig.HmilyJmxConfig.Rule rule = new HmilyMetricsConfig.HmilyJmxConfig.Rule();
                 cfg.getRules().add(rule);
                 if (ruleObject.containsKey("pattern")) {
                     rule.setPattern(Pattern.compile("^.*(?:" + ruleObject.get("pattern") + ").*$"));
@@ -142,7 +142,7 @@ public class JmxCollector extends Collector implements Collector.Describable {
                     rule.setAttrNameSnakeCase((Boolean) ruleObject.get("attrNameSnakeCase"));
                 }
                 if (ruleObject.containsKey("type")) {
-                    rule.setType(HmilyJmxConfig.Type.valueOf(String.valueOf(ruleObject.containsKey("type"))));
+                    rule.setType(HmilyMetricsConfig.HmilyJmxConfig.Type.valueOf(String.valueOf(ruleObject.containsKey("type"))));
                 }
                 if (ruleObject.containsKey("help")) {
                     rule.setHelp(String.valueOf(ruleObject.get("help")));
@@ -164,7 +164,7 @@ public class JmxCollector extends Collector implements Collector.Describable {
             }
         } else {
             // Default to a single default rule.
-            cfg.getRules().add(new HmilyJmxConfig.Rule());
+            cfg.getRules().add(new HmilyMetricsConfig.HmilyJmxConfig.Rule());
         }
         return cfg;
     }
@@ -331,7 +331,7 @@ public class JmxCollector extends Collector implements Collector.Describable {
             // attrDescription tends not to be useful, so give the fully qualified name too.
             String help = attrDescription + " (" + beanName + attrName + ")";
             String attrNameSnakeCase = toSnakeAndLowerCase(attrName);
-            for (HmilyJmxConfig.Rule rule : config.getRules()) {
+            for (HmilyMetricsConfig.HmilyJmxConfig.Rule rule : config.getRules()) {
                 Matcher matcher = null;
                 String matchName = beanName + (rule.isAttrNameSnakeCase() ? attrNameSnakeCase : attrName);
                 if (rule.getPattern() != null) {

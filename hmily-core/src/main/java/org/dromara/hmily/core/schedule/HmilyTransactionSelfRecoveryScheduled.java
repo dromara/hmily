@@ -30,8 +30,8 @@ import org.dromara.hmily.common.concurrent.HmilyThreadFactory;
 import org.dromara.hmily.common.enums.HmilyActionEnum;
 import org.dromara.hmily.common.utils.CollectionUtils;
 import org.dromara.hmily.common.utils.LogUtil;
-import org.dromara.hmily.config.HmilyConfig;
-import org.dromara.hmily.core.holder.SingletonHolder;
+import org.dromara.hmily.config.api.ConfigEnv;
+import org.dromara.hmily.config.api.entity.HmilyConfig;
 import org.dromara.hmily.core.hook.UndoHook;
 import org.dromara.hmily.repository.spi.HmilyRepository;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipant;
@@ -50,7 +50,7 @@ public class HmilyTransactionSelfRecoveryScheduled implements AutoCloseable {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(HmilyTransactionSelfRecoveryScheduled.class);
     
-    private final HmilyConfig hmilyConfig = SingletonHolder.INST.get(HmilyConfig.class);
+    private final HmilyConfig hmilyConfig = ConfigEnv.getInstance().getConfig(HmilyConfig.class);
     
     private final HmilyRepository hmilyRepository;
     

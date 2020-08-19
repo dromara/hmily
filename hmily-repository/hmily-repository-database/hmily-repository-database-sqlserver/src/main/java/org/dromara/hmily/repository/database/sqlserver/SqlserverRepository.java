@@ -23,7 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.jdbc.ScriptRunner;
-import org.dromara.hmily.config.HmilyDbConfig;
+import org.dromara.hmily.config.api.entity.HmilyDatabaseConfig;
 import org.dromara.hmily.repository.database.manager.AbstractHmilyDatabase;
 import org.dromara.hmily.spi.HmilySPI;
 
@@ -50,9 +50,9 @@ public class SqlserverRepository extends AbstractHmilyDatabase {
     }
     
     @Override
-    protected void initScript(final HmilyDbConfig hmilyDbConfig) throws Exception {
-        String jdbcUrl = StringUtils.replace(hmilyDbConfig.getUrl(), "database=hmily", "");
-        Connection conn = DriverManager.getConnection(jdbcUrl, hmilyDbConfig.getUsername(), hmilyDbConfig.getPassword());
+    protected void initScript(final HmilyDatabaseConfig config) throws Exception {
+        String jdbcUrl = StringUtils.replace(config.getUrl(), "database=hmily", "");
+        Connection conn = DriverManager.getConnection(jdbcUrl, config.getUsername(), config.getPassword());
         ScriptRunner runner = new ScriptRunner(conn);
         final String delimiter = "/";
         // doesn't print logger

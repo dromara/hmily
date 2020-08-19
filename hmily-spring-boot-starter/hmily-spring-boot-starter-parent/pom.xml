@@ -12,13 +12,10 @@
     <artifactId>hmily-spring-boot-starter-parent</artifactId>
 
     <dependencies>
-
         <dependency>
             <groupId>org.dromara</groupId>
             <artifactId>hmily-spring</artifactId>
             <version>${project.version}</version>
         </dependency>
-
     </dependencies>
-
 </project>

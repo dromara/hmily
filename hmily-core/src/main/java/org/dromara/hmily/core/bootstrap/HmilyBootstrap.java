@@ -17,10 +17,15 @@
 
 package org.dromara.hmily.core.bootstrap;
 
+import java.util.Objects;
 import org.dromara.hmily.common.exception.HmilyRuntimeException;
-import org.dromara.hmily.common.utils.LogUtil;
 import org.dromara.hmily.common.utils.StringUtils;
-import org.dromara.hmily.config.HmilyConfig;
+import org.dromara.hmily.config.api.ConfigEnv;
+import org.dromara.hmily.config.api.ConfigScan;
+import org.dromara.hmily.config.api.entity.HmilyConfig;
+import org.dromara.hmily.config.api.entity.HmilyMetricsConfig;
+import org.dromara.hmily.config.loader.ConfigLoader;
+import org.dromara.hmily.config.loader.ServerConfigLoader;
 import org.dromara.hmily.core.disruptor.publisher.HmilyRepositoryEventPublisher;
 import org.dromara.hmily.core.holder.SingletonHolder;
 import org.dromara.hmily.core.hook.HmilyShutdownHook;
@@ -62,28 +67,48 @@ public final class HmilyBootstrap {
     /**
      * hmily initialization.
      *
-     * @param hmilyConfig {@linkplain HmilyConfig}
      */
-    public void start(final HmilyConfig hmilyConfig) {
+    public void start() {
         try {
+            loadConfig();
+            HmilyConfig hmilyConfig = ConfigEnv.getInstance().getConfig(HmilyConfig.class);
             check(hmilyConfig);
             if (null == SingletonHolder.INST.get(ObjectProvide.class)) {
                 SingletonHolder.INST.register(ObjectProvide.class, new ReflectObject());
             }
-            if (null != hmilyConfig.getHmilyMetricsConfig()) {
-                MetricsInit metricsInit = ExtensionLoaderFactory.load(MetricsInit.class);
-                metricsInit.init(hmilyConfig.getHmilyMetricsConfig());
-                HmilyShutdownHook.getInstance().registerAutoCloseable(metricsInit);
-            }
-            SingletonHolder.INST.register(HmilyConfig.class, hmilyConfig);
             loadHmilyRepository(hmilyConfig);
             HmilyShutdownHook.getInstance().registerAutoCloseable(new HmilyTransactionSelfRecoveryScheduled());
             HmilyShutdownHook.getInstance().registerAutoCloseable(HmilyRepositoryEventPublisher.getInstance());
+            initMetrics();
         } catch (Exception e) {
             LOGGER.error(" hmily init exception:", e);
             System.exit(0);
         }
         new HmilyLogo().logo();
+    }
+    
+    private void loadConfig() {
+        ConfigScan.scan();
+        ServerConfigLoader loader = new ServerConfigLoader();
+        loader.load(ConfigLoader.Context::new, (context, config) -> {
+            if (config != null) {
+                if (StringUtils.isNoneBlank(config.getConfigMode())) {
+                    String configMode = config.getConfigMode();
+                    ConfigLoader<?> configLoader = ExtensionLoaderFactory.load(ConfigLoader.class, configMode);
+                    LOGGER.info("Load the configuration【{}】information...", configMode);
+                    configLoader.load(context, (contextAfter, configAfter) -> LOGGER.info("Configuration information: {}", configAfter));
+                }
+            }
+        });
+    }
+    
+    private void initMetrics() {
+        HmilyMetricsConfig metricsConfig = ConfigEnv.getInstance().getConfig(HmilyMetricsConfig.class);
+        if (Objects.nonNull(metricsConfig)) {
+            MetricsInit metricsInit = ExtensionLoaderFactory.load(MetricsInit.class);
+            metricsInit.init(metricsConfig);
+            HmilyShutdownHook.getInstance().registerAutoCloseable(metricsInit);
+        }
     }
     
     private void check(final HmilyConfig hmilyConfig) {
@@ -96,7 +121,7 @@ public final class HmilyBootstrap {
         HmilySerializer hmilySerializer = ExtensionLoaderFactory.load(HmilySerializer.class, hmilyConfig.getSerializer());
         HmilyRepository hmilyRepository = ExtensionLoaderFactory.load(HmilyRepository.class, hmilyConfig.getRepository());
         hmilyRepository.setSerializer(hmilySerializer);
-        hmilyRepository.init(hmilyConfig);
+        hmilyRepository.init();
         HmilyRepositoryFacade.getInstance().setHmilyRepository(hmilyRepository);
         HmilyRepositoryFacade.getInstance().setPhyDeleted(hmilyConfig.isPhyDeleted());
     }

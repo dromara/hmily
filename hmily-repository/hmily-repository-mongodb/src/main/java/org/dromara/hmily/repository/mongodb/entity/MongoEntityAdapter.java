@@ -23,6 +23,7 @@ import org.bson.types.ObjectId;
 
 /**
  * Mongo adapter.
+ *
  * @author xiaoyu
  */
 @Data

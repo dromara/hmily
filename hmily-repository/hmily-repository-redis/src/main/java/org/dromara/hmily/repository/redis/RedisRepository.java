@@ -26,8 +26,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.dromara.hmily.common.utils.LogUtil;
 import org.dromara.hmily.common.utils.StringUtils;
-import org.dromara.hmily.config.HmilyConfig;
-import org.dromara.hmily.config.HmilyRedisConfig;
+import org.dromara.hmily.config.api.ConfigEnv;
+import org.dromara.hmily.config.api.entity.HmilyConfig;
+import org.dromara.hmily.config.api.entity.HmilyFileConfig;
+import org.dromara.hmily.config.api.entity.HmilyRedisConfig;
 import org.dromara.hmily.repository.redis.jedis.JedisClient;
 import org.dromara.hmily.repository.redis.jedis.JedisClientCluster;
 import org.dromara.hmily.repository.redis.jedis.JedisClientSentinel;
@@ -64,9 +66,10 @@ public class RedisRepository implements HmilyRepository {
     private String keyPrefix;
     
     @Override
-    public void init(final HmilyConfig hmilyConfig) {
-        keyPrefix = hmilyConfig.getAppName();
-        final HmilyRedisConfig hmilyRedisConfig = hmilyConfig.getHmilyRedisConfig();
+    public void init() {
+        HmilyConfig config = ConfigEnv.getInstance().getConfig(HmilyConfig.class);
+        keyPrefix = config.getAppName();
+        HmilyRedisConfig hmilyRedisConfig = ConfigEnv.getInstance().getConfig(HmilyRedisConfig.class);
         try {
             buildJedisPool(hmilyRedisConfig);
         } catch (Exception e) {
@@ -191,15 +194,15 @@ public class RedisRepository implements HmilyRepository {
         config.setMinIdle(hmilyRedisConfig.getMinIdle());
         config.setMaxTotal(hmilyRedisConfig.getMaxTotal());
         config.setMaxWaitMillis(hmilyRedisConfig.getMaxWaitMillis());
-        config.setTestOnBorrow(hmilyRedisConfig.getTestOnBorrow());
-        config.setTestOnReturn(hmilyRedisConfig.getTestOnReturn());
-        config.setTestWhileIdle(hmilyRedisConfig.getTestWhileIdle());
+        config.setTestOnBorrow(hmilyRedisConfig.isTestOnBorrow());
+        config.setTestOnReturn(hmilyRedisConfig.isTestOnReturn());
+        config.setTestWhileIdle(hmilyRedisConfig.isTestWhileIdle());
         config.setMinEvictableIdleTimeMillis(hmilyRedisConfig.getMinEvictableIdleTimeMillis());
         config.setSoftMinEvictableIdleTimeMillis(hmilyRedisConfig.getSoftMinEvictableIdleTimeMillis());
         config.setTimeBetweenEvictionRunsMillis(hmilyRedisConfig.getTimeBetweenEvictionRunsMillis());
         config.setNumTestsPerEvictionRun(hmilyRedisConfig.getNumTestsPerEvictionRun());
         JedisPool jedisPool;
-        if (hmilyRedisConfig.getCluster()) {
+        if (hmilyRedisConfig.isCluster()) {
             LogUtil.info(LOGGER, () -> "build redis cluster ............");
             final String clusterUrl = hmilyRedisConfig.getClusterUrl();
             final Set<HostAndPort> hostAndPorts =
@@ -209,7 +212,7 @@ public class RedisRepository implements HmilyRepository {
                             .map(HostAndPort::parseString).collect(Collectors.toSet());
             JedisCluster jedisCluster = new JedisCluster(hostAndPorts, config);
             jedisClient = new JedisClientCluster(jedisCluster);
-        } else if (hmilyRedisConfig.getSentinel()) {
+        } else if (hmilyRedisConfig.isSentinel()) {
             LogUtil.info(LOGGER, () -> "build redis sentinel ............");
             final String sentinelUrl = hmilyRedisConfig.getSentinelUrl();
             final Set<String> hostAndPorts =

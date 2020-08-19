@@ -33,7 +33,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.jdbc.ScriptRunner;
-import org.dromara.hmily.config.HmilyDbConfig;
+import org.dromara.hmily.config.api.entity.HmilyDatabaseConfig;
 import org.dromara.hmily.repository.database.manager.AbstractHmilyDatabase;
 import org.dromara.hmily.spi.HmilySPI;
 
@@ -59,9 +59,9 @@ public class PostgresqlRepository extends AbstractHmilyDatabase {
     }
     
     @Override
-    protected void initScript(final HmilyDbConfig hmilyDbConfig) throws Exception {
-        String jdbcUrl = StringUtils.replace(hmilyDbConfig.getUrl(), "/hmily", "/");
-        Connection conn = DriverManager.getConnection(jdbcUrl, hmilyDbConfig.getUsername(), hmilyDbConfig.getPassword());
+    protected void initScript(final HmilyDatabaseConfig config) throws Exception {
+        String jdbcUrl = StringUtils.replace(config.getUrl(), "/hmily", "/");
+        Connection conn = DriverManager.getConnection(jdbcUrl, config.getUsername(), config.getPassword());
         ScriptRunner runner = new ScriptRunner(conn);
         // doesn't print logger
         runner.setLogWriter(null);
@@ -70,7 +70,7 @@ public class PostgresqlRepository extends AbstractHmilyDatabase {
         runner.setAutoCommit(false);
         runner.setSendFullScript(true);
         Resources.setCharset(StandardCharsets.UTF_8);
-        Reader read = fillInfoToSqlFile(hmilyDbConfig.getUsername(), hmilyDbConfig.getPassword());
+        Reader read = fillInfoToSqlFile(config.getUsername(), config.getPassword());
         runner.runScript(read);
         conn.commit();
         runner.closeConnection();

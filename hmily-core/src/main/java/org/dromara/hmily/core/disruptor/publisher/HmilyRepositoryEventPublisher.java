@@ -21,12 +21,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import org.dromara.hmily.common.enums.EventTypeEnum;
-import org.dromara.hmily.config.HmilyConfig;
+import org.dromara.hmily.config.api.ConfigEnv;
+import org.dromara.hmily.config.api.entity.HmilyConfig;
 import org.dromara.hmily.core.concurrent.ConsistentHashSelector;
 import org.dromara.hmily.core.concurrent.SingletonExecutor;
 import org.dromara.hmily.core.disruptor.DisruptorProviderManage;
 import org.dromara.hmily.core.disruptor.handler.HmilyRepositoryDataHandler;
-import org.dromara.hmily.core.holder.SingletonHolder;
 import org.dromara.hmily.core.repository.HmilyRepositoryDispatcher;
 import org.dromara.hmily.core.repository.HmilyRepositoryEvent;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipant;
@@ -44,7 +44,7 @@ public final class HmilyRepositoryEventPublisher implements AutoCloseable {
     
     private DisruptorProviderManage<HmilyRepositoryEvent> disruptorProviderManage;
     
-    private final HmilyConfig hmilyConfig = SingletonHolder.INST.get(HmilyConfig.class);
+    private final HmilyConfig hmilyConfig = ConfigEnv.getInstance().getConfig(HmilyConfig.class);
     
     private HmilyRepositoryEventPublisher() {
         start();

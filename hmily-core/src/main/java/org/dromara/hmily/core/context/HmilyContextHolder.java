@@ -19,8 +19,8 @@ package org.dromara.hmily.core.context;
 
 import java.util.Objects;
 import java.util.Optional;
-import org.dromara.hmily.config.HmilyConfig;
-import org.dromara.hmily.core.holder.SingletonHolder;
+import org.dromara.hmily.config.api.ConfigEnv;
+import org.dromara.hmily.config.api.entity.HmilyConfig;
 import org.dromara.hmily.spi.ExtensionLoaderFactory;
 
 /**
@@ -31,7 +31,7 @@ public class HmilyContextHolder {
     private static HmilyContext hmilyContext;
     
     static {
-        HmilyConfig hmilyConfig = SingletonHolder.INST.get(HmilyConfig.class);
+        HmilyConfig hmilyConfig = ConfigEnv.getInstance().getConfig(HmilyConfig.class);
         if (Objects.isNull(hmilyConfig)) {
             hmilyContext = new ThreadLocalHmilyContext();
         } else {

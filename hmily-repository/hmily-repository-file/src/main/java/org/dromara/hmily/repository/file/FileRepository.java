@@ -21,7 +21,9 @@ import java.io.File;
 import java.util.Date;
 import java.util.List;
 import org.dromara.hmily.common.exception.HmilyRuntimeException;
-import org.dromara.hmily.config.HmilyConfig;
+import org.dromara.hmily.config.api.ConfigEnv;
+import org.dromara.hmily.config.api.entity.HmilyConfig;
+import org.dromara.hmily.config.api.entity.HmilyFileConfig;
 import org.dromara.hmily.repository.spi.HmilyRepository;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipant;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipantUndo;
@@ -46,10 +48,11 @@ public class FileRepository implements HmilyRepository {
     
     private HmilySerializer hmilySerializer;
     
-    
     @Override
-    public void init(final HmilyConfig hmilyConfig) {
-        filePath = hmilyConfig.getAppName();
+    public void init() {
+        HmilyConfig config = ConfigEnv.getInstance().getConfig(HmilyConfig.class);
+        HmilyFileConfig fileConfig = ConfigEnv.getInstance().getConfig(HmilyFileConfig.class);
+        filePath = config.getAppName();
         File file = new File(filePath);
         if (!file.exists()) {
             file.getParentFile().mkdirs();

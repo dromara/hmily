@@ -24,8 +24,8 @@ import java.util.Random;
 import org.apache.zookeeper.ZooKeeper;
 import org.apache.zookeeper.data.Stat;
 import org.dromara.hmily.annotation.TransTypeEnum;
-import org.dromara.hmily.config.HmilyConfig;
-import org.dromara.hmily.config.HmilyZookeeperConfig;
+import org.dromara.hmily.config.api.entity.HmilyConfig;
+import org.dromara.hmily.config.api.entity.HmilyZookeeperConfig;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipant;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipantUndo;
 import org.dromara.hmily.repository.spi.entity.HmilyTransaction;
@@ -47,9 +47,11 @@ public class ZookeeperRepositoryTest {
     private ZookeeperRepository zookeeperRepository = new ZookeeperRepository();
     
     private HmilyConfig hmilyConfig = new HmilyConfig();
+    
     private HmilyZookeeperConfig hmilyZookeeperConfig = new HmilyZookeeperConfig();
     
     private String appName = "test_hmily_zookeeper";
+    
     private Random random = new Random(System.currentTimeMillis());
     
     private static final String HMILY_TRANSACTION_GLOBAL = "hmily_transaction_global";
@@ -66,11 +68,10 @@ public class ZookeeperRepositoryTest {
     @Before
     public void setUp() throws Exception {
         hmilyConfig.setAppName(appName);
-        hmilyConfig.setHmilyZookeeperConfig(hmilyZookeeperConfig);
         hmilyZookeeperConfig.setHost("127.0.0.1:2181");
         hmilyZookeeperConfig.setSessionTimeOut(300000);
         
-        zookeeperRepository.init(hmilyConfig);
+        zookeeperRepository.init();
         zookeeperRepository.setSerializer(new KryoSerializer());
         
         

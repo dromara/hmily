@@ -35,6 +35,7 @@
         <module>hmily-config-nacos</module>
         <module>hmily-config-apollo</module>
         <module>hmily-config-zookeeper</module>
+        <module>hmily-config-all</module>
     </modules>
 
 

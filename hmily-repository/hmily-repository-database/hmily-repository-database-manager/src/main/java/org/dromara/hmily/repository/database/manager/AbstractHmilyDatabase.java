@@ -35,8 +35,9 @@ import javax.sql.DataSource;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.hmily.common.exception.HmilyRuntimeException;
 import org.dromara.hmily.common.utils.CollectionUtils;
-import org.dromara.hmily.config.HmilyConfig;
-import org.dromara.hmily.config.HmilyDbConfig;
+import org.dromara.hmily.config.api.ConfigEnv;
+import org.dromara.hmily.config.api.entity.HmilyConfig;
+import org.dromara.hmily.config.api.entity.HmilyDatabaseConfig;
 import org.dromara.hmily.repository.spi.HmilyRepository;
 import org.dromara.hmily.repository.spi.entity.HmilyInvocation;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipant;
@@ -217,7 +218,7 @@ public abstract class AbstractHmilyDatabase implements HmilyRepository {
      *
      * @param hmilyDbConfig the hmilyDbConfig
      */
-    protected abstract void initScript(HmilyDbConfig hmilyDbConfig) throws Exception;
+    protected abstract void initScript(HmilyDatabaseConfig hmilyDbConfig) throws Exception;
     
     /**
      * Convert data type object.
@@ -228,27 +229,28 @@ public abstract class AbstractHmilyDatabase implements HmilyRepository {
     protected abstract Object convertDataType(Object params);
     
     @Override
-    public void init(final HmilyConfig hmilyConfig) {
+    public void init() {
         try {
-            HmilyDbConfig hmilyDbConfig = hmilyConfig.getHmilyDbConfig();
+            HmilyConfig hmilyConfig = ConfigEnv.getInstance().getConfig(HmilyConfig.class);
+            HmilyDatabaseConfig hmilyDatabaseConfig = ConfigEnv.getInstance().getConfig(HmilyDatabaseConfig.class);
             HikariDataSource hikariDataSource = new HikariDataSource();
-            hikariDataSource.setJdbcUrl(hmilyDbConfig.getUrl());
-            hikariDataSource.setDriverClassName(hmilyDbConfig.getDriverClassName());
-            hikariDataSource.setUsername(hmilyDbConfig.getUsername());
-            hikariDataSource.setPassword(hmilyDbConfig.getPassword());
-            hikariDataSource.setMaximumPoolSize(hmilyDbConfig.getMaxActive());
-            hikariDataSource.setMinimumIdle(hmilyDbConfig.getMinIdle());
-            hikariDataSource.setConnectionTimeout(hmilyDbConfig.getConnectionTimeout());
-            hikariDataSource.setIdleTimeout(hmilyDbConfig.getIdleTimeout());
-            hikariDataSource.setMaxLifetime(hmilyDbConfig.getMaxLifetime());
-            hikariDataSource.setConnectionTestQuery(hmilyDbConfig.getConnectionTestQuery());
-            if (hmilyDbConfig.getDataSourcePropertyMap() != null && !hmilyDbConfig.getDataSourcePropertyMap().isEmpty()) {
-                hmilyDbConfig.getDataSourcePropertyMap().forEach(hikariDataSource::addDataSourceProperty);
+            hikariDataSource.setJdbcUrl(hmilyDatabaseConfig.getUrl());
+            hikariDataSource.setDriverClassName(hmilyDatabaseConfig.getDriverClassName());
+            hikariDataSource.setUsername(hmilyDatabaseConfig.getUsername());
+            hikariDataSource.setPassword(hmilyDatabaseConfig.getPassword());
+            hikariDataSource.setMaximumPoolSize(hmilyDatabaseConfig.getMaxActive());
+            hikariDataSource.setMinimumIdle(hmilyDatabaseConfig.getMinIdle());
+            hikariDataSource.setConnectionTimeout(hmilyDatabaseConfig.getConnectionTimeout());
+            hikariDataSource.setIdleTimeout(hmilyDatabaseConfig.getIdleTimeout());
+            hikariDataSource.setMaxLifetime(hmilyDatabaseConfig.getMaxLifetime());
+            hikariDataSource.setConnectionTestQuery(hmilyDatabaseConfig.getConnectionTestQuery());
+            if (hmilyDatabaseConfig.getPropertyMap() != null && !hmilyDatabaseConfig.getPropertyMap().isEmpty()) {
+                hmilyDatabaseConfig.getPropertyMap().forEach(hikariDataSource::addDataSourceProperty);
             }
             this.dataSource = hikariDataSource;
             this.appName = hmilyConfig.getAppName();
             if (hmilyConfig.isAutoSql()) {
-                this.initScript(hmilyDbConfig);
+                this.initScript(hmilyDatabaseConfig);
             }
         } catch (Exception e) {
             log.error("hmily jdbc log init exception please check config:{}", e.getMessage());

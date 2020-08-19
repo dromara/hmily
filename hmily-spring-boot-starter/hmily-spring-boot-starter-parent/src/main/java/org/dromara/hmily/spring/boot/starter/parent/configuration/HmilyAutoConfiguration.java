@@ -19,10 +19,7 @@ package org.dromara.hmily.spring.boot.starter.parent.configuration;
 
 import org.dromara.hmily.spring.HmilyApplicationContextAware;
 import org.dromara.hmily.spring.aop.SpringHmilyTransactionAspect;
-import org.dromara.hmily.spring.boot.starter.parent.config.HmilyConfigProperties;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
@@ -35,20 +32,7 @@ import org.springframework.context.annotation.Primary;
  */
 @Configuration
 @EnableAspectJAutoProxy(proxyTargetClass = true)
-@EnableConfigurationProperties({HmilyConfigProperties.class})
 public class HmilyAutoConfiguration {
-    
-    private final HmilyConfigProperties hmilyConfigProperties;
-    
-    /**
-     * Instantiates a new Hmily auto configuration.
-     *
-     * @param hmilyConfigProperties the hmily config properties
-     */
-    @Autowired(required = false)
-    public HmilyAutoConfiguration(HmilyConfigProperties hmilyConfigProperties) {
-        this.hmilyConfigProperties = hmilyConfigProperties;
-    }
     
     /**
      * Hmily transaction aspect spring boot hmily transaction aspect.
@@ -69,32 +53,6 @@ public class HmilyAutoConfiguration {
     @Qualifier("hmilyTransactionBootstrap")
     @Primary
     public HmilyApplicationContextAware hmilyTransactionBootstrap() {
-        final HmilyApplicationContextAware contextAware = new HmilyApplicationContextAware();
-        contextAware.setAppName(hmilyConfigProperties.getAppName());
-        contextAware.setSerializer(hmilyConfigProperties.getSerializer());
-        contextAware.setContextTransmittalMode(hmilyConfigProperties.getContextTransmittalMode());
-        contextAware.setScheduledThreadMax(hmilyConfigProperties.getScheduledThreadMax());
-        contextAware.setScheduledRecoveryDelay(hmilyConfigProperties.getScheduledRecoveryDelay());
-        contextAware.setScheduledCleanDelay(hmilyConfigProperties.getScheduledCleanDelay());
-        contextAware.setScheduledPhyDeletedDelay(hmilyConfigProperties.getScheduledPhyDeletedDelay());
-        contextAware.setScheduledInitDelay(hmilyConfigProperties.getScheduledInitDelay());
-        contextAware.setRecoverDelayTime(hmilyConfigProperties.getRecoverDelayTime());
-        contextAware.setCleanDelayTime(hmilyConfigProperties.getCleanDelayTime());
-        contextAware.setLimit(hmilyConfigProperties.getLimit());
-        contextAware.setRetryMax(hmilyConfigProperties.getRetryMax());
-        contextAware.setBufferSize(hmilyConfigProperties.getBufferSize());
-        contextAware.setConsumerThreads(hmilyConfigProperties.getConsumerThreads());
-        contextAware.setAsyncRepository(hmilyConfigProperties.isAsyncRepository());
-        contextAware.setAutoSql(hmilyConfigProperties.isAutoSql());
-        contextAware.setPhyDeleted(hmilyConfigProperties.isPhyDeleted());
-        contextAware.setStoreDays(hmilyConfigProperties.getStoreDays());
-        contextAware.setRepository(hmilyConfigProperties.getRepository());
-        contextAware.setHmilyDbConfig(hmilyConfigProperties.getHmilyDbConfig());
-        contextAware.setHmilyRedisConfig(hmilyConfigProperties.getHmilyRedisConfig());
-        contextAware.setHmilyZookeeperConfig(hmilyConfigProperties.getHmilyZookeeperConfig());
-        contextAware.setHmilyMongoConfig(hmilyConfigProperties.getHmilyMongoConfig());
-        contextAware.setHmilyFileConfig(hmilyConfigProperties.getHmilyFileConfig());
-        contextAware.setHmilyMetricsConfig(hmilyConfigProperties.getHmilyMetricsConfig());
-        return contextAware;
+        return new HmilyApplicationContextAware();
     }
 }

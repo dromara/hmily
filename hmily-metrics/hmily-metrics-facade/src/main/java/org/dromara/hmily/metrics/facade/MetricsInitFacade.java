@@ -19,7 +19,7 @@ package org.dromara.hmily.metrics.facade;
 
 import com.google.common.base.Preconditions;
 import java.util.Optional;
-import org.dromara.hmily.config.HmilyMetricsConfig;
+import org.dromara.hmily.config.api.entity.HmilyMetricsConfig;
 import org.dromara.hmily.metrics.facade.handler.MetricsTrackerHandler;
 import org.dromara.hmily.metrics.spi.MetricsInit;
 import org.dromara.hmily.metrics.spi.MetricsTrackerManager;

@@ -27,7 +27,7 @@ import javax.management.MalformedObjectNameException;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.dromara.hmily.config.HmilyMetricsConfig;
+import org.dromara.hmily.config.api.entity.HmilyMetricsConfig;
 import org.dromara.hmily.metrics.api.MetricsTrackerFactory;
 import org.dromara.hmily.metrics.prometheus.impl.collector.BuildInfoCollector;
 import org.dromara.hmily.metrics.prometheus.impl.collector.JmxCollector;
