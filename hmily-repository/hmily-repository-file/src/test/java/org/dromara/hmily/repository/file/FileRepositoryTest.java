@@ -69,7 +69,10 @@ public class FileRepositoryTest {
         hmilyConfig.setAppName(appName);
         
         fileRepository.init(appName);
-        fileRepository.setSerializer(new JDKSerializer());
+        fileRepository.setSerializer(new KryoSerializer());
+//        fileRepository.setSerializer(new JDKSerializer());
+//        fileRepository.setSerializer(new JDKSerializer());
+//        fileRepository.setSerializer(new JDKSerializer());
     }
     
     /**

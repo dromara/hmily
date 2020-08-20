@@ -33,7 +33,6 @@ import org.dromara.hmily.serializer.spi.exception.HmilySerializerException;
 import org.dromara.hmily.spi.HmilySPI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -93,14 +92,12 @@ public class FileRepository implements HmilyRepository {
 
     @SneakyThrows
     @Override
-    public int createHmilyTransaction(HmilyTransaction hmilyTransaction) throws HmilyRepositoryException {
+    public int createHmilyTransaction(final HmilyTransaction hmilyTransaction) throws HmilyRepositoryException {
         File file = new File(getTransationPath());
         try {
 
             final boolean exsist = isExsist(file, hmilyTransaction.getTransId());
             if (!exsist) {
-                hmilyTransaction.setRetry(0);
-                hmilyTransaction.setVersion(0);
                 hmilyTransaction.setCreateTime(new Date());
                 hmilyTransaction.setUpdateTime(new Date());
                 createOrUpdateWriteFile(file, hmilyTransaction);
@@ -116,7 +113,7 @@ public class FileRepository implements HmilyRepository {
     }
 
     @Override
-    public int updateRetryByLock(HmilyTransaction hmilyTransaction) {
+    public int updateRetryByLock(final HmilyTransaction hmilyTransaction) {
         final int currentVersion = hmilyTransaction.getVersion();
         File file = new File(getTransationPath());
         try {
@@ -137,7 +134,7 @@ public class FileRepository implements HmilyRepository {
     }
 
     @Override
-    public HmilyTransaction findByTransId(Long transId) {
+    public HmilyTransaction findByTransId(final Long transId) {
         File file = new File(getTransationPath());
         boolean exsist = isExsist(file, transId);
         if (exsist) {
@@ -148,13 +145,13 @@ public class FileRepository implements HmilyRepository {
 
 
     @Override
-    public List<HmilyTransaction> listLimitByDelay(Date date, int limit) {
+    public List<HmilyTransaction> listLimitByDelay(final Date date, final int limit) {
         File file = new File(getTransationPath());
         return listByFilter(file, HmilyTransaction.class, (hmilyTransaction, params) -> {
             Date dateParam = (Date) params[0];
             int limitParam = (int) params[1];
             boolean filterResult = dateParam.before(hmilyTransaction.getUpdateTime())
-                    && appName.equals(hmilyTransaction.getAppName())
+                    && Objects.equals(appName,hmilyTransaction.getAppName())
                     && limitParam-- > 0;
             // write back to params
             params[1] = limitParam;
@@ -163,7 +160,7 @@ public class FileRepository implements HmilyRepository {
     }
 
     @Override
-    public int updateHmilyTransactionStatus(Long transId, Integer status) throws HmilyRepositoryException {
+    public int updateHmilyTransactionStatus(final Long transId,final  Integer status) throws HmilyRepositoryException {
         File file = new File(getTransationPath());
         try {
             boolean exsist = isExsist(file, transId);
@@ -208,7 +205,7 @@ public class FileRepository implements HmilyRepository {
     }
 
     @Override
-    public int removeHmilyTransactionByData(Date date) {
+    public int removeHmilyTransactionByData(final Date date) {
         File file = new File(getTransationPath());
         return removeByFilter(file, HmilyTransaction.class, (hmilyTransaction, params) -> {
             Date dateParam = (Date) params[0];
@@ -217,14 +214,12 @@ public class FileRepository implements HmilyRepository {
     }
 
     @Override
-    public int createHmilyParticipant(HmilyParticipant hmilyParticipant) throws HmilyRepositoryException {
+    public int createHmilyParticipant(final HmilyParticipant hmilyParticipant) throws HmilyRepositoryException {
         File file = new File(getTransationParticipantPath());
         try {
 
             boolean exsist = isExsist(file, hmilyParticipant.getTransId());
             if (!exsist) {
-                hmilyParticipant.setRetry(0);
-                hmilyParticipant.setVersion(0);
                 hmilyParticipant.setCreateTime(new Date());
                 hmilyParticipant.setUpdateTime(new Date());
                 createOrUpdateParticipantWriteFile(file, hmilyParticipant);
@@ -240,7 +235,7 @@ public class FileRepository implements HmilyRepository {
     }
 
     @Override
-    public List<HmilyParticipant> findHmilyParticipant(Long participantId) {
+    public List<HmilyParticipant> findHmilyParticipant(final Long participantId) {
         File file = new File(getTransationParticipantPath());
         return listByFilter(file, HmilyParticipant.class, (hmilyParticipant, params) -> {
             Long participantIdParam = (Long) params[0];
@@ -250,7 +245,7 @@ public class FileRepository implements HmilyRepository {
     }
 
     @Override
-    public List<HmilyParticipant> listHmilyParticipant(Date date, String transType, int limit) {
+    public List<HmilyParticipant> listHmilyParticipant(final Date date,final  String transType,final  int limit) {
         File file = new File(getTransationParticipantPath());
         return listByFilter(file, HmilyParticipant.class, (hmilyParticipant, params) -> {
             Date dateParam = (Date) params[0];
@@ -267,14 +262,14 @@ public class FileRepository implements HmilyRepository {
     }
 
     @Override
-    public List<HmilyParticipant> listHmilyParticipantByTransId(Long transId) {
+    public List<HmilyParticipant> listHmilyParticipantByTransId(final Long transId) {
         File file = new File(getTransationParticipantPath());
         return listByFilter(file, HmilyParticipant.class,
                 (hmilyParticipant, params) -> transId.compareTo(hmilyParticipant.getTransId()) == 0, transId);
     }
 
     @Override
-    public boolean existHmilyParticipantByTransId(Long transId) {
+    public boolean existHmilyParticipantByTransId(final Long transId) {
         return existByFilter((hmilyParticipant, params) -> {
             Long transIdParam = (Long) params[0];
             return transIdParam.compareTo(hmilyParticipant.getTransId()) == 0;
@@ -282,7 +277,7 @@ public class FileRepository implements HmilyRepository {
     }
 
     @Override
-    public int updateHmilyParticipantStatus(Long participantId, Integer status) throws HmilyRepositoryException {
+    public int updateHmilyParticipantStatus(final Long participantId,final  Integer status) throws HmilyRepositoryException {
         File file = new File(getTransationParticipantPath());
         try {
             boolean exsist = isExsist(file, participantId);
@@ -306,7 +301,7 @@ public class FileRepository implements HmilyRepository {
     }
 
     @Override
-    public int removeHmilyParticipant(Long participantId) {
+    public int removeHmilyParticipant(final Long participantId) {
         File file = new File(getTransationParticipantPath());
         try {
             boolean exsist = isExsist(file, participantId);
@@ -327,7 +322,7 @@ public class FileRepository implements HmilyRepository {
     }
 
     @Override
-    public int removeHmilyParticipantByData(Date date) {
+    public int removeHmilyParticipantByData(final Date date) {
         File file = new File(getTransationParticipantPath());
         return removeByFilter(file, HmilyParticipant.class, (hmilyParticipant, params) -> {
             Date dateParam = (Date) params[0];
@@ -336,7 +331,7 @@ public class FileRepository implements HmilyRepository {
     }
 
     @Override
-    public boolean lockHmilyParticipant(HmilyParticipant hmilyParticipant) {
+    public boolean lockHmilyParticipant(final HmilyParticipant hmilyParticipant) {
         final int currentVersion = hmilyParticipant.getVersion();
         File file = new File(getTransationParticipantPath());
         try {
@@ -358,7 +353,7 @@ public class FileRepository implements HmilyRepository {
     }
 
     @Override
-    public int createHmilyParticipantUndo(HmilyParticipantUndo hmilyParticipantUndo) {
+    public int createHmilyParticipantUndo(final HmilyParticipantUndo hmilyParticipantUndo) {
         File file = new File(getParticipantUndoPath());
         try {
             boolean exsist = isExsist(file, hmilyParticipantUndo.getUndoId());
@@ -378,7 +373,7 @@ public class FileRepository implements HmilyRepository {
     }
 
     @Override
-    public List<HmilyParticipantUndo> findHmilyParticipantUndoByParticipantId(Long participantId) {
+    public List<HmilyParticipantUndo> findHmilyParticipantUndoByParticipantId(final Long participantId) {
         File file = new File(getParticipantUndoPath());
         return listByFilter(file, HmilyParticipantUndo.class, (undo, params) -> {
             Long participantIdParam = (Long) params[0];
@@ -387,7 +382,7 @@ public class FileRepository implements HmilyRepository {
     }
 
     @Override
-    public int removeHmilyParticipantUndo(Long undoId) {
+    public int removeHmilyParticipantUndo(final Long undoId) {
         File file = new File(getParticipantUndoPath());
         try {
             boolean exsist = isExsist(file, undoId);
@@ -408,7 +403,7 @@ public class FileRepository implements HmilyRepository {
     }
 
     @Override
-    public int removeHmilyParticipantUndoByData(Date date) {
+    public int removeHmilyParticipantUndoByData(final Date date) {
         File file = new File(getParticipantUndoPath());
         return removeByFilter(file, HmilyParticipantUndo.class, (undo, params) -> {
             Date dateParam = (Date) params[0];
@@ -417,7 +412,7 @@ public class FileRepository implements HmilyRepository {
     }
 
     @Override
-    public int updateHmilyParticipantUndoStatus(Long undoId, Integer status) {
+    public int updateHmilyParticipantUndoStatus(final Long undoId,final  Integer status) {
         File file = new File(getParticipantUndoPath());
         try {
             boolean exsist = isExsist(file, undoId);
@@ -440,21 +435,21 @@ public class FileRepository implements HmilyRepository {
      * transation Path
      */
     private String getTransationPath() {
-        return filePath + File.separator + HMILY_TRANSATION_FILE_DIRECTORY;
+        return filePath + File.separator + appName +File.separator+ HMILY_TRANSATION_FILE_DIRECTORY;
     }
 
     /**
      * transation participant Path
      */
     private String getTransationParticipantPath() {
-        return filePath + File.separator + HMILY_TRANSATION_PARTICIPANT_FILE_DIRECTORY;
+        return filePath + File.separator + appName +File.separator + HMILY_TRANSATION_PARTICIPANT_FILE_DIRECTORY;
     }
 
     /**
      * participantUndo Path
      */
     private String getParticipantUndoPath() {
-        return filePath + File.separator + HMILY_PARTICIPANT_UNDO;
+        return filePath + File.separator + appName +File.separator + HMILY_PARTICIPANT_UNDO;
     }
 
 
@@ -517,7 +512,7 @@ public class FileRepository implements HmilyRepository {
      * @param transId transId
      * @return isExsist
      */
-    private boolean isExsist(File file, final Long transId) {
+    private boolean isExsist(final File file, final Long transId) {
         boolean exsist = Arrays.asList(file.listFiles())
                 .stream().filter(c -> Objects.equals(String.valueOf(transId), c.getName()))
                 .findFirst().isPresent();
@@ -535,7 +530,7 @@ public class FileRepository implements HmilyRepository {
         FileOutputStream fos = null;
         LOCK.writeLock().lock();
         try {
-            File curFile = new File(file.getAbsolutePath() + File.separator + hmilyTransaction.getTransId());
+            File curFile = new File(concatPath(file.getAbsolutePath(),hmilyTransaction.getTransId()));
             if (!curFile.exists()) {
                 boolean newFile = curFile.createNewFile();
             }
@@ -560,7 +555,7 @@ public class FileRepository implements HmilyRepository {
         FileOutputStream fos = null;
         LOCK.writeLock().lock();
         try {
-            File curFile = new File(file.getAbsolutePath() + File.separator + hmilyParticipant.getParticipantId());
+            File curFile = new File(concatPath(file.getAbsolutePath(),hmilyParticipant.getParticipantId()));
             if (!curFile.exists()) {
                 boolean newFile = curFile.createNewFile();
             }
@@ -585,7 +580,7 @@ public class FileRepository implements HmilyRepository {
         FileOutputStream fos = null;
         LOCK.writeLock().lock();
         try {
-            File curFile = new File(file.getAbsolutePath() + File.separator + hmilyParticipantUndo.getUndoId());
+            File curFile = new File(concatPath(file.getAbsolutePath(),hmilyParticipantUndo.getUndoId()));
             if (!curFile.exists()) {
                 boolean newFile = curFile.createNewFile();
             }
@@ -601,11 +596,15 @@ public class FileRepository implements HmilyRepository {
 
 
     private boolean deleteFile(final File file, final Long transId) throws IOException {
-        File curFile = new File(file.getAbsolutePath() + File.separator + transId);
+        File curFile = new File(concatPath(file.getAbsolutePath(),transId));
         if (!curFile.exists()) {
             return true;
         }
         return curFile.delete();
+    }
+
+    private String concatPath(String filePath,Long id){
+        return filePath + File.separator + id;
     }
 
     /**
@@ -614,11 +613,11 @@ public class FileRepository implements HmilyRepository {
      * @return
      */
     @SneakyThrows
-    private <T> T readFile(final File file, Class<T> clazz, final Long transId) {
+    private <T> T readFile(final File file,final  Class<T> clazz, final Long transId) {
         LOCK.readLock().lock();
         FileInputStream fis = null;
         try {
-            File curFile = new File(file.getAbsolutePath() + File.separator + transId);
+            File curFile = new File(concatPath(file.getAbsolutePath(),transId));
             if (!curFile.exists()) {
                 return null;
             }
