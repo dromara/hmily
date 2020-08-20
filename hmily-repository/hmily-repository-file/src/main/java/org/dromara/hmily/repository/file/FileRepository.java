@@ -20,6 +20,7 @@ package org.dromara.hmily.repository.file;
 import lombok.SneakyThrows;
 import org.dromara.hmily.common.exception.HmilyException;
 import org.dromara.hmily.common.exception.HmilyRuntimeException;
+import org.dromara.hmily.common.utils.LogUtil;
 import org.dromara.hmily.config.api.ConfigEnv;
 import org.dromara.hmily.config.api.entity.HmilyFileConfig;
 import org.dromara.hmily.repository.spi.HmilyRepository;
@@ -130,7 +131,7 @@ public class FileRepository implements HmilyRepository {
             createOrUpdateWriteFile(file, hmilyTransaction);
             return HmilyRepository.ROWS;
         } catch (IOException e) {
-            LOGGER.error("updateRetryByLock occur a exception", e);
+            LogUtil.error(LOGGER, "updateRetryByLock occur a exception {}", () -> e);
         }
         return HmilyRepository.FAIL_ROWS;
     }
@@ -180,7 +181,7 @@ public class FileRepository implements HmilyRepository {
             createOrUpdateWriteFile(file, hmilyTransaction);
             return HmilyRepository.ROWS;
         } catch (IOException e) {
-            LOGGER.error("updateHmilyTransactionStatus occur a exception", e);
+            LogUtil.error(LOGGER, "updateHmilyTransactionStatus occur a exception {}", () -> e);
         }
         return HmilyRepository.FAIL_ROWS;
     }
@@ -201,7 +202,7 @@ public class FileRepository implements HmilyRepository {
             boolean delete = deleteFile(file, transId);
             return delete ? HmilyRepository.ROWS : HmilyRepository.FAIL_ROWS;
         } catch (IOException e) {
-            LOGGER.error("updateHmilyTransactionStatus occur a exception", e);
+            LogUtil.error(LOGGER, "updateHmilyTransactionStatus occur a exception {}", () -> e);
         }
         return HmilyRepository.FAIL_ROWS;
     }
@@ -299,7 +300,7 @@ public class FileRepository implements HmilyRepository {
             createOrUpdateParticipantWriteFile(file, hmilyParticipant);
             return HmilyRepository.ROWS;
         } catch (IOException e) {
-            LOGGER.error("updateHmilyParticipantStatus occur a exception", e);
+            LogUtil.error(LOGGER, "updateHmilyParticipantStatus occur a exception {}", () -> e);
         }
         return HmilyRepository.FAIL_ROWS;
     }
@@ -320,7 +321,7 @@ public class FileRepository implements HmilyRepository {
             boolean delete = deleteFile(file, participantId);
             return delete ? HmilyRepository.ROWS : HmilyRepository.FAIL_ROWS;
         } catch (IOException e) {
-            LOGGER.error("updateHmilyTransactionStatus occur a exception", e);
+            LogUtil.error(LOGGER, "updateHmilyTransactionStatus occur a exception {}", () -> e);
         }
         return HmilyRepository.FAIL_ROWS;
     }
@@ -341,7 +342,7 @@ public class FileRepository implements HmilyRepository {
         try {
             boolean exsist = isExsist(file, hmilyParticipant.getParticipantId());
             if (!exsist) {
-                LOGGER.warn("path {} is not exists.", file.getPath());
+                LogUtil.warn(LOGGER, "path {} is not exists.", () -> file.getPath());
                 return false;
             }
 
@@ -351,7 +352,7 @@ public class FileRepository implements HmilyRepository {
             createOrUpdateParticipantWriteFile(file, hmilyParticipant);
             return true;
         } catch (IOException e) {
-            LOGGER.error("updateRetryByLock occur a exception", e);
+            LogUtil.error(LOGGER, "updateRetryByLock occur a exception {}", () -> e);
         }
         return false;
     }
@@ -401,7 +402,7 @@ public class FileRepository implements HmilyRepository {
             boolean delete = deleteFile(file, undoId);
             return delete ? HmilyRepository.ROWS : HmilyRepository.FAIL_ROWS;
         } catch (IOException e) {
-            LOGGER.error("updateHmilyTransactionStatus occur a exception", e);
+            LogUtil.error(LOGGER, "updateHmilyTransactionStatus occur a exception {}", () -> e);
         }
         return HmilyRepository.FAIL_ROWS;
     }
@@ -429,7 +430,7 @@ public class FileRepository implements HmilyRepository {
             createOrUpdateParticipantUndoWriteFile(file, hmilyParticipantUndo);
             return HmilyRepository.ROWS;
         } catch (IOException e) {
-            LOGGER.error("updateHmilyParticipantStatus occur a exception", e);
+            LogUtil.error(LOGGER, "updateHmilyParticipantStatus occur a exception {}", () -> e);
         }
 
         return HmilyRepository.FAIL_ROWS;
@@ -488,7 +489,7 @@ public class FileRepository implements HmilyRepository {
             transationFileDir.getParentFile().mkdirs();
             boolean mkdirs = transationFileDir.mkdirs();
             if (!mkdirs) {
-                throw new HmilyRuntimeException("cannot create root path, the path to create is:" + transationFileDir.getAbsolutePath());
+                throw new HmilyRuntimeException("cannot create transationFile path, the path to create is:" + transationFileDir.getAbsolutePath());
             }
         }
         File participantFileDir = new File(getTransationParticipantPath());
@@ -496,7 +497,7 @@ public class FileRepository implements HmilyRepository {
             participantFileDir.getParentFile().mkdirs();
             boolean mkdirs = participantFileDir.mkdirs();
             if (!mkdirs) {
-                throw new HmilyRuntimeException("cannot create root path, the path to create is:" + participantFileDir.getAbsolutePath());
+                throw new HmilyRuntimeException("cannot create participantFile path, the path to create is:" + participantFileDir.getAbsolutePath());
             }
         }
         File participantUndoFileDir = new File(getParticipantUndoPath());
@@ -504,7 +505,7 @@ public class FileRepository implements HmilyRepository {
             participantUndoFileDir.getParentFile().mkdirs();
             boolean mkdirs = participantUndoFileDir.mkdirs();
             if (!mkdirs) {
-                throw new HmilyRuntimeException("cannot create root path, the path to create is:" + participantUndoFileDir.getAbsolutePath());
+                throw new HmilyRuntimeException("cannot create participantUndoFile path, the path to create is:" + participantUndoFileDir.getAbsolutePath());
             }
         }
     }
@@ -522,8 +523,10 @@ public class FileRepository implements HmilyRepository {
                 .findFirst().isPresent();
         return exsist;
     }
+
     /**
      * create or update transation File
+     *
      * @param file
      * @param hmilyParticipantUndo
      * @throws IOException
@@ -545,8 +548,10 @@ public class FileRepository implements HmilyRepository {
             LOCK.writeLock().unlock();
         }
     }
+
     /**
      * create or update participant File
+     *
      * @param file
      * @param hmilyParticipantUndo
      * @throws IOException
@@ -571,6 +576,7 @@ public class FileRepository implements HmilyRepository {
 
     /**
      * create or update participantUndo File
+     *
      * @param file
      * @param hmilyParticipantUndo
      * @throws IOException
@@ -621,7 +627,7 @@ public class FileRepository implements HmilyRepository {
             fis.read(bytes);
             return hmilySerializer.deSerialize(bytes, clazz);
         } catch (IOException | HmilySerializerException e) {
-            LOGGER.error(" read file exception ,because is {}", e);
+            LogUtil.error(LOGGER, " read file exception ,because is {}", () -> e);
             return null;
         } finally {
             if (fis != null) {
@@ -653,7 +659,7 @@ public class FileRepository implements HmilyRepository {
             }
             return result;
         } catch (Exception e) {
-            LOGGER.error("listByFilter occur a exception", e);
+            LogUtil.error(LOGGER, "listByFilter occur a exception {}", () -> e);
         }
         return Collections.emptyList();
     }
