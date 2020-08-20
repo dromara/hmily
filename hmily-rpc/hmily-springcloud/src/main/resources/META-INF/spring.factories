@@ -1,1 +1,3 @@
-#org.springframework.boot.autoconfigure.EnableAutoConfiguration=org.dromara.hmily.springcloud.configuration.HmilyRibbonConfiguration
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+org.dromara.hmily.springcloud.configuration.HmilyFeignConfiguration,\
+org.dromara.hmily.springcloud.configuration.HmilyLoadBalancerConfiguration
