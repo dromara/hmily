@@ -17,19 +17,9 @@
 
 package org.dromara.hmily.repository.file;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.*;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
-
-import com.google.common.collect.Lists;
 import lombok.SneakyThrows;
 import org.dromara.hmily.common.exception.HmilyException;
 import org.dromara.hmily.common.exception.HmilyRuntimeException;
-import org.dromara.hmily.common.utils.CollectionUtils;
 import org.dromara.hmily.config.api.ConfigEnv;
 import org.dromara.hmily.config.api.entity.HmilyFileConfig;
 import org.dromara.hmily.repository.spi.HmilyRepository;
@@ -43,11 +33,22 @@ import org.dromara.hmily.spi.HmilySPI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+
 /**
  * file impl.
  *
  * @author xiaoyu
- *
  * @author choviwu
  */
 @SuppressWarnings("all")
@@ -470,7 +471,7 @@ public class FileRepository implements HmilyRepository {
                         initialized = true;
                     } else if (!rootPathFile.isDirectory()) {
                         throw new HmilyRuntimeException("rootPath is not directory");
-                    }else{
+                    } else {
                         initDir();
                     }
                 }
@@ -478,12 +479,15 @@ public class FileRepository implements HmilyRepository {
         }
     }
 
-    private void initDir(){
+    /**
+     * init sysProperty dirs
+     */
+    private void initDir() {
         File transationFileDir = new File(getTransationPath());
         if (!transationFileDir.exists()) {
             transationFileDir.getParentFile().mkdirs();
             boolean mkdirs = transationFileDir.mkdirs();
-            if(!mkdirs){
+            if (!mkdirs) {
                 throw new HmilyRuntimeException("cannot create root path, the path to create is:" + transationFileDir.getAbsolutePath());
             }
         }
@@ -491,7 +495,7 @@ public class FileRepository implements HmilyRepository {
         if (!participantFileDir.exists()) {
             participantFileDir.getParentFile().mkdirs();
             boolean mkdirs = participantFileDir.mkdirs();
-            if(!mkdirs){
+            if (!mkdirs) {
                 throw new HmilyRuntimeException("cannot create root path, the path to create is:" + participantFileDir.getAbsolutePath());
             }
         }
@@ -499,7 +503,7 @@ public class FileRepository implements HmilyRepository {
         if (!participantUndoFileDir.exists()) {
             participantUndoFileDir.getParentFile().mkdirs();
             boolean mkdirs = participantUndoFileDir.mkdirs();
-            if(!mkdirs){
+            if (!mkdirs) {
                 throw new HmilyRuntimeException("cannot create root path, the path to create is:" + participantUndoFileDir.getAbsolutePath());
             }
         }
@@ -507,7 +511,8 @@ public class FileRepository implements HmilyRepository {
 
     /**
      * curent transation file exsist
-     * @param file  curent parentFileDir
+     *
+     * @param file    curent parentFileDir
      * @param transId transId
      * @return isExsist
      */
@@ -517,7 +522,12 @@ public class FileRepository implements HmilyRepository {
                 .findFirst().isPresent();
         return exsist;
     }
-
+    /**
+     * create or update transation File
+     * @param file
+     * @param hmilyParticipantUndo
+     * @throws IOException
+     */
     private void createOrUpdateWriteFile(final File file, final HmilyTransaction hmilyTransaction) throws IOException {
         FileOutputStream fos = null;
         LOCK.writeLock().lock();
@@ -529,14 +539,18 @@ public class FileRepository implements HmilyRepository {
             fos = new FileOutputStream(curFile);
             fos.write(hmilySerializer.serialize(hmilyTransaction));
         } finally {
-            if(fos!=null){
+            if (fos != null) {
                 fos.close();
             }
             LOCK.writeLock().unlock();
         }
     }
-
-
+    /**
+     * create or update participant File
+     * @param file
+     * @param hmilyParticipantUndo
+     * @throws IOException
+     */
     private void createOrUpdateParticipantWriteFile(final File file, final HmilyParticipant hmilyParticipant) throws IOException {
         FileOutputStream fos = null;
         LOCK.writeLock().lock();
@@ -548,14 +562,19 @@ public class FileRepository implements HmilyRepository {
             fos = new FileOutputStream(curFile);
             fos.write(hmilySerializer.serialize(hmilyParticipant));
         } finally {
-            if(fos!=null){
+            if (fos != null) {
                 fos.close();
             }
             LOCK.writeLock().unlock();
         }
     }
 
-
+    /**
+     * create or update participantUndo File
+     * @param file
+     * @param hmilyParticipantUndo
+     * @throws IOException
+     */
     private void createOrUpdateParticipantUndoWriteFile(final File file, final HmilyParticipantUndo hmilyParticipantUndo) throws IOException {
         FileOutputStream fos = null;
         LOCK.writeLock().lock();
@@ -567,7 +586,7 @@ public class FileRepository implements HmilyRepository {
             fos = new FileOutputStream(curFile);
             fos.write(hmilySerializer.serialize(hmilyParticipantUndo));
         } finally {
-            if(fos!=null){
+            if (fos != null) {
                 fos.close();
             }
             LOCK.writeLock().unlock();
@@ -585,6 +604,7 @@ public class FileRepository implements HmilyRepository {
 
     /**
      * read file from cur dir
+     *
      * @return
      */
     @SneakyThrows
@@ -603,8 +623,8 @@ public class FileRepository implements HmilyRepository {
         } catch (IOException | HmilySerializerException e) {
             LOGGER.error(" read file exception ,because is {}", e);
             return null;
-        }finally {
-            if(fis!=null){
+        } finally {
+            if (fis != null) {
                 fis.close();
             }
             LOCK.readLock().unlock();
