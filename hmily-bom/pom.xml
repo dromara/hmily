@@ -44,18 +44,19 @@
         <objenesis.version>3.1</objenesis.version>
         <jedis.version>3.1.0</jedis.version>
         <kryo.version>4.0.0</kryo.version>
-        <curator.version>4.0.1</curator.version>
         <gson.verions>2.8.0</gson.verions>
         <lombok.version>1.16.14</lombok.version>
         <motan.version>1.0.0</motan.version>
         <disruptor.version>3.4.0</disruptor.version>
         <hikaricp.version>3.2.0</hikaricp.version>
         <prometheus-java-client.version>0.6.0</prometheus-java-client.version>
-        <zookeeper.version>3.4.6</zookeeper.version>
+        <zookeeper.version>3.6.0</zookeeper.version>
         <zkClient.version>0.4</zkClient.version>
         <aspectj.version>1.8.9</aspectj.version>
         <aspectjrt.version>1.6.11</aspectjrt.version>
         <commons-beanutils.verison>1.9.4</commons-beanutils.verison>
+        <curator.version>5.1.0</curator.version>
+        <yml.version>1.23</yml.version>
     </properties>
 
     <dependencyManagement>
@@ -235,17 +236,6 @@
                 <artifactId>guava</artifactId>
                 <version>${guava.version}</version>
             </dependency>
-            <dependency>
-                <groupId>org.apache.curator</groupId>
-                <artifactId>curator-client</artifactId>
-                <version>${curator.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.curator</groupId>
-                <artifactId>curator-framework</artifactId>
-                <version>${curator.version}</version>
-            </dependency>
 
             <dependency>
                 <groupId>org.aspectj</groupId>
@@ -257,6 +247,12 @@
                 <groupId>org.aspectj</groupId>
                 <artifactId>aspectjrt</artifactId>
                 <version>${aspectjrt.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.yaml</groupId>
+                <artifactId>snakeyaml</artifactId>
+                <version>${yml.version}</version>
             </dependency>
 
             <dependency>
@@ -297,6 +293,33 @@
                 <groupId>org.objenesis</groupId>
                 <artifactId>objenesis</artifactId>
                 <version>${objenesis.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.curator</groupId>
+                <artifactId>curator-framework</artifactId>
+                <version>${curator.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.curator</groupId>
+                <artifactId>curator-client</artifactId>
+                <version>${curator.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <artifactId>netty</artifactId>
+                        <groupId>io.netty</groupId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.curator</groupId>
+                <artifactId>curator-recipes</artifactId>
+                <version>${curator.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.curator</groupId>
+                <artifactId>curator-test</artifactId>
+                <version>${curator.version}</version>
             </dependency>
 
             <dependency>

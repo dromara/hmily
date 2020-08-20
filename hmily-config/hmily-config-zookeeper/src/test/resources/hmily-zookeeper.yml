@@ -1,10 +1,6 @@
 hmily:
-  server:
-    configMode: local
-    appName: account-sc
-  #  如果server.configMode eq local 的时候才会读取到这里的配置信息.
   config:
-    appName: account-sc
+    appName: xiaoyu
     serializer: kryo
     contextTransmittalMode: threadLocal
     scheduledThreadMax: 16
@@ -24,16 +20,11 @@ hmily:
     storeDays: 3
     repository: mysql
 
-remote:
-  zookeeper:
-    serverList: 127.0.0.1:2181
-    fileExtension: yml
-    path: /hmily/xiaoyu
 repository:
   database:
     driverClassName: com.mysql.jdbc.Driver
-    url : jdbc:mysql://127.0.0.1:3306/hmily?useUnicode=true&characterEncoding=utf8
-    username: root
+    url :
+    username:
     password:
     maxActive: 20
     minIdle: 10
@@ -79,7 +70,7 @@ repository:
 metrics:
   metricsName: prometheus
   host:
-  port: 9071
+  port: 9091
   async: true
   threadCount : 16
   jmxConfig:

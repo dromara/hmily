@@ -39,7 +39,7 @@
     </modules>
 
     <properties>
-        <curator.version>4.0.1</curator.version>
+        <curator.version>5.1.0</curator.version>
         <dubbo.version>2.6.5</dubbo.version>
     </properties>
 

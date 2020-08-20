@@ -69,11 +69,14 @@ public interface PrefixConstants {
     /**
      * The constant APOLLO_PREFIX.
      */
-    String APOLLO_PREFIX = "hmily.apollo";
+    String REMOTE_APOLLO = "remote.apollo";
     
     /**
      * The constant NACOS_PREFIX.
      */
-    String NACOS_PREFIX = "hmily.nacos";
+    String remote_NACOS = "remote.nacos";
+    
+    
+    String REMOTE_ZOOKEEPER = "remote.zookeeper";
     
 }
