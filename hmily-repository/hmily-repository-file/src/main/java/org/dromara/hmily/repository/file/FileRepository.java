@@ -18,6 +18,7 @@
 package org.dromara.hmily.repository.file;
 
 import lombok.SneakyThrows;
+import org.dromara.hmily.common.enums.HmilyActionEnum;
 import org.dromara.hmily.common.exception.HmilyException;
 import org.dromara.hmily.common.exception.HmilyRuntimeException;
 import org.dromara.hmily.common.utils.LogUtil;
@@ -61,11 +62,11 @@ public class FileRepository implements HmilyRepository {
 
     private String filePath;
 
-    private static final String HMILY_TRANSATION_FILE_DIRECTORY = "hmily_transaction_global";
+    private static final String HMILY_TRANSATION_FILE_DIRECTORY = "hmily";
 
-    private static final String HMILY_TRANSATION_PARTICIPANT_FILE_DIRECTORY = "hmily_transaction_participant";
+    private static final String HMILY_TRANSATION_PARTICIPANT_FILE_DIRECTORY = "participant";
 
-    private static final String HMILY_PARTICIPANT_UNDO = "hmily_participant_undo";
+    private static final String HMILY_PARTICIPANT_UNDO = "undo";
 
     private static final int HMILY_READ_BYTE_SIZE = 2048;
 
@@ -209,7 +210,7 @@ public class FileRepository implements HmilyRepository {
         File file = new File(getTransationPath());
         return removeByFilter(file, HmilyTransaction.class, (hmilyTransaction, params) -> {
             Date dateParam = (Date) params[0];
-            return dateParam.before(hmilyTransaction.getUpdateTime()) && hmilyTransaction.getStatus() == 4;
+            return dateParam.before(hmilyTransaction.getUpdateTime()) && hmilyTransaction.getStatus() == HmilyActionEnum.DELETE.getCode();
         }, date);
     }
 
@@ -253,8 +254,9 @@ public class FileRepository implements HmilyRepository {
             int limitParam = (int) params[2];
             boolean filterResult = dateParam.before(hmilyParticipant.getUpdateTime())
                     && Objects.equals(appName, hmilyParticipant.getAppName())
-                    && transTypeParam.equals(hmilyParticipant.getTransType())
-                    && (hmilyParticipant.getStatus().compareTo(4) != 0 && hmilyParticipant.getStatus().compareTo(8) != 0)
+                    && Objects.equals(transTypeParam,hmilyParticipant.getTransType())
+                    && (hmilyParticipant.getStatus().compareTo(HmilyActionEnum.DELETE.getCode()) != 0
+                    && hmilyParticipant.getStatus().compareTo(HmilyActionEnum.DEATH.getCode()) != 0)
                     && limitParam-- > 0;
             params[2] = limitParam;
             return filterResult;
@@ -435,21 +437,21 @@ public class FileRepository implements HmilyRepository {
      * transation Path
      */
     private String getTransationPath() {
-        return filePath + File.separator + appName +File.separator+ HMILY_TRANSATION_FILE_DIRECTORY;
+        return filePath + File.separator + HMILY_TRANSATION_FILE_DIRECTORY;
     }
 
     /**
      * transation participant Path
      */
     private String getTransationParticipantPath() {
-        return filePath + File.separator + appName +File.separator + HMILY_TRANSATION_PARTICIPANT_FILE_DIRECTORY;
+        return getTransationPath() +File.separator + appName ;
     }
 
     /**
      * participantUndo Path
      */
     private String getParticipantUndoPath() {
-        return filePath + File.separator + appName +File.separator + HMILY_PARTICIPANT_UNDO;
+        return getTransationParticipantPath()+File.separator+HMILY_PARTICIPANT_UNDO;
     }
 
 
@@ -640,20 +642,20 @@ public class FileRepository implements HmilyRepository {
     private <T> List<T> listByFilter(final File file, final Class<T> deserializeClass, final Filter<T> filter, final Object... params) {
 
         try {
-
             File[] files = file.listFiles();
             if (Objects.isNull(files) || files.length <= 0) {
                 return Collections.emptyList();
             }
-
             List<T> result = new ArrayList<>();
             for (File child : files) {
-                T t = readFile(file, deserializeClass, Long.valueOf(child.getName()));
-                if (t == null) {
-                    continue;
-                }
-                if (filter.filter(t, params)) {
-                    result.add(t);
+                if(child.isFile()) {
+                    T t = readFile(file, deserializeClass, Long.valueOf(child.getName()));
+                    if (t == null) {
+                        continue;
+                    }
+                    if (filter.filter(t, params)) {
+                        result.add(t);
+                    }
                 }
             }
             return result;
@@ -671,13 +673,15 @@ public class FileRepository implements HmilyRepository {
         }
 
         for (File child : files) {
-            HmilyParticipant hmilyParticipant = readFile(file, HmilyParticipant.class, Long.valueOf(child.getName()));
-            if (hmilyParticipant == null) {
-                continue;
-            }
+            if(child.isFile()) {
+                HmilyParticipant hmilyParticipant = readFile(file, HmilyParticipant.class, Long.valueOf(child.getName()));
+                if (hmilyParticipant == null) {
+                    continue;
+                }
 
-            if (filter.filter(hmilyParticipant, params)) {
-                return true;
+                if (filter.filter(hmilyParticipant, params)) {
+                    return true;
+                }
             }
         }
         return false;
@@ -692,14 +696,15 @@ public class FileRepository implements HmilyRepository {
 
         int count = 0;
         for (File childFiles : files) {
-            T t = readFile(file, deserializeClass, Long.parseLong(childFiles.getName()));
-            if (t == null) {
-                continue;
-            }
-
-            if (filter.filter(t, params)) {
-                childFiles.delete();
-                count++;
+            if(childFiles.isFile()) {
+                T t = readFile(file, deserializeClass, Long.parseLong(childFiles.getName()));
+                if (t == null) {
+                    continue;
+                }
+                if (filter.filter(t, params)) {
+                    childFiles.delete();
+                    count++;
+                }
             }
         }
         return count;
