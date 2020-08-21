@@ -90,7 +90,7 @@ public final class Binder {
      * @param allowRecursiveBinding the allow recursive binding
      * @return the object
      */
-    protected final <T> Object bind(final PropertyName name, final BindData<T> target, final Env env, final boolean allowRecursiveBinding) {
+    protected <T> Object bind(final PropertyName name, final BindData<T> target, final Env env, final boolean allowRecursiveBinding) {
         return bindObject(name, target, env, allowRecursiveBinding);
     }
 

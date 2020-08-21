@@ -42,7 +42,7 @@ public class OriginTrackedPropertiesLoader {
      *
      * @param resource the resource
      */
-    OriginTrackedPropertiesLoader(InputStream resource) {
+    OriginTrackedPropertiesLoader(final InputStream resource) {
         this.resource = resource;
     }
     
@@ -64,7 +64,7 @@ public class OriginTrackedPropertiesLoader {
      * @return the map
      * @throws IOException the io exception
      */
-    public Map<String, Object> load(boolean expandLists) throws IOException {
+    public Map<String, Object> load(final boolean expandLists) throws IOException {
         try (CharacterReader reader = new CharacterReader(this.resource)) {
             Map<String, Object> result = new LinkedHashMap<>();
             StringBuilder buffer = new StringBuilder();
@@ -90,15 +90,13 @@ public class OriginTrackedPropertiesLoader {
         }
     }
 
-    private void put(Map<String, Object> result, String key,
-                     Object value) {
+    private void put(final Map<String, Object> result, final String key, final Object value) {
         if (!key.isEmpty()) {
             result.put(key, value);
         }
     }
 
-    private String loadKey(StringBuilder buffer, CharacterReader reader)
-            throws IOException {
+    private String loadKey(final StringBuilder buffer, final CharacterReader reader) throws IOException {
         buffer.setLength(0);
         boolean previousWhitespace = false;
         while (!reader.isEndOfLine()) {
@@ -116,8 +114,7 @@ public class OriginTrackedPropertiesLoader {
         return buffer.toString();
     }
 
-    private Object loadValue(StringBuilder buffer, CharacterReader reader,
-                             boolean splitLists) throws IOException {
+    private Object loadValue(final StringBuilder buffer, final CharacterReader reader, final boolean splitLists) throws IOException {
         buffer.setLength(0);
         while (reader.isWhiteSpace() && !reader.isEndOfLine()) {
             reader.read();
@@ -150,7 +147,7 @@ public class OriginTrackedPropertiesLoader {
          *
          * @param resource the resource
          */
-        CharacterReader(InputStream resource) {
+        CharacterReader(final InputStream resource) {
             this.reader = new LineNumberReader(new InputStreamReader(resource, StandardCharsets.ISO_8859_1));
         }
 
@@ -176,7 +173,7 @@ public class OriginTrackedPropertiesLoader {
          * @return the boolean
          * @throws IOException the io exception
          */
-        public boolean read(boolean wrappedLine) throws IOException {
+        public boolean read(final boolean wrappedLine) throws IOException {
             this.escaped = false;
             this.character = this.reader.read();
             this.columnNumber++;

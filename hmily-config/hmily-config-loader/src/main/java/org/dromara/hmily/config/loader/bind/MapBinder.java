@@ -144,7 +144,7 @@ public final class MapBinder extends AggregateBinder<Map<Object, Object>> {
                     BindData<?> valueBindData = getValueBindData(name);
                     PropertyName entryName = getEntryName(source, name);
                     Object key = getKeyName(entryName);
-                    map.computeIfAbsent(key, (k) -> this.elementBinder.bind(entryName, valueBindData, this.env));
+                    map.computeIfAbsent(key, k -> this.elementBinder.bind(entryName, valueBindData, this.env));
                 }
             });
         }
@@ -166,8 +166,7 @@ public final class MapBinder extends AggregateBinder<Map<Object, Object>> {
             return name;
         }
 
-        private PropertyName chopNameAtNumericIndex(
-                PropertyName name) {
+        private PropertyName chopNameAtNumericIndex(final PropertyName name) {
             int start = this.root.getElementSize() + 1;
             int size = name.getElementSize();
             for (int i = start; i < size; i++) {

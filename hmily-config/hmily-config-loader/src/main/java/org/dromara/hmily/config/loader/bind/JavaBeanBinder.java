@@ -203,7 +203,7 @@ public class JavaBeanBinder extends BeanBinder {
             T instance = null;
             if (canCallGetValue && value != null) {
                 instance = value.get();
-                type = (instance != null ? instance.getClass() : type);
+                type = instance != null ? instance.getClass() : type;
             }
             if (instance == null && !isInstantiable(type)) {
                 return null;

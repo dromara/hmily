@@ -99,6 +99,7 @@ public abstract class IndexedBinder<T> extends AggregateBinder<T> {
             collection.addAll((Collection<Object>) value);
         }
     }
+    
     private Multimap<String, ConfigProperty> getKnownIndexedChildren(final ConfigPropertySource source, final PropertyName root) {
         Multimap<String, ConfigProperty> children = ArrayListMultimap.create();
         source.stream().filter(e -> e.isAncestorOf(root)).forEach(name -> {

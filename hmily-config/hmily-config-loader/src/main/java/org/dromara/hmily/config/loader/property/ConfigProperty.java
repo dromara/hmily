@@ -52,7 +52,7 @@ public class ConfigProperty {
      * @param value the value
      * @return the config property
      */
-    public static ConfigProperty of(PropertyName name, Object value) {
+    public static ConfigProperty of(final PropertyName name, final Object value) {
         return Optional.ofNullable(value).map(cf -> new ConfigProperty(name, cf)).orElse(null);
     }
 }
