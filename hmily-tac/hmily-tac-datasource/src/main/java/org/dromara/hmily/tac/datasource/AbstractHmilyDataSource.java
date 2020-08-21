@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-
 package org.dromara.hmily.tac.datasource;
 
 import java.io.PrintWriter;
@@ -23,18 +22,20 @@ import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
 import java.util.logging.Logger;
 import javax.sql.DataSource;
+import lombok.Getter;
 
 /**
  * The type Abstract data source.
  *
  * @author xiaoyu
  */
+@Getter
 public abstract class AbstractHmilyDataSource implements DataSource {
     
     /**
      * The Target data source.
      */
-    protected DataSource targetDataSource;
+    private DataSource targetDataSource;
     
     /**
      * Instantiates a new Abstract data source proxy.
@@ -45,22 +46,13 @@ public abstract class AbstractHmilyDataSource implements DataSource {
         this.targetDataSource = targetDataSource;
     }
     
-    /**
-     * Gets target data source.
-     *
-     * @return the target data source
-     */
-    public DataSource getTargetDataSource() {
-        return targetDataSource;
-    }
-    
     @Override
-    public <T> T unwrap(Class<T> clazz) throws SQLException {
+    public <T> T unwrap(final Class<T> clazz) throws SQLException {
         return targetDataSource.unwrap(clazz);
     }
     
     @Override
-    public boolean isWrapperFor(Class<?> clazz) throws SQLException {
+    public boolean isWrapperFor(final Class<?> clazz) throws SQLException {
         return targetDataSource.isWrapperFor(clazz);
     }
     
@@ -70,12 +62,12 @@ public abstract class AbstractHmilyDataSource implements DataSource {
     }
     
     @Override
-    public void setLogWriter(PrintWriter out) throws SQLException {
+    public void setLogWriter(final PrintWriter out) throws SQLException {
         targetDataSource.setLogWriter(out);
     }
     
     @Override
-    public void setLoginTimeout(int seconds) throws SQLException {
+    public void setLoginTimeout(final int seconds) throws SQLException {
         targetDataSource.setLoginTimeout(seconds);
     }
     
