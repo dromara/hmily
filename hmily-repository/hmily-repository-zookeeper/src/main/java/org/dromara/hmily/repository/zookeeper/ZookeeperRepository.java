@@ -29,6 +29,7 @@ import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.ZooDefs;
 import org.apache.zookeeper.ZooKeeper;
 import org.apache.zookeeper.data.Stat;
+import org.dromara.hmily.common.enums.HmilyActionEnum;
 import org.dromara.hmily.common.exception.HmilyException;
 import org.dromara.hmily.common.exception.HmilyRuntimeException;
 import org.dromara.hmily.common.utils.CollectionUtils;
@@ -50,6 +51,8 @@ import org.slf4j.LoggerFactory;
  * zookeeper impl.
  *
  * @author xiaoyu
+ *
+ * @author lilang
  */
 @HmilySPI("zookeeper")
 @Slf4j
@@ -222,7 +225,7 @@ public class ZookeeperRepository implements HmilyRepository {
         String path = buildHmilyTransactionRootPath();
         return removeByFilter(path, HmilyTransaction.class, (hmilyTransaction, params) -> {
             Date dateParam = (Date) params[0];
-            return dateParam.before(hmilyTransaction.getUpdateTime()) && hmilyTransaction.getStatus() == 4;
+            return dateParam.before(hmilyTransaction.getUpdateTime()) && hmilyTransaction.getStatus() == HmilyActionEnum.DELETE.getCode();
         }, date);
     }
     
@@ -271,7 +274,7 @@ public class ZookeeperRepository implements HmilyRepository {
             int limitParam = (int) params[2];
             boolean filterResult = dateParam.before(hmilyParticipant.getUpdateTime()) && appName.equals(hmilyParticipant.getAppName())
                     && transTypeParam.equals(hmilyParticipant.getTransType())
-                    && (hmilyParticipant.getStatus().compareTo(4) != 0 && hmilyParticipant.getStatus().compareTo(8) != 0)
+                    && (hmilyParticipant.getStatus().compareTo(HmilyActionEnum.DELETE.getCode()) != 0 && hmilyParticipant.getStatus().compareTo(HmilyActionEnum.DEATH.getCode()) != 0)
                     && limitParam-- > 0;
             params[2] = limitParam;
             return filterResult;
@@ -340,7 +343,7 @@ public class ZookeeperRepository implements HmilyRepository {
         String path = buildHmilyParticipantRootPath();
         return removeByFilter(path, HmilyParticipant.class, (hmilyParticipant, params) -> {
             Date dateParam = (Date) params[0];
-            return dateParam.before(hmilyParticipant.getUpdateTime()) && hmilyParticipant.getStatus().compareTo(4) == 0;
+            return dateParam.before(hmilyParticipant.getUpdateTime()) && hmilyParticipant.getStatus().compareTo(HmilyActionEnum.DELETE.getCode()) == 0;
         }, date);
     }
 
@@ -423,7 +426,7 @@ public class ZookeeperRepository implements HmilyRepository {
         String path = buildHmilyParticipantUndoRootPath();
         return removeByFilter(path, HmilyParticipantUndo.class, (undo, params) -> {
             Date dateParam = (Date) params[0];
-            return dateParam.before(undo.getUpdateTime()) && undo.getStatus().compareTo(4) == 0;
+            return dateParam.before(undo.getUpdateTime()) && undo.getStatus().compareTo(HmilyActionEnum.DELETE.getCode()) == 0;
         }, date);
     }
 
@@ -453,11 +456,11 @@ public class ZookeeperRepository implements HmilyRepository {
     }
     
     private String buildHmilyTransactionRootPath() {
-        return  rootPathPrefix + "/" + appName + "/" + HMILY_TRANSACTION_GLOBAL;
+        return  rootPathPrefix + "/" + HMILY_TRANSACTION_GLOBAL;
     }
     
     private String buildHmilyTransactionRealPath(final Long transId) {
-        return  rootPathPrefix + "/" + appName + "/" + HMILY_TRANSACTION_GLOBAL + "/" + transId;
+        return  buildHmilyTransactionRootPath() + "/" + transId;
     }
     
     private String buildHmilyParticipantRootPath() {
@@ -465,7 +468,7 @@ public class ZookeeperRepository implements HmilyRepository {
     }
     
     private String buildHmilyParticipantRealPath(final Long participantId) {
-        return  rootPathPrefix + "/" + appName + "/" + HMILY_TRANSACTION_PARTICIPANT + "/" + participantId;
+        return  buildHmilyParticipantRootPath() + "/" + participantId;
     }
     
     private String buildHmilyParticipantUndoRootPath() {
@@ -473,7 +476,7 @@ public class ZookeeperRepository implements HmilyRepository {
     }
     
     private String buildHmilyParticipantUndoRealPath(final Long undoId) {
-        return  rootPathPrefix + "/" + appName + "/" + HMILY_PARTICIPANT_UNDO + "/" + undoId;
+        return  buildHmilyParticipantUndoRootPath() + "/" + undoId;
     }
     
     private void connect(final HmilyZookeeperConfig config) {
@@ -573,7 +576,7 @@ public class ZookeeperRepository implements HmilyRepository {
 
     private <T> int removeByFilter(final String path, final Class<T> deserializeClass, final Filter<T> filter, final Object... params) {
         try {
-            if (checkAndInitPath(path, false)) {
+            if (!checkAndInitPath(path, false)) {
                 return FAIL_ROWS;
             }
             List<String> children = zooKeeper.getChildren(path, false);

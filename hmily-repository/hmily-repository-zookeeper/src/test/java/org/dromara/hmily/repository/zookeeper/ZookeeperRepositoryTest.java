@@ -21,17 +21,26 @@ import java.lang.reflect.Field;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.CountDownLatch;
+
 import org.apache.zookeeper.ZooKeeper;
 import org.apache.zookeeper.data.Stat;
 import org.dromara.hmily.annotation.TransTypeEnum;
-import org.dromara.hmily.config.api.entity.HmilyConfig;
+import org.dromara.hmily.config.api.ConfigEnv;
 import org.dromara.hmily.config.api.entity.HmilyZookeeperConfig;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipant;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipantUndo;
 import org.dromara.hmily.repository.spi.entity.HmilyTransaction;
+import org.dromara.hmily.repository.zookeeper.mock.ZookeeperMock;
 import org.dromara.hmily.serializer.kryo.KryoSerializer;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.MockitoAnnotations;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
@@ -42,24 +51,28 @@ import static org.junit.Assert.assertTrue;
  * Author:   lilang
  * Description: zookeeper repository test crud
  */
+@RunWith(PowerMockRunner.class)
+@PrepareForTest({ZookeeperRepository.class})
+@PowerMockIgnore({"javax.management.*", "com.intellij.*", "com.codahale.metrics.*"})
 public class ZookeeperRepositoryTest {
+
+    private static final String HMILY_TRANSACTION_GLOBAL = "hmily_transaction_global";
+
+    private static final String HMILY_TRANSACTION_PRTICIPANT = "hmily_transaction_participant";
+
+    private static final String HMILY_PARTICIPANT_UNDO = "hmily_participant_undo";
+
+    // when it is false. please delete the annotation (@RunWith, @PrepareForTest, @PowerMockIgnore) of this class
+    private boolean mockSwitch = true;
     
     private ZookeeperRepository zookeeperRepository = new ZookeeperRepository();
-    
-    private HmilyConfig hmilyConfig = new HmilyConfig();
     
     private HmilyZookeeperConfig hmilyZookeeperConfig = new HmilyZookeeperConfig();
     
     private String appName = "test_hmily_zookeeper";
     
     private Random random = new Random(System.currentTimeMillis());
-    
-    private static final String HMILY_TRANSACTION_GLOBAL = "hmily_transaction_global";
-    
-    private static final String HMILY_TRANSACTION_PRTICIPANT = "hmily_transaction_participant";
-    
-    private static final String HMILY_PARTICIPANT_UNDO = "hmily_participant_undo";
-    
+
     /**
      * Sets up.
      *
@@ -67,11 +80,30 @@ public class ZookeeperRepositoryTest {
      */
     @Before
     public void setUp() throws Exception {
-        hmilyConfig.setAppName(appName);
         hmilyZookeeperConfig.setHost("127.0.0.1:2181");
         hmilyZookeeperConfig.setSessionTimeOut(300000);
-        
-        zookeeperRepository.init("default");
+        ConfigEnv.getInstance().registerConfig(hmilyZookeeperConfig);
+
+        if (mockSwitch) {
+            MockitoAnnotations.initMocks(this);
+            ZookeeperMock zookeeperMock = new ZookeeperMock();
+            Field latchFiled = ZookeeperRepository.class.getDeclaredField("LATCH");
+            latchFiled.setAccessible(true);
+            CountDownLatch latch = (CountDownLatch) latchFiled.get(null);
+            PowerMockito.whenNew(ZooKeeper.class).withAnyArguments().then(x -> {
+                latch.countDown();
+                return zookeeperMock.getZooKeeper();
+            });
+            zookeeperMock.mockGetData();
+            zookeeperMock.mockCreate();
+            zookeeperMock.mockExists();
+            zookeeperMock.mockGetChildren();
+            zookeeperMock.mockSetData();
+            zookeeperMock.mockDelete();
+        }
+
+
+        zookeeperRepository.init(appName);
         zookeeperRepository.setSerializer(new KryoSerializer());
         
         
