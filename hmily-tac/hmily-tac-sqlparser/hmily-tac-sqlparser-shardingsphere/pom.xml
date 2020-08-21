@@ -28,5 +28,12 @@
 
     <artifactId>hmily-tac-sqlparser-shardingsphere</artifactId>
 
+    <dependencies>
+        <dependency>
+            <groupId>org.dromara</groupId>
+            <artifactId>hmily-tac-sqlparser-spi</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
 
 </project>
