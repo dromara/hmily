@@ -74,7 +74,7 @@ public interface PrefixConstants {
     /**
      * The constant NACOS_PREFIX.
      */
-    String remote_NACOS = "remote.nacos";
+    String REMOTE_NACOS = "remote.nacos";
     
     
     String REMOTE_ZOOKEEPER = "remote.zookeeper";

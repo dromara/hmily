@@ -17,13 +17,12 @@
  *
  */
 
-package org.dromara.hmily.config.zookeeper;
+package org.dromara.hmily.config.nacos;
 
 import java.io.ByteArrayInputStream;
 import java.util.function.Supplier;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.dromara.hmily.common.utils.FileUtils;
+import org.dromara.hmily.common.utils.StringUtils;
 import org.dromara.hmily.config.api.ConfigEnv;
 import org.dromara.hmily.config.api.ConfigScan;
 import org.dromara.hmily.config.api.entity.HmilyConfig;
@@ -38,76 +37,63 @@ import org.dromara.hmily.config.loader.ConfigLoader;
 import org.dromara.hmily.config.loader.ServerConfigLoader;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 import static org.mockito.ArgumentMatchers.any;
 
 /**
+ * The type Nacos config loader test.
+ *
  * @author xiaoyu
  */
-@RunWith(MockitoJUnitRunner.class)
-@Slf4j
-public class ZookeeperConfigLoaderTest {
+@RunWith(PowerMockRunner.class)
+@PrepareForTest(NacosClient.class)
+public class NacosConfigLoaderTest {
     
-    @Mock
-    private CuratorZookeeperClient client;
+    private NacosClient client = PowerMockito.mock(NacosClient.class);
     
+    /**
+     * Sets up.
+     */
     @Before
     public void setUp() {
-        String str = FileUtils.readYAML("hmily-zookeeper.yml");
+        String str = FileUtils.readYAML("hmily-nacos.yml");
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(str.getBytes());
-        Mockito.when(client.pull(any())).thenReturn(byteArrayInputStream);
+        try {
+            PowerMockito.when(client.pull(any())).thenReturn(byteArrayInputStream);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
     
+    /**
+     * Test nacos load.
+     */
     @Test
-    @Ignore
-    public void realZookeeperLoad() {
-        ZookeeperConfig remoteConfig = new ZookeeperConfig();
-        remoteConfig.setServerList("127.0.0.1:2181");
-        CuratorZookeeperClient client = CuratorZookeeperClient.getInstance(remoteConfig);
-        client.persist("/hmily/xiaoyu", FileUtils.readYAML("hmily-zookeeper.yml"));
+    public void testNacosLoad() {
         ConfigScan.scan();
-        ZookeeperConfigLoader configLoader = new ZookeeperConfigLoader(client);
         ServerConfigLoader loader = new ServerConfigLoader();
+        NacosConfigLoader nacosConfigLoader = new NacosConfigLoader(client);
         loader.load(ConfigLoader.Context::new, (context, config) -> {
-            System.out.println("config:---->" + config);
             if (config != null) {
-                if (StringUtils.isNotBlank(config.getConfigMode())) {
+                if (StringUtils.isNoneBlank(config.getConfigMode())) {
                     String configMode = config.getConfigMode();
-                    if (configMode.equals("zookeeper")) {
-                        configLoader.load(context, (context1, config1) -> {
-                        });
+                    if (configMode.equals("nacos")) {
+                        nacosConfigLoader.load(context, this::assertTest);
                     }
                 }
             }
         });
     }
-    
-    @Test
-    public void testZookeeperLoad() {
-        ConfigScan.scan();
-        ServerConfigLoader loader = new ServerConfigLoader();
-        loader.load(ConfigLoader.Context::new, (context, config) -> {
-            System.out.println("config:---->" + config);
-            if (config != null) {
-                if (StringUtils.isNotBlank(config.getConfigMode())) {
-                    String configMode = config.getConfigMode();
-                    if (configMode.equals("zookeeper")) {
-                        new ZookeeperConfigLoader(client).load(context, this::assertTest);
-                    }
-                }
-            }
-        });
-    }
-    
-    private void assertTest(final Supplier<ConfigLoader.Context> supplier, final ZookeeperConfig zookeeperConfig) {
-        Assert.assertNotNull(zookeeperConfig);
-        Assert.assertEquals(zookeeperConfig.prefix(), "remote.zookeeper");
+
+    private void assertTest(final Supplier<ConfigLoader.Context> supplier, final NacosConfig nacosConfig) {
+        Assert.assertNotNull(nacosConfig);
+        Assert.assertEquals(nacosConfig.prefix(), "remote.nacos");
+        Assert.assertEquals(nacosConfig.getTimeoutMs(), 6000);
         HmilyServer server = ConfigEnv.getInstance().getConfig(HmilyServer.class);
         Assert.assertNotNull(server);
         Assert.assertEquals(server.getConfigMode(), "nacos");

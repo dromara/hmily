@@ -1,0 +1,14 @@
+hmily:
+  server:
+    configMode: nacos
+    appName: xiaoyu
+  #  如果server.configMode eq local 的时候才会读取到这里的配置信息.
+
+remote:
+  nacos:
+    server: 127.0.0.1:2181
+    dataId: test
+    group: test
+    timeoutMs: 6000
+    fileExtension: yml
+

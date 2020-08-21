@@ -21,6 +21,10 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.stream.Collectors;
+import lombok.SneakyThrows;
 
 /**
  * FileUtils.
@@ -50,5 +54,11 @@ public class FileUtils {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+    
+    @SneakyThrows
+    public static String readYAML(final String yamlFile) {
+        return Files.readAllLines(Paths.get(ClassLoader.getSystemResource(yamlFile).toURI()))
+                .stream().filter(each -> !each.startsWith("#")).map(each -> each + System.lineSeparator()).collect(Collectors.joining());
     }
 }
