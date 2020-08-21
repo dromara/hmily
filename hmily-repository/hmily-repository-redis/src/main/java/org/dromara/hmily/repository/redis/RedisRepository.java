@@ -83,107 +83,107 @@ public class RedisRepository implements HmilyRepository {
     }
     
     @Override
-    public int createHmilyTransaction(HmilyTransaction hmilyTransaction) throws HmilyRepositoryException {
+    public int createHmilyTransaction(final HmilyTransaction hmilyTransaction) throws HmilyRepositoryException {
         return 0;
     }
     
     @Override
-    public int updateRetryByLock(HmilyTransaction hmilyTransaction) {
+    public int updateRetryByLock(final HmilyTransaction hmilyTransaction) {
         return 0;
     }
     
     @Override
-    public HmilyTransaction findByTransId(Long transId) {
+    public HmilyTransaction findByTransId(final Long transId) {
         return null;
     }
     
     @Override
-    public List<HmilyTransaction> listLimitByDelay(Date date, int limit) {
+    public List<HmilyTransaction> listLimitByDelay(final Date date, final int limit) {
         return null;
     }
     
     @Override
-    public int updateHmilyTransactionStatus(Long transId, Integer status) throws HmilyRepositoryException {
+    public int updateHmilyTransactionStatus(final Long transId, final Integer status) throws HmilyRepositoryException {
         return 0;
     }
     
     @Override
-    public int removeHmilyTransaction(Long transId) {
+    public int removeHmilyTransaction(final Long transId) {
         return 0;
     }
     
     @Override
-    public int removeHmilyTransactionByData(Date date) {
+    public int removeHmilyTransactionByData(final Date date) {
         return 0;
     }
     
     @Override
-    public int createHmilyParticipant(HmilyParticipant hmilyParticipant) throws HmilyRepositoryException {
+    public int createHmilyParticipant(final HmilyParticipant hmilyParticipant) throws HmilyRepositoryException {
         return 0;
     }
     
     @Override
-    public List<HmilyParticipant> findHmilyParticipant(Long participantId) {
+    public List<HmilyParticipant> findHmilyParticipant(final Long participantId) {
         return null;
     }
     
     @Override
-    public List<HmilyParticipant> listHmilyParticipant(Date date, String transType, int limit) {
+    public List<HmilyParticipant> listHmilyParticipant(final Date date, final String transType, final int limit) {
         return null;
     }
     
     @Override
-    public List<HmilyParticipant> listHmilyParticipantByTransId(Long transId) {
+    public List<HmilyParticipant> listHmilyParticipantByTransId(final Long transId) {
         return null;
     }
     
     @Override
-    public boolean existHmilyParticipantByTransId(Long transId) {
+    public boolean existHmilyParticipantByTransId(final Long transId) {
         return false;
     }
     
     @Override
-    public int updateHmilyParticipantStatus(Long participantId, Integer status) throws HmilyRepositoryException {
+    public int updateHmilyParticipantStatus(final Long participantId, final Integer status) throws HmilyRepositoryException {
         return 0;
     }
     
     @Override
-    public int removeHmilyParticipant(Long participantId) {
+    public int removeHmilyParticipant(final Long participantId) {
         return 0;
     }
     
     @Override
-    public int removeHmilyParticipantByData(Date date) {
+    public int removeHmilyParticipantByData(final Date date) {
         return 0;
     }
     
     @Override
-    public boolean lockHmilyParticipant(HmilyParticipant hmilyParticipant) {
+    public boolean lockHmilyParticipant(final HmilyParticipant hmilyParticipant) {
         return false;
     }
     
     @Override
-    public int createHmilyParticipantUndo(HmilyParticipantUndo hmilyParticipantUndo) {
+    public int createHmilyParticipantUndo(final HmilyParticipantUndo hmilyParticipantUndo) {
         return 0;
     }
     
     @Override
-    public List<HmilyParticipantUndo> findHmilyParticipantUndoByParticipantId(Long participantId) {
+    public List<HmilyParticipantUndo> findHmilyParticipantUndoByParticipantId(final Long participantId) {
         return null;
     }
     
     @Override
-    public int removeHmilyParticipantUndo(Long undoId) {
+    public int removeHmilyParticipantUndo(final Long undoId) {
         return 0;
     }
     
     @Override
-    public int removeHmilyParticipantUndoByData(Date date) {
+    public int removeHmilyParticipantUndoByData(final Date date) {
         return 0;
     }
     
     @Override
-    public int updateHmilyParticipantUndoStatus(Long undoId, Integer status) {
+    public int updateHmilyParticipantUndoStatus(final Long undoId, final Integer status) {
         return 0;
     }
     
