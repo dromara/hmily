@@ -42,7 +42,7 @@ public class HmilyResourceManager {
      * @param resourceId the resource id
      * @return the hmily resource
      */
-    public static HmilyTacResource get(String resourceId) {
+    public static HmilyTacResource get(final String resourceId) {
         return DATASOURCE_CACHE.get(resourceId);
     }
     

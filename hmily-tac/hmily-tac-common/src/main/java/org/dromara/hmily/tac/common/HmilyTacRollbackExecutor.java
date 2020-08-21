@@ -23,11 +23,11 @@ import org.dromara.hmily.repository.spi.entity.HmilyParticipantUndo;
 /**
  * The type Hmily tac rollback executor.
  */
-public class HmilyTacRollbackExecutor {
+public final class HmilyTacRollbackExecutor {
     
-    private static volatile HmilyTacRollbackExecutor instance = null;
+    private static volatile HmilyTacRollbackExecutor instance;
     
-    private HmilyTacRollbackExecutor(){
+    private HmilyTacRollbackExecutor() {
         registerRollback();
     }
     
