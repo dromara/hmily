@@ -28,6 +28,7 @@ import org.dromara.hmily.repository.database.manager.AbstractHmilyDatabase;
 import org.dromara.hmily.spi.HmilySPI;
 
 import java.sql.DriverManager;
+
 /**
  * The type Postgresql repository.
  *

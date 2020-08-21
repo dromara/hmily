@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
  */
 public class NacosClient {
     
-    private static final Logger logger = LoggerFactory.getLogger(NacosClient.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(NacosClient.class);
     
     private static final String NACOS_SERVER_ADDR_KEY = "serverAddr";
     
@@ -53,8 +53,8 @@ public class NacosClient {
         try {
             ConfigService configService = NacosFactory.createConfigService(properties);
             String content = configService.getConfig(config.getDataId(), config.getGroup(), config.getTimeoutMs());
-            if (logger.isDebugEnabled()) {
-                logger.debug("nacos content {}", content);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("nacos content {}", content);
             }
             if (StringUtils.isBlank(content)) {
                 return null;

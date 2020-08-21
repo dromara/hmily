@@ -55,11 +55,11 @@ public final class CuratorZookeeperClient implements AutoCloseable {
     
     private static final Map<String, CuratorCache> CACHES = new HashMap<>();
     
+    private static volatile CuratorZookeeperClient instance;
+    
     private CuratorFramework client;
     
-    private static volatile CuratorZookeeperClient instance = null;
-    
-    private CuratorZookeeperClient(){
+    private CuratorZookeeperClient() {
     }
     
     /**

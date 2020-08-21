@@ -43,13 +43,13 @@ import org.slf4j.LoggerFactory;
 @HmilySPI("nacos")
 public class NacosConfigLoader implements ConfigLoader<NacosConfig> {
 
-    private static final Logger logger = LoggerFactory.getLogger(NacosConfigLoader.class);
-    
-    private NacosClient client = new NacosClient();
+    private static final Logger LOGGER = LoggerFactory.getLogger(NacosConfigLoader.class);
     
     private static final Map<String, PropertyLoader> LOADERS = new HashMap<>();
     
-    static  {
+    private NacosClient client = new NacosClient();
+    
+    static {
         LOADERS.put("yml", new YamlPropertyLoader());
         LOADERS.put("properties", new PropertiesLoader());
     }
@@ -79,7 +79,7 @@ public class NacosConfigLoader implements ConfigLoader<NacosConfig> {
     private void nacosLoad(final Supplier<Context> context, final LoaderHandler<NacosConfig> handler, final NacosConfig config) {
         if (config != null) {
             check(config);
-            logger.info("loader nacos config: {}", config);
+            LOGGER.info("loader nacos config: {}", config);
             String fileExtension = config.getFileExtension();
             PropertyLoader propertyLoader = LOADERS.get(fileExtension);
             if (propertyLoader == null) {
@@ -95,11 +95,11 @@ public class NacosConfigLoader implements ConfigLoader<NacosConfig> {
         }
     }
 
-    private void nacosFinish(Supplier<Context> context, Config config) {
-        logger.info("nacos loader config {}:{}", config != null ? config.prefix() : "", config);
+    private void nacosFinish(final Supplier<Context> context, final Config config) {
+        LOGGER.info("nacos loader config {}:{}", config != null ? config.prefix() : "", config);
     }
 
-    private void check(NacosConfig config) {
+    private void check(final NacosConfig config) {
         if (StringUtils.isBlank(config.getServer())) {
             throw new ConfigException("nacos.server is null");
         }

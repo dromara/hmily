@@ -19,7 +19,6 @@
 
 package org.dromara.hmily.config.zookeeper;
 
-
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
@@ -51,9 +50,9 @@ public class ZookeeperConfigLoader implements ConfigLoader<ZookeeperConfig> {
     
     private CuratorZookeeperClient client;
     
-   static  {
-       LOADERS.put("yml", new YamlPropertyLoader());
-       LOADERS.put("properties", new PropertiesLoader());
+    static {
+        LOADERS.put("yml", new YamlPropertyLoader());
+        LOADERS.put("properties", new PropertiesLoader());
     }
     
     public ZookeeperConfigLoader() {
@@ -73,7 +72,7 @@ public class ZookeeperConfigLoader implements ConfigLoader<ZookeeperConfig> {
     private void zookeeperLoad(final Supplier<Context> context, final LoaderHandler<ZookeeperConfig> handler, final ZookeeperConfig config) {
         if (config != null) {
             check(config);
-            if(Objects.isNull(client)) {
+            if (Objects.isNull(client)) {
                 client = CuratorZookeeperClient.getInstance(config);
             }
             InputStream result = client.pull(config.getPath());
@@ -83,7 +82,7 @@ public class ZookeeperConfigLoader implements ConfigLoader<ZookeeperConfig> {
                 throw new ConfigException("zookeeper.fileExtension setting error, The loader was not found");
             }
             Optional.ofNullable(result)
-                    .map(e -> propertyLoader.load("remote.zookeeper." + fileExtension , e))
+                    .map(e -> propertyLoader.load("remote.zookeeper." + fileExtension, e))
                     .ifPresent(e -> context.get().getOriginal().load(() -> context.get().withSources(e), this::zookeeperFinish));
             handler.finish(context, config);
         } else {
@@ -95,10 +94,9 @@ public class ZookeeperConfigLoader implements ConfigLoader<ZookeeperConfig> {
         LOGGER.info("zookeeper loader config {}:{}", config != null ? config.prefix() : "", config);
     }
     
-    private void check(ZookeeperConfig config) {
+    private void check(final ZookeeperConfig config) {
         if (StringUtils.isBlank(config.getServerList())) {
             throw new ConfigException("zookeeper server is null");
         }
     }
-    
 }
