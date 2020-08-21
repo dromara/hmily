@@ -30,9 +30,9 @@ import org.dromara.hmily.config.api.exception.ConfigException;
  */
 public final class ConfigEnv {
     
-    private final Map<Class<?>, Config> configBeans = new ConcurrentHashMap<>();
-    
     private static final ConfigEnv INST = new ConfigEnv();
+    
+    private static final Map<Class<?>, Config> CONFIGS = new ConcurrentHashMap<>();
     
     /**
      * Save some custom configuration information.
@@ -73,7 +73,7 @@ public final class ConfigEnv {
      */
     @SuppressWarnings("unchecked")
     public <T extends Config> T getConfig(final Class<T> clazz) {
-        return (T) configBeans.get(clazz);
+        return (T) CONFIGS.get(clazz);
     }
     
     /**
@@ -83,10 +83,10 @@ public final class ConfigEnv {
      */
     public void putBean(final Config parent) {
         if (parent != null && StringUtils.isNotBlank(parent.prefix())) {
-            if (configBeans.containsKey(parent.getClass())) {
+            if (CONFIGS.containsKey(parent.getClass())) {
                 return;
             }
-            configBeans.put(parent.getClass(), parent);
+            CONFIGS.put(parent.getClass(), parent);
         }
     }
     
@@ -96,6 +96,6 @@ public final class ConfigEnv {
      * @return stream. stream
      */
     public Stream<Config> stream() {
-        return configBeans.values().stream().filter(e -> !e.isLoad());
+        return CONFIGS.values().stream().filter(e -> !e.isLoad());
     }
 }

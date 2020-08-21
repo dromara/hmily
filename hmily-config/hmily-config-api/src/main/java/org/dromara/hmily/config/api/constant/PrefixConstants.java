@@ -24,59 +24,61 @@ package org.dromara.hmily.config.api.constant;
  *
  * @author xiaoyu
  */
-public interface PrefixConstants {
+public final class PrefixConstants {
     
     /**
      * The constant SERVER_PREFIX.
      */
-    String SERVER_PREFIX = "hmily.server";
+    public static final String SERVER_PREFIX = "hmily.server";
     
     /**
      * The constant CONFIG_PREFIX.
      */
-    String CONFIG_PREFIX = "hmily.config";
+    public static final String CONFIG_PREFIX = "hmily.config";
     
     /**
      * The constant DATABASE_PREFIX.
      */
-    String DATABASE_PREFIX = "repository.database";
+    public static final String DATABASE_PREFIX = "repository.database";
     
     /**
      * The constant FILE_PREFIX.
      */
-    String FILE_PREFIX = "repository.file";
+    public static final String FILE_PREFIX = "repository.file";
     
     /**
      * The constant MONGO_PREFIX.
      */
-    String MONGO_PREFIX = "repository.mongo";
+    public static final String MONGO_PREFIX = "repository.mongo";
     
     /**
      * The constant REDIS_PREFIX.
      */
-    String REDIS_PREFIX = "repository.redis";
+    public static final String REDIS_PREFIX = "repository.redis";
     
     /**
      * The constant ZOOKEEPER_PREFIX.
      */
-    String ZOOKEEPER_PREFIX = "repository.zookeeper";
+    public static final String ZOOKEEPER_PREFIX = "repository.zookeeper";
     
     /**
      * The constant METRICS_PREFIX.
      */
-    String METRICS_PREFIX = "metrics";
+    public static final String METRICS_PREFIX = "metrics";
     
     /**
      * The constant APOLLO_PREFIX.
      */
-    String REMOTE_APOLLO = "remote.apollo";
+    public static final String REMOTE_APOLLO = "remote.apollo";
     
     /**
      * The constant NACOS_PREFIX.
      */
-    String REMOTE_NACOS = "remote.nacos";
+    public static final String REMOTE_NACOS = "remote.nacos";
     
-    
-    String REMOTE_ZOOKEEPER = "remote.zookeeper";
+    /**
+     * The constant REMOTE_ZOOKEEPER.
+     */
+    public static final String REMOTE_ZOOKEEPER = "remote.zookeeper";
     
 }

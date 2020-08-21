@@ -43,7 +43,7 @@ public abstract class IndexedBinder<T> extends AggregateBinder<T> {
      *
      * @param env the env
      */
-    IndexedBinder(Binder.Env env) {
+    IndexedBinder(final Binder.Env env) {
         super(env);
     }
     
@@ -72,16 +72,6 @@ public abstract class IndexedBinder<T> extends AggregateBinder<T> {
         }
     }
 
-    @SuppressWarnings("unchecked")
-    private void bindValue(final Collection<Object> collection, final Object value) {
-        if (value instanceof String && !StringUtils.isNotBlank((String) value)) {
-            return;
-        }
-        if (value instanceof Collection) {
-            collection.addAll((Collection<Object>)value);
-        }
-    }
-
     private void bindIndexed(final ConfigPropertySource source,
                              final PropertyName root,
                              final AggregateElementBinder elementBinder,
@@ -99,7 +89,16 @@ public abstract class IndexedBinder<T> extends AggregateBinder<T> {
             collection.get().add(value);
         }
     }
-
+    
+    @SuppressWarnings("unchecked")
+    private void bindValue(final Collection<Object> collection, final Object value) {
+        if (value instanceof String && !StringUtils.isNotBlank((String) value)) {
+            return;
+        }
+        if (value instanceof Collection) {
+            collection.addAll((Collection<Object>) value);
+        }
+    }
     private Multimap<String, ConfigProperty> getKnownIndexedChildren(final ConfigPropertySource source, final PropertyName root) {
         Multimap<String, ConfigProperty> children = ArrayListMultimap.create();
         source.stream().filter(e -> e.isAncestorOf(root)).forEach(name -> {

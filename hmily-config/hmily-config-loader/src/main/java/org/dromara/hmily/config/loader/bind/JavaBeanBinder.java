@@ -47,9 +47,8 @@ public class JavaBeanBinder extends BeanBinder {
         }
         BeanSupplier<T> beanSupplier = bean.getSupplier(target);
         boolean bound = bind(propertyBinder, bean, beanSupplier);
-        return (bound ? beanSupplier.get() : null);
+        return bound ? beanSupplier.get() : null;
     }
-    
     
     private <T> boolean bind(final PropertyBinder propertyBinder, final Bean<T> bean, final BeanSupplier<T> beanSupplier) {
         boolean bound = false;
@@ -90,12 +89,13 @@ public class JavaBeanBinder extends BeanBinder {
          *
          * @param type the type
          */
-        public Bean(final Class<?> type) {
+        Bean(final Class<?> type) {
             this.type = type;
             putProperties(type);
         }
         
-        private void putProperties(Class<?> type) {
+        private void putProperties(final Class<?> clazz) {
+            Class<?> type = clazz;
             while (type != null && !Object.class.equals(type)) {
                 for (Method method : type.getDeclaredMethods()) {
                     if (isCandidate(method)) {

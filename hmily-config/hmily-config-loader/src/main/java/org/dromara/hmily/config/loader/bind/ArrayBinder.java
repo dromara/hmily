@@ -26,12 +26,17 @@ import java.util.function.Supplier;
 import org.dromara.hmily.config.loader.property.PropertyName;
 
 /**
- *
+ * The type Array binder.
  *
  * @author xiaoyu
  */
 public final class ArrayBinder extends IndexedBinder<Object> {
-
+    
+    /**
+     * Instantiates a new Array binder.
+     *
+     * @param env the env
+     */
     ArrayBinder(final Binder.Env env) {
         super(env);
     }
@@ -53,7 +58,7 @@ public final class ArrayBinder extends IndexedBinder<Object> {
     }
 
     @Override
-    Object merge(Supplier<?> targetValue, Object object) {
+    Object merge(final Supplier<?> targetValue, final Object object) {
         return object;
     }
 }

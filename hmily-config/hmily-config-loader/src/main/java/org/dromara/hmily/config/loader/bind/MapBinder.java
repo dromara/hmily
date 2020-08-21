@@ -49,7 +49,7 @@ public final class MapBinder extends AggregateBinder<Map<Object, Object>> {
         if (!hasDescendants) {
             new EntryBinder(propertyName, target, env, elementBinder).bindEntries(env.getSource(), map);
         }
-        return (map.isEmpty() ? null : map);
+        return map.isEmpty() ? null : map;
     }
 
     @Override
@@ -69,7 +69,7 @@ public final class MapBinder extends AggregateBinder<Map<Object, Object>> {
     }
 
     @Override
-    public boolean isAllowRecursiveBinding(Binder.Env source) {
+    public boolean isAllowRecursiveBinding(final Binder.Env source) {
         return false;
     }
     
@@ -144,8 +144,7 @@ public final class MapBinder extends AggregateBinder<Map<Object, Object>> {
                     BindData<?> valueBindData = getValueBindData(name);
                     PropertyName entryName = getEntryName(source, name);
                     Object key = getKeyName(entryName);
-                    map.computeIfAbsent(key,
-                            (k) -> this.elementBinder.bind(entryName, valueBindData, this.env));
+                    map.computeIfAbsent(key, (k) -> this.elementBinder.bind(entryName, valueBindData, this.env));
                 }
             });
         }

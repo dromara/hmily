@@ -33,13 +33,23 @@ import lombok.Data;
  * @author xiaoyu
  */
 @Data
-public class DataType {
+public final class DataType {
 
     private Type type;
 
     private DataType[] generics = new DataType[0];
 
     private Class<?> typeClass;
+    
+    /**
+     * Instantiates a new Data type.
+     *
+     * @param type the type
+     */
+    private DataType(final Type type) {
+        this.type = type;
+        this.typeClass = (Class<?>) type;
+    }
 
     /**
      * Is assignable from boolean.
@@ -94,16 +104,6 @@ public class DataType {
             }
         }
         return this;
-    }
-
-    /**
-     * Instantiates a new Data type.
-     *
-     * @param type the type
-     */
-    private DataType(final Type type) {
-        this.type = type;
-        this.typeClass = (Class<?>) type;
     }
     
     /**

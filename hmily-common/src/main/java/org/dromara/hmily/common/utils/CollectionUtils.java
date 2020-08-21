@@ -138,21 +138,6 @@ public class CollectionUtils {
         }
         
         /**
-         * Cast the given type to a subtype of {@link Enum}.
-         *
-         * @param enumType the enum type, never {@code null}
-         * @return the given type as subtype of {@link Enum}
-         * @throws IllegalArgumentException if the given type is not a subtype of {@link Enum}
-         */
-        @SuppressWarnings("rawtypes")
-        private Class<? extends Enum> asEnumType(final Class<?> enumType) {
-            if (!Enum.class.isAssignableFrom(enumType)) {
-                throw new IllegalArgumentException("Supplied type is not an enum: " + enumType.getName());
-            }
-            return enumType.asSubclass(Enum.class);
-        }
-        
-        /**
          * Create map map.
          *
          * @param <K>     the type parameter
@@ -184,6 +169,21 @@ public class CollectionUtils {
                     throw new IllegalArgumentException("Could not instantiate Map type: " + mapType.getName(), ex);
                 }
             }
+        }
+        
+        /**
+         * Cast the given type to a subtype of {@link Enum}.
+         *
+         * @param enumType the enum type, never {@code null}
+         * @return the given type as subtype of {@link Enum}
+         * @throws IllegalArgumentException if the given type is not a subtype of {@link Enum}
+         */
+        @SuppressWarnings("rawtypes")
+        private Class<? extends Enum> asEnumType(final Class<?> enumType) {
+            if (!Enum.class.isAssignableFrom(enumType)) {
+                throw new IllegalArgumentException("Supplied type is not an enum: " + enumType.getName());
+            }
+            return enumType.asSubclass(Enum.class);
         }
     }
 }

@@ -39,7 +39,7 @@ import org.dromara.hmily.config.loader.property.PropertyKeySource;
 public class OriginalConfigLoader implements ConfigLoader<Config> {
 
     @Override
-    public void load(Supplier<Context> context, LoaderHandler<Config> handler) {
+    public void load(final Supplier<Context> context, final LoaderHandler<Config> handler) {
         for (PropertyKeySource<?> propertyKeySource : context.get().getSource()) {
             ConfigPropertySource configPropertySource = new DefaultConfigPropertySource<>(propertyKeySource, PropertyKeyParse.INSTANCE);
             ConfigEnv.getInstance().stream().map(e -> {

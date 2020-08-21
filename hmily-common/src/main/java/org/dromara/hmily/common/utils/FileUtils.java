@@ -32,7 +32,7 @@ import lombok.SneakyThrows;
  * @author xiaoyu(Myth)
  */
 public class FileUtils {
-
+    
     /**
      * Write file.
      *
@@ -56,6 +56,12 @@ public class FileUtils {
         }
     }
     
+    /**
+     * Read yaml string.
+     *
+     * @param yamlFile the yaml file
+     * @return the string
+     */
     @SneakyThrows
     public static String readYAML(final String yamlFile) {
         return Files.readAllLines(Paths.get(ClassLoader.getSystemResource(yamlFile).toURI()))

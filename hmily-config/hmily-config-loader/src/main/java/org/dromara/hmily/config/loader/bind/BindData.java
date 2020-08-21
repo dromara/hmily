@@ -30,7 +30,7 @@ import lombok.Data;
  * @author chenbin sixh
  */
 @Data
-public class BindData<T> {
+public final class BindData<T> {
 
     private DataType type;
 
@@ -38,8 +38,7 @@ public class BindData<T> {
 
     private Supplier<T> value;
 
-    private BindData(DataType type,
-                     Supplier<T> value) {
+    private BindData(final DataType type, final Supplier<T> value) {
         this.type = type;
         this.value = value;
     }
@@ -51,7 +50,7 @@ public class BindData<T> {
      * @param type the type
      * @return the bind data
      */
-    public static <T> BindData<T> of(DataType type) {
+    public static <T> BindData<T> of(final DataType type) {
         return new BindData<>(type, null);
     }
 
@@ -63,8 +62,7 @@ public class BindData<T> {
      * @param value the value
      * @return the bind data
      */
-    public static <T> BindData<T> of(DataType type,
-                                     Supplier<T> value) {
+    public static <T> BindData<T> of(final DataType type, final Supplier<T> value) {
         return new BindData<>(type, value);
     }
 
@@ -75,7 +73,7 @@ public class BindData<T> {
      * @param value the value
      * @return the bind data
      */
-    public <T> BindData<T> withValue(Supplier<T> value) {
+    public <T> BindData<T> withValue(final Supplier<T> value) {
         return new BindData<>(this.type, value);
     }
 }

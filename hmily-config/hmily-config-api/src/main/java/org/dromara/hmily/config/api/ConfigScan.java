@@ -28,6 +28,9 @@ import org.dromara.hmily.spi.ExtensionLoaderFactory;
  */
 public final class ConfigScan {
     
+    /**
+     * Scan all config to add config env.
+     */
     public static void scan() {
         List<Config> configs = ExtensionLoaderFactory.loadAll(Config.class);
         for (Config conf : configs) {

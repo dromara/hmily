@@ -26,7 +26,7 @@ package org.dromara.hmily.config.api;
  */
 public abstract class AbstractConfig implements Config {
 
-    private volatile boolean isLoad = false;
+    private volatile boolean isLoad;
 
     @Override
     public void flagLoad() {
