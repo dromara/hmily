@@ -17,13 +17,14 @@
 
 package org.dromara.hmily.repository.redis.jedis;
 
+import java.util.Map;
 import java.util.Set;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 
 /**
  * JedisClientSingle.
- * @author xiaoyu(Myth)
+ * @author xiaoyu(Myth)、dzc
  */
 public class JedisClientSingle implements JedisClient {
 
@@ -131,4 +132,31 @@ public class JedisClientSingle implements JedisClient {
         }
     }
 
+	@Override
+	public Long hset(byte[] key, byte[] field, byte[] value) {
+		 try (Jedis jedis = jedisPool.getResource()) {
+	            return jedis.hset(key, field, value);
+	     }
+	}
+
+	@Override
+	public Map<byte[], byte[]> hgetAll(byte[] key) {
+		 try (Jedis jedis = jedisPool.getResource()) {
+	            return jedis.hgetAll(key);
+	     }
+	}
+
+	@Override
+	public byte[] hget(byte[] key, byte[] field) {
+		 try (Jedis jedis = jedisPool.getResource()) {
+	            return jedis.hget(key, field);
+	     }
+	}
+
+	@Override
+	public boolean hexists(byte[] key, byte[] field) {
+		 try (Jedis jedis = jedisPool.getResource()) {
+	            return jedis.hexists(key, field);
+	     }
+	}
 }

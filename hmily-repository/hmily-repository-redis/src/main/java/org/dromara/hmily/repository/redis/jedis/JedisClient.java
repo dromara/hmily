@@ -17,12 +17,14 @@
 
 package org.dromara.hmily.repository.redis.jedis;
 
+import java.util.Map;
 import java.util.Set;
+
 
 /**
  * JedisClient.
  *
- * @author xiaoyu(Myth)
+ * @author xiaoyu(Myth)、dzc
  */
 public interface JedisClient {
 
@@ -146,5 +148,41 @@ public interface JedisClient {
      * @return the set
      */
     Set<String> zrange(String key, long start, long end);
+
+    /**
+     * Hset long.
+     *
+     * @param key   the key
+     * @param item  the item
+     * @param value the value
+     * @return the long
+     */
+	Long hset(byte[] key, byte[] field, byte[] value);
+
+    /**
+     * Hset long.
+     *
+     * @param key   the key
+     * @return the map
+     */
+	Map<byte[], byte[]> hgetAll(byte[] key);
+
+    /**
+     * Hget long.
+     *
+     * @param key   the key
+     * @param item  the field
+     * @return the long
+     */
+	byte[] hget(byte[] key, byte[] field);
+
+    /**
+     * Hexists boolean.
+     *
+     * @param key   the key
+     * @param item  the field
+     * @return the long
+     */
+	boolean hexists(byte[] key, byte[] field);
 
 }
