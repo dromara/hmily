@@ -30,9 +30,10 @@ public interface HmilySqlParserEngine {
     /**
      * Parser sql to sql statement.
      *
-     * @param sql the sql
+     * @param sql          the sql
+     * @param databaseType the database type
      * @return the sql statement
      * @throws SqlParserException the sql parser exception
      */
-    SQLStatement parser(String sql) throws SqlParserException;
+    SQLStatement parser(String sql, String databaseType) throws SqlParserException;
 }

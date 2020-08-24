@@ -31,7 +31,7 @@ import org.dromara.hmily.tac.sqlparser.spi.exception.SqlParserException;
 public class CalciteSqlParserEngine implements HmilySqlParserEngine {
     
     @Override
-    public SQLStatement parser(final String sql) throws SqlParserException {
+    public SQLStatement parser(final String sql, final String databaseType) throws SqlParserException {
         return null;
     }
 }
