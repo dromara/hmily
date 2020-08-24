@@ -11,18 +11,22 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
 /**
- * Author:   lilang
- * Date:     2020-08-22 14:53
- * Description:
+ * The type apollo client.
+ *
+ * @author  lilang
  **/
 public class ApolloClient {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ApolloClient.class);
 
     private static final String APOLLO_CONFIG_SERVER_ADDR_KEY = "apollo.configService";
+
     private static final String APOLLO_CONFIG_APPID_KEY = "app.id";
+
     private static final String APOLLO_CONFIG_META_KEY = "apollo.meta";
+
     private static final String APOLLO_CONFIG_SECRET_KEY = "apollo.accesskey.secret";
+
     private static final String APOLLO_CONFIG_ENV_KEY = "env";
 
     /**
@@ -44,7 +48,7 @@ public class ApolloClient {
         return new ByteArrayInputStream(content.getBytes());
     }
 
-    private void setApolloConfig(ApolloConfig config) {
+    private void setApolloConfig(final ApolloConfig config) {
         System.setProperty(APOLLO_CONFIG_APPID_KEY, config.getAppId());
         System.setProperty(APOLLO_CONFIG_SERVER_ADDR_KEY, config.getConfigService());
         if (StringUtils.isNoneBlank(config.getMeta())) {

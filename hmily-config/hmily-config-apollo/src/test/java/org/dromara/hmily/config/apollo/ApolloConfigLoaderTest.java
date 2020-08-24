@@ -42,11 +42,12 @@ public class ApolloConfigLoaderTest {
             PowerMockito.when(client.pull(any())).thenReturn(byteArrayInputStream);
         } catch (Exception e) {
             e.printStackTrace();
+            Assert.fail();
         }
     }
 
     /**
-     * Test nacos load.
+     * Test apollo load.
      */
     @Test
     public void testApolloLoad() {

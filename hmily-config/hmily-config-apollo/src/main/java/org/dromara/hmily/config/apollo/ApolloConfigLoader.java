@@ -18,9 +18,8 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 /**
- * Author:   lilang
- * Date:     2020-08-22 14:54
- * Description:
+ * The type apollo config loader.
+ * @author   lilang
  **/
 @HmilySPI("apollo")
 public class ApolloConfigLoader implements ConfigLoader<ApolloConfig> {
@@ -44,14 +43,13 @@ public class ApolloConfigLoader implements ConfigLoader<ApolloConfig> {
         this.client = apolloClient;
     }
 
-
     @Override
-    public void load(Supplier<Context> context, LoaderHandler<ApolloConfig> handler) {
-        LoaderHandler<ApolloConfig> nacosHandler = (c, config) -> apolloLoad(c, handler, config);
-        againLoad(context, nacosHandler, ApolloConfig.class);
+    public void load(final Supplier<Context> context, final LoaderHandler<ApolloConfig> handler) {
+        LoaderHandler<ApolloConfig> apolloHandler = (c, config) -> apolloLoad(c, handler, config);
+        againLoad(context, apolloHandler, ApolloConfig.class);
     }
 
-    private void apolloLoad(Supplier<Context> context, LoaderHandler<ApolloConfig> handler, ApolloConfig config) {
+    private void apolloLoad(final Supplier<Context> context, final LoaderHandler<ApolloConfig> handler, final ApolloConfig config) {
         if (config != null) {
             check(config);
             LOGGER.info("loader apollo config: {}", config);
@@ -70,7 +68,7 @@ public class ApolloConfigLoader implements ConfigLoader<ApolloConfig> {
         }
     }
 
-    private void check(ApolloConfig config) {
+    private void check(final ApolloConfig config) {
         if (StringUtils.isBlank(config.getAppId())) {
             throw new ConfigException("apollo.appId is null");
         }
@@ -85,12 +83,7 @@ public class ApolloConfigLoader implements ConfigLoader<ApolloConfig> {
         }
     }
 
-    private void apolloFinish(Supplier<Context> contextSupplier, Config config) {
+    private void apolloFinish(final Supplier<Context> contextSupplier, final Config config) {
         LOGGER.info("apollo loader config {}:{}", config != null ? config.prefix() : "", config);
-    }
-
-    @Override
-    public void againLoad(Supplier<Context> context, LoaderHandler<ApolloConfig> handler, Class<ApolloConfig> apolloConfigClass) {
-
     }
 }

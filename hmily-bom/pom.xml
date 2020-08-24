@@ -57,6 +57,8 @@
         <commons-beanutils.verison>1.9.4</commons-beanutils.verison>
         <curator.version>5.1.0</curator.version>
         <yml.version>1.23</yml.version>
+        <apollo-client.version>1.6.0</apollo-client.version>
+        <guice.version>4.2.3</guice.version>
     </properties>
 
     <dependencyManagement>
@@ -334,6 +336,16 @@
                 <version>${spring-cloud.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.ctrip.framework.apollo</groupId>
+                <artifactId>apollo-client</artifactId>
+                <version>${apollo-client.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.inject</groupId>
+                <artifactId>guice</artifactId>
+                <version>${guice.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

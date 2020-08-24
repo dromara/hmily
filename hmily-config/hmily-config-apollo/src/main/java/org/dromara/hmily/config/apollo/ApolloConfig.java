@@ -6,9 +6,8 @@ import org.dromara.hmily.config.api.constant.PrefixConstants;
 import org.dromara.hmily.spi.HmilySPI;
 
 /**
- * Author:   lilang
- * Date:     2020-08-22 14:53
- * Description:
+ * ApolloConfig.
+ * @author   lilang
  **/
 @Data
 @HmilySPI("remoteApollo")
