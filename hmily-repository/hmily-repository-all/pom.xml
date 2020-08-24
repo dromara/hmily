@@ -58,6 +58,11 @@
             <artifactId>hmily-repository-redis</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.dromara</groupId>
+            <artifactId>hmily-repository-zookeeper</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 
 </project>

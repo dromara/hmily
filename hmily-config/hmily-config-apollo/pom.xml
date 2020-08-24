@@ -28,5 +28,21 @@
 
     <artifactId>hmily-config-apollo</artifactId>
 
+    <dependencies>
+        <dependency>
+            <groupId>org.dromara</groupId>
+            <artifactId>hmily-config-loader</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.ctrip.framework.apollo</groupId>
+            <artifactId>apollo-client</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.inject</groupId>
+            <artifactId>guice</artifactId>
+        </dependency>
+    </dependencies>
+
 
 </project>
