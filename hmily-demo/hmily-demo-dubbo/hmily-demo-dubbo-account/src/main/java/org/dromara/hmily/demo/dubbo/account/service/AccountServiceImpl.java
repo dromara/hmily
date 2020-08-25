@@ -115,7 +115,7 @@ public class AccountServiceImpl implements AccountService {
     
     @Override
     public boolean testPayment(AccountDTO accountDTO) {
-        accountMapper.update(accountDTO);
+        accountMapper.testUpdate(accountDTO);
         return Boolean.TRUE;
     }
 

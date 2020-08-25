@@ -23,7 +23,6 @@ import org.dromara.hmily.demo.springcloud.account.dto.AccountDTO;
 import org.dromara.hmily.demo.springcloud.account.entity.AccountDO;
 import org.dromara.hmily.demo.springcloud.account.mapper.AccountMapper;
 import org.dromara.hmily.demo.springcloud.account.service.AccountService;
-import org.dromara.hmily.demo.springcloud.account.service.InLineService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,10 +42,7 @@ public class AccountServiceImpl implements AccountService {
     private static final Logger LOGGER = LoggerFactory.getLogger(AccountServiceImpl.class);
 
     private final AccountMapper accountMapper;
-
-    @Autowired
-    private InLineService inLineService;
-
+    
     /**
      * Instantiates a new Account service.
      *
@@ -62,11 +58,37 @@ public class AccountServiceImpl implements AccountService {
     public boolean payment(final AccountDTO accountDTO) {
         LOGGER.debug("============执行try付款接口===============");
         accountMapper.update(accountDTO);
-        //内嵌调用
-        //inLineService.test();
         return Boolean.TRUE;
     }
-
+    
+    @Override
+    public boolean testPayment(AccountDTO accountDTO) {
+        accountMapper.testUpdate(accountDTO);
+        return Boolean.TRUE;
+    }
+    
+    @Override
+    @HmilyTCC(confirmMethod = "confirm", cancelMethod = "cancel")
+    public boolean mockWithTryException(AccountDTO accountDTO) {
+        throw new HmilyRuntimeException("账户扣减异常！");
+    }
+    
+    @Override
+    @HmilyTCC(confirmMethod = "confirm", cancelMethod = "cancel")
+    public boolean mockWithTryTimeout(AccountDTO accountDTO) {
+        try {
+            //模拟延迟 当前线程暂停10秒
+            Thread.sleep(10000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        int decrease = accountMapper.update(accountDTO);;
+        if (decrease != 1) {
+            throw new HmilyRuntimeException("账户余额不足");
+        }
+        return true;
+    }
+    
     @Override
     public AccountDO findByUserId(final String userId) {
         return accountMapper.findByUserId(userId);

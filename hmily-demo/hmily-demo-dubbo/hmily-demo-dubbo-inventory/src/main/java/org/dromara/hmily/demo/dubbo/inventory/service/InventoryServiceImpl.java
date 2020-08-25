@@ -42,10 +42,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 @Service("inventoryService")
 public class InventoryServiceImpl implements InventoryService {
-
-    /**
-     * logger.
-     */
+    
     private static final Logger LOGGER = LoggerFactory.getLogger(InventoryServiceImpl.class);
 
     private static AtomicInteger tryCount = new AtomicInteger(0);
@@ -109,11 +106,10 @@ public class InventoryServiceImpl implements InventoryService {
         System.out.println("cancelTest in line for rpc.......");
         return new ArrayList<>();
     }
-
-
+    
     @Override
     public Boolean testDecrease(InventoryDTO inventoryDTO) {
-        inventoryMapper.decrease(inventoryDTO);
+        inventoryMapper.testDecrease(inventoryDTO);
         return true;
     }
 

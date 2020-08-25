@@ -17,6 +17,8 @@
 
 package org.dromara.hmily.demo.springcloud.order.service.impl;
 
+import java.math.BigDecimal;
+import java.util.Date;
 import org.dromara.hmily.common.utils.IdWorkerUtils;
 import org.dromara.hmily.demo.springcloud.order.entity.Order;
 import org.dromara.hmily.demo.springcloud.order.enums.OrderStatusEnum;
@@ -28,20 +30,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
-import java.util.Date;
-
 
 /**
  * @author xiaoyu
  */
 @Service("orderService")
-@SuppressWarnings("all")
 public class OrderServiceImpl implements OrderService {
-
-    /**
-     * logger.
-     */
+    
     private static final Logger LOGGER = LoggerFactory.getLogger(OrderServiceImpl.class);
 
     private final OrderMapper orderMapper;
@@ -56,35 +51,32 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public String orderPay(Integer count, BigDecimal amount) {
-        final Order order = buildOrder(count, amount);
-        final int rows = orderMapper.save(order);
-
-        if (rows > 0) {
-            paymentService.makePayment(order);
-        }
+        Order order = saveOrder(count, amount);
+        long start = System.currentTimeMillis();
+        paymentService.makePayment(order);
+        System.out.println("hmily-cloud分布式事务耗时：" + (System.currentTimeMillis() - start));
         return "success";
     }
-
-    /**
-     * 模拟在订单支付操作中，库存在try阶段中的库存异常
-     *
-     * @param count  购买数量
-     * @param amount 支付金额
-     * @return string
-     */
+    
+    @Override
+    public String testOrderPay(Integer count, BigDecimal amount) {
+        Order order = saveOrder(count, amount);
+        paymentService.testMakePayment(order);
+        return "success";
+    }
+    
     @Override
     public String mockInventoryWithTryException(Integer count, BigDecimal amount) {
-        final Order order = buildOrder(count, amount);
-        final int rows = orderMapper.save(order);
-
-        if (rows > 0) {
-            paymentService.mockPaymentInventoryWithTryException(order);
-        }
-
-
-        return "success";
+        Order order = saveOrder(count, amount);
+        return paymentService.mockPaymentInventoryWithTryException(order);
     }
-
+    
+    @Override
+    public String mockAccountWithTryException(Integer count, BigDecimal amount) {
+        Order order = saveOrder(count, amount);
+        return paymentService.mockPaymentAccountWithTryException(order);
+    }
+    
     /**
      * 模拟在订单支付操作中，库存在try阶段中的timeout
      *
@@ -94,23 +86,27 @@ public class OrderServiceImpl implements OrderService {
      */
     @Override
     public String mockInventoryWithTryTimeout(Integer count, BigDecimal amount) {
-        final Order order = buildOrder(count, amount);
-        final int rows = orderMapper.save(order);
-
-        if (rows > 0) {
-            paymentService.mockPaymentInventoryWithTryTimeout(order);
-        }
-
-
-        return "success";
+        Order order = saveOrder(count, amount);
+        return paymentService.mockPaymentInventoryWithTryTimeout(order);
     }
-
-
+    
+    @Override
+    public String mockAccountWithTryTimeout(Integer count, BigDecimal amount) {
+        Order order = saveOrder(count, amount);
+        return paymentService.mockPaymentAccountWithTryTimeout(order);
+    }
+    
     @Override
     public void updateOrderStatus(Order order) {
         orderMapper.update(order);
     }
-
+    
+    private Order saveOrder(Integer count, BigDecimal amount) {
+        final Order order = buildOrder(count, amount);
+        orderMapper.save(order);
+        return order;
+    }
+    
     private Order buildOrder(Integer count, BigDecimal amount) {
         LOGGER.debug("构建订单对象");
         Order order = new Order();

@@ -30,7 +30,6 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/inventory")
-@SuppressWarnings("all")
 public class InventoryController {
 
     private final InventoryService inventoryService;
@@ -43,6 +42,11 @@ public class InventoryController {
     @RequestMapping("/decrease")
     public Boolean decrease(@RequestBody InventoryDTO inventoryDTO) {
         return inventoryService.decrease(inventoryDTO);
+    }
+    
+    @RequestMapping("/testDecrease")
+    public Boolean testDecrease(@RequestBody InventoryDTO inventoryDTO) {
+        return inventoryService.testDecrease(inventoryDTO);
     }
 
     @RequestMapping("/findByProductId")
@@ -59,5 +63,4 @@ public class InventoryController {
     public Boolean mockWithTryTimeout(@RequestBody InventoryDTO inventoryDTO) {
         return inventoryService.mockWithTryTimeout(inventoryDTO);
     }
-
 }

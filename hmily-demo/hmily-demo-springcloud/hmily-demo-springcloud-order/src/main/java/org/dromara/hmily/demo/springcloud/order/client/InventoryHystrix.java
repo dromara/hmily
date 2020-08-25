@@ -32,7 +32,13 @@ public class InventoryHystrix implements InventoryClient {
         System.out.println("inventory hystrix.......");
         return false;
     }
-
+    
+    @Override
+    public Boolean testDecrease(InventoryDTO inventoryDTO) {
+        System.out.println("inventory hystrix.......");
+        return false;
+    }
+    
     @Override
     public Integer findByProductId(String productId) {
         return 0;

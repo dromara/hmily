@@ -31,7 +31,7 @@ import org.springframework.web.bind.annotation.RequestParam;
  */
 @FeignClient(value = "inventory-service")
 public interface InventoryClient {
-
+    
     /**
      * 库存扣减.
      *
@@ -41,7 +41,16 @@ public interface InventoryClient {
     @RequestMapping("/inventory-service/inventory/decrease")
     @HmilyTCC
     Boolean decrease(@RequestBody InventoryDTO inventoryDTO);
-
+    
+    /**
+     * Test decrease boolean.
+     *
+     * @param inventoryDTO the inventory dto
+     * @return the boolean
+     */
+    @RequestMapping("/inventory-service/inventory/testDecrease")
+    Boolean testDecrease(@RequestBody InventoryDTO inventoryDTO);
+    
     /**
      * 获取商品库存.
      *
@@ -50,8 +59,8 @@ public interface InventoryClient {
      */
     @RequestMapping("/inventory-service/inventory/findByProductId")
     Integer findByProductId(@RequestParam("productId") String productId);
-
-
+    
+    
     /**
      * 模拟库存扣减异常.
      *

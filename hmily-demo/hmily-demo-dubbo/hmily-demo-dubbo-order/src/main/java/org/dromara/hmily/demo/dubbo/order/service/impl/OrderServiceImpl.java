@@ -73,7 +73,6 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public String testOrderPay(Integer count, BigDecimal amount) {
         Order order = saveOrder(count, amount);
-        final int rows = orderMapper.save(order);
         final long start = System.currentTimeMillis();
         paymentService.testMakePayment(order);
         System.out.println("方法耗时：" + (System.currentTimeMillis() - start));

@@ -32,6 +32,13 @@ public interface PaymentService {
      * @param order 订单实体
      */
     void makePayment(Order order);
+    
+    /**
+     * Test make payment.
+     *
+     * @param order the order
+     */
+    void testMakePayment(Order order);
 
     /**
      * mock订单支付的时候库存异常.
@@ -40,6 +47,14 @@ public interface PaymentService {
      * @return String
      */
     String mockPaymentInventoryWithTryException(Order order);
+    
+    /**
+     * Mock payment account with try exception string.
+     *
+     * @param order the order
+     * @return the string
+     */
+    String mockPaymentAccountWithTryException(Order order);
 
     /**
      * mock订单支付的时候库存超时.
@@ -48,6 +63,12 @@ public interface PaymentService {
      * @return String
      */
     String mockPaymentInventoryWithTryTimeout(Order order);
-
-
+    
+    /**
+     * Mock payment account with try timeout string.
+     *
+     * @param order the order
+     * @return the string
+     */
+    String mockPaymentAccountWithTryTimeout(Order order);
 }
