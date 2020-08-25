@@ -58,13 +58,11 @@ public class PaymentServiceImpl implements PaymentService {
         this.accountService = accountService;
         this.inventoryService = inventoryService;
     }
-
-
+    
     @Override
     @HmilyTCC(confirmMethod = "confirmOrderStatus", cancelMethod = "cancelOrderStatus")
     public void makePayment(Order order) {
-        order.setStatus(OrderStatusEnum.PAYING.getCode());
-        orderMapper.update(order);
+        updateOrderStatus(order, OrderStatusEnum.PAYING);
         //做库存和资金账户的检验工作 这里只是demo 。。。
        /* final AccountDO accountDO = accountService.findByUserId(order.getUserId());
         if (accountDO.getBalance().compareTo(order.getTotalAmount()) <= 0) {
@@ -76,38 +74,24 @@ public class PaymentServiceImpl implements PaymentService {
             throw new HmilyRuntimeException("库存不足！");
         }*/
         //扣除用户余额
-        AccountDTO accountDTO = new AccountDTO();
-        accountDTO.setAmount(order.getTotalAmount());
-        accountDTO.setUserId(order.getUserId());
-        accountService.payment(accountDTO);
+        accountService.payment(buildAccountDTO(order));
         //进入扣减库存操作
-        InventoryDTO inventoryDTO = new InventoryDTO();
-        inventoryDTO.setCount(order.getCount());
-        inventoryDTO.setProductId(order.getProductId());
-        inventoryService.decrease(inventoryDTO);
+        inventoryService.decrease(buildInventoryDTO(order));
     }
     
     @Override
     @HmilyTAC
     public void makePaymentForTAC(Order order) {
-        order.setStatus(OrderStatusEnum.PAY_SUCCESS.getCode());
-        orderMapper.update(order);
+        updateOrderStatus(order, OrderStatusEnum.PAY_SUCCESS);
         //扣除用户余额
-        AccountDTO accountDTO = new AccountDTO();
-        accountDTO.setAmount(order.getTotalAmount());
-        accountDTO.setUserId(order.getUserId());
-        accountService.paymentTAC(accountDTO);
+        accountService.paymentTAC(buildAccountDTO(order));
         //进入扣减库存操作
-        InventoryDTO inventoryDTO = new InventoryDTO();
-        inventoryDTO.setCount(order.getCount());
-        inventoryDTO.setProductId(order.getProductId());
-        inventoryService.decreaseTAC(inventoryDTO);
+        inventoryService.decreaseTAC(buildInventoryDTO(order));
     }
     
     @Override
     public void testMakePayment(Order order) {
-        order.setStatus(OrderStatusEnum.PAYING.getCode());
-        orderMapper.update(order);
+        updateOrderStatus(order, OrderStatusEnum.PAYING);
         //做库存和资金账户的检验工作 这里只是demo 。。。
        /* final AccountDO accountDO = accountService.findByUserId(order.getUserId());
         if (accountDO.getBalance().compareTo(order.getTotalAmount()) <= 0) {
@@ -119,15 +103,9 @@ public class PaymentServiceImpl implements PaymentService {
             throw new HmilyRuntimeException("库存不足！");
         }*/
         //扣除用户余额
-        AccountDTO accountDTO = new AccountDTO();
-        accountDTO.setAmount(order.getTotalAmount());
-        accountDTO.setUserId(order.getUserId());
-        accountService.testPayment(accountDTO);
+        accountService.testPayment(buildAccountDTO(order));
         //进入扣减库存操作
-        InventoryDTO inventoryDTO = new InventoryDTO();
-        inventoryDTO.setCount(order.getCount());
-        inventoryDTO.setProductId(order.getProductId());
-        inventoryService.testDecrease(inventoryDTO);
+        inventoryService.testDecrease(buildInventoryDTO(order));
     }
 
     /**
@@ -138,119 +116,67 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     @HmilyTCC(confirmMethod = "confirmOrderStatus", cancelMethod = "cancelOrderStatus")
     public void makePaymentWithNested(Order order) {
-        order.setStatus(OrderStatusEnum.PAYING.getCode());
-        orderMapper.update(order);
-
-        //做库存和资金账户的检验工作 这里只是demo 。。。
+        updateOrderStatus(order, OrderStatusEnum.PAYING);
         final AccountDO accountDO = accountService.findByUserId(order.getUserId());
         if (accountDO.getBalance().compareTo(order.getTotalAmount()) <= 0) {
             throw new HmilyRuntimeException("余额不足！");
         }
         //扣除用户余额
-        AccountNestedDTO accountDTO = new AccountNestedDTO();
-        accountDTO.setAmount(order.getTotalAmount());
-        accountDTO.setUserId(order.getUserId());
-        accountDTO.setProductId(order.getProductId());
-        accountDTO.setCount(order.getCount());
-        accountService.paymentWithNested(accountDTO);
-        //进入扣减库存操作
-        InventoryDTO inventoryDTO = new InventoryDTO();
-        inventoryDTO.setCount(order.getCount());
-        inventoryDTO.setProductId(order.getProductId());
-        inventoryService.decrease(inventoryDTO);
+        accountService.paymentWithNested(buildAccountNestedDTO(order));
     }
     
     @Override
     @HmilyTCC(confirmMethod = "confirmOrderStatus", cancelMethod = "cancelOrderStatus")
     public void makePaymentWithNestedException(Order order) {
-        order.setStatus(OrderStatusEnum.PAYING.getCode());
-        orderMapper.update(order);
-    
-        //做库存和资金账户的检验工作 这里只是demo 。。。
+        updateOrderStatus(order, OrderStatusEnum.PAYING);
         final AccountDO accountDO = accountService.findByUserId(order.getUserId());
         if (accountDO.getBalance().compareTo(order.getTotalAmount()) <= 0) {
             throw new HmilyRuntimeException("余额不足！");
         }
         //扣除用户余额
-        AccountNestedDTO accountDTO = new AccountNestedDTO();
-        accountDTO.setAmount(order.getTotalAmount());
-        accountDTO.setUserId(order.getUserId());
-        accountDTO.setProductId(order.getProductId());
-        accountDTO.setCount(order.getCount());
-        accountService.paymentWithNestedException(accountDTO);
-        //进入扣减库存操作
-        InventoryDTO inventoryDTO = new InventoryDTO();
-        inventoryDTO.setCount(order.getCount());
-        inventoryDTO.setProductId(order.getProductId());
-        inventoryService.decrease(inventoryDTO);
+        accountService.paymentWithNestedException(buildAccountNestedDTO(order));
     }
     
     @Override
     @HmilyTCC(confirmMethod = "confirmOrderStatus", cancelMethod = "cancelOrderStatus")
     public String mockPaymentInventoryWithTryException(Order order) {
-        order.setStatus(OrderStatusEnum.PAYING.getCode());
-        orderMapper.update(order);
-
+        updateOrderStatus(order, OrderStatusEnum.PAYING);
         //扣除用户余额
-        AccountDTO accountDTO = new AccountDTO();
-        accountDTO.setAmount(order.getTotalAmount());
-        accountDTO.setUserId(order.getUserId());
-        accountService.payment(accountDTO);
-
-
-        InventoryDTO inventoryDTO = new InventoryDTO();
-        inventoryDTO.setCount(order.getCount());
-        inventoryDTO.setProductId(order.getProductId());
-        inventoryService.mockWithTryException(inventoryDTO);
+        accountService.payment(buildAccountDTO(order));
+        inventoryService.mockWithTryException(buildInventoryDTO(order));
         return "success";
     }
 
     @Override
     @HmilyTCC(confirmMethod = "confirmOrderStatus", cancelMethod = "cancelOrderStatus")
     public String mockPaymentInventoryWithTryTimeout(Order order) {
-        order.setStatus(OrderStatusEnum.PAYING.getCode());
-        orderMapper.update(order);
-
+        updateOrderStatus(order, OrderStatusEnum.PAYING);
         //扣除用户余额
-        AccountDTO accountDTO = new AccountDTO();
-        accountDTO.setAmount(order.getTotalAmount());
-        accountDTO.setUserId(order.getUserId());
-        accountService.payment(accountDTO);
-
-        //进入扣减库存操作
-        InventoryDTO inventoryDTO = new InventoryDTO();
-        inventoryDTO.setCount(order.getCount());
-        inventoryDTO.setProductId(order.getProductId());
-        inventoryService.mockWithTryTimeout(inventoryDTO);
+        accountService.payment(buildAccountDTO(order));
+        inventoryService.mockWithTryTimeout(buildInventoryDTO(order));
         return "success";
     }
-
+    
     @Override
     @HmilyTCC(confirmMethod = "confirmOrderStatus", cancelMethod = "cancelOrderStatus")
-    public String mockPaymentInventoryWithConfirmException(Order order) {
-        order.setStatus(OrderStatusEnum.PAYING.getCode());
-        orderMapper.update(order);
-
-        //扣除用户余额
-        AccountDTO accountDTO = new AccountDTO();
-        accountDTO.setAmount(order.getTotalAmount());
-        accountDTO.setUserId(order.getUserId());
-        accountService.payment(accountDTO);
-
-
-        InventoryDTO inventoryDTO = new InventoryDTO();
-        inventoryDTO.setCount(order.getCount());
-        inventoryDTO.setProductId(order.getProductId());
-        inventoryService.mockWithConfirmException(inventoryDTO);
+    public String mockPaymentAccountWithTryException(Order order) {
+        updateOrderStatus(order, OrderStatusEnum.PAYING);
+        accountService.mockTryPaymentException(buildAccountDTO(order));
         return "success";
     }
-
+    
+    @Override
+    @HmilyTCC(confirmMethod = "confirmOrderStatus", cancelMethod = "cancelOrderStatus")
+    public String mockPaymentAccountWithTryTimeout(Order order) {
+        updateOrderStatus(order, OrderStatusEnum.PAYING);
+        accountService.mockTryPaymentTimeout(buildAccountDTO(order));
+        return "success";
+    }
+    
     @Override
     @HmilyTCC(confirmMethod = "confirmOrderStatus", cancelMethod = "cancelOrderStatus")
     public String mockPaymentInventoryWithConfirmTimeout(Order order) {
-        order.setStatus(OrderStatusEnum.PAYING.getCode());
-        orderMapper.update(order);
-
+        updateOrderStatus(order, OrderStatusEnum.PAYING);
         //扣除用户余额
         AccountDTO accountDTO = new AccountDTO();
         accountDTO.setAmount(order.getTotalAmount());
@@ -259,17 +185,42 @@ public class PaymentServiceImpl implements PaymentService {
         inventoryService.mockWithConfirmTimeout(new InventoryDTO());
         return "success";
     }
-
+    
     public void confirmOrderStatus(Order order) {
-        order.setStatus(OrderStatusEnum.PAY_SUCCESS.getCode());
-        orderMapper.update(order);
+        updateOrderStatus(order, OrderStatusEnum.PAY_SUCCESS);
         LOGGER.info("=========进行订单confirm操作完成================");
     }
-
+    
     public void cancelOrderStatus(Order order) {
-
-        order.setStatus(OrderStatusEnum.PAY_FAIL.getCode());
-        orderMapper.update(order);
+        updateOrderStatus(order, OrderStatusEnum.PAY_FAIL);
         LOGGER.info("=========进行订单cancel操作完成================");
+    }
+    
+    private void updateOrderStatus(Order order, OrderStatusEnum orderStatus) {
+        order.setStatus(orderStatus.getCode());
+        orderMapper.update(order);
+    }
+    
+    private AccountDTO buildAccountDTO(Order order) {
+        AccountDTO accountDTO = new AccountDTO();
+        accountDTO.setAmount(order.getTotalAmount());
+        accountDTO.setUserId(order.getUserId());
+        return accountDTO;
+    }
+    
+    private AccountNestedDTO buildAccountNestedDTO(Order order) {
+        AccountNestedDTO nestedDTO = new AccountNestedDTO();
+        nestedDTO.setAmount(order.getTotalAmount());
+        nestedDTO.setUserId(order.getUserId());
+        nestedDTO.setProductId(order.getProductId());
+        nestedDTO.setCount(order.getCount());
+        return nestedDTO;
+    }
+    
+    private InventoryDTO buildInventoryDTO(Order order) {
+        InventoryDTO inventoryDTO = new InventoryDTO();
+        inventoryDTO.setCount(order.getCount());
+        inventoryDTO.setProductId(order.getProductId());
+        return inventoryDTO;
     }
 }

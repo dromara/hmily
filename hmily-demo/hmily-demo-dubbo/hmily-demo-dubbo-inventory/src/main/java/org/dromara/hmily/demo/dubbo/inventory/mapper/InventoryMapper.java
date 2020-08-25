@@ -28,8 +28,7 @@ import org.dromara.hmily.demo.dubbo.inventory.api.entity.InventoryDO;
  * @author xiaoyu
  */
 public interface InventoryMapper {
-
-
+    
     /**
      * Decrease int.
      *
@@ -38,10 +37,9 @@ public interface InventoryMapper {
      */
     @Update("update inventory set total_inventory = total_inventory - #{count}," +
             " lock_inventory= lock_inventory + #{count} " +
-            " where product_id =#{productId}  and  total_inventory >0  ")
+            " where product_id =#{productId} and total_inventory > 0  ")
     int decrease(InventoryDTO inventoryDTO);
-
-
+    
     /**
      * Confirm int.
      *
@@ -49,11 +47,10 @@ public interface InventoryMapper {
      * @return the int
      */
     @Update("update inventory set " +
-            " lock_inventory=  lock_inventory - #{count} " +
-            " where product_id =#{productId}  and lock_inventory >0 ")
+            " lock_inventory = lock_inventory - #{count} " +
+            " where product_id =#{productId} and lock_inventory > 0 ")
     int confirm(InventoryDTO inventoryDTO);
-
-
+    
     /**
      * Cancel int.
      *

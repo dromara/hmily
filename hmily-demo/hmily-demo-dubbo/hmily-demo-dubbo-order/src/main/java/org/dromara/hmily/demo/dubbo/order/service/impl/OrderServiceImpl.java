@@ -17,7 +17,8 @@
 
 package org.dromara.hmily.demo.dubbo.order.service.impl;
 
-import org.dromara.hmily.annotation.HmilyTAC;
+import java.math.BigDecimal;
+import java.util.Date;
 import org.dromara.hmily.common.utils.IdWorkerUtils;
 import org.dromara.hmily.demo.dubbo.order.entity.Order;
 import org.dromara.hmily.demo.dubbo.order.enums.OrderStatusEnum;
@@ -30,9 +31,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
-import java.util.Date;
-
 
 /**
  * @author xiaoyu
@@ -40,10 +38,7 @@ import java.util.Date;
 @Service("orderService")
 @SuppressWarnings("all")
 public class OrderServiceImpl implements OrderService {
-
-    /**
-     * logger.
-     */
+    
     private static final Logger LOGGER = LoggerFactory.getLogger(OrderServiceImpl.class);
 
     private final OrderMapper orderMapper;
@@ -59,37 +54,29 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public String orderPay(Integer count, BigDecimal amount) {
-        final Order order = buildOrder(count, amount);
-        final int rows = orderMapper.save(order);
-        if (rows > 0) {
-            final long start = System.currentTimeMillis();
-            paymentService.makePayment(order);
-            System.out.println("切面耗时：" + (System.currentTimeMillis() - start));
-        }
+        Order order = saveOrder(count, amount);
+        long start = System.currentTimeMillis();
+        paymentService.makePayment(order);
+        System.out.println("切面耗时：" + (System.currentTimeMillis() - start));
         return "success";
     }
     
     @Override
     public String saveOrderForTAC(Integer count, BigDecimal amount) {
-        final Order order = buildOrder(count, amount);
-        final int rows = orderMapper.save(order);
-        if (rows > 0) {
-            final long start = System.currentTimeMillis();
-            paymentService.makePaymentForTAC(order);
-            System.out.println("切面耗时：" + (System.currentTimeMillis() - start));
-        }
+        Order order = saveOrder(count, amount);;
+        final long start = System.currentTimeMillis();
+        paymentService.makePaymentForTAC(order);
+        System.out.println("切面耗时：" + (System.currentTimeMillis() - start));
         return "success";
     }
     
     @Override
     public String testOrderPay(Integer count, BigDecimal amount) {
-        final Order order = buildTestOrder(count, amount);
+        Order order = saveOrder(count, amount);
         final int rows = orderMapper.save(order);
-        if (rows > 0) {
-            final long start = System.currentTimeMillis();
-            paymentService.testMakePayment(order);
-            System.out.println("方法耗时：" + (System.currentTimeMillis() - start));
-        }
+        final long start = System.currentTimeMillis();
+        paymentService.testMakePayment(order);
+        System.out.println("方法耗时：" + (System.currentTimeMillis() - start));
         return "success";
     }
 
@@ -103,21 +90,15 @@ public class OrderServiceImpl implements OrderService {
      */
     @Override
     public String orderPayWithNested(Integer count, BigDecimal amount) {
-        final Order order = buildOrder(count, amount);
-        final int rows = orderMapper.save(order);
-        if (rows > 0) {
-            paymentService.makePaymentWithNested(order);
-        }
+        Order order = saveOrder(count, amount);
+        paymentService.makePaymentWithNested(order);
         return "success";
     }
     
     @Override
     public String orderPayWithNestedException(Integer count, BigDecimal amount) {
-        final Order order = buildOrder(count, amount);
-        final int rows = orderMapper.save(order);
-        if (rows > 0) {
-            paymentService.makePaymentWithNestedException(order);
-        }
+        Order order = saveOrder(count, amount);
+        paymentService.makePaymentWithNestedException(order);
         return "success";
     }
     
@@ -130,11 +111,8 @@ public class OrderServiceImpl implements OrderService {
      */
     @Override
     public String mockInventoryWithTryException(Integer count, BigDecimal amount) {
-        final Order order = buildOrder(count, amount);
-        final int rows = orderMapper.save(order);
-        if (rows > 0) {
-            paymentService.mockPaymentInventoryWithTryException(order);
-        }
+        Order order = saveOrder(count, amount);
+        paymentService.mockPaymentInventoryWithTryException(order);
         return "success";
     }
 
@@ -148,31 +126,26 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public String mockInventoryWithTryTimeout(Integer count, BigDecimal amount) {
-        final Order order = buildOrder(count, amount);
-        final int rows = orderMapper.save(order);
-        if (rows > 0) {
-            paymentService.mockPaymentInventoryWithTryTimeout(order);
-        }
+        Order order = saveOrder(count, amount);
+        paymentService.mockPaymentInventoryWithTryTimeout(order);
         return "success";
     }
-
-    /**
-     * 模拟在订单支付操作中，库存在Confirm阶段中的异常
-     *
-     * @param count  购买数量
-     * @param amount 支付金额
-     * @return string
-     */
+    
     @Override
-    public String mockInventoryWithConfirmException(Integer count, BigDecimal amount) {
-        final Order order = buildOrder(count, amount);
-        final int rows = orderMapper.save(order);
-        if (rows > 0) {
-            paymentService.mockPaymentInventoryWithConfirmException(order);
-        }
+    public String mockAccountWithTryException(Integer count, BigDecimal amount) {
+        Order order = saveOrder(count, amount);
+        paymentService.mockPaymentAccountWithTryException(order);
         return "success";
     }
-
+    
+    @Override
+    public String mockAccountWithTryTimeout(Integer count, BigDecimal amount) {
+        Order order = saveOrder(count, amount);
+        paymentService.mockPaymentAccountWithTryTimeout(order);
+        return "success";
+    }
+    
+    
     /**
      * 模拟在订单支付操作中，库存在Confirm阶段中的timeout
      *
@@ -182,19 +155,22 @@ public class OrderServiceImpl implements OrderService {
      */
     @Override
     public String mockInventoryWithConfirmTimeout(Integer count, BigDecimal amount) {
-        final Order order = buildOrder(count, amount);
-        final int rows = orderMapper.save(order);
-        if (rows > 0) {
-            paymentService.mockPaymentInventoryWithConfirmTimeout(order);
-        }
+        Order order = saveOrder(count, amount);
+        paymentService.mockPaymentInventoryWithConfirmTimeout(order);
         return "success";
     }
-
+    
     @Override
     public void updateOrderStatus(Order order) {
         orderMapper.update(order);
     }
-
+    
+    private Order saveOrder(Integer count, BigDecimal amount) {
+        final Order order = buildOrder(count, amount);
+        orderMapper.save(order);
+        return order;
+    }
+    
     private Order buildOrder(Integer count, BigDecimal amount) {
         Order order = new Order();
         order.setCreateTime(new Date());

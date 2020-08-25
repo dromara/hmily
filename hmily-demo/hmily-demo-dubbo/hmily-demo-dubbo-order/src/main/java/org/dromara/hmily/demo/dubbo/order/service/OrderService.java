@@ -37,7 +37,6 @@ public interface OrderService {
      */
     String orderPay(Integer count, BigDecimal amount);
     
-    
     /**
      * Save order for tac string.
      *
@@ -47,7 +46,6 @@ public interface OrderService {
      */
     String saveOrderForTAC(Integer count, BigDecimal amount);
     
-    
     /**
      * Test order pay string.
      *
@@ -56,7 +54,6 @@ public interface OrderService {
      * @return the string
      */
     String testOrderPay(Integer count, BigDecimal amount);
-    
     
     /**
      * 创建订单并且进行扣除账户余额支付，并进行库存扣减操作
@@ -77,8 +74,6 @@ public interface OrderService {
      */
     String orderPayWithNestedException(Integer count, BigDecimal amount);
     
-    
-    
     /**
      * 模拟在订单支付操作中，库存在try阶段中的库存异常
      *
@@ -87,7 +82,6 @@ public interface OrderService {
      * @return string string
      */
     String mockInventoryWithTryException(Integer count, BigDecimal amount);
-    
     
     /**
      * 模拟在订单支付操作中，库存在try阶段中的timeout
@@ -98,16 +92,23 @@ public interface OrderService {
      */
     String mockInventoryWithTryTimeout(Integer count, BigDecimal amount);
     
-    
     /**
-     * 模拟在订单支付操作中，库存在Confirm阶段中的异常
+     * 模拟在订单支付操作中，账户在try阶段中的异常
      *
      * @param count  购买数量
      * @param amount 支付金额
      * @return string string
      */
-    String mockInventoryWithConfirmException(Integer count, BigDecimal amount);
+    String mockAccountWithTryException(Integer count, BigDecimal amount);
     
+    /**
+     * 模拟在订单支付操作中，账户在try阶段中的timeout超时异常（最后自身成功）
+     *
+     * @param count  购买数量
+     * @param amount 支付金额
+     * @return string string
+     */
+    String mockAccountWithTryTimeout(Integer count, BigDecimal amount);
     
     /**
      * 模拟在订单支付操作中，库存在Confirm阶段中的timeout
@@ -117,7 +118,6 @@ public interface OrderService {
      * @return string string
      */
     String mockInventoryWithConfirmTimeout(Integer count, BigDecimal amount);
-    
     
     /**
      * 更新订单状态

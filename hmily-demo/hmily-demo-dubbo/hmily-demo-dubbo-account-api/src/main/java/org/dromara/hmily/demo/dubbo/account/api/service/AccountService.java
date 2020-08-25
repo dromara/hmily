@@ -24,12 +24,14 @@ import org.dromara.hmily.demo.dubbo.account.api.dto.AccountNestedDTO;
 import org.dromara.hmily.demo.dubbo.account.api.entity.AccountDO;
 
 /**
+ * The interface Account service.
+ *
  * @author xiaoyu
  */
 @SuppressWarnings("all")
 public interface AccountService {
-
-
+    
+    
     /**
      * 扣款支付
      *
@@ -39,20 +41,54 @@ public interface AccountService {
     @HmilyTCC
     void payment(AccountDTO accountDTO);
     
+    /**
+     * Mock try payment exception.
+     *
+     * @param accountDTO the account dto
+     */
+    @HmilyTCC
+    void mockTryPaymentException(AccountDTO accountDTO);
+    
+    /**
+     * Mock try payment timeout.
+     *
+     * @param accountDTO the account dto
+     */
+    @HmilyTCC
+    void mockTryPaymentTimeout(AccountDTO accountDTO);
+    
+    /**
+     * Payment tac boolean.
+     *
+     * @param accountDTO the account dto
+     * @return the boolean
+     */
     @HmilyTAC
     boolean paymentTAC(AccountDTO accountDTO);
-
+    
+    /**
+     * Test payment boolean.
+     *
+     * @param accountDTO the account dto
+     * @return the boolean
+     */
     boolean testPayment(AccountDTO accountDTO);
-
+    
     /**
      * 扣款支付
      *
      * @param accountNestedDTO 参数dto
-     * @return true
+     * @return true boolean
      */
     @HmilyTCC
     boolean paymentWithNested(AccountNestedDTO accountNestedDTO);
     
+    /**
+     * Payment with nested exception boolean.
+     *
+     * @param accountNestedDTO the account nested dto
+     * @return the boolean
+     */
     @HmilyTCC
     boolean paymentWithNestedException(AccountNestedDTO accountNestedDTO);
     
@@ -60,7 +96,7 @@ public interface AccountService {
      * 获取用户账户信息
      *
      * @param userId 用户id
-     * @return AccountDO
+     * @return AccountDO account do
      */
     AccountDO findByUserId(String userId);
 }

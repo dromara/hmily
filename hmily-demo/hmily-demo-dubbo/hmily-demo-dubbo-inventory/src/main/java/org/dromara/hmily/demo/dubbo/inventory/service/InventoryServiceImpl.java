@@ -153,17 +153,6 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     @Override
-    @HmilyTCC(confirmMethod = "confirmMethodException", cancelMethod = "cancelMethod")
-    @Transactional(rollbackFor = Exception.class)
-    public String mockWithConfirmException(InventoryDTO inventoryDTO) {
-        final int decrease = inventoryMapper.decrease(inventoryDTO);
-        if (decrease != 1) {
-            throw new HmilyRuntimeException("库存不足");
-        }
-        return "success";
-    }
-
-    @Override
     @HmilyTCC(confirmMethod = "confirmMethodTimeout", cancelMethod = "cancelMethod")
     @Transactional(rollbackFor = Exception.class)
     public Boolean mockWithConfirmTimeout(InventoryDTO inventoryDTO) {

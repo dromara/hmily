@@ -30,8 +30,8 @@ import java.util.List;
  * @author xiaoyu
  */
 public interface InventoryService {
-
-
+    
+    
     /**
      * 扣减库存操作
      * 这一个tcc接口
@@ -42,13 +42,23 @@ public interface InventoryService {
     @HmilyTCC
     Boolean decrease(InventoryDTO inventoryDTO);
     
+    /**
+     * Decrease tac boolean.
+     *
+     * @param inventoryDTO the inventory dto
+     * @return the boolean
+     */
     @HmilyTAC
     Boolean decreaseTAC(InventoryDTO inventoryDTO);
     
+    /**
+     * Test in line list.
+     *
+     * @return the list
+     */
     @HmilyTCC
     List<InventoryDTO> testInLine();
-
-
+    
     /**
      * Test decrease boolean.
      *
@@ -56,7 +66,7 @@ public interface InventoryService {
      * @return the boolean
      */
     Boolean testDecrease(InventoryDTO inventoryDTO);
-
+    
     /**
      * 获取商品库存信息
      *
@@ -64,8 +74,7 @@ public interface InventoryService {
      * @return InventoryDO inventory do
      */
     InventoryDO findByProductId(String productId);
-
-
+    
     /**
      * mock扣减库存异常
      *
@@ -74,8 +83,7 @@ public interface InventoryService {
      */
     @HmilyTCC
     String mockWithTryException(InventoryDTO inventoryDTO);
-
-
+    
     /**
      * mock扣减库存超时
      *
@@ -84,18 +92,7 @@ public interface InventoryService {
      */
     @HmilyTCC
     Boolean mockWithTryTimeout(InventoryDTO inventoryDTO);
-
-
-    /**
-     * mock 扣减库存confirm异常
-     *
-     * @param inventoryDTO dto对象
-     * @return String string
-     */
-    @HmilyTCC
-    String mockWithConfirmException(InventoryDTO inventoryDTO);
-
-
+    
     /**
      * mock 扣减库存confirm超时
      *
@@ -104,6 +101,4 @@ public interface InventoryService {
      */
     @HmilyTCC
     Boolean mockWithConfirmTimeout(InventoryDTO inventoryDTO);
-
-
 }
