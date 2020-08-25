@@ -24,10 +24,10 @@ import java.util.Set;
 /**
  * JedisClient.
  *
- * @author xiaoyu(Myth)、dzc
+ * @author xiaoyu(Myth) 、dzc
  */
 public interface JedisClient {
-
+    
     /**
      * Set string.
      *
@@ -36,7 +36,7 @@ public interface JedisClient {
      * @return the string
      */
     String set(String key, String value);
-
+    
     /**
      * Set string.
      *
@@ -45,7 +45,7 @@ public interface JedisClient {
      * @return the string
      */
     String set(String key, byte[] value);
-
+    
     /**
      * Del long.
      *
@@ -53,7 +53,7 @@ public interface JedisClient {
      * @return the long
      */
     Long del(String... keys);
-
+    
     /**
      * Get string.
      *
@@ -61,7 +61,7 @@ public interface JedisClient {
      * @return the string
      */
     String get(String key);
-
+    
     /**
      * Get byte [ ].
      *
@@ -69,7 +69,7 @@ public interface JedisClient {
      * @return the byte [ ]
      */
     byte[] get(byte[] key);
-
+    
     /**
      * Keys set.
      *
@@ -77,7 +77,7 @@ public interface JedisClient {
      * @return the set
      */
     Set<byte[]> keys(byte[] pattern);
-
+    
     /**
      * Keys set.
      *
@@ -85,7 +85,7 @@ public interface JedisClient {
      * @return the set
      */
     Set<String> keys(String key);
-
+    
     /**
      * Hset long.
      *
@@ -95,7 +95,17 @@ public interface JedisClient {
      * @return the long
      */
     Long hset(String key, String item, String value);
-
+    
+    /**
+     * Hset long.
+     *
+     * @param key   the key
+     * @param field the field
+     * @param value the value
+     * @return the long
+     */
+    Long hset(byte[] key, byte[] field, byte[] value);
+    
     /**
      * Hget string.
      *
@@ -104,7 +114,16 @@ public interface JedisClient {
      * @return the string
      */
     String hget(String key, String item);
-
+    
+    /**
+     * Hget byte [ ].
+     *
+     * @param key   the key
+     * @param field the field
+     * @return the byte [ ]
+     */
+    byte[] hget(byte[] key, byte[] field);
+    
     /**
      * Hdel long.
      *
@@ -113,7 +132,7 @@ public interface JedisClient {
      * @return the long
      */
     Long hdel(String key, String item);
-
+    
     /**
      * Incr long.
      *
@@ -121,7 +140,7 @@ public interface JedisClient {
      * @return the long
      */
     Long incr(String key);
-
+    
     /**
      * Decr long.
      *
@@ -129,7 +148,7 @@ public interface JedisClient {
      * @return the long
      */
     Long decr(String key);
-
+    
     /**
      * Expire long.
      *
@@ -138,7 +157,7 @@ public interface JedisClient {
      * @return the long
      */
     Long expire(String key, int second);
-
+    
     /**
      * Zrange set.
      *
@@ -148,41 +167,21 @@ public interface JedisClient {
      * @return the set
      */
     Set<String> zrange(String key, long start, long end);
-
+    
     /**
-     * Hset long.
+     * Hget all map.
      *
-     * @param key   the key
-     * @param item  the item
-     * @param value the value
-     * @return the long
-     */
-	Long hset(byte[] key, byte[] field, byte[] value);
-
-    /**
-     * Hset long.
-     *
-     * @param key   the key
+     * @param key the key
      * @return the map
      */
-	Map<byte[], byte[]> hgetAll(byte[] key);
-
-    /**
-     * Hget long.
-     *
-     * @param key   the key
-     * @param item  the field
-     * @return the long
-     */
-	byte[] hget(byte[] key, byte[] field);
-
+    Map<byte[], byte[]> hgetAll(byte[] key);
+    
     /**
      * Hexists boolean.
      *
      * @param key   the key
-     * @param item  the field
-     * @return the long
+     * @param field the field
+     * @return the boolean
      */
-	boolean hexists(byte[] key, byte[] field);
-
+    boolean hexists(byte[] key, byte[] field);
 }

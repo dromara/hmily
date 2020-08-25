@@ -75,8 +75,18 @@ public class JedisClientCluster implements JedisClient {
     }
     
     @Override
+    public Long hset(final byte[] key, final byte[] field, final byte[] value) {
+        return jedisCluster.hset(key, field, value);
+    }
+    
+    @Override
     public String hget(final String key, final String item) {
         return jedisCluster.hget(key, item);
+    }
+    
+    @Override
+    public byte[] hget(final byte[] key, final byte[] field) {
+        return jedisCluster.hget(key, field);
     }
     
     @Override
@@ -103,24 +113,14 @@ public class JedisClientCluster implements JedisClient {
     public Set<String> zrange(final String key, final long start, final long end) {
         return jedisCluster.zrange(key, start, end);
     }
-
-	@Override
-	public Long hset(byte[] key, byte[] field, byte[] value) {
-		 return jedisCluster.hset(key, field,value);
-	}
-
-	@Override
-	public Map<byte[], byte[]> hgetAll(byte[] key) {
-		 return jedisCluster.hgetAll(key);
-	}
-
-	@Override
-	public byte[] hget(byte[] key, byte[] field) {
-		 return jedisCluster.hget(key, field);
-	}
-
-	@Override
-	public boolean hexists(byte[] key, byte[] field) {
-		 return jedisCluster.hexists(key, field);
-	}  
+    
+    @Override
+    public Map<byte[], byte[]> hgetAll(final byte[] key) {
+        return jedisCluster.hgetAll(key);
+    }
+    
+    @Override
+    public boolean hexists(final byte[] key, final byte[] field) {
+        return jedisCluster.hexists(key, field);
+    }
 }

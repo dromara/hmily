@@ -19,7 +19,6 @@ package org.dromara.hmily.repository.redis;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -67,22 +66,20 @@ public class RedisRepository implements HmilyRepository {
     private static final Logger LOGGER = LoggerFactory.getLogger(RedisRepository.class);
     
     private static final String HMILY_TRANSACTION_GLOBAL = "hmily_transaction_global";
-
+    
     private static final String HMILY_TRANSACTION_PARTICIPANT = "hmily_transaction_participant";
-
+    
     private static final String HMILY_PARTICIPANT_UNDO = "hmily_participant_undo";
     
     private String rootPathPrefix = "hmily";
     
-    private String keyPrefix="-";
+    private String keyPrefix = "-";
     
     private String appName;
     
     private HmilySerializer hmilySerializer;
     
     private JedisClient jedisClient;
-    
-
     
     @Override
     public void init(final String appName) {
@@ -104,19 +101,17 @@ public class RedisRepository implements HmilyRepository {
     @Override
     public int createHmilyTransaction(final HmilyTransaction hmilyTransaction) throws HmilyRepositoryException {
         try {
-         	String transId = buildHmilyTransactionRealPath(hmilyTransaction.getTransId());
-            final boolean exsist = jedisClient.hexists(HMILY_TRANSACTION_GLOBAL.getBytes(),transId.getBytes());
-            if (!exsist) {
+            String transId = buildHmilyTransactionRealPath(hmilyTransaction.getTransId());
+            final boolean exist = jedisClient.hexists(HMILY_TRANSACTION_GLOBAL.getBytes(), transId.getBytes());
+            if (!exist) {
                 hmilyTransaction.setRetry(0);
                 hmilyTransaction.setVersion(0);
                 hmilyTransaction.setCreateTime(new Date());
-                hmilyTransaction.setUpdateTime(new Date());
-                jedisClient.hset(HMILY_TRANSACTION_GLOBAL.getBytes(),transId.getBytes(), hmilySerializer.serialize(hmilyTransaction));
             } else {
                 hmilyTransaction.setVersion(hmilyTransaction.getVersion() + 1);
-                hmilyTransaction.setUpdateTime(new Date());
-                jedisClient.hset(HMILY_TRANSACTION_GLOBAL.getBytes(),transId.getBytes(), hmilySerializer.serialize(hmilyTransaction));
             }
+            hmilyTransaction.setUpdateTime(new Date());
+            jedisClient.hset(HMILY_TRANSACTION_GLOBAL.getBytes(), transId.getBytes(), hmilySerializer.serialize(hmilyTransaction));
             return HmilyRepository.ROWS;
         } catch (JedisException e) {
             throw new HmilyException(e);
@@ -126,44 +121,44 @@ public class RedisRepository implements HmilyRepository {
     @Override
     public int updateRetryByLock(final HmilyTransaction hmilyTransaction) {
         try {
-         	String transId = buildHmilyTransactionRealPath(hmilyTransaction.getTransId());
-	        final boolean exsist = jedisClient.hexists(HMILY_TRANSACTION_GLOBAL.getBytes(),transId.getBytes());
-	        if (!exsist) {
-	         	return HmilyRepository.FAIL_ROWS;
-	        } else {
-	            hmilyTransaction.setVersion(hmilyTransaction.getVersion() + 1);
-	            hmilyTransaction.setUpdateTime(new Date());
-	            jedisClient.hset(HMILY_TRANSACTION_GLOBAL.getBytes(),transId.getBytes(), hmilySerializer.serialize(hmilyTransaction));
-	        }
-	        return HmilyRepository.ROWS;
-	    } catch (JedisException e) {
-	        throw new HmilyException(e);
-	    }
+            String transId = buildHmilyTransactionRealPath(hmilyTransaction.getTransId());
+            final boolean exist = jedisClient.hexists(HMILY_TRANSACTION_GLOBAL.getBytes(), transId.getBytes());
+            if (!exist) {
+                return HmilyRepository.FAIL_ROWS;
+            } else {
+                hmilyTransaction.setVersion(hmilyTransaction.getVersion() + 1);
+                hmilyTransaction.setUpdateTime(new Date());
+                jedisClient.hset(HMILY_TRANSACTION_GLOBAL.getBytes(), transId.getBytes(), hmilySerializer.serialize(hmilyTransaction));
+            }
+            return HmilyRepository.ROWS;
+        } catch (JedisException e) {
+            throw new HmilyException(e);
+        }
     }
     
     @Override
     public HmilyTransaction findByTransId(final Long transId) {
         try {
-         	String key = buildHmilyTransactionRealPath(transId);;
-	        final boolean exsist = jedisClient.hexists(HMILY_TRANSACTION_GLOBAL.getBytes(),key.getBytes());;
-	        if (!exsist) {
-	         	return null;
-	        } else {
-	          	byte[] data = jedisClient.hget(HMILY_TRANSACTION_GLOBAL.getBytes(),key.getBytes());
-	          	if (data == null) {
-	                 return null;
-	             }
-	             return hmilySerializer.deSerialize(data, HmilyTransaction.class);
-	        }
-	    } catch (JedisException e) {
-	     	LOGGER.error("transId occur a exception", e);
-	        throw new HmilyException(e);
-	    }
+            String key = buildHmilyTransactionRealPath(transId);
+            final boolean exist = jedisClient.hexists(HMILY_TRANSACTION_GLOBAL.getBytes(), key.getBytes());
+            if (!exist) {
+                return null;
+            } else {
+                byte[] data = jedisClient.hget(HMILY_TRANSACTION_GLOBAL.getBytes(), key.getBytes());
+                if (data == null) {
+                    return null;
+                }
+                return hmilySerializer.deSerialize(data, HmilyTransaction.class);
+            }
+        } catch (JedisException e) {
+            LOGGER.error("transId occur a exception", e);
+            throw new HmilyException(e);
+        }
     }
     
     @Override
     public List<HmilyTransaction> listLimitByDelay(final Date date, final int limit) {
-     	String key = buildHmilyTransactionRootPath();
+        String key = buildHmilyTransactionRootPath();
         return listByFilter(key, HmilyTransaction.class, (hmilyTransaction, params) -> {
             Date dateParam = (Date) params[0];
             int limitParam = (int) params[1];
@@ -176,35 +171,35 @@ public class RedisRepository implements HmilyRepository {
         }, date, limit);
     }
     
-	 private <T> List<T> listByFilter(final String key, final Class<T> deserializeClass, final Filter<T> filter, final Object... params) {
-	        try {
-	         	Map<byte[], byte[]> dataAll = jedisClient.hgetAll(key.getBytes());
-	            if (Objects.nonNull(dataAll)) {
-	                return Collections.emptyList();
-	            }
-	            List<T> result = new ArrayList<>();
-	            for(Entry<byte[], byte[]> entry : dataAll.entrySet()){
-	             	byte[] data = entry.getValue();
-	                if (data == null) {
-	                    continue;
-	                }
-	                T t = hmilySerializer.deSerialize(data, deserializeClass);
-	                if (filter.filter(t, params)) {
-	                    result.add(t);
-	                }
-	            }
-	            return result;
-	        } catch (JedisException e) {
-	            LOGGER.error("listByFilter occur a exception", e);
-	        }
-	        return Collections.emptyList();
-    }
-
-	@Override
-    public int updateHmilyTransactionStatus(final Long transId, final Integer status) throws HmilyRepositoryException {
-		byte[] key = buildHmilyTransactionRealPath(transId).getBytes();
+    private <T> List<T> listByFilter(final String key, final Class<T> deserializeClass, final Filter<T> filter, final Object... params) {
         try {
-         	byte[] data = jedisClient.hget(HMILY_TRANSACTION_GLOBAL.getBytes(),key);
+            Map<byte[], byte[]> dataAll = jedisClient.hgetAll(key.getBytes());
+            if (Objects.isNull(dataAll)) {
+                return Collections.emptyList();
+            }
+            List<T> result = new ArrayList<>();
+            for (Entry<byte[], byte[]> entry : dataAll.entrySet()) {
+                byte[] data = entry.getValue();
+                if (data == null) {
+                    continue;
+                }
+                T t = hmilySerializer.deSerialize(data, deserializeClass);
+                if (filter.filter(t, params)) {
+                    result.add(t);
+                }
+            }
+            return result;
+        } catch (JedisException e) {
+            LOGGER.error("listByFilter occur a exception", e);
+        }
+        return Collections.emptyList();
+    }
+    
+    @Override
+    public int updateHmilyTransactionStatus(final Long transId, final Integer status) throws HmilyRepositoryException {
+        byte[] key = buildHmilyTransactionRealPath(transId).getBytes();
+        try {
+            byte[] data = jedisClient.hget(HMILY_TRANSACTION_GLOBAL.getBytes(), key);
             if (data == null) {
                 return HmilyRepository.FAIL_ROWS;
             }
@@ -212,7 +207,7 @@ public class RedisRepository implements HmilyRepository {
             hmilyTransaction.setStatus(status);
             hmilyTransaction.setVersion(hmilyTransaction.getVersion() + 1);
             hmilyTransaction.setUpdateTime(new Date());
-            jedisClient.hset(HMILY_TRANSACTION_GLOBAL.getBytes(),key, hmilySerializer.serialize(hmilyTransaction));
+            jedisClient.hset(HMILY_TRANSACTION_GLOBAL.getBytes(), key, hmilySerializer.serialize(hmilyTransaction));
             return HmilyRepository.ROWS;
         } catch (JedisException e) {
             LOGGER.error("updateHmilyTransactionStatus occur a exception", e);
@@ -222,41 +217,39 @@ public class RedisRepository implements HmilyRepository {
     
     @Override
     public int removeHmilyTransaction(final Long transId) {
-     	 String key = buildHmilyTransactionRealPath(transId);
-         try {
-        	     jedisClient.hdel(HMILY_TRANSACTION_GLOBAL,key);
-             return HmilyRepository.ROWS;
-         } catch (JedisException e) {
-             LOGGER.error("removeHmilyTransaction occur a exception", e);
-         }
-         return HmilyRepository.FAIL_ROWS;
+        String key = buildHmilyTransactionRealPath(transId);
+        try {
+            jedisClient.hdel(HMILY_TRANSACTION_GLOBAL, key);
+            return HmilyRepository.ROWS;
+        } catch (JedisException e) {
+            LOGGER.error("removeHmilyTransaction occur a exception", e);
+        }
+        return HmilyRepository.FAIL_ROWS;
     }
     
     @Override
     public int removeHmilyTransactionByData(final Date date) {
-     	 String key = buildHmilyTransactionRootPath();
-         return removeByFilter(key, HmilyTransaction.class, (hmilyTransaction, params) -> {
-             Date dateParam = (Date) params[0];
-             return dateParam.before(hmilyTransaction.getUpdateTime()) && hmilyTransaction.getStatus() == HmilyActionEnum.DELETE.getCode();
-         }, date);
+        String key = buildHmilyTransactionRootPath();
+        return removeByFilter(key, HmilyTransaction.class, (hmilyTransaction, params) -> {
+            Date dateParam = (Date) params[0];
+            return dateParam.before(hmilyTransaction.getUpdateTime()) && hmilyTransaction.getStatus() == HmilyActionEnum.DELETE.getCode();
+        }, date);
     }
     
     @Override
     public int createHmilyParticipant(final HmilyParticipant hmilyParticipant) throws HmilyRepositoryException {
         try {
             byte[] transId = buildHmilyParticipantRealPath(hmilyParticipant.getTransId()).getBytes();
-            Boolean isExists = jedisClient.hexists(HMILY_TRANSACTION_PARTICIPANT.getBytes(),transId);
-            if (!isExists) {
+            boolean exist = jedisClient.hexists(HMILY_TRANSACTION_PARTICIPANT.getBytes(), transId);
+            if (!exist) {
                 hmilyParticipant.setRetry(0);
                 hmilyParticipant.setVersion(0);
                 hmilyParticipant.setCreateTime(new Date());
-                hmilyParticipant.setUpdateTime(new Date());
-                jedisClient.hset(HMILY_TRANSACTION_PARTICIPANT.getBytes(),String.valueOf(hmilyParticipant.getParticipantId()).getBytes(), hmilySerializer.serialize(hmilyParticipant));
             } else {
                 hmilyParticipant.setVersion(hmilyParticipant.getVersion() + 1);
-                hmilyParticipant.setUpdateTime(new Date());
-                jedisClient.hset(HMILY_TRANSACTION_PARTICIPANT.getBytes(),String.valueOf(hmilyParticipant.getParticipantId()).getBytes(), hmilySerializer.serialize(hmilyParticipant));
             }
+            hmilyParticipant.setUpdateTime(new Date());
+            jedisClient.hset(HMILY_TRANSACTION_PARTICIPANT.getBytes(), String.valueOf(hmilyParticipant.getParticipantId()).getBytes(), hmilySerializer.serialize(hmilyParticipant));
             return HmilyRepository.ROWS;
         } catch (JedisException e) {
             throw new HmilyException(e);
@@ -275,7 +268,7 @@ public class RedisRepository implements HmilyRepository {
     
     @Override
     public List<HmilyParticipant> listHmilyParticipant(final Date date, final String transType, final int limit) {
-     	String path = buildHmilyParticipantRootPath();
+        String path = buildHmilyParticipantRootPath();
         return listByFilter(path, HmilyParticipant.class, (hmilyParticipant, params) -> {
             Date dateParam = (Date) params[0];
             String transTypeParam = (String) params[1];
@@ -297,7 +290,7 @@ public class RedisRepository implements HmilyRepository {
     
     @Override
     public boolean existHmilyParticipantByTransId(final Long transId) {
-     	String key = buildHmilyParticipantRootPath();
+        String key = buildHmilyParticipantRootPath();
         return existByFilter(key, HmilyParticipant.class, (hmilyParticipant, params) -> {
             Long transIdParam = (Long) params[0];
             return transIdParam.compareTo(hmilyParticipant.getTransId()) == 0;
@@ -306,9 +299,9 @@ public class RedisRepository implements HmilyRepository {
     
     @Override
     public int updateHmilyParticipantStatus(final Long participantId, final Integer status) throws HmilyRepositoryException {
-     	byte[] key = buildHmilyParticipantRealPath(participantId).getBytes();
+        byte[] key = buildHmilyParticipantRealPath(participantId).getBytes();
         try {
-         	byte[] data = jedisClient.hget(HMILY_TRANSACTION_PARTICIPANT.getBytes(),key);
+            byte[] data = jedisClient.hget(HMILY_TRANSACTION_PARTICIPANT.getBytes(), key);
             if (data == null) {
                 return HmilyRepository.FAIL_ROWS;
             }
@@ -316,7 +309,7 @@ public class RedisRepository implements HmilyRepository {
             hmilyParticipant.setStatus(status);
             hmilyParticipant.setVersion(hmilyParticipant.getVersion() + 1);
             hmilyParticipant.setUpdateTime(new Date());
-            jedisClient.hset(HMILY_TRANSACTION_PARTICIPANT.getBytes(),String.valueOf(hmilyParticipant.getParticipantId()).getBytes(), hmilySerializer.serialize(hmilyParticipant));
+            jedisClient.hset(HMILY_TRANSACTION_PARTICIPANT.getBytes(), String.valueOf(hmilyParticipant.getParticipantId()).getBytes(), hmilySerializer.serialize(hmilyParticipant));
             return HmilyRepository.ROWS;
         } catch (JedisException e) {
             LOGGER.error("updateHmilyParticipantStatus occur a exception", e);
@@ -326,9 +319,9 @@ public class RedisRepository implements HmilyRepository {
     
     @Override
     public int removeHmilyParticipant(final Long participantId) {
-     	String key = buildHmilyParticipantRealPath(participantId);
+        String key = buildHmilyParticipantRealPath(participantId);
         try {
-         	jedisClient.hdel(HMILY_TRANSACTION_PARTICIPANT, key);
+            jedisClient.hdel(HMILY_TRANSACTION_PARTICIPANT, key);
             return HmilyRepository.ROWS;
         } catch (JedisException e) {
             LOGGER.error("removeHmilyParticipant occur a exception", e);
@@ -338,7 +331,7 @@ public class RedisRepository implements HmilyRepository {
     
     @Override
     public int removeHmilyParticipantByData(final Date date) {
-     	String key = buildHmilyParticipantRootPath();
+        String key = buildHmilyParticipantRootPath();
         return removeByFilter(key, HmilyParticipant.class, (hmilyParticipant, params) -> {
             Date dateParam = (Date) params[0];
             return dateParam.before(hmilyParticipant.getUpdateTime()) && hmilyParticipant.getStatus().compareTo(HmilyActionEnum.DELETE.getCode()) == 0;
@@ -350,16 +343,15 @@ public class RedisRepository implements HmilyRepository {
         final int currentVersion = hmilyParticipant.getVersion();
         String key = buildHmilyParticipantRealPath(hmilyParticipant.getParticipantId());
         try {
-            Boolean isExist = jedisClient.hexists(HMILY_TRANSACTION_PARTICIPANT.getBytes(), key.getBytes());
-            if (!isExist) {
+            boolean exist = jedisClient.hexists(HMILY_TRANSACTION_PARTICIPANT.getBytes(), key.getBytes());
+            if (!exist) {
                 LOGGER.warn("key {} is not exists.", key);
                 return false;
             }
-           
             hmilyParticipant.setVersion(currentVersion + 1);
             hmilyParticipant.setRetry(hmilyParticipant.getRetry() + 1);
             hmilyParticipant.setUpdateTime(new Date());
-            jedisClient.hset(HMILY_TRANSACTION_PARTICIPANT.getBytes(),String.valueOf(hmilyParticipant.getParticipantId()).getBytes(), hmilySerializer.serialize(hmilyParticipant));
+            jedisClient.hset(HMILY_TRANSACTION_PARTICIPANT.getBytes(), String.valueOf(hmilyParticipant.getParticipantId()).getBytes(), hmilySerializer.serialize(hmilyParticipant));
             return true;
         } catch (JedisException e) {
             LOGGER.error("updateRetryByLock occur a exception", e);
@@ -371,15 +363,12 @@ public class RedisRepository implements HmilyRepository {
     public int createHmilyParticipantUndo(final HmilyParticipantUndo hmilyParticipantUndo) {
         try {
             byte[] transId = buildHmilyParticipantRealPath(hmilyParticipantUndo.getTransId()).getBytes();
-            Boolean isExists = jedisClient.hexists(HMILY_PARTICIPANT_UNDO.getBytes(),transId);
-            if (!isExists) {
-             	hmilyParticipantUndo.setCreateTime(new Date());
-                hmilyParticipantUndo.setUpdateTime(new Date());
-                jedisClient.hset(HMILY_PARTICIPANT_UNDO.getBytes(),String.valueOf(hmilyParticipantUndo.getUndoId()).getBytes(), hmilySerializer.serialize(hmilyParticipantUndo));
-            } else {
-             	hmilyParticipantUndo.setUpdateTime(new Date());
-                jedisClient.hset(HMILY_PARTICIPANT_UNDO.getBytes(),String.valueOf(hmilyParticipantUndo.getUndoId()).getBytes(), hmilySerializer.serialize(hmilyParticipantUndo));
+            boolean exist = jedisClient.hexists(HMILY_PARTICIPANT_UNDO.getBytes(), transId);
+            if (!exist) {
+                hmilyParticipantUndo.setCreateTime(new Date());
             }
+            hmilyParticipantUndo.setUpdateTime(new Date());
+            jedisClient.hset(HMILY_PARTICIPANT_UNDO.getBytes(), String.valueOf(hmilyParticipantUndo.getUndoId()).getBytes(), hmilySerializer.serialize(hmilyParticipantUndo));
             return HmilyRepository.ROWS;
         } catch (JedisException e) {
             throw new HmilyException(e);
@@ -397,7 +386,7 @@ public class RedisRepository implements HmilyRepository {
     
     @Override
     public int removeHmilyParticipantUndo(final Long undoId) {
-     	String key = buildHmilyParticipantUndoRealPath(undoId);
+        String key = buildHmilyParticipantUndoRealPath(undoId);
         try {
             jedisClient.hdel(HMILY_PARTICIPANT_UNDO, key);
             return HmilyRepository.ROWS;
@@ -418,9 +407,9 @@ public class RedisRepository implements HmilyRepository {
     
     @Override
     public int updateHmilyParticipantUndoStatus(final Long undoId, final Integer status) {
-     	String key = buildHmilyParticipantUndoRealPath(undoId);
+        String key = buildHmilyParticipantUndoRealPath(undoId);
         try {
-         	byte[] data = jedisClient.hget(HMILY_PARTICIPANT_UNDO.getBytes(),key.getBytes());
+            byte[] data = jedisClient.hget(HMILY_PARTICIPANT_UNDO.getBytes(), key.getBytes());
             if (data == null) {
                 return HmilyRepository.FAIL_ROWS;
             }
@@ -428,7 +417,7 @@ public class RedisRepository implements HmilyRepository {
             HmilyParticipantUndo hmilyParticipantUndo = hmilySerializer.deSerialize(data, HmilyParticipantUndo.class);
             hmilyParticipantUndo.setStatus(status);
             hmilyParticipantUndo.setUpdateTime(new Date());
-            jedisClient.hset(HMILY_PARTICIPANT_UNDO.getBytes(),String.valueOf(hmilyParticipantUndo.getUndoId()).getBytes(), hmilySerializer.serialize(hmilyParticipantUndo));
+            jedisClient.hset(HMILY_PARTICIPANT_UNDO.getBytes(), String.valueOf(hmilyParticipantUndo.getUndoId()).getBytes(), hmilySerializer.serialize(hmilyParticipantUndo));
             return HmilyRepository.ROWS;
         } catch (JedisException e) {
             LOGGER.error("updateHmilyParticipantStatus occur a exception", e);
@@ -438,24 +427,24 @@ public class RedisRepository implements HmilyRepository {
     
     private <T> int removeByFilter(final String key, final Class<T> deserializeClass, final Filter<T> filter, final Object... params) {
         try {
-	         	Map<byte[], byte[]> dataAll = jedisClient.hgetAll(key.getBytes());
-	            if (Objects.nonNull(dataAll)) {
-	             	return HmilyRepository.FAIL_ROWS;
-	            }
-	            int count = 0;
-	            for(Entry<byte[], byte[]> entry : dataAll.entrySet()){
-	             	byte[] data = entry.getValue();
-	                if (data == null) {
-	                    continue;
-	                }
-	                T t = hmilySerializer.deSerialize(data, deserializeClass);
-	                if (filter.filter(t, params)) {
-	                    jedisClient.hdel(rootPathPrefix,key);
-	                    count++;
-	                }
-	                return count;
-	            }
-            }catch (JedisException  e) {
+            Map<byte[], byte[]> dataAll = jedisClient.hgetAll(key.getBytes());
+            if (Objects.isNull(dataAll)) {
+                return HmilyRepository.FAIL_ROWS;
+            }
+            int count = 0;
+            for (Entry<byte[], byte[]> entry : dataAll.entrySet()) {
+                byte[] data = entry.getValue();
+                if (data == null) {
+                    continue;
+                }
+                T t = hmilySerializer.deSerialize(data, deserializeClass);
+                if (filter.filter(t, params)) {
+                    jedisClient.hdel(rootPathPrefix, key);
+                    count++;
+                }
+                return count;
+            }
+        } catch (JedisException e) {
             LOGGER.error("removeByFilter occur a exception", e);
         }
         return HmilyRepository.FAIL_ROWS;
@@ -463,12 +452,12 @@ public class RedisRepository implements HmilyRepository {
     
     private <T> boolean existByFilter(final String key, final Class<T> deserializeClass, final Filter<T> filter, final Object... params) {
         try {
-         	Map<byte[], byte[]> dataAll = jedisClient.hgetAll(key.getBytes());
-         	if (Objects.nonNull(dataAll)) {
+            Map<byte[], byte[]> dataAll = jedisClient.hgetAll(key.getBytes());
+            if (Objects.isNull(dataAll)) {
                 return false;
             }
-         	for(Entry<byte[], byte[]> entry : dataAll.entrySet()){
-         		byte[] data = entry.getValue();
+            for (Entry<byte[], byte[]> entry : dataAll.entrySet()) {
+                byte[] data = entry.getValue();
                 if (data == null) {
                     continue;
                 }
@@ -482,8 +471,6 @@ public class RedisRepository implements HmilyRepository {
         }
         return false;
     }
-    
-
     
     private String buildHmilyTransactionRootPath() {
         return rootPathPrefix + keyPrefix + HMILY_TRANSACTION_GLOBAL;
