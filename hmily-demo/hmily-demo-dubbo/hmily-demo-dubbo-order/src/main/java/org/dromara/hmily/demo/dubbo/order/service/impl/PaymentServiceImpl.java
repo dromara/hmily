@@ -182,7 +182,7 @@ public class PaymentServiceImpl implements PaymentService {
         accountDTO.setAmount(order.getTotalAmount());
         accountDTO.setUserId(order.getUserId());
         accountService.payment(accountDTO);
-        inventoryService.mockWithConfirmTimeout(new InventoryDTO());
+        inventoryService.mockWithConfirmTimeout(buildInventoryDTO(order));
         return "success";
     }
     

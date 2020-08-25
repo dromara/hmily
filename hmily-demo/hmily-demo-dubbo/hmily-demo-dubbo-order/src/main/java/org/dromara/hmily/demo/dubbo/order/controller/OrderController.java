@@ -113,7 +113,7 @@ public class OrderController {
     }
 
     @PostMapping(value = "/mockInventoryWithConfirmTimeout")
-    @ApiOperation(value = "模拟下单付款操作在Confirm阶段异常，此时所有的系统调用都会执行cancel方法，达到数据的一致性（异常指的是超时异常）")
+    @ApiOperation(value = "模拟下单付款操作中，try操作完成，但是库存模块在confirm阶段超时异常，此时订单，账户调用都会执行confirm方法，库存的confirm方法依赖自身日志，进行调度执行达到数据的一致性")
     public String mockInventoryWithConfirmTimeout(@RequestParam(value = "count") Integer count,
                                               @RequestParam(value = "amount") BigDecimal amount) {
         return orderService.mockInventoryWithConfirmTimeout(count,amount);
