@@ -113,7 +113,7 @@ public class HmilyTransactionSelfRecoveryScheduled implements AutoCloseable {
                         for (HmilyParticipant hmilyParticipant : hmilyParticipantList) {
                             // if the try is not completed, no compensation will be provided (to prevent various exceptions in the try phase)
                             if (hmilyParticipant.getRetry() > hmilyConfig.getRetryMax()) {
-                                LogUtil.error(LOGGER, "This tcc transaction exceeds the maximum number of retries and no retries will occur：{}", () -> hmilyParticipant);
+                                LogUtil.error(LOGGER, "This hmily tcc transaction exceeds the maximum number of retries and no retries will occur：{}", () -> hmilyParticipant);
                                 hmilyRepository.updateHmilyParticipantStatus(hmilyParticipant.getParticipantId(), HmilyActionEnum.DEATH.getCode());
                                 continue;
                             }
@@ -124,6 +124,7 @@ public class HmilyTransactionSelfRecoveryScheduled implements AutoCloseable {
                             final boolean successful = hmilyRepository.lockHmilyParticipant(hmilyParticipant);
                             // determine that rows > 0 is executed to prevent concurrency when the business side is in cluster mode
                             if (successful) {
+                                LOGGER.info("hmily tcc transaction begin self recovery: {}", hmilyParticipant.toString());
                                 HmilyTransaction globalHmilyTransaction = hmilyRepository.findByTransId(hmilyParticipant.getTransId());
                                 if (Objects.isNull(globalHmilyTransaction)) {
                                     //do remove

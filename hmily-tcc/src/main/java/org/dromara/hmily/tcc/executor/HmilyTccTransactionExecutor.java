@@ -130,6 +130,7 @@ public final class HmilyTccTransactionExecutor {
         currentTransaction.setStatus(HmilyActionEnum.CONFIRMING.getCode());
         HmilyRepositoryStorage.updateHmilyTransactionStatus(currentTransaction);
         final List<HmilyParticipant> hmilyParticipants = currentTransaction.getHmilyParticipants();
+        List<Boolean> successList = Lists.newArrayListWithCapacity(hmilyParticipants.size());
         for (HmilyParticipant hmilyParticipant : hmilyParticipants) {
             try {
                 if (hmilyParticipant.getRole() == HmilyRoleEnum.START.getCode()) {
@@ -138,11 +139,17 @@ public final class HmilyTccTransactionExecutor {
                 } else {
                     HmilyReflector.executor(HmilyActionEnum.CONFIRMING, ExecutorTypeEnum.RPC, hmilyParticipant);
                 }
+                successList.add(true);
             } catch (Throwable e) {
+                successList.add(false);
                 LOGGER.error("HmilyParticipant confirm exception :{} ", hmilyParticipant.toString());
             } finally {
                 HmilyContextHolder.remove();
             }
+        }
+        if (successList.stream().allMatch(e -> e)) {
+            // remove global
+            HmilyRepositoryStorage.removeHmilyTransaction(currentTransaction);
         }
     }
     
