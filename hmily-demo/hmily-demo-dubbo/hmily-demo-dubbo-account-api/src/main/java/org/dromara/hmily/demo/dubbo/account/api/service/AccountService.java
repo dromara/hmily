@@ -17,8 +17,7 @@
 
 package org.dromara.hmily.demo.dubbo.account.api.service;
 
-import org.dromara.hmily.annotation.HmilyTAC;
-import org.dromara.hmily.annotation.HmilyTCC;
+import org.dromara.hmily.annotation.Hmily;
 import org.dromara.hmily.demo.dubbo.account.api.dto.AccountDTO;
 import org.dromara.hmily.demo.dubbo.account.api.dto.AccountNestedDTO;
 import org.dromara.hmily.demo.dubbo.account.api.entity.AccountDO;
@@ -38,7 +37,7 @@ public interface AccountService {
      * @param accountDTO 参数dto
      * @return true
      */
-    @HmilyTCC
+    @Hmily
     void payment(AccountDTO accountDTO);
     
     /**
@@ -46,7 +45,7 @@ public interface AccountService {
      *
      * @param accountDTO the account dto
      */
-    @HmilyTCC
+    @Hmily
     void mockTryPaymentException(AccountDTO accountDTO);
     
     /**
@@ -54,7 +53,7 @@ public interface AccountService {
      *
      * @param accountDTO the account dto
      */
-    @HmilyTCC
+    @Hmily
     void mockTryPaymentTimeout(AccountDTO accountDTO);
     
     /**
@@ -63,7 +62,7 @@ public interface AccountService {
      * @param accountDTO the account dto
      * @return the boolean
      */
-    @HmilyTAC
+    @Hmily
     boolean paymentTAC(AccountDTO accountDTO);
     
     /**
@@ -80,7 +79,7 @@ public interface AccountService {
      * @param accountNestedDTO 参数dto
      * @return true boolean
      */
-    @HmilyTCC
+    @Hmily
     boolean paymentWithNested(AccountNestedDTO accountNestedDTO);
     
     /**
@@ -89,7 +88,7 @@ public interface AccountService {
      * @param accountNestedDTO the account nested dto
      * @return the boolean
      */
-    @HmilyTCC
+    @Hmily
     boolean paymentWithNestedException(AccountNestedDTO accountNestedDTO);
     
     /**

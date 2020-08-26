@@ -17,12 +17,10 @@
 
 package org.dromara.hmily.demo.dubbo.inventory.api.service;
 
-import org.dromara.hmily.annotation.HmilyTAC;
-import org.dromara.hmily.annotation.HmilyTCC;
+import java.util.List;
+import org.dromara.hmily.annotation.Hmily;
 import org.dromara.hmily.demo.dubbo.inventory.api.dto.InventoryDTO;
 import org.dromara.hmily.demo.dubbo.inventory.api.entity.InventoryDO;
-
-import java.util.List;
 
 /**
  * The interface Inventory service.
@@ -31,7 +29,6 @@ import java.util.List;
  */
 public interface InventoryService {
     
-    
     /**
      * 扣减库存操作
      * 这一个tcc接口
@@ -39,7 +36,7 @@ public interface InventoryService {
      * @param inventoryDTO 库存DTO对象
      * @return true boolean
      */
-    @HmilyTCC
+    @Hmily
     Boolean decrease(InventoryDTO inventoryDTO);
     
     /**
@@ -48,7 +45,7 @@ public interface InventoryService {
      * @param inventoryDTO the inventory dto
      * @return the boolean
      */
-    @HmilyTAC
+    @Hmily
     Boolean decreaseTAC(InventoryDTO inventoryDTO);
     
     /**
@@ -56,7 +53,7 @@ public interface InventoryService {
      *
      * @return the list
      */
-    @HmilyTCC
+    @Hmily
     List<InventoryDTO> testInLine();
     
     /**
@@ -81,7 +78,7 @@ public interface InventoryService {
      * @param inventoryDTO dto对象
      * @return String string
      */
-    @HmilyTCC
+    @Hmily
     String mockWithTryException(InventoryDTO inventoryDTO);
     
     /**
@@ -90,7 +87,7 @@ public interface InventoryService {
      * @param inventoryDTO dto对象
      * @return String boolean
      */
-    @HmilyTCC
+    @Hmily
     Boolean mockWithTryTimeout(InventoryDTO inventoryDTO);
     
     /**
@@ -99,6 +96,6 @@ public interface InventoryService {
      * @param inventoryDTO dto对象
      * @return True boolean
      */
-    @HmilyTCC
+    @Hmily
     Boolean mockWithConfirmTimeout(InventoryDTO inventoryDTO);
 }
