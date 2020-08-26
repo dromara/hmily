@@ -17,10 +17,13 @@
 
 package org.dromara.hmily.demo.springcloud.order.service.impl;
 
+import java.math.BigDecimal;
 import org.dromara.hmily.annotation.HmilyTCC;
+import org.dromara.hmily.common.exception.HmilyRuntimeException;
 import org.dromara.hmily.demo.springcloud.order.client.AccountClient;
 import org.dromara.hmily.demo.springcloud.order.client.InventoryClient;
 import org.dromara.hmily.demo.springcloud.order.dto.AccountDTO;
+import org.dromara.hmily.demo.springcloud.order.dto.AccountNestedDTO;
 import org.dromara.hmily.demo.springcloud.order.dto.InventoryDTO;
 import org.dromara.hmily.demo.springcloud.order.entity.Order;
 import org.dromara.hmily.demo.springcloud.order.enums.OrderStatusEnum;
@@ -120,6 +123,30 @@ public class PaymentServiceImpl implements PaymentService {
         return "success";
     }
     
+    @Override
+    @HmilyTCC(confirmMethod = "confirmOrderStatus", cancelMethod = "cancelOrderStatus")
+    public String makePaymentWithNested(Order order) {
+        updateOrderStatus(order, OrderStatusEnum.PAYING);
+        final BigDecimal balance = accountClient.findByUserId(order.getUserId());
+        if (balance.compareTo(order.getTotalAmount()) <= 0) {
+            throw new HmilyRuntimeException("余额不足！");
+        }
+        accountClient.paymentWithNested(buildAccountNestedDTO(order));
+        return "success";
+    }
+    
+    @Override
+    @HmilyTCC(confirmMethod = "confirmOrderStatus", cancelMethod = "cancelOrderStatus")
+    public String makePaymentWithNestedException(Order order) {
+        updateOrderStatus(order, OrderStatusEnum.PAYING);
+        final BigDecimal balance = accountClient.findByUserId(order.getUserId());
+        if (balance.compareTo(order.getTotalAmount()) <= 0) {
+            throw new HmilyRuntimeException("余额不足！");
+        }
+        accountClient.paymentWithNestedException(buildAccountNestedDTO(order));
+        return "success";
+    }
+    
     public void confirmOrderStatus(Order order) {
         updateOrderStatus(order, OrderStatusEnum.PAY_SUCCESS);
         LOGGER.info("=========进行订单confirm操作完成================");
@@ -147,5 +174,14 @@ public class PaymentServiceImpl implements PaymentService {
         inventoryDTO.setCount(order.getCount());
         inventoryDTO.setProductId(order.getProductId());
         return inventoryDTO;
+    }
+    
+    private AccountNestedDTO buildAccountNestedDTO(Order order) {
+        AccountNestedDTO nestedDTO = new AccountNestedDTO();
+        nestedDTO.setAmount(order.getTotalAmount());
+        nestedDTO.setUserId(order.getUserId());
+        nestedDTO.setProductId(order.getProductId());
+        nestedDTO.setCount(order.getCount());
+        return nestedDTO;
     }
 }

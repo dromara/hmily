@@ -18,6 +18,7 @@
 package org.dromara.hmily.demo.springcloud.account.service;
 
 import org.dromara.hmily.demo.springcloud.account.dto.AccountDTO;
+import org.dromara.hmily.demo.springcloud.account.dto.AccountNestedDTO;
 import org.dromara.hmily.demo.springcloud.account.entity.AccountDO;
 
 /**
@@ -58,6 +59,22 @@ public interface AccountService {
      * @return the boolean
      */
     boolean mockWithTryTimeout(AccountDTO accountDTO);
+    
+    /**
+     * Payment with nested boolean.
+     *
+     * @param nestedDTO the nested dto
+     * @return the boolean
+     */
+    boolean paymentWithNested(AccountNestedDTO nestedDTO);
+    
+    /**
+     * Payment with nested exception boolean.
+     *
+     * @param nestedDTO the nested dto
+     * @return the boolean
+     */
+    boolean paymentWithNestedException(AccountNestedDTO nestedDTO);
     
     /**
      * 获取用户账户信息.

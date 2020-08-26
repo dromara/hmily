@@ -18,6 +18,7 @@
 package org.dromara.hmily.demo.springcloud.order.client;
 
 import org.dromara.hmily.demo.springcloud.order.dto.AccountDTO;
+import org.dromara.hmily.demo.springcloud.order.dto.AccountNestedDTO;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -55,6 +56,16 @@ public class AccountHystrix implements AccountClient {
     
     @Override
     public Boolean mockWithTryTimeout(AccountDTO accountDO) {
+        return false;
+    }
+    
+    @Override
+    public Boolean paymentWithNested(AccountNestedDTO nestedDTO) {
+        return false;
+    }
+    
+    @Override
+    public Boolean paymentWithNestedException(AccountNestedDTO nestedDTO) {
         return false;
     }
 }

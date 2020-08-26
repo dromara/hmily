@@ -83,6 +83,24 @@ public interface OrderService {
     String mockAccountWithTryTimeout(Integer count, BigDecimal amount);
     
     /**
+     * Order pay with nested string.
+     *
+     * @param count  the count
+     * @param amount the amount
+     * @return the string
+     */
+    String orderPayWithNested(Integer count, BigDecimal amount);
+    
+    /**
+     * Order pay with nested exception string.
+     *
+     * @param count  the count
+     * @param amount the amount
+     * @return the string
+     */
+    String orderPayWithNestedException(Integer count, BigDecimal amount);
+    
+    /**
      * 更新订单状态.
      *
      * @param order 订单实体类

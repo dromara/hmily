@@ -19,7 +19,10 @@ package org.dromara.hmily.demo.springcloud.account.service.impl;
 
 import org.dromara.hmily.annotation.HmilyTCC;
 import org.dromara.hmily.common.exception.HmilyRuntimeException;
+import org.dromara.hmily.demo.springcloud.account.client.InventoryClient;
 import org.dromara.hmily.demo.springcloud.account.dto.AccountDTO;
+import org.dromara.hmily.demo.springcloud.account.dto.AccountNestedDTO;
+import org.dromara.hmily.demo.springcloud.account.dto.InventoryDTO;
 import org.dromara.hmily.demo.springcloud.account.entity.AccountDO;
 import org.dromara.hmily.demo.springcloud.account.mapper.AccountMapper;
 import org.dromara.hmily.demo.springcloud.account.service.AccountService;
@@ -43,14 +46,17 @@ public class AccountServiceImpl implements AccountService {
 
     private final AccountMapper accountMapper;
     
+    private final InventoryClient inventoryClient;
+    
     /**
      * Instantiates a new Account service.
      *
      * @param accountMapper the account mapper
      */
     @Autowired(required = false)
-    public AccountServiceImpl(final AccountMapper accountMapper) {
+    public AccountServiceImpl(final AccountMapper accountMapper, final InventoryClient inventoryClient) {
         this.accountMapper = accountMapper;
+        this.inventoryClient = inventoryClient;
     }
 
     @Override
@@ -82,11 +88,27 @@ public class AccountServiceImpl implements AccountService {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        int decrease = accountMapper.update(accountDTO);;
+        int decrease = accountMapper.update(accountDTO);
         if (decrease != 1) {
             throw new HmilyRuntimeException("账户余额不足");
         }
         return true;
+    }
+    
+    @Override
+    @HmilyTCC(confirmMethod = "confirm", cancelMethod = "cancel")
+    public boolean paymentWithNested(AccountNestedDTO nestedDTO) {
+        accountMapper.update(buildAccountDTO(nestedDTO));
+        inventoryClient.decrease(buildInventoryDTO(nestedDTO));
+        return Boolean.TRUE;
+    }
+    
+    @Override
+    @HmilyTCC(confirmMethod = "confirm", cancelMethod = "cancel")
+    public boolean paymentWithNestedException(AccountNestedDTO nestedDTO) {
+        accountMapper.update(buildAccountDTO(nestedDTO));
+        inventoryClient.mockWithTryException(buildInventoryDTO(nestedDTO));
+        return Boolean.TRUE;
     }
     
     @Override
@@ -102,8 +124,7 @@ public class AccountServiceImpl implements AccountService {
      */
     public boolean confirm(final AccountDTO accountDTO) {
         LOGGER.debug("============执行confirm 付款接口===============");
-        final int rows = accountMapper.confirm(accountDTO);
-        return Boolean.TRUE;
+        return accountMapper.confirm(accountDTO) > 0;
     }
 
 
@@ -115,10 +136,20 @@ public class AccountServiceImpl implements AccountService {
      */
     public boolean cancel(final AccountDTO accountDTO) {
         LOGGER.debug("============执行cancel 付款接口===============");
-        final int rows = accountMapper.cancel(accountDTO);
-        if (rows != 1) {
-            throw new HmilyRuntimeException("取消扣减账户异常！");
-        }
-        return Boolean.TRUE;
+        return accountMapper.cancel(accountDTO) > 0;
+    }
+    
+    private AccountDTO buildAccountDTO(AccountNestedDTO nestedDTO) {
+        AccountDTO dto = new AccountDTO();
+        dto.setAmount(nestedDTO.getAmount());
+        dto.setUserId(nestedDTO.getUserId());
+        return dto;
+    }
+    
+    private InventoryDTO buildInventoryDTO(AccountNestedDTO nestedDTO) {
+        InventoryDTO inventoryDTO = new InventoryDTO();
+        inventoryDTO.setCount(nestedDTO.getCount());
+        inventoryDTO.setProductId(nestedDTO.getProductId());
+        return inventoryDTO;
     }
 }

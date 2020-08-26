@@ -25,7 +25,7 @@ import org.dromara.hmily.demo.springcloud.order.entity.Order;
  * @author xiaoyu
  */
 public interface PaymentService {
-
+    
     /**
      * 订单支付.
      *
@@ -39,12 +39,12 @@ public interface PaymentService {
      * @param order the order
      */
     void testMakePayment(Order order);
-
+    
     /**
      * mock订单支付的时候库存异常.
      *
      * @param order 订单实体
-     * @return String
+     * @return String string
      */
     String mockPaymentInventoryWithTryException(Order order);
     
@@ -55,12 +55,12 @@ public interface PaymentService {
      * @return the string
      */
     String mockPaymentAccountWithTryException(Order order);
-
+    
     /**
      * mock订单支付的时候库存超时.
      *
      * @param order 订单实体
-     * @return String
+     * @return String string
      */
     String mockPaymentInventoryWithTryTimeout(Order order);
     
@@ -71,4 +71,20 @@ public interface PaymentService {
      * @return the string
      */
     String mockPaymentAccountWithTryTimeout(Order order);
+    
+    /**
+     * Make payment with nested.
+     *
+     * @param order the order
+     * @return the string
+     */
+    String makePaymentWithNested(Order order);
+    
+    /**
+     * Make payment with nested exception.
+     *
+     * @param order the order
+     * @return the string
+     */
+    String makePaymentWithNestedException(Order order);
 }

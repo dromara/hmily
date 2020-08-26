@@ -15,30 +15,25 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.demo.springcloud.order.dto;
-
-import lombok.Data;
+package org.dromara.hmily.demo.springcloud.account.dto;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
+import lombok.Data;
 
 /**
- * AccountDTO.
+ * InventoryDTO.
  * @author xiaoyu
  */
 @Data
-public class AccountDTO implements Serializable {
-
-    private static final long serialVersionUID = 7223470850578998427L;
+public class InventoryDTO implements Serializable {
 
     /**
-     * 用户id.
+     * 商品id.
      */
-    private String userId;
-
+    private String productId;
+    
     /**
-     * 扣款金额.
+     * 数量.
      */
-    private BigDecimal amount;
-
+    private Integer count;
 }

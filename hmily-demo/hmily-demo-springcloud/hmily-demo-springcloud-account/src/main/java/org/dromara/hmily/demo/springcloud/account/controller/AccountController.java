@@ -18,6 +18,7 @@
 package org.dromara.hmily.demo.springcloud.account.controller;
 
 import org.dromara.hmily.demo.springcloud.account.dto.AccountDTO;
+import org.dromara.hmily.demo.springcloud.account.dto.AccountNestedDTO;
 import org.dromara.hmily.demo.springcloud.account.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -61,6 +62,18 @@ public class AccountController {
     public Boolean mockWithTryTimeout(@RequestBody AccountDTO accountDO) {
         return accountService.mockWithTryTimeout(accountDO);
     }
+    
+    @RequestMapping("/paymentWithNested")
+    public Boolean paymentWithNested(@RequestBody AccountNestedDTO nestedDTO) {
+        return accountService.paymentWithNested(nestedDTO);
+    }
+    
+    @RequestMapping("/paymentWithNestedException")
+    public Boolean paymentWithNestedException(@RequestBody AccountNestedDTO nestedDTO) {
+        return accountService.paymentWithNestedException(nestedDTO);
+    }
+    
+    
     
     @RequestMapping("/findByUserId")
     public BigDecimal findByUserId(@RequestParam("userId") String userId) {

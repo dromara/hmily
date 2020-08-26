@@ -84,4 +84,18 @@ public class OrderController {
                                             @RequestParam(value = "amount") BigDecimal amount) {
         return orderService.mockAccountWithTryTimeout(count, amount);
     }
+    
+    @PostMapping(value = "/orderPayWithNested")
+    @ApiOperation(value = "订单支付接口（这里模拟的是rpc的嵌套调用 order--> account--> inventory）")
+    public String orderPayWithNested(@RequestParam(value = "count") Integer count,
+                                     @RequestParam(value = "amount") BigDecimal amount) {
+        return orderService.orderPayWithNested(count, amount);
+    }
+    
+    @PostMapping(value = "/orderPayWithNestedException")
+    @ApiOperation(value = "订单支付接口（里模拟的是rpc的嵌套调用 order--> account--> inventory, inventory异常情况")
+    public String orderPayWithNestedException(@RequestParam(value = "count") Integer count,
+                                              @RequestParam(value = "amount") BigDecimal amount) {
+        return orderService.orderPayWithNestedException(count, amount);
+    }
 }

@@ -97,6 +97,18 @@ public class OrderServiceImpl implements OrderService {
     }
     
     @Override
+    public String orderPayWithNested(Integer count, BigDecimal amount) {
+        Order order = saveOrder(count, amount);
+        return paymentService.makePaymentWithNested(order);
+    }
+    
+    @Override
+    public String orderPayWithNestedException(Integer count, BigDecimal amount) {
+        Order order = saveOrder(count, amount);
+        return paymentService.makePaymentWithNested(order);
+    }
+    
+    @Override
     public void updateOrderStatus(Order order) {
         orderMapper.update(order);
     }

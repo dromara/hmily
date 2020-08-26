@@ -99,14 +99,14 @@ public class OrderController {
     }
 
     @PostMapping(value = "/orderPayWithNested")
-    @ApiOperation(value = "订单支付接口（注意这里模拟的是创建订单并进行支付扣减库存等操作）")
+    @ApiOperation(value = "订单支付接口（这里模拟的是rpc的嵌套调用 order--> account--> inventory）")
     public String orderPayWithNested(@RequestParam(value = "count") Integer count,
                                      @RequestParam(value = "amount") BigDecimal amount) {
         return orderService.orderPayWithNested(count, amount);
     }
     
     @PostMapping(value = "/orderPayWithNestedException")
-    @ApiOperation(value = "订单支付接口（这里模拟且套调用时候的异常")
+    @ApiOperation(value = "订单支付接口（里模拟的是rpc的嵌套调用 order--> account--> inventory, inventory异常情况")
     public String orderPayWithNestedException(@RequestParam(value = "count") Integer count,
                                      @RequestParam(value = "amount") BigDecimal amount) {
         return orderService.orderPayWithNestedException(count, amount);

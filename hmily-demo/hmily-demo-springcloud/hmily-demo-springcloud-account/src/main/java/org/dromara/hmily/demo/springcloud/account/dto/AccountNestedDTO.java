@@ -15,30 +15,38 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.demo.springcloud.order.dto;
-
-import lombok.Data;
+package org.dromara.hmily.demo.springcloud.account.dto;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import lombok.Data;
 
 /**
- * AccountDTO.
+ * The type Account nested dto.
+ *
  * @author xiaoyu
  */
 @Data
-public class AccountDTO implements Serializable {
-
-    private static final long serialVersionUID = 7223470850578998427L;
-
+public class AccountNestedDTO implements Serializable {
+    
     /**
-     * 用户id.
+     * 用户id
      */
     private String userId;
 
     /**
-     * 扣款金额.
+     * 扣款金额
      */
     private BigDecimal amount;
 
+    /**
+     * productId
+     */
+    private String productId;
+
+    /**
+     * count
+     */
+    private Integer count;
+    
 }
