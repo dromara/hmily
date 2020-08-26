@@ -127,16 +127,21 @@ public class HmilyTransactionSelfRecoveryScheduled implements AutoCloseable {
                                 LOGGER.info("hmily tcc transaction begin self recovery: {}", hmilyParticipant.toString());
                                 HmilyTransaction globalHmilyTransaction = hmilyRepository.findByTransId(hmilyParticipant.getTransId());
                                 if (Objects.isNull(globalHmilyTransaction)) {
-                                    //do remove
-                                    hmilyRepository.removeHmilyParticipant(hmilyParticipant.getParticipantId());
-                                    continue;
+                                    if (hmilyParticipant.getStatus() == HmilyActionEnum.TRYING.getCode()
+                                            || hmilyParticipant.getStatus() == HmilyActionEnum.CANCELING.getCode()) {
+                                        hmilyTransactionRecoveryService.cancel(hmilyParticipant);
+                                    } else if (hmilyParticipant.getStatus() == HmilyActionEnum.CONFIRMING.getCode()) {
+                                        hmilyTransactionRecoveryService.confirm(hmilyParticipant);
+                                    }
+                                } else {
+                                    if (globalHmilyTransaction.getStatus() == HmilyActionEnum.TRYING.getCode()
+                                            || globalHmilyTransaction.getStatus() == HmilyActionEnum.CANCELING.getCode()) {
+                                        hmilyTransactionRecoveryService.cancel(hmilyParticipant);
+                                    } else if (globalHmilyTransaction.getStatus() == HmilyActionEnum.CONFIRMING.getCode()) {
+                                        hmilyTransactionRecoveryService.confirm(hmilyParticipant);
+                                    }
                                 }
-                                if (globalHmilyTransaction.getStatus() == HmilyActionEnum.TRYING.getCode()
-                                        || globalHmilyTransaction.getStatus() == HmilyActionEnum.CANCELING.getCode()) {
-                                    hmilyTransactionRecoveryService.cancel(hmilyParticipant);
-                                } else if (globalHmilyTransaction.getStatus() == HmilyActionEnum.CONFIRMING.getCode()) {
-                                    hmilyTransactionRecoveryService.confirm(hmilyParticipant);
-                                }
+                               
                             }
                         }
                     } catch (Exception e) {
