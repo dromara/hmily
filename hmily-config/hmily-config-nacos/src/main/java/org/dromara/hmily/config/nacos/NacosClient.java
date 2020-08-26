@@ -34,6 +34,7 @@ import org.slf4j.LoggerFactory;
  * The type Nacos client.
  *
  * @author xiaoyu
+ * @author sixh
  */
 public class NacosClient {
     

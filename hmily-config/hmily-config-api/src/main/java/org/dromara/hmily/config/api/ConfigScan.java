@@ -18,6 +18,7 @@
 package org.dromara.hmily.config.api;
 
 import java.util.List;
+
 import org.dromara.hmily.spi.ExtensionLoaderFactory;
 
 /**
@@ -27,7 +28,7 @@ import org.dromara.hmily.spi.ExtensionLoaderFactory;
  * @author xiaoyu
  */
 public final class ConfigScan {
-    
+
     /**
      * Scan all config to add config env.
      */

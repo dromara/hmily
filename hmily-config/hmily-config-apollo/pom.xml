@@ -25,6 +25,16 @@
         <version>2.1.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
+    <properties>
+        <apollo.version>1.5.1</apollo.version>
+    </properties>
+    <dependencies>
+        <dependency>
+            <groupId>com.ctrip.framework.apollo</groupId>
+            <artifactId>apollo-client</artifactId>
+            <version>${apollo.version}</version>
+        </dependency>
+    </dependencies>
 
     <artifactId>hmily-config-apollo</artifactId>
 
