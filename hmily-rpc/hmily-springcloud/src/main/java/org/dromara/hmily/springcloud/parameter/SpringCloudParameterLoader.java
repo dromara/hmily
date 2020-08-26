@@ -17,10 +17,7 @@
 
 package org.dromara.hmily.springcloud.parameter;
 
-import java.util.Objects;
-import org.dromara.hmily.common.enums.HmilyRoleEnum;
 import org.dromara.hmily.common.utils.LogUtil;
-import org.dromara.hmily.core.context.HmilyContextHolder;
 import org.dromara.hmily.core.context.HmilyTransactionContext;
 import org.dromara.hmily.core.mediator.RpcMediator;
 import org.dromara.hmily.core.mediator.RpcParameterLoader;
@@ -43,18 +40,12 @@ public class SpringCloudParameterLoader implements RpcParameterLoader {
     
     @Override
     public HmilyTransactionContext load() {
-        HmilyTransactionContext hmilyTransactionContext = HmilyContextHolder.get();
-        if (Objects.nonNull(hmilyTransactionContext)) {
-            if (HmilyRoleEnum.START.getCode() == hmilyTransactionContext.getRole()) {
-                hmilyTransactionContext.setRole(HmilyRoleEnum.SPRING_CLOUD.getCode());
-            }
-        } else {
-            try {
-                final RequestAttributes requestAttributes = RequestContextHolder.currentRequestAttributes();
-                hmilyTransactionContext = RpcMediator.getInstance().acquire(key -> ((ServletRequestAttributes) requestAttributes).getRequest().getHeader(key));
-            } catch (IllegalStateException ex) {
-                LogUtil.warn(LOGGER, () -> "can not acquire request info:" + ex.getLocalizedMessage());
-            }
+        HmilyTransactionContext hmilyTransactionContext = null;
+        try {
+            final RequestAttributes requestAttributes = RequestContextHolder.currentRequestAttributes();
+            hmilyTransactionContext = RpcMediator.getInstance().acquire(key -> ((ServletRequestAttributes) requestAttributes).getRequest().getHeader(key));
+        } catch (IllegalStateException ex) {
+            LogUtil.warn(LOGGER, () -> "can not acquire request info:" + ex.getLocalizedMessage());
         }
         return hmilyTransactionContext;
     }

@@ -56,7 +56,7 @@ public class InventoryServiceImpl implements InventoryService {
     @Override
     @HmilyTCC(confirmMethod = "confirmMethod", cancelMethod = "cancelMethod")
     public Boolean decrease(InventoryDTO inventoryDTO) {
-        LOGGER.info("==========springcloud调用扣减库存decrease===========");
+        LOGGER.info("==========try扣减库存decrease===========");
         inventoryMapper.decrease(inventoryDTO);
         return true;
     }
@@ -129,12 +129,12 @@ public class InventoryServiceImpl implements InventoryService {
     }
     
     public Boolean confirmMethod(InventoryDTO inventoryDTO) {
-        LOGGER.info("==========Springcloud调用扣减库存确认方法===========");
+        LOGGER.info("==========confirmMethod库存确认方法===========");
         return inventoryMapper.confirm(inventoryDTO) > 0;
     }
 
     public Boolean cancelMethod(InventoryDTO inventoryDTO) {
-        LOGGER.info("==========Springcloud调用扣减库存取消方法===========");
+        LOGGER.info("==========cancelMethod库存取消方法===========");
         return inventoryMapper.cancel(inventoryDTO) > 0;
     }
 }

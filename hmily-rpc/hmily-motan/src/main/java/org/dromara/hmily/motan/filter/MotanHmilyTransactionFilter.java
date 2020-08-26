@@ -83,7 +83,7 @@ public class MotanHmilyTransactionFilter implements Filter {
         }
         Long participantId = context.getParticipantId();
         final HmilyParticipant hmilyParticipant = buildParticipant(context, request);
-        Optional.ofNullable(hmilyParticipant).ifPresent(h -> context.setParticipantId(h.getParticipantId()));
+        Optional.ofNullable(hmilyParticipant).ifPresent(participant -> context.setParticipantId(participant.getParticipantId()));
         if (context.getRole() == HmilyRoleEnum.PARTICIPANT.getCode()) {
             context.setParticipantRefId(participantId);
         }
@@ -91,7 +91,7 @@ public class MotanHmilyTransactionFilter implements Filter {
         final Response response = caller.call(request);
         if (null != response.getException()) {
             if (context.getRole() == HmilyRoleEnum.PARTICIPANT.getCode()) {
-                HmilyTransactionHolder.getInstance().registerParticipantByNested(context.getParticipantId(), hmilyParticipant);
+                HmilyTransactionHolder.getInstance().registerParticipantByNested(participantId, hmilyParticipant);
             } else {
                 HmilyTransactionHolder.getInstance().registerStarterParticipant(hmilyParticipant);
             }

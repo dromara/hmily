@@ -17,7 +17,7 @@
 
 package org.dromara.hmily.demo.springcloud.order.client;
 
-import org.dromara.hmily.annotation.HmilyTCC;
+import org.dromara.hmily.annotation.Hmily;
 import org.dromara.hmily.demo.springcloud.order.dto.InventoryDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -39,7 +39,7 @@ public interface InventoryClient {
      * @return true 成功
      */
     @RequestMapping("/inventory-service/inventory/decrease")
-    @HmilyTCC
+    @Hmily
     Boolean decrease(@RequestBody InventoryDTO inventoryDTO);
     
     /**
@@ -60,14 +60,13 @@ public interface InventoryClient {
     @RequestMapping("/inventory-service/inventory/findByProductId")
     Integer findByProductId(@RequestParam("productId") String productId);
     
-    
     /**
      * 模拟库存扣减异常.
      *
      * @param inventoryDTO 实体对象
      * @return true 成功
      */
-    @HmilyTCC
+    @Hmily
     @RequestMapping("/inventory-service/inventory/mockWithTryException")
     Boolean mockWithTryException(@RequestBody InventoryDTO inventoryDTO);
     
@@ -77,7 +76,7 @@ public interface InventoryClient {
      * @param inventoryDTO 实体对象
      * @return true 成功
      */
-    @HmilyTCC
+    @Hmily
     @RequestMapping("/inventory-service/inventory/mockWithTryTimeout")
     Boolean mockWithTryTimeout(@RequestBody InventoryDTO inventoryDTO);
 }

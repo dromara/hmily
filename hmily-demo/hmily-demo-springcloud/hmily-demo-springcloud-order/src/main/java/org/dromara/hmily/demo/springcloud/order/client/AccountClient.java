@@ -18,7 +18,7 @@
 package org.dromara.hmily.demo.springcloud.order.client;
 
 import java.math.BigDecimal;
-import org.dromara.hmily.annotation.HmilyTCC;
+import org.dromara.hmily.annotation.Hmily;
 import org.dromara.hmily.demo.springcloud.order.dto.AccountDTO;
 import org.dromara.hmily.demo.springcloud.order.dto.AccountNestedDTO;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -41,7 +41,7 @@ public interface AccountClient {
      * @return true 成功
      */
     @RequestMapping("/account-service/account/payment")
-    @HmilyTCC
+    @Hmily
     Boolean payment(@RequestBody AccountDTO accountDO);
     
     /**
@@ -68,7 +68,7 @@ public interface AccountClient {
      * @param accountDO the account do
      * @return the boolean
      */
-    @HmilyTCC
+    @Hmily
     @RequestMapping("/account-service/account/mockWithTryException")
     Boolean mockWithTryException(@RequestBody AccountDTO accountDO);
     
@@ -78,7 +78,7 @@ public interface AccountClient {
      * @param accountDO the account do
      * @return the boolean
      */
-    @HmilyTCC
+    @Hmily
     @RequestMapping("/account-service/account/mockWithTryTimeout")
     Boolean mockWithTryTimeout(@RequestBody AccountDTO accountDO);
     
@@ -88,7 +88,7 @@ public interface AccountClient {
      * @param nestedDTO the nested dto
      * @return the boolean
      */
-    @HmilyTCC
+    @Hmily
     @RequestMapping("/account-service/account/paymentWithNested")
     Boolean paymentWithNested(@RequestBody AccountNestedDTO nestedDTO);
     
@@ -98,7 +98,7 @@ public interface AccountClient {
      * @param nestedDTO the nested dto
      * @return the boolean
      */
-    @HmilyTCC
+    @Hmily
     @RequestMapping("/account-service/account/paymentWithNestedException")
     Boolean paymentWithNestedException(@RequestBody AccountNestedDTO nestedDTO);
 }

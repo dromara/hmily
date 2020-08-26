@@ -129,6 +129,7 @@ public class HmilyTransactionSelfRecoveryScheduled implements AutoCloseable {
                                 if (Objects.isNull(globalHmilyTransaction)) {
                                     //do remove
                                     hmilyRepository.removeHmilyParticipant(hmilyParticipant.getParticipantId());
+                                    continue;
                                 }
                                 if (globalHmilyTransaction.getStatus() == HmilyActionEnum.TRYING.getCode()
                                         || globalHmilyTransaction.getStatus() == HmilyActionEnum.CANCELING.getCode()) {

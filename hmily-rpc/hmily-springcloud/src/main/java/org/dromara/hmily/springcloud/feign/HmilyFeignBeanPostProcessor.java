@@ -17,16 +17,15 @@
 
 package org.dromara.hmily.springcloud.feign;
 
-import org.dromara.hmily.annotation.HmilyTCC;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.config.BeanPostProcessor;
-import org.springframework.core.annotation.AnnotationUtils;
-import org.springframework.util.ReflectionUtils;
-
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.Objects;
+import org.dromara.hmily.annotation.Hmily;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.util.ReflectionUtils;
 
 /**
  * The type Hmily feign bean post processor.
@@ -46,11 +45,9 @@ public class HmilyFeignBeanPostProcessor implements BeanPostProcessor {
             return bean;
         }
         InvocationHandler handler = Proxy.getInvocationHandler(bean);
-
         final Method[] methods = ReflectionUtils.getAllDeclaredMethods(bean.getClass());
-
         for (Method method : methods) {
-            HmilyTCC hmily = AnnotationUtils.findAnnotation(method, HmilyTCC.class);
+            Hmily hmily = AnnotationUtils.findAnnotation(method, Hmily.class);
             if (Objects.nonNull(hmily)) {
                 HmilyFeignHandler hmilyFeignHandler = new HmilyFeignHandler();
                 hmilyFeignHandler.setDelegate(handler);
@@ -62,7 +59,6 @@ public class HmilyFeignBeanPostProcessor implements BeanPostProcessor {
         }
         return bean;
     }
-
 }
 
 

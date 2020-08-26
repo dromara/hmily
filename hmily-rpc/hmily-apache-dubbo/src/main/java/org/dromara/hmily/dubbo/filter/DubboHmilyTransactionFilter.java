@@ -81,7 +81,7 @@ public class DubboHmilyTransactionFilter implements Filter {
         }
         Long participantId = context.getParticipantId();
         final HmilyParticipant hmilyParticipant = buildParticipant(context, invoker, invocation);
-        Optional.ofNullable(hmilyParticipant).ifPresent(h -> context.setParticipantId(h.getParticipantId()));
+        Optional.ofNullable(hmilyParticipant).ifPresent(participant -> context.setParticipantId(participant.getParticipantId()));
         if (context.getRole() == HmilyRoleEnum.PARTICIPANT.getCode()) {
             context.setParticipantRefId(participantId);
         }

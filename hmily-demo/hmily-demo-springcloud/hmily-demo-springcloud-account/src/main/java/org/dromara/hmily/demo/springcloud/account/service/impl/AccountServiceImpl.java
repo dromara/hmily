@@ -30,6 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * The type Account service.
@@ -62,7 +63,7 @@ public class AccountServiceImpl implements AccountService {
     @Override
     @HmilyTCC(confirmMethod = "confirm", cancelMethod = "cancel")
     public boolean payment(final AccountDTO accountDTO) {
-        LOGGER.debug("============执行try付款接口===============");
+        LOGGER.info("============执行try付款接口===============");
         accountMapper.update(accountDTO);
         return Boolean.TRUE;
     }
@@ -96,7 +97,7 @@ public class AccountServiceImpl implements AccountService {
     }
     
     @Override
-    @HmilyTCC(confirmMethod = "confirm", cancelMethod = "cancel")
+    @HmilyTCC(confirmMethod = "confirmNested", cancelMethod = "cancelNested")
     public boolean paymentWithNested(AccountNestedDTO nestedDTO) {
         accountMapper.update(buildAccountDTO(nestedDTO));
         inventoryClient.decrease(buildInventoryDTO(nestedDTO));
@@ -104,7 +105,7 @@ public class AccountServiceImpl implements AccountService {
     }
     
     @Override
-    @HmilyTCC(confirmMethod = "confirm", cancelMethod = "cancel")
+    @HmilyTCC(confirmMethod = "confirmNested", cancelMethod = "cancelNested")
     public boolean paymentWithNestedException(AccountNestedDTO nestedDTO) {
         accountMapper.update(buildAccountDTO(nestedDTO));
         inventoryClient.mockWithTryException(buildInventoryDTO(nestedDTO));
@@ -123,7 +124,7 @@ public class AccountServiceImpl implements AccountService {
      * @return the boolean
      */
     public boolean confirm(final AccountDTO accountDTO) {
-        LOGGER.debug("============执行confirm 付款接口===============");
+        LOGGER.info("============执行confirm 付款接口===============");
         return accountMapper.confirm(accountDTO) > 0;
     }
 
@@ -135,8 +136,26 @@ public class AccountServiceImpl implements AccountService {
      * @return the boolean
      */
     public boolean cancel(final AccountDTO accountDTO) {
-        LOGGER.debug("============执行cancel 付款接口===============");
+        LOGGER.info("============执行cancel 付款接口===============");
         return accountMapper.cancel(accountDTO) > 0;
+    }
+    
+    @Transactional(rollbackFor = Exception.class)
+    public boolean confirmNested(AccountNestedDTO accountNestedDTO) {
+        LOGGER.info("============confirmNested确认付款接口===============");
+        return accountMapper.confirm(buildAccountDTO(accountNestedDTO)) > 0;
+    }
+    
+    /**
+     * Cancel nested boolean.
+     *
+     * @param accountNestedDTO the account nested dto
+     * @return the boolean
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public boolean cancelNested(AccountNestedDTO accountNestedDTO) {
+        LOGGER.info("============cancelNested 执行取消付款接口===============");
+        return accountMapper.cancel(buildAccountDTO(accountNestedDTO)) > 0;
     }
     
     private AccountDTO buildAccountDTO(AccountNestedDTO nestedDTO) {
