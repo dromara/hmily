@@ -16,6 +16,8 @@
     <modules>
         <module>hmily-demo-dubbo</module>
         <module>hmily-demo-springcloud</module>
+        <module>hmily-demo-motan</module>
+        <module>hmily-demo-motan</module>
     </modules>
 
     <properties>

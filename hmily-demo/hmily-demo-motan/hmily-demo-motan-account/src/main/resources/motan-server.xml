@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:motan="http://api.weibo.com/schema/motan"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+   http://api.weibo.com/schema/motan http://api.weibo.com/schema/motan.xsd">
+
+    <!-- exporting service by Motan -->
+    <motan:service interface="org.dromara.hmily.demo.motan.account.api.service.AccountService" ref="accountService" registry="my_zookeeper" export="8002" />
+    <motan:service interface="org.dromara.hmily.demo.motan.account.api.service.InlineService" ref="inlineService" registry="my_zookeeper" export="8002" />
+
+    <!--zk 单点-->
+    <motan:registry regProtocol="zookeeper" name="my_zookeeper" address="127.0.0.1:2181"/>
+
+</beans>
