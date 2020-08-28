@@ -117,7 +117,7 @@ public class MotanHmilyTransactionFilter implements Filter {
     @SneakyThrows
     private Class<?>[] buildArgumentTypes(final String methodName, final Class<?> clazz) {
         final Method[] methods = clazz.getMethods();
-        return  Stream.of(methods)
+        return Stream.of(methods)
                 .filter(m -> m.getName().equals(methodName))
                 .findFirst()
                 .map(Method::getParameterTypes).get();
