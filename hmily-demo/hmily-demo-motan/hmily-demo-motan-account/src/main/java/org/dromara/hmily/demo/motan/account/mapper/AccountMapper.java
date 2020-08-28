@@ -17,6 +17,7 @@
 
 package org.dromara.hmily.demo.motan.account.mapper;
 
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 import org.dromara.hmily.demo.motan.account.api.dto.AccountDTO;
@@ -27,6 +28,7 @@ import org.dromara.hmily.demo.motan.account.api.entity.AccountDO;
  *
  * @author bbaiggey
  */
+@Mapper
 public interface AccountMapper {
     
     /**

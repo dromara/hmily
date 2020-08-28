@@ -17,6 +17,8 @@
 
 package org.dromara.hmily.demo.motan.account.service;
 
+import com.weibo.api.motan.config.springsupport.annotation.MotanReferer;
+import com.weibo.api.motan.config.springsupport.annotation.MotanService;
 import org.dromara.hmily.annotation.HmilyTAC;
 import org.dromara.hmily.annotation.HmilyTCC;
 import org.dromara.hmily.common.exception.HmilyRuntimeException;
@@ -31,9 +33,9 @@ import org.dromara.hmily.demo.motan.inventory.api.service.InventoryService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -41,7 +43,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  *
  * @author bbaiggey
  */
-@Service("accountService")
+@MotanService
 public class AccountServiceImpl implements AccountService {
 
     /**
@@ -59,38 +61,27 @@ public class AccountServiceImpl implements AccountService {
      */
     private static AtomicInteger confrimCount = new AtomicInteger(0);
 
-    private final AccountMapper accountMapper;
+    @Resource
+    private AccountMapper accountMapper;
 
-    private final InventoryService inventoryService;
+    @Autowired
+    private InlineService inlineService;
 
-    private final InlineService inlineService;
-
-    /**
-     * Instantiates a new Account service.
-     *
-     * @param accountMapper the account mapper
-     */
-    @Autowired(required = false)
-    public AccountServiceImpl(final AccountMapper accountMapper,
-                              final InventoryService inventoryService,
-                              final InlineService inlineService) {
-        this.accountMapper = accountMapper;
-        this.inventoryService = inventoryService;
-        this.inlineService = inlineService;
-    }
+    @MotanReferer(basicReferer = "hmilyClientBasicConfig")
+    private InventoryService inventoryService;
 
     @Override
     @HmilyTCC(confirmMethod = "confirm", cancelMethod = "cancel")
     public void payment(AccountDTO accountDTO) {
         accountMapper.update(accountDTO);
     }
-    
+
     @Override
     @HmilyTCC(confirmMethod = "confirm", cancelMethod = "cancel")
     public void mockTryPaymentException(AccountDTO accountDTO) {
         throw new HmilyRuntimeException("账户扣减异常！");
     }
-    
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     @HmilyTCC(confirmMethod = "confirm", cancelMethod = "cancel")
@@ -106,14 +97,14 @@ public class AccountServiceImpl implements AccountService {
             throw new HmilyRuntimeException("库存不足");
         }
     }
-    
+
     @Override
     @HmilyTAC
     public boolean paymentTAC(AccountDTO accountDTO) {
         accountMapper.update(accountDTO);
         return true;
     }
-    
+
     @Override
     public boolean testPayment(AccountDTO accountDTO) {
         accountMapper.testUpdate(accountDTO);
@@ -134,7 +125,7 @@ public class AccountServiceImpl implements AccountService {
         inventoryService.decrease(inventoryDTO);
         return Boolean.TRUE;
     }
-    
+
     @Override
     @HmilyTCC(confirmMethod = "confirmNested", cancelMethod = "cancelNested")
     @Transactional(rollbackFor = Exception.class)
@@ -151,12 +142,12 @@ public class AccountServiceImpl implements AccountService {
         inventoryService.mockWithTryException(inventoryDTO);
         return Boolean.TRUE;
     }
-    
+
     @Override
     public AccountDO findByUserId(String userId) {
         return accountMapper.findByUserId(userId);
     }
-    
+
     /**
      * Confirm nested boolean.
      *
@@ -203,7 +194,7 @@ public class AccountServiceImpl implements AccountService {
         LOGGER.info("调用了account confirm " + i + " 次");
         return Boolean.TRUE;
     }
-    
+
     /**
      * Cancel boolean.
      *

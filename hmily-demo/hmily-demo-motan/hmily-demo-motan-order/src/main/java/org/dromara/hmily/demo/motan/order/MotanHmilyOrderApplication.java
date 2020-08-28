@@ -15,36 +15,36 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.demo.motan.account;
+package org.dromara.hmily.demo.motan.order;
 
-import com.weibo.api.motan.common.MotanConstants;
-import com.weibo.api.motan.util.MotanSwitcherUtil;
+import org.dromara.hmily.demo.motan.order.service.PaymentService;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.data.mongo.MongoDataAutoConfiguration;
 import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
+import org.springframework.context.annotation.ImportResource;
 
 /**
- * The MotanHmilyAccountApplication.
+ * MotanHmilyOrderApplication.
  *
  * @author bbaiggey
  */
 @SpringBootApplication(exclude = {MongoAutoConfiguration.class, MongoDataAutoConfiguration.class})
-@MapperScan("org.dromara.hmily.demo.motan.account.mapper")
-public class MotanHmilyAccountApplication {
+@MapperScan("org.dromara.hmily.demo.motan.order.mapper")
+public class MotanHmilyOrderApplication {
 
     /**
      * main.
      *
-     * @param args args.
+     * @param args args
      */
     public static void main(final String[] args) {
-        SpringApplication springApplication = new SpringApplication(MotanHmilyAccountApplication.class);
-        springApplication.setWebApplicationType(WebApplicationType.NONE);
-        springApplication.run(args);
-        MotanSwitcherUtil.setSwitcherValue(MotanConstants.REGISTRY_HEARTBEAT_SWITCHER, true);
-        System.out.println("MotanHmilyAccountApplication server start...");
+        ConfigurableApplicationContext context = SpringApplication.run(MotanHmilyOrderApplication.class, args);
+        context.getBean(PaymentService.class);
+
+
     }
 }

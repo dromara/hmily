@@ -11,11 +11,11 @@
     <artifactId>hmily-demo-motan</artifactId>
     <packaging>pom</packaging>
     <modules>
-        <module>hmily-demo-motan-order</module>
         <module>hmily-demo-motan-account-api</module>
         <module>hmily-demo-motan-inventory-api</module>
         <module>hmily-demo-motan-account</module>
         <module>hmily-demo-motan-inventory</module>
+        <module>hmily-demo-motan-order</module>
     </modules>
 
 </project>
