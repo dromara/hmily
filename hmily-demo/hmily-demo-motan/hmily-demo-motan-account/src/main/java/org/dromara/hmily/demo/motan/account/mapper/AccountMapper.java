@@ -75,7 +75,6 @@ public interface AccountMapper {
             " where user_id =#{userId}  and freeze_amount >0")
     int cancel(AccountDTO accountDTO);
     
-    
     /**
      * 根据userId获取用户账户信息
      *

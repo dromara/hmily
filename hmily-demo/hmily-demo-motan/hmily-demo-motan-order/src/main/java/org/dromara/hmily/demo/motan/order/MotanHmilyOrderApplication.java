@@ -17,15 +17,11 @@
 
 package org.dromara.hmily.demo.motan.order;
 
-import org.dromara.hmily.demo.motan.order.service.PaymentService;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.data.mongo.MongoDataAutoConfiguration;
 import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
-import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.annotation.EnableAspectJAutoProxy;
-import org.springframework.context.annotation.ImportResource;
 
 /**
  * MotanHmilyOrderApplication.
@@ -42,9 +38,6 @@ public class MotanHmilyOrderApplication {
      * @param args args
      */
     public static void main(final String[] args) {
-        ConfigurableApplicationContext context = SpringApplication.run(MotanHmilyOrderApplication.class, args);
-        context.getBean(PaymentService.class);
-
-
+       SpringApplication.run(MotanHmilyOrderApplication.class, args);
     }
 }

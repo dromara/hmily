@@ -1,10 +1,10 @@
 hmily:
   server:
     configMode: local
-    appName: inventory-sc
+    appName: account-motan
   #  如果server.configMode eq local 的时候才会读取到这里的配置信息.
   config:
-    appName: inventory-motan
+    appName: account-motan
     serializer: kryo
     contextTransmittalMode: threadLocal
     scheduledThreadMax: 16

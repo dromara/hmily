@@ -17,10 +17,9 @@
 
 package org.dromara.hmily.demo.motan.order.service.impl;
 
-import com.weibo.api.motan.config.springsupport.annotation.MotanReferer;
+import java.math.BigDecimal;
+import java.util.Date;
 import org.dromara.hmily.common.utils.IdWorkerUtils;
-import org.dromara.hmily.demo.motan.account.api.entity.AccountDO;
-import org.dromara.hmily.demo.motan.account.api.service.AccountService;
 import org.dromara.hmily.demo.motan.order.entity.Order;
 import org.dromara.hmily.demo.motan.order.enums.OrderStatusEnum;
 import org.dromara.hmily.demo.motan.order.mapper.OrderMapper;
@@ -31,10 +30,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.math.BigDecimal;
-import java.util.Date;
-
 
 /**
  * @author xiaoyu
@@ -50,18 +45,11 @@ public class OrderServiceImpl implements OrderService {
 
     @Autowired
     private PaymentService paymentService;
-
-    @MotanReferer(basicReferer = "hmilyClientBasicConfig")
-    private AccountService accountService;
-
+    
 
     @Override
     public String orderPay(Integer count, BigDecimal amount) {
         Order order = saveOrder(count, amount);
-
-        AccountDO accountDO = accountService.findByUserId("1000000");
-        System.out.println("调用账户系统查询账户信息： "+ accountDO);
-
         long start = System.currentTimeMillis();
         paymentService.makePayment(order);
         System.out.println("切面耗时：" + (System.currentTimeMillis() - start));

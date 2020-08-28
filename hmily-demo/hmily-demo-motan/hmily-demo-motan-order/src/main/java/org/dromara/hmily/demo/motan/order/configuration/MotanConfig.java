@@ -13,38 +13,39 @@ import org.springframework.context.annotation.Configuration;
  * @author bbaiggey
  */
 @Configuration
-public class MotanConfig
-{
+public class MotanConfig {
+    
     /**
+     * Motan annotation bean annotation bean.
      *
-     * @return
+     * @return the annotation bean
      */
     @Bean
     @ConfigurationProperties(prefix = "hmily.motan.annotation")
     public AnnotationBean motanAnnotationBean() {
-        AnnotationBean motanAnnotationBean = new AnnotationBean();
-        return motanAnnotationBean;
+        return new AnnotationBean();
     }
-
+    
+    
     /**
+     * Protocol config protocol config bean.
      *
-     * @return
+     * @return the protocol config bean
      */
     @Bean(name = "hmilyMotan")
     @ConfigurationProperties(prefix = "hmily.motan.protocol")
     public ProtocolConfigBean protocolConfig() {
-        ProtocolConfigBean config = new ProtocolConfigBean();
-        return config;
+        return new ProtocolConfigBean();
     }
-
+    
     /**
+     * Registry config registry config bean.
      *
-     * @return
+     * @return the registry config bean
      */
     @Bean(name = "hmilyRegistryConfig")
     @ConfigurationProperties(prefix = "hmily.motan.registry")
     public RegistryConfigBean registryConfig() {
-        RegistryConfigBean config = new RegistryConfigBean();
-        return config;
+        return new RegistryConfigBean();
     }
 }

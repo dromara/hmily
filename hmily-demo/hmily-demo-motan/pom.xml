@@ -18,4 +18,59 @@
         <module>hmily-demo-motan-order</module>
     </modules>
 
+    <properties>
+        <motan.version>1.0.0</motan.version>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.dromara</groupId>
+                <artifactId>hmily-demo-motan-inventory-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.dromara</groupId>
+                <artifactId>hmily-demo-motan-account-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+        <!--motan 依赖-->
+        <dependency>
+            <groupId>com.weibo</groupId>
+            <artifactId>motan-core</artifactId>
+            <version>${motan.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.weibo</groupId>
+            <artifactId>motan-transport-netty</artifactId>
+            <version>${motan.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.weibo</groupId>
+            <artifactId>motan-springsupport</artifactId>
+            <version>${motan.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.weibo</groupId>
+            <artifactId>motan-registry-zookeeper</artifactId>
+            <version>${motan.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>log4j</groupId>
+                    <artifactId>log4j</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-api</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+    </dependencies>
+
 </project>

@@ -11,13 +11,11 @@ import org.springframework.context.annotation.Configuration;
  * @author bbaiggey
  */
 @Configuration
-public class MotanClientConfig
-{
-
+public class MotanClientConfig {
+    
     @Bean(name = "hmilyClientBasicConfig")
     @ConfigurationProperties(prefix = "hmily.motan.client")
     public BasicRefererConfigBean baseRefererConfig() {
-        BasicRefererConfigBean config = new BasicRefererConfigBean();
-        return config;
+        return new BasicRefererConfigBean();
     }
 }

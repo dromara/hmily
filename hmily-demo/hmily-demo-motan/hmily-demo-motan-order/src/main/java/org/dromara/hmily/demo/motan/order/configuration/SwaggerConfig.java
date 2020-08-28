@@ -55,7 +55,7 @@ public class SwaggerConfig {
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
                 .title("Swagger API")
-                .description("dubbo分布式事务解决方案之Hmily测试体验")
+                .description("motan分布式事务解决方案之Hmily测试体验")
                 .license("Apache 2.0")
                 .licenseUrl("http://www.apache.org/licenses/LICENSE-2.0.html")
                 .termsOfServiceUrl("")

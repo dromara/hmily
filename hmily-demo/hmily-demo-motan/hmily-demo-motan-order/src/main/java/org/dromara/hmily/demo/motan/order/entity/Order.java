@@ -30,6 +30,7 @@ import java.util.Date;
 public class Order implements Serializable {
 
     private static final long serialVersionUID = -8551347266419380333L;
+    
     private Integer id;
 
     /**
@@ -67,6 +68,5 @@ public class Order implements Serializable {
      * 购买人
      */
     private String userId;
-
-
+    
 }

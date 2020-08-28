@@ -17,7 +17,6 @@
 
 package org.dromara.hmily.spring.provide;
 
-import org.apache.commons.lang3.StringUtils;
 import org.dromara.hmily.common.utils.AssertUtils;
 import org.dromara.hmily.core.provide.ObjectProvide;
 import org.springframework.beans.BeansException;
@@ -58,24 +57,8 @@ public final class SpringBeanProvide implements ObjectProvide {
     private <T> T getByName(final Class<T> type) {
         T bean;
         String className = type.getSimpleName();
-        bean = cfgContext.getBean(firstLowercase(firstDelete(className)), type);
+        bean = cfgContext.getBean(className, type);
         return bean;
-    }
-
-    private String firstLowercase(final String target) {
-        if (StringUtils.isEmpty(target)) {
-            return target;
-        }
-        char[] targetChar = target.toCharArray();
-        targetChar[0] += 32;
-        return String.valueOf(targetChar);
-    }
-
-    private static String firstDelete(final String target) {
-        if (StringUtils.isEmpty(target)) {
-            return target;
-        }
-        return target.substring(1);
     }
     
     /**

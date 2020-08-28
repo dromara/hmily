@@ -84,12 +84,14 @@ public class MotanHmilyTransactionFilter implements Filter {
         }
         RpcMediator.getInstance().transmit(request::setAttachment, context);
         final Response response = caller.call(request);
-        if (null != response.getException()) {
+        if (null == response.getException()) {
             if (context.getRole() == HmilyRoleEnum.PARTICIPANT.getCode()) {
                 HmilyTransactionHolder.getInstance().registerParticipantByNested(participantId, hmilyParticipant);
             } else {
                 HmilyTransactionHolder.getInstance().registerStarterParticipant(hmilyParticipant);
             }
+        } else {
+            throw new HmilyRuntimeException("motan rpc invoke exception{}", response.getException());
         }
         return response;
     }

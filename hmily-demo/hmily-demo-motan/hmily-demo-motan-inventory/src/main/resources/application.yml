@@ -40,3 +40,14 @@ spring:
 
 mybatis:
     type-aliases-package: org.dromara.hmily.demo.motan.inventory.api.entity
+
+logging:
+    level:
+        root: error
+        org.springframework.web: info
+        org.apache.ibatis: debug
+        org.dromara.hmily.demo.bonuspoint: debug
+        org.dromara.hmily.demo.lottery: debug
+        org.dromara.hmily.demo: debug
+        io.netty: info
+    path: "./logs"

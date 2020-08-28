@@ -142,7 +142,7 @@ public final class HmilyTccTransactionExecutor {
                 successList.add(true);
             } catch (Throwable e) {
                 successList.add(false);
-                LOGGER.error("HmilyParticipant confirm exception :{} ", hmilyParticipant.toString());
+                LOGGER.error("HmilyParticipant confirm exception param:{} ", hmilyParticipant.toString(), e);
             } finally {
                 HmilyContextHolder.remove();
             }
