@@ -46,5 +46,4 @@ public class SpringCloudHmilyAccountApplication {
     public static void main(final String[] args) {
         SpringApplication.run(SpringCloudHmilyAccountApplication.class, args);
     }
-
 }

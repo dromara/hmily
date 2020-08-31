@@ -27,12 +27,14 @@ hmily :
             requestTimeout: 30000 #请求超时时间(毫秒)
             connectTimeout: 5000 #连接超时时间(毫秒)
             registry: hmilyRegistryConfig
+    support:
+        rpc:
+            annotation: true
 server:
     port: 8885
     address: 0.0.0.0
     servlet:
         context-path: /
-
 
 spring:
     main:
