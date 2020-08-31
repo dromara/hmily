@@ -87,6 +87,17 @@ public class HmilyRepositoryStorage {
     }
     
     /**
+     * Remove hmily transaction.
+     *
+     * @param hmilyTransaction the hmily transaction
+     */
+    public static void removeHmilyTransaction(final HmilyTransaction hmilyTransaction) {
+        if (Objects.nonNull(hmilyTransaction)) {
+            PUBLISHER.asyncPublishEvent(hmilyTransaction, EventTypeEnum.REMOVE_HMILY_TRANSACTION.getCode());
+        }
+    }
+    
+    /**
      * Remove hmily participant undo.
      *
      * @param hmilyParticipantUndo the hmily participant undo

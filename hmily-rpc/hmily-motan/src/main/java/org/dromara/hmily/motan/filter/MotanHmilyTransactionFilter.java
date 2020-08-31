@@ -25,25 +25,25 @@ import com.weibo.api.motan.rpc.Caller;
 import com.weibo.api.motan.rpc.Request;
 import com.weibo.api.motan.rpc.Response;
 import com.weibo.api.motan.util.ReflectUtil;
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 import lombok.SneakyThrows;
-import org.dromara.hmily.annotation.HmilyTAC;
-import org.dromara.hmily.annotation.HmilyTCC;
+import org.dromara.hmily.annotation.Hmily;
 import org.dromara.hmily.common.enums.HmilyActionEnum;
 import org.dromara.hmily.common.enums.HmilyRoleEnum;
 import org.dromara.hmily.common.exception.HmilyRuntimeException;
 import org.dromara.hmily.common.utils.IdWorkerUtils;
+import org.dromara.hmily.common.utils.LogUtil;
 import org.dromara.hmily.core.context.HmilyContextHolder;
 import org.dromara.hmily.core.context.HmilyTransactionContext;
 import org.dromara.hmily.core.holder.HmilyTransactionHolder;
 import org.dromara.hmily.core.mediator.RpcMediator;
 import org.dromara.hmily.repository.spi.entity.HmilyInvocation;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipant;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The MotanHmilyTransactionFilter.
@@ -53,6 +53,8 @@ import org.dromara.hmily.repository.spi.entity.HmilyParticipant;
 @SpiMeta(name = "motanHmilyTransactionFilter")
 @Activation(key = {MotanConstants.NODE_TYPE_REFERER})
 public class MotanHmilyTransactionFilter implements Filter {
+    
+    private static final Logger LOGGER = LoggerFactory.getLogger(MotanHmilyTransactionFilter.class);
 
     @Override
     public Response filter(final Caller<?> caller, final Request request) {
@@ -63,38 +65,33 @@ public class MotanHmilyTransactionFilter implements Filter {
         final String interfaceName = request.getInterfaceName();
         final String methodName = request.getMethodName();
         try {
-            //他妈的 这里还要拿方法参数类型
             Class<?> clazz = ReflectUtil.forName(interfaceName);
-            final Method[] methods = clazz.getMethods();
-            Class<?>[] args = Stream.of(methods)
-                    .filter(m -> m.getName().equals(methodName))
-                    .findFirst()
-                    .map(Method::getParameterTypes).get();
+            Class<?>[] args = buildArgumentTypes(methodName, clazz);
             Method method = clazz.getMethod(methodName, args);
-            Annotation[] annotations = method.getAnnotations();
-            boolean match = Arrays.stream(annotations)
-                    .anyMatch(annotation -> annotation.annotationType().equals(HmilyTCC.class)
-                            || annotation.annotationType().equals(HmilyTAC.class));
-            if (!match) {
+            Hmily hmily = method.getAnnotation(Hmily.class);
+            if (Objects.isNull(hmily)) {
                 return caller.call(request);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LogUtil.error(LOGGER, "hmily find method error {} ", e::getMessage);
+            return caller.call(request);
         }
         Long participantId = context.getParticipantId();
         final HmilyParticipant hmilyParticipant = buildParticipant(context, request);
-        Optional.ofNullable(hmilyParticipant).ifPresent(h -> context.setParticipantId(h.getParticipantId()));
+        Optional.ofNullable(hmilyParticipant).ifPresent(participant -> context.setParticipantId(participant.getParticipantId()));
         if (context.getRole() == HmilyRoleEnum.PARTICIPANT.getCode()) {
             context.setParticipantRefId(participantId);
         }
         RpcMediator.getInstance().transmit(request::setAttachment, context);
         final Response response = caller.call(request);
-        if (null != response.getException()) {
+        if (null == response.getException()) {
             if (context.getRole() == HmilyRoleEnum.PARTICIPANT.getCode()) {
-                HmilyTransactionHolder.getInstance().registerParticipantByNested(context.getParticipantId(), hmilyParticipant);
+                HmilyTransactionHolder.getInstance().registerParticipantByNested(participantId, hmilyParticipant);
             } else {
                 HmilyTransactionHolder.getInstance().registerStarterParticipant(hmilyParticipant);
             }
+        } else {
+            throw new HmilyRuntimeException("motan rpc invoke exception{}", response.getException());
         }
         return response;
     }
@@ -108,18 +105,23 @@ public class MotanHmilyTransactionFilter implements Filter {
         hmilyParticipant.setTransId(context.getTransId());
         hmilyParticipant.setTransType(context.getTransType());
         hmilyParticipant.setParticipantId(IdWorkerUtils.getInstance().createUUID());
-        final String interfaceName = request.getInterfaceName();
         final String methodName = request.getMethodName();
         final Object[] arguments = request.getArguments();
+        final String interfaceName = request.getInterfaceName();
         Class<?> clazz = ReflectUtil.forName(interfaceName);
-        final Method[] methods = clazz.getMethods();
-        Class<?>[] args = Stream.of(methods)
-                .filter(m -> m.getName().equals(methodName))
-                .findFirst()
-                .map(Method::getParameterTypes).get();
+        Class<?>[] args = buildArgumentTypes(methodName, clazz);
         HmilyInvocation hmilyInvocation = new HmilyInvocation(clazz, methodName, args, arguments);
         hmilyParticipant.setConfirmHmilyInvocation(hmilyInvocation);
         hmilyParticipant.setCancelHmilyInvocation(hmilyInvocation);
         return hmilyParticipant;
+    }
+    
+    @SneakyThrows
+    private Class<?>[] buildArgumentTypes(final String methodName, final Class<?> clazz) {
+        final Method[] methods = clazz.getMethods();
+        return Stream.of(methods)
+                .filter(m -> m.getName().equals(methodName))
+                .findFirst()
+                .map(Method::getParameterTypes).get();
     }
 }

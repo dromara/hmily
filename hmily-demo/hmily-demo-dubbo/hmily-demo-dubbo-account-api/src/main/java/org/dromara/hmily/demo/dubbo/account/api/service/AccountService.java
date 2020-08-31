@@ -17,50 +17,85 @@
 
 package org.dromara.hmily.demo.dubbo.account.api.service;
 
-import org.dromara.hmily.annotation.HmilyTAC;
-import org.dromara.hmily.annotation.HmilyTCC;
+import org.dromara.hmily.annotation.Hmily;
 import org.dromara.hmily.demo.dubbo.account.api.dto.AccountDTO;
 import org.dromara.hmily.demo.dubbo.account.api.dto.AccountNestedDTO;
 import org.dromara.hmily.demo.dubbo.account.api.entity.AccountDO;
 
 /**
+ * The interface Account service.
+ *
  * @author xiaoyu
  */
 @SuppressWarnings("all")
 public interface AccountService {
-
-
+    
+    
     /**
      * 扣款支付
      *
      * @param accountDTO 参数dto
      * @return true
      */
-    @HmilyTCC
+    @Hmily
     void payment(AccountDTO accountDTO);
     
-    @HmilyTAC
+    /**
+     * Mock try payment exception.
+     *
+     * @param accountDTO the account dto
+     */
+    @Hmily
+    void mockTryPaymentException(AccountDTO accountDTO);
+    
+    /**
+     * Mock try payment timeout.
+     *
+     * @param accountDTO the account dto
+     */
+    @Hmily
+    void mockTryPaymentTimeout(AccountDTO accountDTO);
+    
+    /**
+     * Payment tac boolean.
+     *
+     * @param accountDTO the account dto
+     * @return the boolean
+     */
+    @Hmily
     boolean paymentTAC(AccountDTO accountDTO);
-
+    
+    /**
+     * Test payment boolean.
+     *
+     * @param accountDTO the account dto
+     * @return the boolean
+     */
     boolean testPayment(AccountDTO accountDTO);
-
+    
     /**
      * 扣款支付
      *
      * @param accountNestedDTO 参数dto
-     * @return true
+     * @return true boolean
      */
-    @HmilyTCC
+    @Hmily
     boolean paymentWithNested(AccountNestedDTO accountNestedDTO);
     
-    @HmilyTCC
+    /**
+     * Payment with nested exception boolean.
+     *
+     * @param accountNestedDTO the account nested dto
+     * @return the boolean
+     */
+    @Hmily
     boolean paymentWithNestedException(AccountNestedDTO accountNestedDTO);
     
     /**
      * 获取用户账户信息
      *
      * @param userId 用户id
-     * @return AccountDO
+     * @return AccountDO account do
      */
     AccountDO findByUserId(String userId);
 }

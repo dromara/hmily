@@ -113,6 +113,20 @@ public final class HmilyRepositoryEventPublisher implements AutoCloseable {
         push(event);
     }
     
+    /**
+     * Async publish event.
+     *
+     * @param hmilyTransaction the hmily transaction
+     * @param type             the type
+     */
+    public void asyncPublishEvent(final HmilyTransaction hmilyTransaction, final int type) {
+        HmilyRepositoryEvent event = new HmilyRepositoryEvent();
+        event.setType(type);
+        event.setHmilyTransaction(hmilyTransaction);
+        event.setTransId(hmilyTransaction.getTransId());
+        disruptorProviderManage.getProvider().onData(event);
+    }
+    
     private void push(final HmilyRepositoryEvent event) {
         if (Objects.nonNull(hmilyConfig) && hmilyConfig.isAsyncRepository()) {
             disruptorProviderManage.getProvider().onData(event);

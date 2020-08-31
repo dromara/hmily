@@ -17,12 +17,10 @@
 
 package org.dromara.hmily.demo.dubbo.inventory.api.service;
 
-import org.dromara.hmily.annotation.HmilyTAC;
-import org.dromara.hmily.annotation.HmilyTCC;
+import java.util.List;
+import org.dromara.hmily.annotation.Hmily;
 import org.dromara.hmily.demo.dubbo.inventory.api.dto.InventoryDTO;
 import org.dromara.hmily.demo.dubbo.inventory.api.entity.InventoryDO;
-
-import java.util.List;
 
 /**
  * The interface Inventory service.
@@ -30,8 +28,7 @@ import java.util.List;
  * @author xiaoyu
  */
 public interface InventoryService {
-
-
+    
     /**
      * 扣减库存操作
      * 这一个tcc接口
@@ -39,16 +36,26 @@ public interface InventoryService {
      * @param inventoryDTO 库存DTO对象
      * @return true boolean
      */
-    @HmilyTCC
+    @Hmily
     Boolean decrease(InventoryDTO inventoryDTO);
     
-    @HmilyTAC
+    /**
+     * Decrease tac boolean.
+     *
+     * @param inventoryDTO the inventory dto
+     * @return the boolean
+     */
+    @Hmily
     Boolean decreaseTAC(InventoryDTO inventoryDTO);
     
-    @HmilyTCC
+    /**
+     * Test in line list.
+     *
+     * @return the list
+     */
+    @Hmily
     List<InventoryDTO> testInLine();
-
-
+    
     /**
      * Test decrease boolean.
      *
@@ -56,7 +63,7 @@ public interface InventoryService {
      * @return the boolean
      */
     Boolean testDecrease(InventoryDTO inventoryDTO);
-
+    
     /**
      * 获取商品库存信息
      *
@@ -64,46 +71,31 @@ public interface InventoryService {
      * @return InventoryDO inventory do
      */
     InventoryDO findByProductId(String productId);
-
-
+    
     /**
      * mock扣减库存异常
      *
      * @param inventoryDTO dto对象
      * @return String string
      */
-    @HmilyTCC
+    @Hmily
     String mockWithTryException(InventoryDTO inventoryDTO);
-
-
+    
     /**
      * mock扣减库存超时
      *
      * @param inventoryDTO dto对象
      * @return String boolean
      */
-    @HmilyTCC
+    @Hmily
     Boolean mockWithTryTimeout(InventoryDTO inventoryDTO);
-
-
-    /**
-     * mock 扣减库存confirm异常
-     *
-     * @param inventoryDTO dto对象
-     * @return String string
-     */
-    @HmilyTCC
-    String mockWithConfirmException(InventoryDTO inventoryDTO);
-
-
+    
     /**
      * mock 扣减库存confirm超时
      *
      * @param inventoryDTO dto对象
      * @return True boolean
      */
-    @HmilyTCC
+    @Hmily
     Boolean mockWithConfirmTimeout(InventoryDTO inventoryDTO);
-
-
 }

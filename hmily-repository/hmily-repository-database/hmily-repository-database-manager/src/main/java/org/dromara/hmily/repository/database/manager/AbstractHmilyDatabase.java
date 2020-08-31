@@ -217,6 +217,7 @@ public abstract class AbstractHmilyDatabase implements HmilyRepository {
      * Execte schema.sql by different database.
      *
      * @param hmilyDbConfig the hmilyDbConfig
+     * @throws Exception the exception
      */
     protected abstract void initScript(HmilyDatabaseConfig hmilyDbConfig) throws Exception;
     

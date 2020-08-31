@@ -28,7 +28,7 @@ import org.dromara.hmily.demo.dubbo.account.api.entity.AccountDO;
  * @author xiaoyu
  */
 public interface AccountMapper {
-
+    
     /**
      * Update int.
      *
@@ -39,8 +39,17 @@ public interface AccountMapper {
             " freeze_amount= freeze_amount + #{amount} ,update_time = now()" +
             " where user_id =#{userId}  and  balance > 0  ")
     int update(AccountDTO accountDTO);
-
-
+    
+    /**
+     * Test update int.
+     *
+     * @param accountDTO the account dto
+     * @return the int
+     */
+    @Update("update account set balance = balance - #{amount}, update_time = now() " +
+            " where user_id =#{userId}  and  balance > 0  ")
+    int testUpdate(AccountDTO accountDTO);
+    
     /**
      * Confirm int.
      *
@@ -51,8 +60,8 @@ public interface AccountMapper {
             " freeze_amount= freeze_amount - #{amount}" +
             " where user_id =#{userId}  and freeze_amount >0 ")
     int confirm(AccountDTO accountDTO);
-
-
+    
+    
     /**
      * Cancel int.
      *
@@ -63,8 +72,8 @@ public interface AccountMapper {
             " freeze_amount= freeze_amount -  #{amount} " +
             " where user_id =#{userId}  and freeze_amount >0")
     int cancel(AccountDTO accountDTO);
-
-
+    
+    
     /**
      * 根据userId获取用户账户信息
      *

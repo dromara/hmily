@@ -41,11 +41,6 @@ public abstract class AbstractHmilyTransactionHandlerFactory implements HmilyTra
         if (Objects.isNull(context)) {
             return getMap().get(HmilyRoleEnum.START);
         } else {
-            //why this code?  because spring cloud invoke has proxy.
-            if (context.getRole() == HmilyRoleEnum.SPRING_CLOUD.getCode()) {
-                context.setRole(HmilyRoleEnum.START.getCode());
-                return getMap().get(HmilyRoleEnum.CONSUMER);
-            }
             // if context not null and role is inline  is ParticipantHmilyTransactionHandler.
             if (context.getRole() == HmilyRoleEnum.LOCAL.getCode()) {
                 return getMap().get(HmilyRoleEnum.LOCAL);

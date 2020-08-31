@@ -45,7 +45,7 @@ public class HmilyTransactionRecoveryService {
             HmilyReflector.executor(HmilyActionEnum.CANCELING, ExecutorTypeEnum.LOCAL, hmilyParticipant);
             return removeHmilyParticipant(hmilyParticipant.getParticipantId());
         } catch (Exception e) {
-            LOGGER.error("hmily Recovery executor cancel exception:", e);
+            LOGGER.error("hmily Recovery executor cancel exception param {}", hmilyParticipant.toString(), e);
             return false;
         }
     }
@@ -61,7 +61,7 @@ public class HmilyTransactionRecoveryService {
             HmilyReflector.executor(HmilyActionEnum.CONFIRMING, ExecutorTypeEnum.LOCAL, hmilyParticipant);
             return removeHmilyParticipant(hmilyParticipant.getParticipantId());
         } catch (Exception e) {
-            LOGGER.error("hmily Recovery executor confirm exception:", e);
+            LOGGER.error("hmily Recovery executor confirm exception param:{} ", hmilyParticipant.toString(), e);
             return false;
         }
     }

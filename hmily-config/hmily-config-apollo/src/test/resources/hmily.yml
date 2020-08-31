@@ -1,0 +1,14 @@
+hmily:
+  server:
+    configMode: apollo
+    appName: xiaoyu
+  #  如果server.configMode eq local 的时候才会读取到这里的配置信息.
+
+remote:
+  apollo:
+    appId: 10001234
+    configService: 127.0.0.1:8080
+    namespace: test
+    secret: 469af76eb84b4a40b2e3fd905a576ff0
+    fileExtension: yml
+

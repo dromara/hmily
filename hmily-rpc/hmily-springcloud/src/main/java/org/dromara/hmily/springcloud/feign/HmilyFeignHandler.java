@@ -21,7 +21,7 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.Objects;
 import java.util.Optional;
-import org.dromara.hmily.annotation.HmilyTCC;
+import org.dromara.hmily.annotation.Hmily;
 import org.dromara.hmily.common.enums.HmilyActionEnum;
 import org.dromara.hmily.common.enums.HmilyRoleEnum;
 import org.dromara.hmily.common.utils.IdWorkerUtils;
@@ -53,7 +53,7 @@ public class HmilyFeignHandler implements InvocationHandler {
             if (Objects.isNull(context)) {
                 return this.delegate.invoke(proxy, method, args);
             }
-            final HmilyTCC hmily = method.getAnnotation(HmilyTCC.class);
+            final Hmily hmily = method.getAnnotation(Hmily.class);
             if (Objects.isNull(hmily)) {
                 return this.delegate.invoke(proxy, method, args);
             }
@@ -66,7 +66,7 @@ public class HmilyFeignHandler implements InvocationHandler {
                 }
                 final Object invoke = delegate.invoke(proxy, method, args);
                 if (context.getRole() == HmilyRoleEnum.PARTICIPANT.getCode()) {
-                    HmilyTransactionHolder.getInstance().registerParticipantByNested(context.getParticipantId(), hmilyParticipant);
+                    HmilyTransactionHolder.getInstance().registerParticipantByNested(participantId, hmilyParticipant);
                 } else {
                     HmilyTransactionHolder.getInstance().registerStarterParticipant(hmilyParticipant);
                 }

@@ -17,13 +17,14 @@
 
 package org.dromara.hmily.repository.redis.jedis;
 
+import java.util.Map;
 import java.util.Set;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 
 /**
  * JedisClientSingle.
- * @author xiaoyu(Myth)
+ * @author xiaoyu(Myth)、dzc
  */
 public class JedisClientSingle implements JedisClient {
 
@@ -88,11 +89,25 @@ public class JedisClientSingle implements JedisClient {
             return jedis.hset(key, item, value);
         }
     }
+    
+    @Override
+    public Long hset(final byte[] key, final byte[] field, final byte[] value) {
+        try (Jedis jedis = jedisPool.getResource()) {
+            return jedis.hset(key, field, value);
+        }
+    }
 
     @Override
     public String hget(final String key, final String item) {
         try (Jedis jedis = jedisPool.getResource()) {
             return jedis.hget(key, item);
+        }
+    }
+    
+    @Override
+    public byte[] hget(final byte[] key, final byte[] field) {
+        try (Jedis jedis = jedisPool.getResource()) {
+            return jedis.hget(key, field);
         }
     }
 
@@ -130,5 +145,18 @@ public class JedisClientSingle implements JedisClient {
             return jedis.zrange(key, start, end);
         }
     }
-
+    
+    @Override
+    public Map<byte[], byte[]> hgetAll(final byte[] key) {
+        try (Jedis jedis = jedisPool.getResource()) {
+            return jedis.hgetAll(key);
+        }
+    }
+    
+    @Override
+    public boolean hexists(final byte[] key, final byte[] field) {
+        try (Jedis jedis = jedisPool.getResource()) {
+            return jedis.hexists(key, field);
+        }
+    }
 }
