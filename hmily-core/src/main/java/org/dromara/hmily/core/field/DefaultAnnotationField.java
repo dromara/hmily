@@ -15,25 +15,19 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.spring.provide;
+package org.dromara.hmily.core.field;
 
-import org.dromara.hmily.core.holder.SingletonHolder;
-import org.dromara.hmily.core.provide.ObjectProvide;
-import org.dromara.hmily.spring.utils.SpringBeanUtils;
+import java.lang.reflect.Field;
 
 /**
- * SpringBeanProvide.
+ * The type Default annotation field.
  *
  * @author xiaoyu
  */
-public final class SpringBeanProvide implements ObjectProvide {
+public class DefaultAnnotationField implements AnnotationField {
     
     @Override
-    public Object provide(final Class<?> clazz) {
-        Object bean = SpringBeanUtils.INSTANCE.getBean(clazz);
-        if (null == bean) {
-            return SingletonHolder.INST.get(clazz);
-        }
-        return bean;
+    public boolean check(final Field field) {
+        return false;
     }
 }
