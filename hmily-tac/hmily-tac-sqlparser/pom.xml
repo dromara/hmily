@@ -33,6 +33,7 @@
         <module>hmily-tac-sqlparser-spi</module>
         <module>hmily-tac-sqlparser-shardingsphere</module>
         <module>hmily-tac-sqlparser-calcite</module>
+        <module>hmily-tac-sqlparser-all</module>
     </modules>
     
     <dependencies>

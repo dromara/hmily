@@ -15,24 +15,24 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.motan.field;
+package org.dromara.hmily.tac.common.utils;
 
-import com.weibo.api.motan.config.springsupport.annotation.MotanReferer;
-import java.lang.reflect.Field;
-import org.dromara.hmily.core.field.AnnotationField;
-import org.dromara.hmily.spi.HmilySPI;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
- * The type Motan referer annotation field.
+ * The enum Database types.
  *
  * @author xiaoyu
  */
-@HmilySPI(value = "motan")
-public class MotanRefererAnnotationField implements AnnotationField {
+public enum DatabaseTypes {
     
-    @Override
-    public boolean check(final Field field) {
-        MotanReferer reference = field.getAnnotation(MotanReferer.class);
-        return reference != null;
-    }
+    /**
+     * Instance database types.
+     */
+    INSTANCE;
+    
+    @Setter
+    @Getter
+    private String databaseType;
 }

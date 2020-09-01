@@ -15,24 +15,31 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.motan.field;
+package org.dromara.hmily.tac.core.context;
 
-import com.weibo.api.motan.config.springsupport.annotation.MotanReferer;
-import java.lang.reflect.Field;
-import org.dromara.hmily.core.field.AnnotationField;
-import org.dromara.hmily.spi.HmilySPI;
+import lombok.Data;
+import org.dromara.hmily.repository.spi.entity.HmilyUndoInvocation;
 
-/**
- * The type Motan referer annotation field.
- *
- * @author xiaoyu
- */
-@HmilySPI(value = "motan")
-public class MotanRefererAnnotationField implements AnnotationField {
+@Data
+public class HmilyUndoContext {
     
-    @Override
-    public boolean check(final Field field) {
-        MotanReferer reference = field.getAnnotation(MotanReferer.class);
-        return reference != null;
-    }
+    /**
+     * participant id.
+     */
+    private Long participantId;
+    
+    /**
+     * transaction id.
+     */
+    private Long transId;
+    
+    /**
+     * resource id.
+     */
+    private String resourceId;
+    
+    /**
+     * undo invocation.
+     */
+    private HmilyUndoInvocation undoInvocation;
 }

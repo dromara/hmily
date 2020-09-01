@@ -96,7 +96,7 @@ public final class HmilyRepositoryEventPublisher implements AutoCloseable {
         event.setType(type);
         event.setTransId(hmilyParticipantUndo.getTransId());
         event.setHmilyParticipantUndo(hmilyParticipantUndo);
-        disruptorProviderManage.getProvider().onData(event);
+        push(event);
     }
     
     /**

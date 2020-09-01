@@ -15,24 +15,48 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.motan.field;
+package org.dromara.hmily.tac.core.cache;
 
-import com.weibo.api.motan.config.springsupport.annotation.MotanReferer;
-import java.lang.reflect.Field;
-import org.dromara.hmily.core.field.AnnotationField;
-import org.dromara.hmily.spi.HmilySPI;
+import org.dromara.hmily.tac.core.context.HmilyUndoContext;
 
 /**
- * The type Motan referer annotation field.
+ * The enum Hmily undo context cache manager.
  *
  * @author xiaoyu
  */
-@HmilySPI(value = "motan")
-public class MotanRefererAnnotationField implements AnnotationField {
+public enum HmilyUndoContextCacheManager {
     
-    @Override
-    public boolean check(final Field field) {
-        MotanReferer reference = field.getAnnotation(MotanReferer.class);
-        return reference != null;
+    
+    /**
+     * Instance hmily undo context cache manager.
+     */
+    INSTANCE;
+    
+    private static final ThreadLocal<HmilyUndoContext> CURRENT_LOCAL = new ThreadLocal<>();
+    
+    /**
+     * Set.
+     *
+     * @param context the context
+     */
+    public void set(final HmilyUndoContext context) {
+        CURRENT_LOCAL.set(context);
+    }
+    
+    
+    /**
+     * Get hmily undo context.
+     *
+     * @return the hmily undo context
+     */
+    public HmilyUndoContext get() {
+        return CURRENT_LOCAL.get();
+    }
+    
+    /**
+     * clean threadLocal for gc.
+     */
+    public void remove() {
+        CURRENT_LOCAL.remove();
     }
 }

@@ -15,24 +15,27 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.motan.field;
+package org.dromara.hmily.tac.sqlrevert.spi;
 
-import com.weibo.api.motan.config.springsupport.annotation.MotanReferer;
-import java.lang.reflect.Field;
-import org.dromara.hmily.core.field.AnnotationField;
-import org.dromara.hmily.spi.HmilySPI;
+import javax.sql.DataSource;
+import org.dromara.hmily.repository.spi.entity.HmilyUndoInvocation;
+import org.dromara.hmily.tac.sqlparser.model.statement.SQLStatement;
+import org.dromara.hmily.tac.sqlrevert.spi.exception.SqlRevertException;
 
 /**
- * The type Motan referer annotation field.
+ * The interface Hmily sql revert engine.
  *
  * @author xiaoyu
  */
-@HmilySPI(value = "motan")
-public class MotanRefererAnnotationField implements AnnotationField {
+public interface HmilySqlRevertEngine {
     
-    @Override
-    public boolean check(final Field field) {
-        MotanReferer reference = field.getAnnotation(MotanReferer.class);
-        return reference != null;
-    }
+    /**
+     * Revert hmily undo invocation.
+     *
+     * @param sqlStatement the sql statement
+     * @param dataSource   the data source
+     * @return the hmily undo invocation
+     * @throws SqlRevertException the sql revert exception
+     */
+    HmilyUndoInvocation revert(SQLStatement sqlStatement, DataSource dataSource) throws SqlRevertException;
 }

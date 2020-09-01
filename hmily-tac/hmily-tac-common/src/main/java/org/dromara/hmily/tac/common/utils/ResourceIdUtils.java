@@ -15,24 +15,31 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.motan.field;
-
-import com.weibo.api.motan.config.springsupport.annotation.MotanReferer;
-import java.lang.reflect.Field;
-import org.dromara.hmily.core.field.AnnotationField;
-import org.dromara.hmily.spi.HmilySPI;
+package org.dromara.hmily.tac.common.utils;
 
 /**
- * The type Motan referer annotation field.
+ * The enum Resource id utils.
  *
  * @author xiaoyu
  */
-@HmilySPI(value = "motan")
-public class MotanRefererAnnotationField implements AnnotationField {
+public enum ResourceIdUtils {
     
-    @Override
-    public boolean check(final Field field) {
-        MotanReferer reference = field.getAnnotation(MotanReferer.class);
-        return reference != null;
+    /**
+     * Instance resource id utils.
+     */
+    INSTANCE;
+    
+    /**
+     * Gets resource id.
+     *
+     * @param jdbcUrl the jdbc url
+     * @return the resource id
+     */
+    public String getResourceId(final String jdbcUrl) {
+        if (jdbcUrl.contains("?")) {
+            return jdbcUrl.substring(0, jdbcUrl.indexOf('?'));
+        } else {
+            return jdbcUrl;
+        }
     }
 }
