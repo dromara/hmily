@@ -21,6 +21,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -32,7 +35,9 @@ import lombok.SneakyThrows;
 import org.dromara.hmily.common.enums.HmilyActionEnum;
 import org.dromara.hmily.common.exception.HmilyException;
 import org.dromara.hmily.common.exception.HmilyRuntimeException;
+import org.dromara.hmily.common.utils.AssertUtils;
 import org.dromara.hmily.common.utils.LogUtil;
+import org.dromara.hmily.common.utils.StringUtils;
 import org.dromara.hmily.config.api.ConfigEnv;
 import org.dromara.hmily.config.api.entity.HmilyFileConfig;
 import org.dromara.hmily.repository.spi.HmilyRepository;
@@ -58,7 +63,7 @@ public class FileRepository implements HmilyRepository {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(FileRepository.class);
     
-    private static final String HMILY_TRANSATION_FILE_DIRECTORY = "hmily";
+    private static final String HMILY_TRANSATION_FILE_DIRECTORY = ".hmily";
     
     private static final String HMILY_TRANSATION_PARTICIPANT_FILE_DIRECTORY = "participant";
     
@@ -80,8 +85,9 @@ public class FileRepository implements HmilyRepository {
     public void init(final String appName) {
         this.appName = appName;
         HmilyFileConfig fileConfig = ConfigEnv.getInstance().getConfig(HmilyFileConfig.class);
-        fileConfig.setPath(fileConfig.getPath());
-        filePath = fileConfig.getPath();
+        filePath = StringUtils.isBlank(fileConfig.getPath()) ? System.getProperty("user.home") : fileConfig.getPath();
+        Path workPath = Paths.get(filePath);
+        AssertUtils.notNull(Files.isDirectory(workPath));
         makeDir();
     }
     
@@ -126,7 +132,7 @@ public class FileRepository implements HmilyRepository {
             createOrUpdateWriteFile(file, hmilyTransaction);
             return HmilyRepository.ROWS;
         } catch (IOException e) {
-            LogUtil.error(LOGGER, "updateRetryByLock occur a exception {}", () -> e);
+            LogUtil.error(LOGGER, "updateRetryByLock occur a exception {}", e::getMessage);
         }
         return HmilyRepository.FAIL_ROWS;
     }
@@ -174,7 +180,7 @@ public class FileRepository implements HmilyRepository {
             createOrUpdateWriteFile(file, hmilyTransaction);
             return HmilyRepository.ROWS;
         } catch (IOException e) {
-            LogUtil.error(LOGGER, "updateHmilyTransactionStatus occur a exception {}", () -> e);
+            LogUtil.error(LOGGER, "updateHmilyTransactionStatus occur a exception {}", e::getMessage);
         }
         return HmilyRepository.FAIL_ROWS;
     }
@@ -194,7 +200,7 @@ public class FileRepository implements HmilyRepository {
             boolean delete = deleteFile(file, transId);
             return delete ? HmilyRepository.ROWS : HmilyRepository.FAIL_ROWS;
         } catch (IOException e) {
-            LogUtil.error(LOGGER, "updateHmilyTransactionStatus occur a exception {}", () -> e);
+            LogUtil.error(LOGGER, "updateHmilyTransactionStatus occur a exception {}", e::getMessage);
         }
         return HmilyRepository.FAIL_ROWS;
     }
@@ -288,7 +294,7 @@ public class FileRepository implements HmilyRepository {
             createOrUpdateParticipantWriteFile(file, hmilyParticipant);
             return HmilyRepository.ROWS;
         } catch (IOException e) {
-            LogUtil.error(LOGGER, "updateHmilyParticipantStatus occur a exception {}", () -> e);
+            LogUtil.error(LOGGER, "updateHmilyParticipantStatus occur a exception {}", e::getMessage);
         }
         return HmilyRepository.FAIL_ROWS;
     }
@@ -308,7 +314,7 @@ public class FileRepository implements HmilyRepository {
             boolean delete = deleteFile(file, participantId);
             return delete ? HmilyRepository.ROWS : HmilyRepository.FAIL_ROWS;
         } catch (IOException e) {
-            LogUtil.error(LOGGER, "updateHmilyTransactionStatus occur a exception {}", () -> e);
+            LogUtil.error(LOGGER, "updateHmilyTransactionStatus occur a exception {}", e::getMessage);
         }
         return HmilyRepository.FAIL_ROWS;
     }
@@ -338,7 +344,7 @@ public class FileRepository implements HmilyRepository {
             createOrUpdateParticipantWriteFile(file, hmilyParticipant);
             return true;
         } catch (IOException e) {
-            LogUtil.error(LOGGER, "updateRetryByLock occur a exception {}", () -> e);
+            LogUtil.error(LOGGER, "updateRetryByLock occur a exception {}", e::getMessage);
         }
         return false;
     }
@@ -388,7 +394,7 @@ public class FileRepository implements HmilyRepository {
             boolean delete = deleteFile(file, undoId);
             return delete ? HmilyRepository.ROWS : HmilyRepository.FAIL_ROWS;
         } catch (IOException e) {
-            LogUtil.error(LOGGER, "updateHmilyTransactionStatus occur a exception {}", () -> e);
+            LogUtil.error(LOGGER, "updateHmilyTransactionStatus occur a exception {}", e::getMessage);
         }
         return HmilyRepository.FAIL_ROWS;
     }
@@ -416,7 +422,7 @@ public class FileRepository implements HmilyRepository {
             createOrUpdateParticipantUndoWriteFile(file, hmilyParticipantUndo);
             return HmilyRepository.ROWS;
         } catch (IOException e) {
-            LogUtil.error(LOGGER, "updateHmilyParticipantStatus occur a exception {}", () -> e);
+            LogUtil.error(LOGGER, "updateHmilyParticipantStatus occur a exception {}", e::getMessage);
         }
         return HmilyRepository.FAIL_ROWS;
     }
@@ -490,55 +496,40 @@ public class FileRepository implements HmilyRepository {
     }
     
     private void createOrUpdateWriteFile(final File file, final HmilyTransaction hmilyTransaction) throws IOException {
-        FileOutputStream fos = null;
+        File curFile = new File(concatPath(file.getAbsolutePath(), hmilyTransaction.getTransId()));
+        if (!curFile.exists()) {
+            boolean newFile = curFile.createNewFile();
+        }
         LOCK.writeLock().lock();
-        try {
-            File curFile = new File(concatPath(file.getAbsolutePath(), hmilyTransaction.getTransId()));
-            if (!curFile.exists()) {
-                boolean newFile = curFile.createNewFile();
-            }
-            fos = new FileOutputStream(curFile);
+        try (FileOutputStream fos = new FileOutputStream(curFile);) {
             fos.write(hmilySerializer.serialize(hmilyTransaction));
         } finally {
-            if (fos != null) {
-                fos.close();
-            }
             LOCK.writeLock().unlock();
         }
     }
     
     private void createOrUpdateParticipantWriteFile(final File file, final HmilyParticipant hmilyParticipant) throws IOException {
-        FileOutputStream fos = null;
+        File curFile = new File(concatPath(file.getAbsolutePath(), hmilyParticipant.getParticipantId()));
+        if (!curFile.exists()) {
+            boolean newFile = curFile.createNewFile();
+        }
         LOCK.writeLock().lock();
-        try {
-            File curFile = new File(concatPath(file.getAbsolutePath(), hmilyParticipant.getParticipantId()));
-            if (!curFile.exists()) {
-                boolean newFile = curFile.createNewFile();
-            }
-            fos = new FileOutputStream(curFile);
+        try (FileOutputStream fos = new FileOutputStream(curFile);) {
             fos.write(hmilySerializer.serialize(hmilyParticipant));
         } finally {
-            if (fos != null) {
-                fos.close();
-            }
             LOCK.writeLock().unlock();
         }
     }
     
     private void createOrUpdateParticipantUndoWriteFile(final File file, final HmilyParticipantUndo hmilyParticipantUndo) throws IOException {
-        FileOutputStream fos = null;
+        File curFile = new File(concatPath(file.getAbsolutePath(), hmilyParticipantUndo.getUndoId()));
+        if (!curFile.exists()) {
+            boolean newFile = curFile.createNewFile();
+        }
         LOCK.writeLock().lock();
-        try {
-            File curFile = new File(concatPath(file.getAbsolutePath(), hmilyParticipantUndo.getUndoId()));
-            if (!curFile.exists()) {
-                boolean newFile = curFile.createNewFile();
-            }
-            fos = new FileOutputStream(curFile);
+        try (FileOutputStream fos = new FileOutputStream(curFile);) {
             fos.write(hmilySerializer.serialize(hmilyParticipantUndo));
         } finally {
-            if (fos != null) {
-                fos.close();
-            }
             LOCK.writeLock().unlock();
         }
     }
@@ -558,23 +549,18 @@ public class FileRepository implements HmilyRepository {
     @SneakyThrows
     private <T> T readFile(final File file, final Class<T> clazz, final Long transId) {
         LOCK.readLock().lock();
-        FileInputStream fis = null;
-        try {
-            File curFile = new File(concatPath(file.getAbsolutePath(), transId));
+        File curFile = new File(concatPath(file.getAbsolutePath(), transId));
+        try (FileInputStream fis = new FileInputStream(curFile)) {
             if (!curFile.exists()) {
                 return null;
             }
-            fis = new FileInputStream(curFile);
             byte[] bytes = new byte[HMILY_READ_BYTE_SIZE];
             fis.read(bytes);
             return hmilySerializer.deSerialize(bytes, clazz);
         } catch (IOException | HmilySerializerException e) {
-            LogUtil.error(LOGGER, " read file exception ,because is {}", () -> e);
+            LogUtil.error(LOGGER, " read file exception ,because is {}", e::getMessage);
             return null;
         } finally {
-            if (fis != null) {
-                fis.close();
-            }
             LOCK.readLock().unlock();
         }
     }
@@ -599,7 +585,7 @@ public class FileRepository implements HmilyRepository {
             }
             return result;
         } catch (Exception e) {
-            LogUtil.error(LOGGER, "listByFilter occur a exception {}", () -> e);
+            LogUtil.error(LOGGER, "listByFilter occur a exception {}", e::getMessage);
         }
         return Collections.emptyList();
     }
