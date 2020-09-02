@@ -41,6 +41,16 @@ public interface AccountMapper {
     int update(AccountDTO accountDTO);
     
     /**
+     * Update tac int.
+     *
+     * @param accountDTO the account dto
+     * @return the int
+     */
+    @Update("update account set balance = balance - #{amount}, update_time = now()" +
+            " where user_id =#{userId} and balance > 0  ")
+    int updateTAC(AccountDTO accountDTO);
+    
+    /**
      * Test update int.
      *
      * @param accountDTO the account dto

@@ -66,15 +66,9 @@ public class HmilyTransactionSelfRecoveryScheduled implements AutoCloseable {
     
     public HmilyTransactionSelfRecoveryScheduled() {
         hmilyRepository = ExtensionLoaderFactory.load(HmilyRepository.class, hmilyConfig.getRepository());
-        this.selfTccRecoveryExecutor =
-                new ScheduledThreadPoolExecutor(1,
-                        HmilyThreadFactory.create("hmily-tcc-self-recovery", true));
-        this.selfTacRecoveryExecutor =
-                new ScheduledThreadPoolExecutor(1,
-                        HmilyThreadFactory.create("hmily-tac-self-recovery", true));
-        this.cleanHmilyTransactionExecutor =
-                new ScheduledThreadPoolExecutor(1,
-                        HmilyThreadFactory.create("hmily-transaction-clean", true));
+        this.selfTccRecoveryExecutor = new ScheduledThreadPoolExecutor(1, HmilyThreadFactory.create("hmily-tcc-self-recovery", true));
+        this.selfTacRecoveryExecutor = new ScheduledThreadPoolExecutor(1, HmilyThreadFactory.create("hmily-tac-self-recovery", true));
+        this.cleanHmilyTransactionExecutor = new ScheduledThreadPoolExecutor(1,   HmilyThreadFactory.create("hmily-transaction-clean", true));
         hmilyTransactionRecoveryService = new HmilyTransactionRecoveryService();
         selfTccRecovery();
         selfTacRecovery();
@@ -85,9 +79,7 @@ public class HmilyTransactionSelfRecoveryScheduled implements AutoCloseable {
     private void phyDeleted() {
         if (!hmilyConfig.isPhyDeleted()) {
             int seconds = hmilyConfig.getStoreDays() * 24 * 60 * 60;
-            phyDeletedExecutor =
-                    new ScheduledThreadPoolExecutor(1,
-                            HmilyThreadFactory.create("hmily-phyDeleted-clean", true));
+            phyDeletedExecutor = new ScheduledThreadPoolExecutor(1,  HmilyThreadFactory.create("hmily-phyDeleted-clean", true));
             phyDeletedExecutor
                     .scheduleWithFixedDelay(() -> {
                         try {
@@ -127,21 +119,10 @@ public class HmilyTransactionSelfRecoveryScheduled implements AutoCloseable {
                                 LOGGER.info("hmily tcc transaction begin self recovery: {}", hmilyParticipant.toString());
                                 HmilyTransaction globalHmilyTransaction = hmilyRepository.findByTransId(hmilyParticipant.getTransId());
                                 if (Objects.isNull(globalHmilyTransaction)) {
-                                    if (hmilyParticipant.getStatus() == HmilyActionEnum.TRYING.getCode()
-                                            || hmilyParticipant.getStatus() == HmilyActionEnum.CANCELING.getCode()) {
-                                        hmilyTransactionRecoveryService.cancel(hmilyParticipant);
-                                    } else if (hmilyParticipant.getStatus() == HmilyActionEnum.CONFIRMING.getCode()) {
-                                        hmilyTransactionRecoveryService.confirm(hmilyParticipant);
-                                    }
+                                    tccRecovery(hmilyParticipant.getStatus(), hmilyParticipant);
                                 } else {
-                                    if (globalHmilyTransaction.getStatus() == HmilyActionEnum.TRYING.getCode()
-                                            || globalHmilyTransaction.getStatus() == HmilyActionEnum.CANCELING.getCode()) {
-                                        hmilyTransactionRecoveryService.cancel(hmilyParticipant);
-                                    } else if (globalHmilyTransaction.getStatus() == HmilyActionEnum.CONFIRMING.getCode()) {
-                                        hmilyTransactionRecoveryService.confirm(hmilyParticipant);
-                                    }
+                                    tccRecovery(globalHmilyTransaction.getStatus(), hmilyParticipant);
                                 }
-                               
                             }
                         }
                     } catch (Exception e) {
@@ -150,13 +131,21 @@ public class HmilyTransactionSelfRecoveryScheduled implements AutoCloseable {
                 }, hmilyConfig.getScheduledInitDelay(), hmilyConfig.getScheduledRecoveryDelay(), TimeUnit.SECONDS);
     }
     
+    private void tccRecovery(final int status, final HmilyParticipant hmilyParticipant) {
+        if (status == HmilyActionEnum.TRYING.getCode() || status == HmilyActionEnum.CANCELING.getCode()) {
+            hmilyTransactionRecoveryService.cancel(hmilyParticipant);
+        } else if (status == HmilyActionEnum.CONFIRMING.getCode()) {
+            hmilyTransactionRecoveryService.confirm(hmilyParticipant);
+        }
+    }
+    
     private void selfTacRecovery() {
         selfTacRecoveryExecutor
                 .scheduleWithFixedDelay(() -> {
                     try {
                         List<HmilyParticipant> hmilyParticipantList =
                                 hmilyRepository.listHmilyParticipant(acquireDelayData(hmilyConfig.getRecoverDelayTime()), TransTypeEnum.TAC.name(), hmilyConfig.getLimit());
-    
+                        
                         if (CollectionUtils.isEmpty(hmilyParticipantList)) {
                             return;
                         }
@@ -170,27 +159,15 @@ public class HmilyTransactionSelfRecoveryScheduled implements AutoCloseable {
                             final boolean successful = hmilyRepository.lockHmilyParticipant(hmilyParticipant);
                             // determine that rows > 0 is executed to prevent concurrency when the business side is in cluster mode
                             if (successful) {
-                                HmilyTransaction globalHmilyTransaction = hmilyRepository.findByTransId(hmilyParticipant.getTransId());
-                                if (Objects.isNull(globalHmilyTransaction)) {
-                                    //do remove
-                                    hmilyRepository.removeHmilyParticipant(hmilyParticipant.getParticipantId());
-                                }
                                 List<HmilyParticipantUndo> participantUndoList = hmilyRepository.findHmilyParticipantUndoByParticipantId(hmilyParticipant.getParticipantId());
                                 if (CollectionUtils.isEmpty(participantUndoList)) {
                                     continue;
                                 }
-                                if (globalHmilyTransaction.getStatus() == HmilyActionEnum.TRYING.getCode()
-                                        || globalHmilyTransaction.getStatus() == HmilyActionEnum.CANCELING.getCode()) {
-                                    for (HmilyParticipantUndo undo : participantUndoList) {
-                                        boolean success = UndoHook.INSTANCE.run(undo);
-                                        if (success) {
-                                            hmilyRepository.removeHmilyParticipantUndo(undo.getUndoId());
-                                        }
-                                    }
-                                } else if (globalHmilyTransaction.getStatus() == HmilyActionEnum.CONFIRMING.getCode()) {
-                                    for (HmilyParticipantUndo undo : participantUndoList) {
-                                        hmilyRepository.removeHmilyParticipantUndo(undo.getUndoId());
-                                    }
+                                HmilyTransaction globalHmilyTransaction = hmilyRepository.findByTransId(hmilyParticipant.getTransId());
+                                if (Objects.isNull(globalHmilyTransaction)) {
+                                    tacRecovery(hmilyParticipant.getStatus(), participantUndoList);
+                                } else {
+                                    tacRecovery(globalHmilyTransaction.getStatus(), participantUndoList);
                                 }
                             }
                             hmilyRepository.removeHmilyParticipant(hmilyParticipant.getParticipantId());
@@ -199,6 +176,21 @@ public class HmilyTransactionSelfRecoveryScheduled implements AutoCloseable {
                         LOGGER.error("hmily scheduled transaction log is error:", e);
                     }
                 }, hmilyConfig.getScheduledInitDelay(), hmilyConfig.getScheduledRecoveryDelay(), TimeUnit.SECONDS);
+    }
+    
+    private void tacRecovery(final int status, final List<HmilyParticipantUndo> participantUndoList) {
+        if (status == HmilyActionEnum.TRYING.getCode() || status == HmilyActionEnum.CANCELING.getCode()) {
+            for (HmilyParticipantUndo undo : participantUndoList) {
+                boolean success = UndoHook.INSTANCE.run(undo);
+                if (success) {
+                    hmilyRepository.removeHmilyParticipantUndo(undo.getUndoId());
+                }
+            }
+        } else if (status == HmilyActionEnum.CONFIRMING.getCode()) {
+            for (HmilyParticipantUndo undo : participantUndoList) {
+                hmilyRepository.removeHmilyParticipantUndo(undo.getUndoId());
+            }
+        }
     }
     
     private void cleanHmilyTransaction() {

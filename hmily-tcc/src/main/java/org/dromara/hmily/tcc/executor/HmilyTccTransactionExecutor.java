@@ -19,6 +19,7 @@ package org.dromara.hmily.tcc.executor;
 
 import com.google.common.collect.Lists;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -130,7 +131,7 @@ public final class HmilyTccTransactionExecutor {
         currentTransaction.setStatus(HmilyActionEnum.CONFIRMING.getCode());
         HmilyRepositoryStorage.updateHmilyTransactionStatus(currentTransaction);
         final List<HmilyParticipant> hmilyParticipants = currentTransaction.getHmilyParticipants();
-        List<Boolean> successList = Lists.newArrayListWithCapacity(hmilyParticipants.size());
+        List<Boolean> successList = new ArrayList<>();
         for (HmilyParticipant hmilyParticipant : hmilyParticipants) {
             try {
                 if (hmilyParticipant.getRole() == HmilyRoleEnum.START.getCode()) {

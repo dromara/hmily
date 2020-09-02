@@ -41,6 +41,16 @@ public interface InventoryMapper {
     int decrease(InventoryDTO inventoryDTO);
     
     /**
+     * Decrease tac int.
+     *
+     * @param inventoryDTO the inventory dto
+     * @return the int
+     */
+    @Update("update inventory set total_inventory = total_inventory - #{count} " +
+            " where product_id =#{productId} and total_inventory > 0  ")
+    int decreaseTAC(InventoryDTO inventoryDTO);
+    
+    /**
      * Test decrease int.
      *
      * @param inventoryDTO the inventory dto

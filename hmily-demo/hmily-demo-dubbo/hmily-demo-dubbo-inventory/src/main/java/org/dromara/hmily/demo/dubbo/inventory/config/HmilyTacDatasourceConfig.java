@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.demo.dubbo.order.configuration;
+package org.dromara.hmily.demo.dubbo.inventory.config;
 
 import com.zaxxer.hikari.HikariDataSource;
 import javax.sql.DataSource;

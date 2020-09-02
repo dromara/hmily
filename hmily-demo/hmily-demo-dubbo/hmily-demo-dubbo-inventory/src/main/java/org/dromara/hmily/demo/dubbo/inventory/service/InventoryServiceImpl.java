@@ -18,6 +18,9 @@
 package org.dromara.hmily.demo.dubbo.inventory.service;
 
 import com.google.common.collect.Lists;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.dromara.hmily.annotation.HmilyTAC;
 import org.dromara.hmily.annotation.HmilyTCC;
 import org.dromara.hmily.common.exception.HmilyRuntimeException;
@@ -30,10 +33,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * The type Inventory service.
@@ -72,15 +71,13 @@ public class InventoryServiceImpl implements InventoryService {
     @Override
     @HmilyTCC(confirmMethod = "confirmMethod", cancelMethod = "cancelMethod")
     public Boolean decrease(InventoryDTO inventoryDTO) {
-        inventoryMapper.decrease(inventoryDTO);
-        return true;
+        return inventoryMapper.decrease(inventoryDTO) > 0;
     }
     
     @Override
     @HmilyTAC
     public Boolean decreaseTAC(InventoryDTO inventoryDTO) {
-        inventoryMapper.decrease(inventoryDTO);
-        return true;
+        return inventoryMapper.decreaseTAC(inventoryDTO) > 0;
     }
     
     @Override

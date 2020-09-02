@@ -109,8 +109,7 @@ public class AccountServiceImpl implements AccountService {
     @Override
     @HmilyTAC
     public boolean paymentTAC(AccountDTO accountDTO) {
-        accountMapper.update(accountDTO);
-        return true;
+        return accountMapper.updateTAC(accountDTO) > 0;
     }
     
     @Override
