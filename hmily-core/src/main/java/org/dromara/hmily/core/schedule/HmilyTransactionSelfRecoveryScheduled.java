@@ -68,7 +68,7 @@ public class HmilyTransactionSelfRecoveryScheduled implements AutoCloseable {
         hmilyRepository = ExtensionLoaderFactory.load(HmilyRepository.class, hmilyConfig.getRepository());
         this.selfTccRecoveryExecutor = new ScheduledThreadPoolExecutor(1, HmilyThreadFactory.create("hmily-tcc-self-recovery", true));
         this.selfTacRecoveryExecutor = new ScheduledThreadPoolExecutor(1, HmilyThreadFactory.create("hmily-tac-self-recovery", true));
-        this.cleanHmilyTransactionExecutor = new ScheduledThreadPoolExecutor(1,   HmilyThreadFactory.create("hmily-transaction-clean", true));
+        this.cleanHmilyTransactionExecutor = new ScheduledThreadPoolExecutor(1, HmilyThreadFactory.create("hmily-transaction-clean", true));
         hmilyTransactionRecoveryService = new HmilyTransactionRecoveryService();
         selfTccRecovery();
         selfTacRecovery();
@@ -79,7 +79,7 @@ public class HmilyTransactionSelfRecoveryScheduled implements AutoCloseable {
     private void phyDeleted() {
         if (!hmilyConfig.isPhyDeleted()) {
             int seconds = hmilyConfig.getStoreDays() * 24 * 60 * 60;
-            phyDeletedExecutor = new ScheduledThreadPoolExecutor(1,  HmilyThreadFactory.create("hmily-phyDeleted-clean", true));
+            phyDeletedExecutor = new ScheduledThreadPoolExecutor(1, HmilyThreadFactory.create("hmily-phyDeleted-clean", true));
             phyDeletedExecutor
                     .scheduleWithFixedDelay(() -> {
                         try {

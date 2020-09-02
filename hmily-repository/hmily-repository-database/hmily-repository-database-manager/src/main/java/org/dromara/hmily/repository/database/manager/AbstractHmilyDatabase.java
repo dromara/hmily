@@ -455,7 +455,8 @@ public abstract class AbstractHmilyDatabase implements HmilyRepository {
      * @return the int
      */
     private int executeUpdate(final String sql, final Object... params) {
-        try (Connection con = dataSource.getConnection(); PreparedStatement ps = createPreparedStatement(con, sql, params)) {
+        try (Connection con = dataSource.getConnection();
+             PreparedStatement ps = createPreparedStatement(con, sql, params)) {
             return ps.executeUpdate();
         } catch (SQLException e) {
             log.error("hmily jdbc executeUpdate repository exception -> ", e);
@@ -465,7 +466,9 @@ public abstract class AbstractHmilyDatabase implements HmilyRepository {
     
     private List<Map<String, Object>> executeQuery(final String sql, final Object... params) {
         List<Map<String, Object>> list = null;
-        try (Connection con = dataSource.getConnection(); PreparedStatement ps = createPreparedStatement(con, sql, params); ResultSet rs = ps.executeQuery()) {
+        try (Connection con = dataSource.getConnection();
+             PreparedStatement ps = createPreparedStatement(con, sql, params);
+             ResultSet rs = ps.executeQuery()) {
             ResultSetMetaData md = rs.getMetaData();
             int columnCount = md.getColumnCount();
             list = new ArrayList<>();

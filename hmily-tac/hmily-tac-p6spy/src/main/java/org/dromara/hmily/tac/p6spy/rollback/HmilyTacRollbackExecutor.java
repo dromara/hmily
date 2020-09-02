@@ -71,7 +71,8 @@ public final class HmilyTacRollbackExecutor {
     }
     
     private int executeUpdate(final String sql, final DataSource dataSource) {
-        try (Connection connection = dataSource.getConnection(); PreparedStatement ps = connection.prepareStatement(sql)) {
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
             return ps.executeUpdate();
         } catch (SQLException e) {
             log.error("hmily tac rollback exception -> ", e);
