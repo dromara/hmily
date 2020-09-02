@@ -34,8 +34,9 @@ public interface HmilySqlRevertEngine {
      *
      * @param sqlStatement the sql statement
      * @param dataSource   the data source
+     * @param sql          the sql
      * @return the hmily undo invocation
      * @throws SqlRevertException the sql revert exception
      */
-    HmilyUndoInvocation revert(SQLStatement sqlStatement, DataSource dataSource) throws SqlRevertException;
+    HmilyUndoInvocation revert(SQLStatement sqlStatement, DataSource dataSource, String sql) throws SqlRevertException;
 }

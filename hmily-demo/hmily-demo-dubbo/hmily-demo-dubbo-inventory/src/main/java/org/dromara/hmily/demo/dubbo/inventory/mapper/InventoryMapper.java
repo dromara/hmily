@@ -79,7 +79,7 @@ public interface InventoryMapper {
      */
     @Update("update inventory set total_inventory = total_inventory + #{count}," +
             " lock_inventory= lock_inventory - #{count} " +
-            " where product_id =#{productId}  and lock_inventory >0 ")
+            " where product_id =#{productId}  and lock_inventory > 0 ")
     int cancel(InventoryDTO inventoryDTO);
     
     /**

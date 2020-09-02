@@ -88,12 +88,13 @@ public enum HmilyExecuteTemplate {
         }
         try {
             HmilySqlParserEngine hmilySqlParserEngine = HmilySqlParserEngineFactory.newInstance();
-            SQLStatement statement = hmilySqlParserEngine.parser(statementInformation.getSqlWithValues(), DatabaseTypes.INSTANCE.getDatabaseType());
+            String sql = statementInformation.getSqlWithValues();
+            SQLStatement statement = hmilySqlParserEngine.parser(sql, DatabaseTypes.INSTANCE.getDatabaseType());
             //3.然后根据不同的statement生产不同的反向sql
             HmilySqlRevertEngine hmilySqlRevertEngine = HmilySqlRevertEngineFactory.newInstance();
             String resourceId = ResourceIdUtils.INSTANCE.getResourceId(statementInformation.getConnectionInformation().getUrl());
             HmilyP6Datasource hmilyP6Datasource = (HmilyP6Datasource) HmilyResourceManager.get(resourceId);
-            HmilyUndoInvocation hmilyUndoInvocation = hmilySqlRevertEngine.revert(statement, hmilyP6Datasource);
+            HmilyUndoInvocation hmilyUndoInvocation = hmilySqlRevertEngine.revert(statement, hmilyP6Datasource, sql);
             //4.缓存sql日志记录 ? 存储到哪里呢 threadLocal？
             HmilyUndoContext context = new HmilyUndoContext();
             context.setUndoInvocation(hmilyUndoInvocation);
