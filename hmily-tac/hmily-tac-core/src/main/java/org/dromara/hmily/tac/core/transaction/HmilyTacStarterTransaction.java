@@ -79,6 +79,7 @@ public class HmilyTacStarterTransaction {
         context.setTransId(globalHmilyTransaction.getTransId());
         context.setRole(HmilyRoleEnum.START.getCode());
         context.setTransType(TransTypeEnum.TAC.name());
+        context.setParticipantId(hmilyParticipant.getParticipantId());
         HmilyContextHolder.set(context);
         return globalHmilyTransaction;
     }

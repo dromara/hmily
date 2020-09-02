@@ -19,9 +19,8 @@ package org.dromara.hmily.repository.spi.entity;
 
 import java.io.Serializable;
 import java.util.Date;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.EqualsAndHashCode;
 
 /**
  * The type Hmily participant undo.
@@ -29,8 +28,7 @@ import lombok.NoArgsConstructor;
  * @author xiaoyu
  */
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
+@EqualsAndHashCode
 public final class HmilyParticipantUndo implements Serializable {
     
     /**
@@ -72,4 +70,9 @@ public final class HmilyParticipantUndo implements Serializable {
      * updateTime.
      */
     private Date updateTime;
+    
+    public HmilyParticipantUndo() {
+        this.createTime = new Date();
+        this.updateTime = new Date();
+    }
 }

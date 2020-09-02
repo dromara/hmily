@@ -23,7 +23,7 @@ import java.sql.SQLException;
 import javax.sql.DataSource;
 import org.dromara.hmily.tac.common.HmilyResourceManager;
 import org.dromara.hmily.tac.common.HmilyTacResource;
-import org.dromara.hmily.tac.common.HmilyTacRollbackExecutor;
+import org.dromara.hmily.tac.p6spy.rollback.HmilyTacRollbackExecutor;
 import org.dromara.hmily.tac.common.utils.DatabaseTypes;
 import org.dromara.hmily.tac.common.utils.JdbcUtils;
 import org.dromara.hmily.tac.common.utils.ResourceIdUtils;

@@ -15,11 +15,16 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.tac.p6spy;
+package org.dromara.hmily.tac.p6spy.executor;
 
 import com.p6spy.engine.common.StatementInformation;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Objects;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.dromara.hmily.annotation.TransTypeEnum;
+import org.dromara.hmily.common.enums.HmilyActionEnum;
 import org.dromara.hmily.common.utils.IdWorkerUtils;
 import org.dromara.hmily.core.context.HmilyContextHolder;
 import org.dromara.hmily.core.context.HmilyTransactionContext;
@@ -32,6 +37,8 @@ import org.dromara.hmily.tac.common.utils.ResourceIdUtils;
 import org.dromara.hmily.tac.core.cache.HmilyParticipantUndoCacheManager;
 import org.dromara.hmily.tac.core.cache.HmilyUndoContextCacheManager;
 import org.dromara.hmily.tac.core.context.HmilyUndoContext;
+import org.dromara.hmily.tac.p6spy.HmilyP6Datasource;
+import org.dromara.hmily.tac.p6spy.threadlocal.AutoCommitThreadLocal;
 import org.dromara.hmily.tac.sqlparser.model.statement.SQLStatement;
 import org.dromara.hmily.tac.sqlparser.spi.HmilySqlParserEngine;
 import org.dromara.hmily.tac.sqlparser.spi.HmilySqlParserEngineFactory;
@@ -41,6 +48,7 @@ import org.dromara.hmily.tac.sqlrevert.spi.HmilySqlRevertEngineFactory;
 /**
  * The enum Hmily execute template.
  */
+@Slf4j
 public enum HmilyExecuteTemplate {
     
     /**
@@ -49,15 +57,36 @@ public enum HmilyExecuteTemplate {
     INSTANCE;
     
     /**
+     * Sets auto commit.
+     *
+     * @param connection the connection
+     */
+    public void beforeSetAutoCommit(final Connection connection) {
+        if (!check()) {
+            return;
+        }
+        try {
+            boolean autoCommit = connection.getAutoCommit();
+            if (autoCommit) {
+                connection.setAutoCommit(false);
+            }
+            AutoCommitThreadLocal.INSTANCE.set(autoCommit);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    
+    /**
      * Execute.
      *
      * @param statementInformation the statement information
      */
     public void execute(final StatementInformation statementInformation) {
-        //1.是否存在tac事务
-        HmilyTransactionContext transactionContext = HmilyContextHolder.get();
-        if (Objects.nonNull(transactionContext) && TransTypeEnum.TAC.name().equalsIgnoreCase(transactionContext.getTransType())) {
-            //2.对sql进行解析，
+        if (!check()) {
+            return;
+        }
+        try {
             HmilySqlParserEngine hmilySqlParserEngine = HmilySqlParserEngineFactory.newInstance();
             SQLStatement statement = hmilySqlParserEngine.parser(statementInformation.getSqlWithValues(), DatabaseTypes.INSTANCE.getDatabaseType());
             //3.然后根据不同的statement生产不同的反向sql
@@ -69,16 +98,24 @@ public enum HmilyExecuteTemplate {
             HmilyUndoContext context = new HmilyUndoContext();
             context.setUndoInvocation(hmilyUndoInvocation);
             context.setResourceId(resourceId);
+            HmilyTransactionContext transactionContext = HmilyContextHolder.get();
             context.setTransId(transactionContext.getTransId());
             context.setParticipantId(transactionContext.getParticipantId());
             HmilyUndoContextCacheManager.INSTANCE.set(context);
+        } catch (Exception e) {
+            log.error("execute hmily tac module have exception:", e);
         }
     }
     
     /**
      * Commit.
+     *
+     * @param connection the connection
      */
-    public void commit() {
+    public void commit(final Connection connection) {
+        if (!check()) {
+            return;
+        }
         //构建
         HmilyParticipantUndo undo = build();
         //缓存
@@ -86,14 +123,22 @@ public enum HmilyExecuteTemplate {
         //存储
         HmilyRepositoryStorage.createHmilyParticipantUndo(undo);
         //清除
-        clean();
+        clean(connection);
     }
     
     /**
      * clean.
+     *
+     * @param connection the connection
      */
-    public void clean() {
+    @SneakyThrows
+    public void clean(final Connection connection) {
+        if (!check()) {
+            return;
+        }
+        connection.setAutoCommit(AutoCommitThreadLocal.INSTANCE.get());
         HmilyUndoContextCacheManager.INSTANCE.remove();
+        AutoCommitThreadLocal.INSTANCE.remove();
     }
     
     private HmilyParticipantUndo build() {
@@ -104,6 +149,12 @@ public enum HmilyExecuteTemplate {
         undo.setParticipantId(context.getParticipantId());
         undo.setTransId(context.getTransId());
         undo.setUndoInvocation(context.getUndoInvocation());
+        undo.setStatus(HmilyActionEnum.TRYING.getCode());
         return undo;
+    }
+    
+    private boolean check() {
+        HmilyTransactionContext transactionContext = HmilyContextHolder.get();
+        return Objects.nonNull(transactionContext) && TransTypeEnum.TAC.name().equalsIgnoreCase(transactionContext.getTransType());
     }
 }

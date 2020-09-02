@@ -15,29 +15,45 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.tac.p6spy;
+package org.dromara.hmily.tac.p6spy.threadlocal;
 
-import com.p6spy.engine.event.JdbcEventListener;
-import com.p6spy.engine.spy.JdbcEventListenerFactory;
 
 /**
- * The type Hmily jdbc event listener factory.
+ * The enum Auto commit thread local.
  *
  * @author xiaoyu
  */
-public class HmilyJdbcEventListenerFactory implements JdbcEventListenerFactory {
+public enum AutoCommitThreadLocal {
     
-    private static volatile JdbcEventListener jdbcEventListener;
+    /**
+     * Instance auto commit thread local.
+     */
+    INSTANCE;
     
-    @Override
-    public JdbcEventListener createJdbcEventListener() {
-        if (jdbcEventListener == null) {
-            synchronized (HmilyJdbcEventListenerFactory.class) {
-                if (jdbcEventListener == null) {
-                    jdbcEventListener = new HmilyJdbcEventListener();
-                }
-            }
-        }
-        return jdbcEventListener;
+    private static final ThreadLocal<Boolean> CURRENT_LOCAL = new ThreadLocal<>();
+    
+    /**
+     * Set.
+     *
+     * @param oldAutoCommit the old auto commit
+     */
+    public void set(final boolean oldAutoCommit) {
+        CURRENT_LOCAL.set(oldAutoCommit);
+    }
+    
+    /**
+     * Get boolean.
+     *
+     * @return the boolean
+     */
+    public boolean get() {
+        return CURRENT_LOCAL.get();
+    }
+    
+    /**
+     * Remove.
+     */
+    public void remove() {
+        CURRENT_LOCAL.remove();
     }
 }

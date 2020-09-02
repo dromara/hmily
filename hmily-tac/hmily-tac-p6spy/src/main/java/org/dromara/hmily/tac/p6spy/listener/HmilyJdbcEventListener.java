@@ -15,14 +15,16 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.tac.p6spy;
+package org.dromara.hmily.tac.p6spy.listener;
 
+import com.p6spy.engine.common.CallableStatementInformation;
 import com.p6spy.engine.common.ConnectionInformation;
 import com.p6spy.engine.common.PreparedStatementInformation;
 import com.p6spy.engine.common.StatementInformation;
 import com.p6spy.engine.event.JdbcEventListener;
 import java.sql.SQLException;
 import java.util.Objects;
+import org.dromara.hmily.tac.p6spy.executor.HmilyExecuteTemplate;
 
 /**
  * The type Hmily jdbc event listener.
@@ -32,9 +34,17 @@ import java.util.Objects;
 public class HmilyJdbcEventListener extends JdbcEventListener {
     
     @Override
+    public void onAfterGetConnection(final ConnectionInformation connectionInformation, final SQLException e) {
+        super.onAfterGetConnection(connectionInformation, e);
+        if (Objects.isNull(e)) {
+            HmilyExecuteTemplate.INSTANCE.beforeSetAutoCommit(connectionInformation.getConnection());
+        }
+    }
+    
+    @Override
     public void onAfterExecute(final PreparedStatementInformation statementInformation, final long timeElapsedNanos, final SQLException e) {
         super.onAfterExecute(statementInformation, timeElapsedNanos, e);
-        if (Objects.nonNull(e)) {
+        if (Objects.isNull(e)) {
             HmilyExecuteTemplate.INSTANCE.execute(statementInformation);
         }
     }
@@ -42,7 +52,7 @@ public class HmilyJdbcEventListener extends JdbcEventListener {
     @Override
     public void onAfterExecute(final StatementInformation statementInformation, final long timeElapsedNanos, final String sql, final SQLException e) {
         super.onAfterExecute(statementInformation, timeElapsedNanos, sql, e);
-        if (Objects.nonNull(e)) {
+        if (Objects.isNull(e)) {
             HmilyExecuteTemplate.INSTANCE.execute(statementInformation);
         }
     }
@@ -50,7 +60,7 @@ public class HmilyJdbcEventListener extends JdbcEventListener {
     @Override
     public void onAfterExecuteUpdate(final PreparedStatementInformation statementInformation, final long timeElapsedNanos, final int rowCount, final SQLException e) {
         super.onAfterExecuteUpdate(statementInformation, timeElapsedNanos, rowCount, e);
-        if (Objects.nonNull(e)) {
+        if (Objects.isNull(e)) {
             HmilyExecuteTemplate.INSTANCE.execute(statementInformation);
         }
     }
@@ -58,7 +68,7 @@ public class HmilyJdbcEventListener extends JdbcEventListener {
     @Override
     public void onAfterExecuteUpdate(final StatementInformation statementInformation, final long timeElapsedNanos, final String sql, final int rowCount, final SQLException e) {
         super.onAfterExecuteUpdate(statementInformation, timeElapsedNanos, sql, rowCount, e);
-        if (Objects.nonNull(e)) {
+        if (Objects.isNull(e)) {
             HmilyExecuteTemplate.INSTANCE.execute(statementInformation);
         }
     }
@@ -66,22 +76,32 @@ public class HmilyJdbcEventListener extends JdbcEventListener {
     @Override
     public void onAfterCommit(final ConnectionInformation connectionInformation, final long timeElapsedNanos, final SQLException e) {
         super.onAfterCommit(connectionInformation, timeElapsedNanos, e);
-        if (Objects.nonNull(e)) {
-            HmilyExecuteTemplate.INSTANCE.commit();
+        if (Objects.isNull(e)) {
+            HmilyExecuteTemplate.INSTANCE.commit(connectionInformation.getConnection());
         } else {
-            HmilyExecuteTemplate.INSTANCE.clean();
+            HmilyExecuteTemplate.INSTANCE.clean(connectionInformation.getConnection());
         }
     }
     
     @Override
     public void onAfterRollback(final ConnectionInformation connectionInformation, final long timeElapsedNanos, final SQLException e) {
         super.onAfterRollback(connectionInformation, timeElapsedNanos, e);
-        HmilyExecuteTemplate.INSTANCE.clean();
+        HmilyExecuteTemplate.INSTANCE.clean(connectionInformation.getConnection());
     }
     
     @Override
     public void onAfterSetAutoCommit(final ConnectionInformation connectionInformation, final boolean newAutoCommit, final boolean oldAutoCommit, final SQLException e) {
         super.onAfterSetAutoCommit(connectionInformation, newAutoCommit, oldAutoCommit, e);
+    }
+    
+    @Override
+    public void onAfterCallableStatementSet(final CallableStatementInformation statementInformation, final String parameterName, final Object value, final SQLException e) {
+        statementInformation.setParameterValue(parameterName, value);
+    }
+    
+    @Override
+    public void onAfterPreparedStatementSet(final PreparedStatementInformation statementInformation, final int parameterIndex, final Object value, final SQLException e) {
+        statementInformation.setParameterValue(parameterIndex, value);
     }
 }
 

@@ -33,7 +33,7 @@
 
         <dependency>
             <groupId>org.dromara</groupId>
-            <artifactId>hmily-tac-datasource</artifactId>
+            <artifactId>hmily-tac-p6spy</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

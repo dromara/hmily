@@ -15,10 +15,12 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.tac.common;
+package org.dromara.hmily.tac.p6spy.rollback;
 
 import org.dromara.hmily.core.hook.UndoHook;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipantUndo;
+import org.dromara.hmily.tac.common.HmilyResourceManager;
+import org.dromara.hmily.tac.p6spy.HmilyP6Datasource;
 
 /**
  * The type Hmily tac rollback executor.
@@ -49,14 +51,14 @@ public final class HmilyTacRollbackExecutor {
     
     private void registerRollback() {
         UndoHook.INSTANCE.register(undo -> {
-            HmilyTacResource hmilyTacResource = HmilyResourceManager.get(undo.getResourceId());
-            doRollback(hmilyTacResource, undo);
-            return true;
+            HmilyP6Datasource hmilyP6Datasource = (HmilyP6Datasource) HmilyResourceManager.get(undo.getResourceId());
+            return doRollback(hmilyP6Datasource, undo);
         });
     }
     
-    private void doRollback(final HmilyTacResource hmilyTacResource, final HmilyParticipantUndo undo) {
-    
+    private boolean doRollback(final HmilyP6Datasource hmilyP6Datasource, final HmilyParticipantUndo undo) {
+        //1 . 根据undo生成 反向sql来执行
+        return false;
     }
     
 }
