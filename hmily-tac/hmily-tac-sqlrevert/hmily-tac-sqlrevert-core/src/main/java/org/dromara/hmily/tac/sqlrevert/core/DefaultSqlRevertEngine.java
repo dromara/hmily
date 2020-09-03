@@ -45,7 +45,8 @@ public class DefaultSqlRevertEngine implements HmilySqlRevertEngine {
         } else {
             revertSql = "update inventory set total_inventory = total_inventory + 1 where product_id = 1";
         }
-        undoInvocation.setSql(revertSql);
+        undoInvocation.setRevertSql(revertSql);
+        undoInvocation.setOriginSql(sql);
         //根据jdbcUrl获取 datasource
         return undoInvocation;
     }

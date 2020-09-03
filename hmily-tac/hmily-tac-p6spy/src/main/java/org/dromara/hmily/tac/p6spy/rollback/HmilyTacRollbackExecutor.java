@@ -66,7 +66,7 @@ public final class HmilyTacRollbackExecutor {
     private boolean doRollback(final HmilyP6Datasource hmilyP6Datasource, final HmilyParticipantUndo undo) {
         //1 . 根据undo生成 反向sql来执行
         HmilyUndoInvocation undoInvocation = undo.getUndoInvocation();
-        String revertSql = undoInvocation.getSql();
+        String revertSql = undoInvocation.getRevertSql();
         return executeUpdate(revertSql, hmilyP6Datasource) > 0;
     }
     

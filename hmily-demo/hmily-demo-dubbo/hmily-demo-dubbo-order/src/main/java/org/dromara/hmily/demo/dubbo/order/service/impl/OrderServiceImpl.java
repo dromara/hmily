@@ -166,7 +166,7 @@ public class OrderServiceImpl implements OrderService {
     
     @Override
     public void updateOrderStatus(Order order) {
-        orderMapper.update(order);
+        orderMapper.updateStatus(order);
     }
     
     private Order saveOrder(Integer count, BigDecimal amount) {

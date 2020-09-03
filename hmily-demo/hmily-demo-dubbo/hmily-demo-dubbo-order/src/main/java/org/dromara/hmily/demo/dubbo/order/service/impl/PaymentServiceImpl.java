@@ -35,6 +35,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author xiaoyu
@@ -139,6 +140,7 @@ public class PaymentServiceImpl implements PaymentService {
     
     @Override
     @HmilyTAC
+    @Transactional
     public String mockTacPaymentInventoryWithTryException(Order order) {
         updateOrderStatus(order, OrderStatusEnum.PAY_SUCCESS);
         accountService.paymentTAC(buildAccountDTO(order));
@@ -196,7 +198,7 @@ public class PaymentServiceImpl implements PaymentService {
     
     private void updateOrderStatus(Order order, OrderStatusEnum orderStatus) {
         order.setStatus(orderStatus.getCode());
-        orderMapper.update(order);
+        orderMapper.updateStatus(order);
     }
     
     private AccountDTO buildAccountDTO(Order order) {

@@ -46,8 +46,8 @@ public interface OrderMapper {
      * @param order 订单对象
      * @return rows
      */
-    @Update("update `order` set status = #{status} , total_amount=#{totalAmount} where number=#{number}")
-    int update(Order order);
+    @Update("update `order` set status = #{status}  where number = #{number}")
+    int updateStatus(Order order);
 
     /**
      * 获取所有的订单

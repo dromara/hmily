@@ -20,7 +20,9 @@ package org.dromara.hmily.tac.p6spy.executor;
 import com.p6spy.engine.common.StatementInformation;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.hmily.annotation.TransTypeEnum;
@@ -62,7 +64,7 @@ public enum HmilyExecuteTemplate {
      * @param connection the connection
      */
     public void beforeSetAutoCommit(final Connection connection) {
-        if (!check()) {
+        if (check()) {
             return;
         }
         try {
@@ -83,7 +85,7 @@ public enum HmilyExecuteTemplate {
      * @param statementInformation the statement information
      */
     public void execute(final StatementInformation statementInformation) {
-        if (!check()) {
+        if (check()) {
             return;
         }
         try {
@@ -114,15 +116,16 @@ public enum HmilyExecuteTemplate {
      * @param connection the connection
      */
     public void commit(final Connection connection) {
-        if (!check()) {
+        if (check()) {
             return;
         }
-        //构建
-        HmilyParticipantUndo undo = build();
-        //缓存
-        HmilyParticipantUndoCacheManager.getInstance().cacheHmilyParticipantUndo(undo);
-        //存储
-        HmilyRepositoryStorage.createHmilyParticipantUndo(undo);
+        List<HmilyParticipantUndo> undoList = buildUndoList();
+        for(HmilyParticipantUndo undo : undoList) {
+            //缓存
+            HmilyParticipantUndoCacheManager.getInstance().cacheHmilyParticipantUndo(undo);
+            //存储
+            HmilyRepositoryStorage.createHmilyParticipantUndo(undo);
+        }
         //清除
         clean(connection);
     }
@@ -134,7 +137,7 @@ public enum HmilyExecuteTemplate {
      */
     @SneakyThrows
     public void clean(final Connection connection) {
-        if (!check()) {
+        if (check()) {
             return;
         }
         connection.setAutoCommit(AutoCommitThreadLocal.INSTANCE.get());
@@ -142,20 +145,23 @@ public enum HmilyExecuteTemplate {
         AutoCommitThreadLocal.INSTANCE.remove();
     }
     
-    private HmilyParticipantUndo build() {
-        HmilyUndoContext context = HmilyUndoContextCacheManager.INSTANCE.get();
-        HmilyParticipantUndo undo = new HmilyParticipantUndo();
-        undo.setResourceId(context.getResourceId());
-        undo.setUndoId(IdWorkerUtils.getInstance().createUUID());
-        undo.setParticipantId(context.getParticipantId());
-        undo.setTransId(context.getTransId());
-        undo.setUndoInvocation(context.getUndoInvocation());
-        undo.setStatus(HmilyActionEnum.TRYING.getCode());
-        return undo;
+    private List<HmilyParticipantUndo> buildUndoList() {
+        List<HmilyUndoContext> contexts = HmilyUndoContextCacheManager.INSTANCE.get();
+        return contexts.stream().map(context -> {
+            HmilyParticipantUndo undo = new HmilyParticipantUndo();
+            undo.setResourceId(context.getResourceId());
+            undo.setUndoId(IdWorkerUtils.getInstance().createUUID());
+            undo.setParticipantId(context.getParticipantId());
+            undo.setTransId(context.getTransId());
+            undo.setUndoInvocation(context.getUndoInvocation());
+            undo.setStatus(HmilyActionEnum.TRYING.getCode());
+            return undo;
+        }).collect(Collectors.toList());
+        
     }
     
     private boolean check() {
         HmilyTransactionContext transactionContext = HmilyContextHolder.get();
-        return Objects.nonNull(transactionContext) && TransTypeEnum.TAC.name().equalsIgnoreCase(transactionContext.getTransType());
+        return Objects.isNull(transactionContext) || !TransTypeEnum.TAC.name().equalsIgnoreCase(transactionContext.getTransType());
     }
 }
