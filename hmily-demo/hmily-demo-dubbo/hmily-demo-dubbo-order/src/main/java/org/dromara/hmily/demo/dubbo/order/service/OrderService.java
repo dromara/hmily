@@ -84,6 +84,15 @@ public interface OrderService {
     String mockInventoryWithTryException(Integer count, BigDecimal amount);
     
     /**
+     * Mock tac inventory with try exception string.
+     *
+     * @param count  the count
+     * @param amount the amount
+     * @return the string
+     */
+    String mockTacInventoryWithTryException(Integer count, BigDecimal amount);
+    
+    /**
      * 模拟在订单支付操作中，库存在try阶段中的timeout
      *
      * @param count  购买数量

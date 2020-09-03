@@ -136,7 +136,15 @@ public class PaymentServiceImpl implements PaymentService {
         inventoryService.mockWithTryException(buildInventoryDTO(order));
         return "success";
     }
-
+    
+    @Override
+    @HmilyTAC
+    public String mockTacPaymentInventoryWithTryException(Order order) {
+        updateOrderStatus(order, OrderStatusEnum.PAY_SUCCESS);
+        accountService.paymentTAC(buildAccountDTO(order));
+        throw new RuntimeException("");
+    }
+    
     @Override
     @HmilyTCC(confirmMethod = "confirmOrderStatus", cancelMethod = "cancelOrderStatus")
     public String mockPaymentInventoryWithTryTimeout(Order order) {

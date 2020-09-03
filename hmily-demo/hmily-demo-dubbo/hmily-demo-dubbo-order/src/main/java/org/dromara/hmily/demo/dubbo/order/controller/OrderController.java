@@ -76,6 +76,13 @@ public class OrderController {
                                                 @RequestParam(value = "amount") BigDecimal amount) {
         return orderService.mockInventoryWithTryException(count, amount);
     }
+    
+    @PostMapping(value = "/mockTacInventoryWithTryException")
+    @ApiOperation(value = "TAC模式下，模拟下单付款操作在try阶段时候，库存异常，此时账户系统和订单状态会自动回滚，达到数据的一致性（注意:这里模拟的是系统异常，或者rpc异常）")
+    public String mockTacInventoryWithTryException(@RequestParam(value = "count") Integer count,
+                                                @RequestParam(value = "amount") BigDecimal amount) {
+        return orderService.mockTacInventoryWithTryException(count, amount);
+    }
 
     @PostMapping(value = "/mockInventoryWithTryTimeout")
     @ApiOperation(value = "模拟下单付款操作在try阶段时候，库存超时异常（但是自身最后又成功了），此时账户系统和订单状态会回滚，（库存依赖事务日志进行恢复），达到数据的一致性（异常指的是超时异常）")

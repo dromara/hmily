@@ -70,6 +70,14 @@ public interface PaymentService {
     String mockPaymentInventoryWithTryException(Order order);
     
     /**
+     * Mock tac payment inventory with try exception string.
+     *
+     * @param order the order
+     * @return the string
+     */
+    String mockTacPaymentInventoryWithTryException(Order order);
+    
+    /**
      * mock订单支付的时候库存超时
      *
      * @param order 订单实体

@@ -36,9 +36,9 @@ public class DefaultSqlRevertEngine implements HmilySqlRevertEngine {
     public HmilyUndoInvocation revert(final SQLStatement sqlStatement, final DataSource dataSource, final String sql) throws SqlRevertException {
         HmilyUndoInvocation undoInvocation = new HmilyUndoInvocation();
         //这里是我的测试验证，写死了
-        String revertSql = "";
+        String revertSql;
         if (sql.contains("order")) {
-            String number = sql.substring(sql.indexOf("'") + 1, sql.length() - 2);
+            String number = sql.substring(sql.indexOf("'") + 1, sql.length() - 1);
             revertSql = "update `order` set status = 3 where number = " + number;
         } else if (sql.contains("account")) {
             revertSql = "update account set balance = balance + 1  where user_id = 10000 ";

@@ -111,10 +111,15 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public String mockInventoryWithTryException(Integer count, BigDecimal amount) {
         Order order = saveOrder(count, amount);
-        paymentService.mockPaymentInventoryWithTryException(order);
-        return "success";
+        return paymentService.mockPaymentInventoryWithTryException(order);
     }
-
+    
+    @Override
+    public String mockTacInventoryWithTryException(Integer count, BigDecimal amount) {
+        Order order = saveOrder(count, amount);
+        return paymentService.mockTacPaymentInventoryWithTryException(order);
+    }
+    
     /**
      * 模拟在订单支付操作中，库存在try阶段中的timeout
      *
