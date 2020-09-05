@@ -80,5 +80,10 @@ public final class PrefixConstants {
      * The constant REMOTE_ZOOKEEPER.
      */
     public static final String REMOTE_ZOOKEEPER = "remote.zookeeper";
+
+    /**
+     * The constant REMOTE_ZOOKEEPER.
+     */
+    public static final String REMOTE_ETCD = "remote.etcd";
     
 }

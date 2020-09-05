@@ -64,5 +64,10 @@
             <artifactId>hmily-config-zookeeper</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.dromara</groupId>
+            <artifactId>hmily-config-etcd</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 </project>
