@@ -6,7 +6,7 @@ hmily:
 
 remote:
   etcd:
-    server: 127.0.0.1:2181
+    server: http://127.0.0.1:2379
     key: test
     timeoutMs: 6000
     fileExtension: yml
