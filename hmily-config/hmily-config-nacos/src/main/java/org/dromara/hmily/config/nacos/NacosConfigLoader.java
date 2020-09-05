@@ -19,12 +19,8 @@
 
 package org.dromara.hmily.config.nacos;
 
-import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.function.Supplier;
 import org.dromara.hmily.common.utils.StringUtils;
+import org.dromara.hmily.config.api.AbstractConfig;
 import org.dromara.hmily.config.api.Config;
 import org.dromara.hmily.config.api.exception.ConfigException;
 import org.dromara.hmily.config.loader.ConfigLoader;
@@ -35,6 +31,12 @@ import org.dromara.hmily.spi.HmilySPI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Supplier;
+
 /**
  * The type Nacos config loader.
  *
@@ -44,22 +46,22 @@ import org.slf4j.LoggerFactory;
 public class NacosConfigLoader implements ConfigLoader<NacosConfig> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(NacosConfigLoader.class);
-    
+
     private static final Map<String, PropertyLoader> LOADERS = new HashMap<>();
-    
+
     private NacosClient client = new NacosClient();
-    
+
     static {
         LOADERS.put("yml", new YamlPropertyLoader());
         LOADERS.put("properties", new PropertiesLoader());
     }
-    
+
     /**
      * Instantiates a new Nacos config loader.
      */
     public NacosConfigLoader() {
     }
-    
+
     /**
      * Instantiates a new Nacos config loader.
      *
@@ -76,7 +78,12 @@ public class NacosConfigLoader implements ConfigLoader<NacosConfig> {
         againLoad(context, nacosHandler, NacosConfig.class);
     }
 
-    private void nacosLoad(final Supplier<Context> context, final LoaderHandler<NacosConfig> handler, final NacosConfig config) {
+    @Override
+    public void passive(Supplier<Context> context, AbstractConfig config) {
+
+    }
+
+    private PassiveHandler<NacosConfig> nacosLoad(final Supplier<Context> context, final LoaderHandler<NacosConfig> handler, final NacosConfig config) {
         if (config != null) {
             check(config);
             LOGGER.info("loader nacos config: {}", config);
@@ -90,13 +97,15 @@ public class NacosConfigLoader implements ConfigLoader<NacosConfig> {
                     .map(e -> propertyLoader.load("remote.nacos." + fileExtension, e))
                     .ifPresent(e -> context.get().getOriginal().load(() -> context.get().withSources(e), this::nacosFinish));
             handler.finish(context, config);
+            return (e, e1) -> passive(context, config);
         } else {
             throw new ConfigException("nacos config is null");
         }
     }
 
-    private void nacosFinish(final Supplier<Context> context, final Config config) {
+    private PassiveHandler<Config> nacosFinish(final Supplier<Context> context, final Config config) {
         LOGGER.info("nacos loader config {}:{}", config != null ? config.prefix() : "", config);
+        return (e, e1) -> LOGGER.info("nacos passive success....");
     }
 
     private void check(final NacosConfig config) {

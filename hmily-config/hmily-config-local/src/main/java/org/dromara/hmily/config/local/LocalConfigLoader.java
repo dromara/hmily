@@ -20,6 +20,8 @@
 package org.dromara.hmily.config.local;
 
 import java.util.function.Supplier;
+
+import org.dromara.hmily.config.api.AbstractConfig;
 import org.dromara.hmily.config.api.Config;
 import org.dromara.hmily.config.loader.ConfigLoader;
 import org.dromara.hmily.spi.HmilySPI;
@@ -37,5 +39,10 @@ public class LocalConfigLoader implements ConfigLoader<Config> {
     public void load(final Supplier<Context> context, final LoaderHandler<Config> handler) {
         ConfigLoader<Config> original = context.get().getOriginal();
         original.load(context, handler);
+    }
+
+    @Override
+    public void passive(Supplier<Context> context, AbstractConfig config) {
+
     }
 }

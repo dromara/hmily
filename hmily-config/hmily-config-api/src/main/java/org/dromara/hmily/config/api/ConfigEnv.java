@@ -17,23 +17,31 @@
 
 package org.dromara.hmily.config.api;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Stream;
 import org.apache.commons.lang3.StringUtils;
 import org.dromara.hmily.config.api.exception.ConfigException;
+
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 /**
  * The type Config env.
  *
  * @author xiaoyu
+ * @author chenbin sixh
  */
 public final class ConfigEnv {
-    
+
     private static final ConfigEnv INST = new ConfigEnv();
-    
+
     private static final Map<Class<?>, Config> CONFIGS = new ConcurrentHashMap<>();
-    
+
+    /**
+     * Monitoring event change processing.
+     */
+    private static final Map<String, Set<Consumer<?>>> EVENTS = new ConcurrentHashMap<>();
+
     /**
      * Save some custom configuration information.
      */
@@ -42,7 +50,7 @@ public final class ConfigEnv {
             throw new ConfigException("repeated configEnv object.");
         }
     }
-    
+
     /**
      * Gets instance.
      *
@@ -51,8 +59,8 @@ public final class ConfigEnv {
     public static ConfigEnv getInstance() {
         return INST;
     }
-    
-    
+
+
     /**
      * Register config.
      *
@@ -63,7 +71,7 @@ public final class ConfigEnv {
             putBean(config);
         }
     }
-    
+
     /**
      * Gets config.
      *
@@ -75,7 +83,7 @@ public final class ConfigEnv {
     public <T extends Config> T getConfig(final Class<T> clazz) {
         return (T) CONFIGS.get(clazz);
     }
-    
+
     /**
      * Register an object that needs to interpret configuration information .
      *
@@ -89,7 +97,33 @@ public final class ConfigEnv {
             CONFIGS.put(parent.getClass(), parent);
         }
     }
-    
+
+    /**
+     * Add an event subscription processing.
+     *
+     * @param key      the key
+     * @param consumer the consumer
+     */
+    public synchronized void addEvent(String key, Consumer<?> consumer) {
+        Set<Consumer<?>> consumers;
+        if (EVENTS.containsKey(key)) {
+            consumers = EVENTS.get(key);
+        } else {
+            consumers = new HashSet<>();
+        }
+        consumers.add(consumer);
+        EVENTS.put(key, consumers);
+    }
+
+    /**
+     * Gets events.
+     *
+     * @return the events
+     */
+    public Map<String, Set<Consumer<?>>> getEvents() {
+        return Collections.unmodifiableMap(EVENTS);
+    }
+
     /**
      * Gets all loaded configuration information.
      *

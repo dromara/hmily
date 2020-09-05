@@ -19,9 +19,16 @@
 package org.dromara.hmily.config.loader;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
+import java.util.regex.Pattern;
+
+import org.dromara.hmily.config.api.AbstractConfig;
 import org.dromara.hmily.config.api.Config;
 import org.dromara.hmily.config.api.ConfigEnv;
+import org.dromara.hmily.config.api.event.ChangeEvent;
 import org.dromara.hmily.config.loader.bind.BindData;
 import org.dromara.hmily.config.loader.bind.Binder;
 import org.dromara.hmily.config.loader.bind.DataType;
@@ -35,9 +42,10 @@ import org.dromara.hmily.config.loader.property.PropertyKeySource;
  *
  * @param <T> the type parameter
  * @author xiaoyu
+ * @author chenbin sixh
  */
 public interface ConfigLoader<T extends Config> {
-    
+
     /**
      * Load related configuration information.
      *
@@ -45,7 +53,45 @@ public interface ConfigLoader<T extends Config> {
      * @param handler the handler
      */
     void load(Supplier<Context> context, LoaderHandler<T> handler);
-    
+
+    /**
+     * Implementation of Active Remote Push.
+     *
+     * @param context the context
+     * @param key     the key
+     * @param value   the value
+     * @param event   the event
+     */
+    default void push(Supplier<Context> context, String key, String value, ChangeEvent event) {
+        if (event == null) {
+            return;
+        }
+        Map<String, Set<Consumer<?>>> events = ConfigEnv.getInstance().getEvents();
+        if (events.isEmpty()) {
+            return;
+        }
+        events.forEach((k, v) -> {
+            boolean isMatch = Pattern.matches(k, key);
+            if (isMatch) {
+                v.forEach(consumer -> {
+                    if (event.match(consumer)) {
+                        //todo:这里需要更新ConfigEvn里面的对象数据.
+                    }
+                });
+            }
+        });
+    }
+
+    /**
+     * Passive subscription processes related events. When the current event is processed,
+     * the push method is called to push it to subscribers in the system.
+     *
+     * @param context the context
+     * @param config  Configuration information of things processed by load method
+     * @see #push(Supplier, String, String, ChangeEvent) #push(Supplier, String, String, ChangeEvent)#push(Supplier, String, String, ChangeEvent)#push(Supplier, String, String, ChangeEvent)#push(Supplier, String, String, ChangeEvent)#push(Supplier, String, String, ChangeEvent)
+     */
+    void passive(final Supplier<Context> context, AbstractConfig config);
+
     /**
      * Again load.
      *
@@ -58,11 +104,11 @@ public interface ConfigLoader<T extends Config> {
         for (PropertyKeySource<?> propertyKeySource : context.get().getSource()) {
             ConfigPropertySource configPropertySource = new DefaultConfigPropertySource<>(propertyKeySource, PropertyKeyParse.INSTANCE);
             Binder binder = Binder.of(configPropertySource);
-            T bind = binder.bind(config.prefix(), BindData.of(DataType.of(tClass), () -> config));
-            handler.finish(context, bind);
+            T newConfig = binder.bind(config.prefix(), BindData.of(DataType.of(tClass), () -> config));
+            handler.finish(context, newConfig).passive(context, newConfig);
         }
     }
-    
+
     /**
      * The type Context.
      */
@@ -71,13 +117,13 @@ public interface ConfigLoader<T extends Config> {
         private ConfigLoader<Config> original;
 
         private List<PropertyKeySource<?>> propertyKeySources;
-    
+
         /**
          * Instantiates a new Context.
          */
         public Context() {
         }
-    
+
         /**
          * Instantiates a new Context.
          *
@@ -86,7 +132,7 @@ public interface ConfigLoader<T extends Config> {
         public Context(final List<PropertyKeySource<?>> propertyKeySources) {
             this(null, propertyKeySources);
         }
-    
+
         /**
          * Instantiates a new Context.
          *
@@ -97,7 +143,7 @@ public interface ConfigLoader<T extends Config> {
             this.original = original;
             this.propertyKeySources = propertyKeySources;
         }
-    
+
         /**
          * With context.
          *
@@ -108,7 +154,7 @@ public interface ConfigLoader<T extends Config> {
         public Context with(final List<PropertyKeySource<?>> sources, final ConfigLoader<Config> original) {
             return new Context(original, sources);
         }
-    
+
         /**
          * With sources context.
          *
@@ -118,7 +164,7 @@ public interface ConfigLoader<T extends Config> {
         public Context withSources(final List<PropertyKeySource<?>> sources) {
             return with(sources, this.original);
         }
-    
+
         /**
          * Gets original.
          *
@@ -127,7 +173,7 @@ public interface ConfigLoader<T extends Config> {
         public ConfigLoader<Config> getOriginal() {
             return original;
         }
-    
+
         /**
          * Gets source.
          *
@@ -137,7 +183,7 @@ public interface ConfigLoader<T extends Config> {
             return propertyKeySources;
         }
     }
-    
+
     /**
      * The interface Loader handler.
      *
@@ -145,13 +191,30 @@ public interface ConfigLoader<T extends Config> {
      */
     @FunctionalInterface
     interface LoaderHandler<T extends Config> {
-        
+
         /**
          * if done finish this.
          *
          * @param context the context
          * @param config  config.
+         * @return the passive handler
          */
-        void finish(Supplier<Context> context, T config);
+        PassiveHandler<T> finish(Supplier<Context> context, T config);
+    }
+
+    /**
+     * The interface Passive handler.
+     *
+     * @param <T> the type parameter
+     */
+    @FunctionalInterface
+    interface PassiveHandler<T extends Config> {
+        /**
+         * Passive.
+         *
+         * @param context the context
+         * @param config  the config
+         */
+        void passive(Supplier<Context> context, T config);
     }
 }

@@ -28,6 +28,11 @@ public abstract class AbstractConfig implements Config {
 
     private volatile boolean isLoad;
 
+    /**
+     * Whether to passively receive push
+     */
+    private boolean passive;
+
     @Override
     public void flagLoad() {
         isLoad = true;
@@ -38,4 +43,7 @@ public abstract class AbstractConfig implements Config {
         return isLoad;
     }
 
+    public boolean isPassive() {
+        return passive;
+    }
 }

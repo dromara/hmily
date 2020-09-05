@@ -37,6 +37,13 @@
         <module>hmily-config-zookeeper</module>
         <module>hmily-config-all</module>
     </modules>
+    <dependencies>
+        <dependency>
+            <groupId>org.dromara</groupId>
+            <artifactId>hmily-config-loader</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
 
 
 </project>

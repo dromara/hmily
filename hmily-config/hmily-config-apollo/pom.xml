@@ -34,25 +34,23 @@
             <artifactId>apollo-client</artifactId>
             <version>${apollo.version}</version>
         </dependency>
-    </dependencies>
-
-    <artifactId>hmily-config-apollo</artifactId>
-
-    <dependencies>
         <dependency>
             <groupId>org.dromara</groupId>
-            <artifactId>hmily-config-loader</artifactId>
+            <artifactId>hmily-common</artifactId>
             <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.ctrip.framework.apollo</groupId>
-            <artifactId>apollo-client</artifactId>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.google.inject</groupId>
             <artifactId>guice</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.dromara</groupId>
+            <artifactId>hmily-spi</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
-
+    <artifactId>hmily-config-apollo</artifactId>
 
 </project>

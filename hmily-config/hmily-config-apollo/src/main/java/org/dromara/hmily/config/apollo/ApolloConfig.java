@@ -7,7 +7,8 @@ import org.dromara.hmily.spi.HmilySPI;
 
 /**
  * ApolloConfig.
- * @author   lilang
+ *
+ * @author lilang
  **/
 @Data
 @HmilySPI("remoteApollo")
