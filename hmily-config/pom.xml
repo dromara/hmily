@@ -36,6 +36,7 @@
         <module>hmily-config-apollo</module>
         <module>hmily-config-zookeeper</module>
         <module>hmily-config-all</module>
+        <module>hmily-config-etcd</module>
     </modules>
 
 
