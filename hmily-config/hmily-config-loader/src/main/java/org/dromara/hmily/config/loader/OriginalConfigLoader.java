@@ -21,6 +21,8 @@ package org.dromara.hmily.config.loader;
 
 import java.util.Objects;
 import java.util.function.Supplier;
+
+import org.dromara.hmily.config.api.AbstractConfig;
 import org.dromara.hmily.config.api.Config;
 import org.dromara.hmily.config.api.ConfigEnv;
 import org.dromara.hmily.config.loader.bind.BindData;
@@ -47,5 +49,10 @@ public class OriginalConfigLoader implements ConfigLoader<Config> {
                 return binder.bind(e.prefix(), BindData.of(DataType.of(e.getClass()), () -> e));
             }).filter(Objects::nonNull).peek(Config::flagLoad).forEach(e -> handler.finish(context, e));
         }
+    }
+
+    @Override
+    public void passive(Supplier<Context> context, AbstractConfig config) {
+        throw new UnsupportedOperationException("No need to implement");
     }
 }
