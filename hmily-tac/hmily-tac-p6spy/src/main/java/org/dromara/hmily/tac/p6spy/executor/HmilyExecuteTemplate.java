@@ -120,7 +120,7 @@ public enum HmilyExecuteTemplate {
             return;
         }
         List<HmilyParticipantUndo> undoList = buildUndoList();
-        for(HmilyParticipantUndo undo : undoList) {
+        for (HmilyParticipantUndo undo : undoList) {
             //缓存
             HmilyParticipantUndoCacheManager.getInstance().cacheHmilyParticipantUndo(undo);
             //存储
