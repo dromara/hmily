@@ -1,4 +1,4 @@
-<p align="center">
+<p align="center" >
     <a href="https://dromara.org"><img src="https://yu199195.github.io/images/hmily/hmily-logo.png" width="45%"></a>
 </p>
 <p align="center">
@@ -41,7 +41,7 @@
 
  -------------------------------------------------------------------------------
 
-#分布式事务解决方案全景图
+# 分布式事务解决方案全景图
  ![](https://yu199195.github.io/images/hmily/hmily.png) 
  
 -------------------------------------------------------------------------------
