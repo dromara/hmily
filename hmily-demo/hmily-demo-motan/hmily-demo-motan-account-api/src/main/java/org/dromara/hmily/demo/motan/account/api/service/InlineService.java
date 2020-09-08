@@ -1,7 +1,8 @@
 package org.dromara.hmily.demo.motan.account.api.service;
 
 /**
- * @author bbaiggey(Myth)
+ * @author Administrator
+ * @date 2020/9/8 20:53
  */
 public interface InlineService {
 
@@ -10,3 +11,4 @@ public interface InlineService {
      */
     void testInline();
 }
+

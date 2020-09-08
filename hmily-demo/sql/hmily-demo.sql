@@ -20,7 +20,7 @@ CREATE TABLE `account` (
 
 insert  into `account`(`id`,`user_id`,`balance`,`freeze_amount`,`create_time`,`update_time`) values
 
-(1,'1000000',10000,0,'2017-09-18 14:54:22',NULL);
+(1,'10000',10000,0,'2017-09-18 14:54:22',NULL);
 
 
 

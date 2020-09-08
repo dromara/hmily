@@ -17,14 +17,15 @@
 
 package org.dromara.hmily.demo.springcloud.order.client;
 
-import java.math.BigDecimal;
 import org.dromara.hmily.annotation.Hmily;
-import org.dromara.hmily.demo.springcloud.order.dto.AccountDTO;
-import org.dromara.hmily.demo.springcloud.order.dto.AccountNestedDTO;
+import org.dromara.hmily.demo.common.account.dto.AccountDTO;
+import org.dromara.hmily.demo.common.account.dto.AccountNestedDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import java.math.BigDecimal;
 
 /**
  * The interface Account client.

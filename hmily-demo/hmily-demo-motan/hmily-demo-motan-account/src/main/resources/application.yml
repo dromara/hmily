@@ -12,6 +12,7 @@ hmily :
             minWorkerThread : 20 #最小工作pool线程数
             maxWorkerThread : 50 #最大工作pool线程数
             filter : statistic
+            serialization: fastjson
         #指定需要解析的包名
         annotation :
             package : org.dromara.hmily
@@ -48,7 +49,7 @@ spring:
         name: order-service
 
 mybatis:
-    type-aliases-package: org.dromara.hmily.demo.motan.account.api.entity
+    type-aliases-package: org.dromara.hmily.demo.common.account.entity
 
 logging:
     level:

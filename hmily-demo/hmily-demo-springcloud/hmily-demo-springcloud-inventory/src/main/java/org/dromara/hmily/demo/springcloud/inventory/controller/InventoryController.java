@@ -17,7 +17,7 @@
 
 package org.dromara.hmily.demo.springcloud.inventory.controller;
 
-import org.dromara.hmily.demo.springcloud.inventory.dto.InventoryDTO;
+import org.dromara.hmily.demo.common.inventory.dto.InventoryDTO;
 import org.dromara.hmily.demo.springcloud.inventory.service.InventoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;

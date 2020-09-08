@@ -32,7 +32,7 @@ import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
  * @author bbaiggey
  */
 @SpringBootApplication(exclude = {MongoAutoConfiguration.class, MongoDataAutoConfiguration.class})
-@MapperScan("org.dromara.hmily.demo.motan.account.mapper")
+@MapperScan("org.dromara.hmily.demo.common.account.mapper")
 public class MotanHmilyAccountApplication {
 
     /**

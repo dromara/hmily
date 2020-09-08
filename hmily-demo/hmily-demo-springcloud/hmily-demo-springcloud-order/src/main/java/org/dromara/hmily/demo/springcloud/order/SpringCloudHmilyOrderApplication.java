@@ -35,7 +35,7 @@ import org.springframework.context.annotation.ImportResource;
 @EnableEurekaClient
 @EnableFeignClients
 @ImportResource({"classpath:applicationContext.xml"})
-@MapperScan("org.dromara.hmily.demo.springcloud.order.mapper")
+@MapperScan("org.dromara.hmily.demo.common.order.mapper")
 public class SpringCloudHmilyOrderApplication {
 
     /**

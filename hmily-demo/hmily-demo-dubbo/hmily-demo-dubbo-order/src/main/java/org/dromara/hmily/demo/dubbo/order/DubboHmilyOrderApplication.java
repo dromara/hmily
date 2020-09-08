@@ -38,6 +38,10 @@ public class DubboHmilyOrderApplication {
      * @param args args
      */
     public static void main(final String[] args) {
-        SpringApplication.run(DubboHmilyOrderApplication.class, args);
+        try {
+            SpringApplication.run(DubboHmilyOrderApplication.class, args);
+        }catch (Exception e){
+            System.out.println(e);
+        }
     }
 }

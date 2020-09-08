@@ -17,7 +17,7 @@
 
 package org.dromara.hmily.demo.springcloud.order.client;
 
-import org.dromara.hmily.demo.springcloud.order.dto.InventoryDTO;
+import org.dromara.hmily.demo.common.inventory.dto.InventoryDTO;
 import org.springframework.stereotype.Component;
 
 /**

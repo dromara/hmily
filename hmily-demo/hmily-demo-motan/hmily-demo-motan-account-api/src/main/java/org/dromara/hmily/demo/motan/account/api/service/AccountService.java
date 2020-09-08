@@ -18,9 +18,9 @@
 package org.dromara.hmily.demo.motan.account.api.service;
 
 import org.dromara.hmily.annotation.Hmily;
-import org.dromara.hmily.demo.motan.account.api.dto.AccountDTO;
-import org.dromara.hmily.demo.motan.account.api.dto.AccountNestedDTO;
-import org.dromara.hmily.demo.motan.account.api.entity.AccountDO;
+import org.dromara.hmily.demo.common.account.dto.AccountDTO;
+import org.dromara.hmily.demo.common.account.dto.AccountNestedDTO;
+import org.dromara.hmily.demo.common.account.entity.AccountDO;
 
 /**
  * The interface Account service.

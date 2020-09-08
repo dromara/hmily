@@ -18,6 +18,7 @@
         <module>hmily-demo-springcloud</module>
         <module>hmily-demo-motan</module>
         <module>hmily-demo-motan</module>
+        <module>hmily-demo-common</module>
     </modules>
 
     <properties>

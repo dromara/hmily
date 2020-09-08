@@ -16,7 +16,7 @@ spring:
       name: inventory-service
 
 mybatis:
-  type-aliases-package: org.dromara.hmily.demo.springcloud.inventory.entity
+  type-aliases-package: org.dromara.hmily.demo.common.inventory.entity
   config-location: classpath:mybatis/mybatis-config.xml
 #${random.int[9000,9999]}
 eureka:

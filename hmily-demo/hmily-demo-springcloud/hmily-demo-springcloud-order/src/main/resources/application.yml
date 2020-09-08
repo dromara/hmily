@@ -17,7 +17,7 @@ spring:
       name: order-service
 
 mybatis:
-  type-aliases-package: org.dromara.hmily.demo.springcloud.order.entity
+  type-aliases-package: org.dromara.hmily.demo.common.order.entity
   config-location: classpath:mybatis/mybatis-config.xml
 #${random.int[9000,9999]}
 eureka:

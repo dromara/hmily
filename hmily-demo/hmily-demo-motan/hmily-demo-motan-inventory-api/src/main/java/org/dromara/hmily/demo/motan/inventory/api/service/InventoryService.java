@@ -18,8 +18,8 @@
 package org.dromara.hmily.demo.motan.inventory.api.service;
 
 import org.dromara.hmily.annotation.Hmily;
-import org.dromara.hmily.demo.motan.inventory.api.dto.InventoryDTO;
-import org.dromara.hmily.demo.motan.inventory.api.entity.InventoryDO;
+import org.dromara.hmily.demo.common.inventory.dto.InventoryDTO;
+import org.dromara.hmily.demo.common.inventory.entity.InventoryDO;
 
 import java.util.List;
 

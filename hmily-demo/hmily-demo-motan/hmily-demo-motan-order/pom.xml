@@ -12,6 +12,7 @@
     <artifactId>hmily-demo-motan-order</artifactId>
 
     <dependencies>
+
         <dependency>
             <groupId>org.dromara</groupId>
             <artifactId>hmily-demo-motan-account-api</artifactId>

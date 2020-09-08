@@ -2,6 +2,7 @@ package org.dromara.hmily.demo.motan.inventory;
 
 import com.weibo.api.motan.common.MotanConstants;
 import com.weibo.api.motan.util.MotanSwitcherUtil;
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -13,6 +14,7 @@ import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
  * @Date: 2020/8/28 12:51
  */
 @SpringBootApplication(exclude = {MongoAutoConfiguration.class, MongoDataAutoConfiguration.class})
+@MapperScan("org.dromara.hmily.demo.common.inventory.mapper")
 public class MotanHmilyInventoryApplication {
 
     /**
