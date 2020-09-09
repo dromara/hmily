@@ -27,20 +27,15 @@ import org.dromara.hmily.demo.common.account.entity.AccountDO;
  *
  * @author xiaoyu
  */
-@SuppressWarnings("all")
 public interface AccountService {
-    
     
     /**
      * 扣款支付
      *
      * @param accountDTO 参数dto
-     * @return true
      */
     @Hmily
     void payment(AccountDTO accountDTO);
-    
-    
     
     /**
      * Mock try payment exception.

@@ -34,6 +34,7 @@
         <spring-cloud.version>Finchley.RELEASE</spring-cloud.version>
         <dubbo.version>2.6.2</dubbo.version>
         <apache.dubbo.version>2.7.1</apache.dubbo.version>
+        <sofa.rpc.version>5.5.3</sofa.rpc.version>
         <mongo.driver.version>3.8.0</mongo.driver.version>
         <mysql-connector-java>5.1.46</mysql-connector-java>
         <commons-lang3.version>3.3.2</commons-lang3.version>
@@ -167,6 +168,12 @@
                 <groupId>org.apache.dubbo</groupId>
                 <artifactId>dubbo</artifactId>
                 <version>${apache.dubbo.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.alipay.sofa</groupId>
+                <artifactId>sofa-rpc-all</artifactId>
+                <version>${sofa.rpc.version}</version>
             </dependency>
 
             <!-- motan config start-->

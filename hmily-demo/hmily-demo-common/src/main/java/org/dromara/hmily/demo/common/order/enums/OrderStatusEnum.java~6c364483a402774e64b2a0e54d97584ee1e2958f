@@ -14,30 +14,41 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.dromara.hmily.demo.common.order.enums;
 
-package org.dromara.hmily.demo.common.inventory.dto;
-
-import lombok.Data;
-
-import java.io.Serializable;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 /**
- * The type Inventory dto.
+ * The enum Order status enum.
  *
  * @author xiaoyu
  */
-@Data
-public class InventoryDTO implements Serializable {
-
-    private static final long serialVersionUID = 8229355519336565493L;
-
-    /**
-     * 商品id.
-     */
-    private String productId;
+@Getter
+@AllArgsConstructor
+public enum OrderStatusEnum {
 
     /**
-     * 数量.
+     * Not pay order status enum.
      */
-    private Integer count;
+    NOT_PAY(1, "未支付"),
+
+    /**
+     * Paying order status enum.
+     */
+    PAYING(2, "支付中"),
+
+    /**
+     * Pay fail order status enum.
+     */
+    PAY_FAIL(3, "支付失败"),
+
+    /**
+     * Pay success order status enum.
+     */
+    PAY_SUCCESS(4, "支付成功");
+    
+    private final int code;
+
+    private final String desc;
 }

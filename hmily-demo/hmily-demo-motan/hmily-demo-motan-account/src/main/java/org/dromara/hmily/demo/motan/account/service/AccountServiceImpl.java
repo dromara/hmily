@@ -73,6 +73,7 @@ public class AccountServiceImpl implements AccountService {
     @Override
     @HmilyTCC(confirmMethod = "confirm", cancelMethod = "cancel")
     public void payment(AccountDTO accountDTO) {
+        System.out.println(accountDTO+"<<<<<<<<<<<<<<<");
         accountMapper.update(accountDTO);
     }
 

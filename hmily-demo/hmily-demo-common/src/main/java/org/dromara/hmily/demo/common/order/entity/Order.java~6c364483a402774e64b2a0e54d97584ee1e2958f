@@ -15,29 +15,58 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.demo.common.inventory.dto;
+package org.dromara.hmily.demo.common.order.entity;
 
 import lombok.Data;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.Date;
 
 /**
- * The type Inventory dto.
+ * The type Order.
  *
  * @author xiaoyu
  */
 @Data
-public class InventoryDTO implements Serializable {
+public class Order implements Serializable {
 
-    private static final long serialVersionUID = 8229355519336565493L;
+    private static final long serialVersionUID = -8551347266419380333L;
+    
+    private Integer id;
 
     /**
-     * 商品id.
+     * 创建时间
+     */
+    private Date createTime;
+
+    /**
+     * 订单编号
+     */
+    private String number;
+    
+    /**
+     * 订单状态
+     */
+    private Integer status;
+
+    /**
+     * 商品id
      */
     private String productId;
 
     /**
-     * 数量.
+     * 付款金额
+     */
+    private BigDecimal totalAmount;
+
+    /**
+     * 购买数量
      */
     private Integer count;
+
+    /**
+     * 购买人
+     */
+    private String userId;
 }

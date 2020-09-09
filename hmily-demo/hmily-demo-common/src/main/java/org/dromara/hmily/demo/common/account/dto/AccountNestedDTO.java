@@ -31,25 +31,24 @@ import java.math.BigDecimal;
 public class AccountNestedDTO implements Serializable {
 
     private static final long serialVersionUID = 7223470850578998427L;
+    
     /**
-     * 用户id
+     * 用户id.
      */
     private String userId;
 
     /**
-     * 扣款金额
+     * 扣款金额.
      */
     private BigDecimal amount;
 
     /**
-     * productId
+     * productId.
      */
     private String productId;
 
     /**
-     * count
+     * count.
      */
     private Integer count;
-
-
 }

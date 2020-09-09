@@ -71,7 +71,6 @@ public interface AccountMapper {
             " where user_id =#{userId}  and freeze_amount >0 ")
     int confirm(AccountDTO accountDTO);
     
-    
     /**
      * Cancel int.
      *
@@ -82,7 +81,6 @@ public interface AccountMapper {
             " freeze_amount= freeze_amount -  #{amount} " +
             " where user_id =#{userId}  and freeze_amount >0")
     int cancel(AccountDTO accountDTO);
-    
     
     /**
      * 根据userId获取用户账户信息
