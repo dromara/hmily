@@ -52,7 +52,7 @@ spring:
 
 mybatis:
     type-aliases-package: org.dromara.hmily.demo.common.order.entity
-
+    config-location: classpath:mybatis/mybatis-config.xml
 
 logging:
     level:
