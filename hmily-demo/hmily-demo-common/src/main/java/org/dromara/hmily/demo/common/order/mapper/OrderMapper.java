@@ -20,7 +20,7 @@ package org.dromara.hmily.demo.common.order.mapper;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
-import org.springframework.core.annotation.Order;
+import org.dromara.hmily.demo.common.order.entity.Order;
 
 import java.util.List;
 
