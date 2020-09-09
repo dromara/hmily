@@ -20,22 +20,35 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>hmily</artifactId>
+        <artifactId>hmily-rpc</artifactId>
         <groupId>org.dromara</groupId>
         <version>2.1.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>hmily-rpc</artifactId>
+    <artifactId>hmily-sofa-rpc</artifactId>
 
-    <packaging>pom</packaging>
+    <dependencies>
+        <dependency>
+            <groupId>org.dromara</groupId>
+            <artifactId>hmily-spring</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
-    <modules>
-        <module>hmily-apache-dubbo</module>
-        <module>hmily-dubbo</module>
-        <module>hmily-motan</module>
-        <module>hmily-springcloud</module>
-        <module>hmily-sofa-rpc</module>
-    </modules>
+        <dependency>
+            <groupId>org.dromara</groupId>
+            <artifactId>hmily-tcc</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.dromara</groupId>
+            <artifactId>hmily-tac-p6spy</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.alipay.sofa</groupId>
+            <artifactId>sofa-rpc-all</artifactId>
+        </dependency>
+    </dependencies>
 
 </project>
