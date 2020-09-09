@@ -19,8 +19,6 @@ package org.dromara.hmily.demo.motan.account;
 
 import com.weibo.api.motan.common.MotanConstants;
 import com.weibo.api.motan.util.MotanSwitcherUtil;
-import org.dromara.hmily.demo.common.account.api.AccountService;
-import org.dromara.hmily.demo.motan.account.service.AccountServiceImpl;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.WebApplicationType;
@@ -49,7 +47,5 @@ public class MotanHmilyAccountApplication {
         ConfigurableApplicationContext context = springApplication.run(args);
         MotanSwitcherUtil.setSwitcherValue(MotanConstants.REGISTRY_HEARTBEAT_SWITCHER, true);
         System.out.println("MotanHmilyAccountApplication server start...");
-        AccountService accountService = (AccountServiceImpl) context.getBean(AccountService.class);
-        accountService.findByUserId("1");
     }
 }
