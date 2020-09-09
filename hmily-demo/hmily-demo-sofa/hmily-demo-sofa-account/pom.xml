@@ -7,6 +7,7 @@
         <groupId>org.dromara</groupId>
         <version>2.0.2-RELEASE</version>
     </parent>
+
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>hmily-demo-sofa-account</artifactId>
@@ -19,21 +20,19 @@
         </dependency>
 
         <dependency>
+            <groupId>com.alipay.sofa</groupId>
+            <artifactId>rpc-sofa-boot-starter</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>org.dromara</groupId>
             <artifactId>hmily-common</artifactId>
-            <version>2.1.0-SNAPSHOT</version>
             <exclusions>
                 <exclusion>
                     <groupId>com.google.guava</groupId>
                     <artifactId>guava</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
-
-        <dependency>
-            <groupId>com.alipay.sofa</groupId>
-            <artifactId>rpc-sofa-boot-starter</artifactId>
-            <version>6.0.4</version>
         </dependency>
 
     </dependencies>
