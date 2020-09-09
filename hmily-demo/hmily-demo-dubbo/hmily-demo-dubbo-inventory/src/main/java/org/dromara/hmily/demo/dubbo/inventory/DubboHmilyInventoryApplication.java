@@ -30,7 +30,7 @@ import org.springframework.context.annotation.ImportResource;
  */
 @SpringBootApplication
 @ImportResource({"classpath:applicationContext.xml"})
-@MapperScan("org.dromara.hmily.demo.dubbo.inventory.mapper")
+@MapperScan("org.dromara.hmily.demo.common.inventory.mapper")
 public class DubboHmilyInventoryApplication {
 
     /**

@@ -22,14 +22,14 @@ import com.weibo.api.motan.config.springsupport.annotation.MotanService;
 import org.dromara.hmily.annotation.HmilyTAC;
 import org.dromara.hmily.annotation.HmilyTCC;
 import org.dromara.hmily.common.exception.HmilyRuntimeException;
+import org.dromara.hmily.demo.common.account.api.AccountService;
+import org.dromara.hmily.demo.common.account.api.InlineService;
 import org.dromara.hmily.demo.common.account.dto.AccountDTO;
 import org.dromara.hmily.demo.common.account.dto.AccountNestedDTO;
 import org.dromara.hmily.demo.common.account.entity.AccountDO;
 import org.dromara.hmily.demo.common.account.mapper.AccountMapper;
+import org.dromara.hmily.demo.common.inventory.api.InventoryService;
 import org.dromara.hmily.demo.common.inventory.dto.InventoryDTO;
-import org.dromara.hmily.demo.motan.account.api.service.AccountService;
-import org.dromara.hmily.demo.motan.account.api.service.InlineService;
-import org.dromara.hmily.demo.motan.inventory.api.service.InventoryService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,8 +37,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.concurrent.atomic.AtomicInteger;
-
-//import org.dromara.hmily.demo.motan.account.api.service.InlineService;
 
 /**
  * The type Account service.

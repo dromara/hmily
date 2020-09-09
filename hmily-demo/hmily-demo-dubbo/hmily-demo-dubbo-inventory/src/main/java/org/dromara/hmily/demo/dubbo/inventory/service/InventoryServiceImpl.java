@@ -18,21 +18,22 @@
 package org.dromara.hmily.demo.dubbo.inventory.service;
 
 import com.google.common.collect.Lists;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 import org.dromara.hmily.annotation.HmilyTAC;
 import org.dromara.hmily.annotation.HmilyTCC;
 import org.dromara.hmily.common.exception.HmilyRuntimeException;
-import org.dromara.hmily.demo.dubbo.inventory.api.dto.InventoryDTO;
-import org.dromara.hmily.demo.dubbo.inventory.api.entity.InventoryDO;
-import org.dromara.hmily.demo.dubbo.inventory.api.service.InventoryService;
-import org.dromara.hmily.demo.dubbo.inventory.mapper.InventoryMapper;
+import org.dromara.hmily.demo.common.inventory.api.InventoryService;
+import org.dromara.hmily.demo.common.inventory.dto.InventoryDTO;
+import org.dromara.hmily.demo.common.inventory.entity.InventoryDO;
+import org.dromara.hmily.demo.common.inventory.mapper.InventoryMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * The type Inventory service.

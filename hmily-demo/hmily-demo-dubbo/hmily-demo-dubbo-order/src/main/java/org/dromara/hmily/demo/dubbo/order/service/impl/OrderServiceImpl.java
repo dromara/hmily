@@ -17,12 +17,10 @@
 
 package org.dromara.hmily.demo.dubbo.order.service.impl;
 
-import java.math.BigDecimal;
-import java.util.Date;
 import org.dromara.hmily.common.utils.IdWorkerUtils;
-import org.dromara.hmily.demo.dubbo.order.entity.Order;
-import org.dromara.hmily.demo.dubbo.order.enums.OrderStatusEnum;
-import org.dromara.hmily.demo.dubbo.order.mapper.OrderMapper;
+import org.dromara.hmily.demo.common.order.entity.Order;
+import org.dromara.hmily.demo.common.order.enums.OrderStatusEnum;
+import org.dromara.hmily.demo.common.order.mapper.OrderMapper;
 import org.dromara.hmily.demo.dubbo.order.service.OrderService;
 import org.dromara.hmily.demo.dubbo.order.service.PaymentService;
 import org.slf4j.Logger;
@@ -30,6 +28,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
+import java.util.Date;
 
 
 /**
@@ -166,7 +167,7 @@ public class OrderServiceImpl implements OrderService {
     
     @Override
     public void updateOrderStatus(Order order) {
-        orderMapper.updateStatus(order);
+        orderMapper.update(order);
     }
     
     private Order saveOrder(Integer count, BigDecimal amount) {

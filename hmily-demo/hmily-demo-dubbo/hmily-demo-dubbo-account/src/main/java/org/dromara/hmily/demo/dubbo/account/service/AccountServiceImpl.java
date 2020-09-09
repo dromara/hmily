@@ -17,23 +17,24 @@
 
 package org.dromara.hmily.demo.dubbo.account.service;
 
-import java.util.concurrent.atomic.AtomicInteger;
 import org.dromara.hmily.annotation.HmilyTAC;
 import org.dromara.hmily.annotation.HmilyTCC;
 import org.dromara.hmily.common.exception.HmilyRuntimeException;
-import org.dromara.hmily.demo.dubbo.account.api.dto.AccountDTO;
-import org.dromara.hmily.demo.dubbo.account.api.dto.AccountNestedDTO;
-import org.dromara.hmily.demo.dubbo.account.api.entity.AccountDO;
-import org.dromara.hmily.demo.dubbo.account.api.service.AccountService;
-import org.dromara.hmily.demo.dubbo.account.api.service.InlineService;
-import org.dromara.hmily.demo.dubbo.account.mapper.AccountMapper;
-import org.dromara.hmily.demo.dubbo.inventory.api.dto.InventoryDTO;
-import org.dromara.hmily.demo.dubbo.inventory.api.service.InventoryService;
+import org.dromara.hmily.demo.common.account.dto.AccountDTO;
+import org.dromara.hmily.demo.common.account.dto.AccountNestedDTO;
+import org.dromara.hmily.demo.common.account.entity.AccountDO;
+import org.dromara.hmily.demo.common.account.mapper.AccountMapper;
+import org.dromara.hmily.demo.common.account.api.AccountService;
+import org.dromara.hmily.demo.common.account.api.InlineService;
+import org.dromara.hmily.demo.common.inventory.api.InventoryService;
+import org.dromara.hmily.demo.common.inventory.dto.InventoryDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * The type Account service.

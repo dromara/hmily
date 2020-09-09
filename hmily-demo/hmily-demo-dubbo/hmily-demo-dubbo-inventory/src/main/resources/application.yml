@@ -13,7 +13,7 @@ spring:
 
 
 mybatis:
-  type-aliases-package: com.hmily.tcc.demo.dubbo.inventory.api.entity
+  type-aliases-package: com.hmily.tcc.demo.common.inventory.entity
   config-location: classpath:mybatis/mybatis-config.xml
 
 logging:

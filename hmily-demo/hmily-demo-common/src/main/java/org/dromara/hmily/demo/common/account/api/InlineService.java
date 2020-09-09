@@ -1,4 +1,4 @@
-package org.dromara.hmily.demo.dubbo.account.api.service;
+package org.dromara.hmily.demo.common.account.api;
 
 /**
  * @author xiaoyu(Myth)

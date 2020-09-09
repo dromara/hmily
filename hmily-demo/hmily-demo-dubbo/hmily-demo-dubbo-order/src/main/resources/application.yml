@@ -12,7 +12,7 @@ spring:
         password:
 
 mybatis:
-  type-aliases-package: com.hmily.tcc.demo.dubbo.order.entity
+  type-aliases-package: com.hmily.tcc.demo.common.order.entity
   config-location: classpath:mybatis/mybatis-config.xml
 
 logging:

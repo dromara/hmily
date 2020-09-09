@@ -33,8 +33,6 @@
     <modules>
         <module>hmily-demo-dubbo-order</module>
         <module>hmily-demo-dubbo-account</module>
-        <module>hmily-demo-dubbo-account-api</module>
-        <module>hmily-demo-dubbo-inventory-api</module>
         <module>hmily-demo-dubbo-inventory</module>
     </modules>
 
@@ -84,19 +82,7 @@
 
             <dependency>
                 <groupId>org.dromara</groupId>
-                <artifactId>hmily-demo-dubbo-inventory-api</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.dromara</groupId>
                 <artifactId>hmily-demo-dubbo-account</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.dromara</groupId>
-                <artifactId>hmily-demo-dubbo-account-api</artifactId>
                 <version>${project.version}</version>
             </dependency>
 

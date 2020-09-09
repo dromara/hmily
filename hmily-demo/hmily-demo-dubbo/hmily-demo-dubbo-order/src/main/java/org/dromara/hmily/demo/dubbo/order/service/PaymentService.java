@@ -17,7 +17,8 @@
 
 package org.dromara.hmily.demo.dubbo.order.service;
 
-import org.dromara.hmily.demo.dubbo.order.entity.Order;
+
+import org.dromara.hmily.demo.common.order.entity.Order;
 
 /**
  * The interface Payment service.

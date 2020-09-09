@@ -29,7 +29,7 @@ import org.springframework.context.annotation.ImportResource;
  */
 @SpringBootApplication
 @ImportResource({"classpath:spring-dubbo.xml"})
-@MapperScan("org.dromara.hmily.demo.dubbo.order.mapper")
+@MapperScan("org.dromara.hmily.demo.common.order.mapper")
 public class DubboHmilyOrderApplication {
 
     /**
@@ -38,10 +38,6 @@ public class DubboHmilyOrderApplication {
      * @param args args
      */
     public static void main(final String[] args) {
-        try {
-            SpringApplication.run(DubboHmilyOrderApplication.class, args);
-        }catch (Exception e){
-            System.out.println(e);
-        }
+        SpringApplication.run(DubboHmilyOrderApplication.class, args);
     }
 }

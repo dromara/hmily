@@ -11,8 +11,6 @@
     <artifactId>hmily-demo-motan</artifactId>
     <packaging>pom</packaging>
     <modules>
-        <module>hmily-demo-motan-account-api</module>
-        <module>hmily-demo-motan-inventory-api</module>
         <module>hmily-demo-motan-account</module>
         <module>hmily-demo-motan-inventory</module>
         <module>hmily-demo-motan-order</module>
@@ -21,22 +19,6 @@
     <properties>
         <motan.version>1.0.0</motan.version>
     </properties>
-
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.dromara</groupId>
-                <artifactId>hmily-demo-motan-inventory-api</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.dromara</groupId>
-                <artifactId>hmily-demo-motan-account-api</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
-
     <dependencies>
         <!--motan 依赖-->
         <dependency>

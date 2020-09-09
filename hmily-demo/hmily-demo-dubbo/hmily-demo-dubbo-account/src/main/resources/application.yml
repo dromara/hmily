@@ -11,7 +11,7 @@ spring:
         password:
 
 mybatis:
-  type-aliases-package: com.hmily.tcc.demo.dubbo.account.api.entity
+  type-aliases-package: com.hmily.tcc.demo.common.account.entity
   config-location: classpath:mybatis/mybatis-config.xml
 
 logging:

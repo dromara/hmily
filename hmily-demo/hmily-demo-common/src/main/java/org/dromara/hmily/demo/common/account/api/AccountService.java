@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.demo.motan.account.api.service;
+package org.dromara.hmily.demo.common.account.api;
 
 import org.dromara.hmily.annotation.Hmily;
 import org.dromara.hmily.demo.common.account.dto.AccountDTO;
@@ -25,7 +25,7 @@ import org.dromara.hmily.demo.common.account.entity.AccountDO;
 /**
  * The interface Account service.
  *
- * @author bbaiggey
+ * @author xiaoyu
  */
 @SuppressWarnings("all")
 public interface AccountService {
@@ -39,6 +39,8 @@ public interface AccountService {
      */
     @Hmily
     void payment(AccountDTO accountDTO);
+    
+    
     
     /**
      * Mock try payment exception.

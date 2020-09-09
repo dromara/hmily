@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.demo.motan.inventory.api.service;
+package org.dromara.hmily.demo.common.inventory.api;
 
 import org.dromara.hmily.annotation.Hmily;
 import org.dromara.hmily.demo.common.inventory.dto.InventoryDTO;
