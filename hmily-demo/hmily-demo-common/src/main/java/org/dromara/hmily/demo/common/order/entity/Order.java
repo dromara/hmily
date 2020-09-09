@@ -24,12 +24,15 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 /**
+ * The type Order.
+ *
  * @author xiaoyu
  */
 @Data
 public class Order implements Serializable {
 
     private static final long serialVersionUID = -8551347266419380333L;
+    
     private Integer id;
 
     /**
@@ -41,8 +44,7 @@ public class Order implements Serializable {
      * 订单编号
      */
     private String number;
-
-
+    
     /**
      * 订单状态
      */
@@ -67,6 +69,4 @@ public class Order implements Serializable {
      * 购买人
      */
     private String userId;
-
-
 }

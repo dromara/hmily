@@ -10,13 +10,14 @@ import org.springframework.boot.autoconfigure.data.mongo.MongoDataAutoConfigurat
 import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
 
 /**
- * @Author: bbaiggey
- * @Date: 2020/8/28 12:51
+ * The type Motan hmily inventory application.
+ *
+ * @author bbaiggey
  */
 @SpringBootApplication(exclude = {MongoAutoConfiguration.class, MongoDataAutoConfiguration.class})
 @MapperScan("org.dromara.hmily.demo.common.inventory.mapper")
 public class MotanHmilyInventoryApplication {
-
+    
     /**
      * main.
      *
@@ -29,5 +30,4 @@ public class MotanHmilyInventoryApplication {
         MotanSwitcherUtil.setSwitcherValue(MotanConstants.REGISTRY_HEARTBEAT_SWITCHER, true);
         System.out.println("MotanHmilyInventoryApplication server start...");
     }
-
 }

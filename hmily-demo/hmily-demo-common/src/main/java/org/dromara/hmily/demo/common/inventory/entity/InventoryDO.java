@@ -47,5 +47,4 @@ public class InventoryDO implements Serializable {
      * 锁定库存.
      */
     private Integer lockInventory;
-
 }

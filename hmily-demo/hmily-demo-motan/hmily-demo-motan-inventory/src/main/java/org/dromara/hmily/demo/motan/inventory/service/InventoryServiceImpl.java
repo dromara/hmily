@@ -211,5 +211,4 @@ public class InventoryServiceImpl implements InventoryService {
         inventoryMapper.cancel(inventoryDTO);
         return true;
     }
-
 }

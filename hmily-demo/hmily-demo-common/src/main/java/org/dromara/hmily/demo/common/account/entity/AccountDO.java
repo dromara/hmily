@@ -44,6 +44,4 @@ public class AccountDO implements Serializable {
     private Date createTime;
 
     private Date updateTime;
-
-
 }
