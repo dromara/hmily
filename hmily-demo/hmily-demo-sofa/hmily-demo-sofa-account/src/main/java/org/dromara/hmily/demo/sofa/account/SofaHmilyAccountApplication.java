@@ -6,6 +6,11 @@ import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ImportResource;
 
+/**
+ * The SofaHmilyAccountApplication.
+ *
+ * @author bbaiggey
+ */
 @ImportResource({ "classpath*:invoke-server-example.xml", "classpath*:invoke-client-example.xml"})
 @SpringBootApplication
 @MapperScan("org.dromara.hmily.demo.common.account.mapper")

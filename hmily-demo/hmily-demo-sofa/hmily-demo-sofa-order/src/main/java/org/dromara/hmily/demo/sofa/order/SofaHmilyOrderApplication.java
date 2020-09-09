@@ -7,8 +7,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ImportResource;
 
 /**
+ * The SofaHmilyOrderApplication.
+ *
  * @Author: bbaiggey
- * @Date: 2020/8/28 12:51
  */
 @SpringBootApplication
 @ImportResource({ "classpath*:invoke-client-example.xml"})
