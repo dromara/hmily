@@ -19,9 +19,9 @@ package org.dromara.hmily.demo.springcloud.inventory.service.impl;
 
 import org.dromara.hmily.annotation.HmilyTCC;
 import org.dromara.hmily.common.exception.HmilyRuntimeException;
-import org.dromara.hmily.demo.springcloud.inventory.dto.InventoryDTO;
-import org.dromara.hmily.demo.springcloud.inventory.entity.InventoryDO;
-import org.dromara.hmily.demo.springcloud.inventory.mapper.InventoryMapper;
+import org.dromara.hmily.demo.common.inventory.dto.InventoryDTO;
+import org.dromara.hmily.demo.common.inventory.entity.InventoryDO;
+import org.dromara.hmily.demo.common.inventory.mapper.InventoryMapper;
 import org.dromara.hmily.demo.springcloud.inventory.service.InventoryService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

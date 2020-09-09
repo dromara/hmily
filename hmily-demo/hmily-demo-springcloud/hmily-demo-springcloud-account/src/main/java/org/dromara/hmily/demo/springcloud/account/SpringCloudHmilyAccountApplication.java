@@ -35,7 +35,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableDiscoveryClient
 @EnableFeignClients
 @EnableTransactionManagement
-@MapperScan("org.dromara.hmily.demo.springcloud.account.mapper")
+@MapperScan("org.dromara.hmily.demo.common.account.mapper")
 public class SpringCloudHmilyAccountApplication {
 
     /**

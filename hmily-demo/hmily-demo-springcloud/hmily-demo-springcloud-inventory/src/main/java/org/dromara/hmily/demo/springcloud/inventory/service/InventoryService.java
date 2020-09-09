@@ -17,8 +17,8 @@
 
 package org.dromara.hmily.demo.springcloud.inventory.service;
 
-import org.dromara.hmily.demo.springcloud.inventory.dto.InventoryDTO;
-import org.dromara.hmily.demo.springcloud.inventory.entity.InventoryDO;
+import org.dromara.hmily.demo.common.inventory.dto.InventoryDTO;
+import org.dromara.hmily.demo.common.inventory.entity.InventoryDO;
 
 
 /**

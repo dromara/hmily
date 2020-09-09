@@ -22,15 +22,15 @@ import com.weibo.api.motan.config.springsupport.annotation.MotanReferer;
 import org.dromara.hmily.annotation.HmilyTAC;
 import org.dromara.hmily.annotation.HmilyTCC;
 import org.dromara.hmily.common.exception.HmilyRuntimeException;
-import org.dromara.hmily.demo.motan.account.api.dto.AccountDTO;
-import org.dromara.hmily.demo.motan.account.api.dto.AccountNestedDTO;
-import org.dromara.hmily.demo.motan.account.api.entity.AccountDO;
-import org.dromara.hmily.demo.motan.account.api.service.AccountService;
-import org.dromara.hmily.demo.motan.inventory.api.dto.InventoryDTO;
-import org.dromara.hmily.demo.motan.inventory.api.service.InventoryService;
-import org.dromara.hmily.demo.motan.order.entity.Order;
-import org.dromara.hmily.demo.motan.order.enums.OrderStatusEnum;
-import org.dromara.hmily.demo.motan.order.mapper.OrderMapper;
+import org.dromara.hmily.demo.common.account.dto.AccountDTO;
+import org.dromara.hmily.demo.common.account.dto.AccountNestedDTO;
+import org.dromara.hmily.demo.common.account.entity.AccountDO;
+import org.dromara.hmily.demo.common.account.api.AccountService;
+import org.dromara.hmily.demo.common.inventory.api.InventoryService;
+import org.dromara.hmily.demo.common.inventory.dto.InventoryDTO;
+import org.dromara.hmily.demo.common.order.entity.Order;
+import org.dromara.hmily.demo.common.order.enums.OrderStatusEnum;
+import org.dromara.hmily.demo.common.order.mapper.OrderMapper;
 import org.dromara.hmily.demo.motan.order.service.PaymentService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,7 +70,11 @@ public class PaymentServiceImpl implements PaymentService {
             throw new HmilyRuntimeException("库存不足！");
         }*/
         //扣除用户余额
-        accountService.payment(buildAccountDTO(order));
+        System.out.println(order+"<<<<<<<<order<<<<<<<");
+        AccountDTO accountDTO = buildAccountDTO(order);
+        System.out.println(accountDTO+"<<<<<<<<accountDTO<<<<<<<");
+
+        accountService.payment(accountDTO);
         //进入扣减库存操作
         inventoryService.decrease(buildInventoryDTO(order));
     }

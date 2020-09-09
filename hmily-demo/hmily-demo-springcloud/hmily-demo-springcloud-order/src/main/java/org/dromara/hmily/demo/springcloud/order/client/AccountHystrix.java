@@ -17,8 +17,8 @@
 
 package org.dromara.hmily.demo.springcloud.order.client;
 
-import org.dromara.hmily.demo.springcloud.order.dto.AccountDTO;
-import org.dromara.hmily.demo.springcloud.order.dto.AccountNestedDTO;
+import org.dromara.hmily.demo.common.account.dto.AccountDTO;
+import org.dromara.hmily.demo.common.account.dto.AccountNestedDTO;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;

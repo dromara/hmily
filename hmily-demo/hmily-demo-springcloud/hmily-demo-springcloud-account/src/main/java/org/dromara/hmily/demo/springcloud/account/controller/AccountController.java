@@ -17,8 +17,8 @@
 
 package org.dromara.hmily.demo.springcloud.account.controller;
 
-import org.dromara.hmily.demo.springcloud.account.dto.AccountDTO;
-import org.dromara.hmily.demo.springcloud.account.dto.AccountNestedDTO;
+import org.dromara.hmily.demo.common.account.dto.AccountDTO;
+import org.dromara.hmily.demo.common.account.dto.AccountNestedDTO;
 import org.dromara.hmily.demo.springcloud.account.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;

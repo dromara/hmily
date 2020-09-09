@@ -36,7 +36,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableEurekaClient
 @EnableFeignClients
 @ImportResource({"classpath:applicationContext.xml"})
-@MapperScan("org.dromara.hmily.demo.springcloud.inventory.mapper")
+@MapperScan("org.dromara.hmily.demo.common.inventory.mapper")
 @EnableTransactionManagement
 public class SpringCloudHmilyInventoryApplication {
 

@@ -18,7 +18,7 @@
 package org.dromara.hmily.demo.motan.order.service;
 
 
-import org.dromara.hmily.demo.motan.order.entity.Order;
+import org.dromara.hmily.demo.common.order.entity.Order;
 
 import java.math.BigDecimal;
 

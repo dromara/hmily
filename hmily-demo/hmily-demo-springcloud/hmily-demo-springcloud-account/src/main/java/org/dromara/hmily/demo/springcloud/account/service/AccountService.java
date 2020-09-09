@@ -17,9 +17,9 @@
 
 package org.dromara.hmily.demo.springcloud.account.service;
 
-import org.dromara.hmily.demo.springcloud.account.dto.AccountDTO;
-import org.dromara.hmily.demo.springcloud.account.dto.AccountNestedDTO;
-import org.dromara.hmily.demo.springcloud.account.entity.AccountDO;
+import org.dromara.hmily.demo.common.account.dto.AccountDTO;
+import org.dromara.hmily.demo.common.account.dto.AccountNestedDTO;
+import org.dromara.hmily.demo.common.account.entity.AccountDO;
 
 /**
  * AccountService.

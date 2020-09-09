@@ -17,7 +17,8 @@
 
 package org.dromara.hmily.demo.springcloud.order.service;
 
-import org.dromara.hmily.demo.springcloud.order.entity.Order;
+
+import org.dromara.hmily.demo.common.order.entity.Order;
 
 import java.math.BigDecimal;
 
