@@ -19,12 +19,15 @@ package org.dromara.hmily.demo.motan.account;
 
 import com.weibo.api.motan.common.MotanConstants;
 import com.weibo.api.motan.util.MotanSwitcherUtil;
+import org.dromara.hmily.demo.common.account.api.AccountService;
+import org.dromara.hmily.demo.motan.account.service.AccountServiceImpl;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.data.mongo.MongoDataAutoConfiguration;
 import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
+import org.springframework.context.ConfigurableApplicationContext;
 
 /**
  * The MotanHmilyAccountApplication.
@@ -43,8 +46,10 @@ public class MotanHmilyAccountApplication {
     public static void main(final String[] args) {
         SpringApplication springApplication = new SpringApplication(MotanHmilyAccountApplication.class);
         springApplication.setWebApplicationType(WebApplicationType.NONE);
-        springApplication.run(args);
+        ConfigurableApplicationContext context = springApplication.run(args);
         MotanSwitcherUtil.setSwitcherValue(MotanConstants.REGISTRY_HEARTBEAT_SWITCHER, true);
         System.out.println("MotanHmilyAccountApplication server start...");
+        AccountService accountService = (AccountServiceImpl) context.getBean(AccountService.class);
+        accountService.findByUserId("1");
     }
 }

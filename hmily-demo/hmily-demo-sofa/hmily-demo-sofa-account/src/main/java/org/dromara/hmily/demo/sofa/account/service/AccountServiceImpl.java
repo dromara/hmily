@@ -15,10 +15,8 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.demo.motan.account.service;
+package org.dromara.hmily.demo.sofa.account.service;
 
-import com.weibo.api.motan.config.springsupport.annotation.MotanReferer;
-import com.weibo.api.motan.config.springsupport.annotation.MotanService;
 import org.dromara.hmily.annotation.HmilyTAC;
 import org.dromara.hmily.annotation.HmilyTCC;
 import org.dromara.hmily.common.exception.HmilyRuntimeException;
@@ -33,9 +31,9 @@ import org.dromara.hmily.demo.common.inventory.dto.InventoryDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Resource;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -43,7 +41,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  *
  * @author bbaiggey
  */
-@MotanService
+@Service("accountService")
 public class AccountServiceImpl implements AccountService {
 
     /**
@@ -61,18 +59,26 @@ public class AccountServiceImpl implements AccountService {
      */
     private static AtomicInteger confrimCount = new AtomicInteger(0);
 
-    @Resource
-    private AccountMapper accountMapper;
+    private final AccountMapper accountMapper;
 
-    @Autowired
-    private InlineService inlineService;
+    private final InlineService inlineService;
 
-    @MotanReferer(basicReferer = "hmilyClientBasicConfig")
-    private InventoryService inventoryService;
+    private final InventoryService inventoryService;
+
+    @Autowired(required = false)
+    public AccountServiceImpl(AccountMapper accountMapper,
+                              InlineService inlineService,
+                              InventoryService inventoryService){
+        this.accountMapper = accountMapper;
+        this.inlineService = inlineService;
+        this.inventoryService = inventoryService;
+    }
+
 
     @Override
     @HmilyTCC(confirmMethod = "confirm", cancelMethod = "cancel")
     public void payment(AccountDTO accountDTO) {
+        System.out.println(accountDTO+"<<<<<<<<<<<<<<<");
         accountMapper.update(accountDTO);
     }
 
