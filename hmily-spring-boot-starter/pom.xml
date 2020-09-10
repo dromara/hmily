@@ -37,6 +37,7 @@
         <module>hmily-spring-boot-starter-motan</module>
         <module>hmily-spring-boot-starter-parent</module>
         <module>hmily-spring-boot-starter-apache-dubbo</module>
+        <module>hmily-spring-boot-starter-sofa-rpc</module>
     </modules>
 
     <dependencies>

@@ -15,6 +15,12 @@ import org.springframework.context.annotation.ImportResource;
 @SpringBootApplication
 @MapperScan("org.dromara.hmily.demo.common.account.mapper")
 public class SofaHmilyAccountApplication {
+    
+    /**
+     * The entry point of application.
+     *
+     * @param args the input arguments
+     */
     public static void main(String[] args) {
           SpringApplication springApplication = new SpringApplication(SofaHmilyAccountApplication.class);
           springApplication.setWebApplicationType(WebApplicationType.NONE);

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.demo.motan.inventory.service;
+package org.dromara.hmily.demo.sofa.inventory.service;
 
 import com.google.common.collect.Lists;
 import org.dromara.hmily.annotation.HmilyTAC;

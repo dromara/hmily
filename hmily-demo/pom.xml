@@ -32,7 +32,6 @@
 
     <dependencyManagement>
         <dependencies>
-
             <dependency>
                 <groupId>org.dromara</groupId>
                 <artifactId>hmily-demo-common</artifactId>
@@ -76,6 +75,12 @@
             </dependency>
 
             <dependency>
+                <groupId>org.dromara</groupId>
+                <artifactId>hmily-spring-boot-starter-sofa-rpc</artifactId>
+                <version>${hmily.version}</version>
+            </dependency>
+
+            <dependency>
                 <groupId>io.springfox</groupId>
                 <artifactId>springfox-swagger2</artifactId>
                 <version>${springfox.version}</version>
@@ -98,10 +103,8 @@
                 <artifactId>spring-data-mongodb</artifactId>
                 <version>${spring.data.mongodb.version}</version>
             </dependency>
-
         </dependencies>
     </dependencyManagement>
-
 
     <build>
         <plugins>

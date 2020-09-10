@@ -26,15 +26,46 @@
 
         <dependency>
             <groupId>org.dromara</groupId>
-            <artifactId>hmily-common</artifactId>
+            <artifactId>hmily-spring-boot-starter-sofa-rpc</artifactId>
+            <version>${hmily.version}</version>
             <exclusions>
                 <exclusion>
-                    <groupId>com.google.guava</groupId>
+                    <groupId>org.dromara</groupId>
+                    <artifactId>hmily-config-apollo</artifactId>
+                </exclusion>
+                <exclusion>
                     <artifactId>guava</artifactId>
+                    <groupId>com.google.guava</groupId>
                 </exclusion>
             </exclusions>
         </dependency>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>5.1.47</version>
+        </dependency>
 
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>org.dromara.hmily.demo.sofa.account.SofaHmilyAccountApplication</mainClass>
+                    <executable>true</executable>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

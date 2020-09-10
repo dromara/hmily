@@ -15,24 +15,29 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.dubbo.loadbalance;
+package org.dromara.hmily.demo.sofa.inventory.configuration;
 
-import com.alibaba.dubbo.common.URL;
-import com.alibaba.dubbo.rpc.Invocation;
-import com.alibaba.dubbo.rpc.Invoker;
-import com.alibaba.dubbo.rpc.cluster.loadbalance.ConsistentHashLoadBalance;
-import java.util.List;
+import com.weibo.api.motan.config.springsupport.BasicServiceConfigBean;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 /**
- * The type ConsistentHash Dubbo hmily load balance.
+ * The MotanServerConfig.
  *
- * @author xiaoyu(Myth)
+ * @author bbaiggey
  */
-public class HmilyConsistentHashDubboLoadBalance extends ConsistentHashLoadBalance {
+@Configuration
+public class MotanServerConfig {
     
-    @Override
-    protected <T> Invoker<T> doSelect(final List<Invoker<T>> invokers, final URL url, final Invocation invocation) {
-        Invoker<T> defaultInvoker = super.doSelect(invokers, url, invocation);
-        return HmilyLoadBalanceUtils.doSelect(defaultInvoker, invokers);
+    /**
+     * Base service config basic service config bean.
+     *
+     * @return the basic service config bean
+     */
+    @Bean
+    @ConfigurationProperties(prefix = "hmily.motan.server")
+    public BasicServiceConfigBean baseServiceConfig() {
+        return new BasicServiceConfigBean();
     }
 }

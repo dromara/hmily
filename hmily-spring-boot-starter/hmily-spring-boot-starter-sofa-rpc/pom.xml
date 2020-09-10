@@ -20,29 +20,24 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
+        <artifactId>hmily-spring-boot-starter</artifactId>
         <groupId>org.dromara</groupId>
-        <artifactId>hmily-config</artifactId>
         <version>2.1.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>hmily-config-apollo</artifactId>
+    <artifactId>hmily-spring-boot-starter-sofa-rpc</artifactId>
 
     <dependencies>
         <dependency>
             <groupId>org.dromara</groupId>
-            <artifactId>hmily-config-loader</artifactId>
+            <artifactId>hmily-spring-boot-starter-parent</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.ctrip.framework.apollo</groupId>
-            <artifactId>apollo-client</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.google.inject</groupId>
-            <artifactId>guice</artifactId>
+            <groupId>org.dromara</groupId>
+            <artifactId>hmily-sofa-rpc</artifactId>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
-
-
 </project>
