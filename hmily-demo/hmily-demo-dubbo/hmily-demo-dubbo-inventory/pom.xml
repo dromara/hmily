@@ -44,8 +44,6 @@
             <version>${hmily.version}</version>
         </dependency>
 
-
-
         <!-- if you want to use oracle,please import and open this-->
         <!-- <dependency>
              <groupId>com.oracle</groupId>
@@ -65,53 +63,10 @@
              <artifactId>sqljdbc4</artifactId>
              <version>6.0</version>
          </dependency>-->
-
-        <!-- dubbo -->
-        <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>dubbo</artifactId>
-        </dependency>
-
-
-        <dependency>
-            <groupId>com.101tec</groupId>
-            <artifactId>zkclient</artifactId>
-            <version>0.10</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-log4j12</artifactId>
-                </exclusion>
-
-                <exclusion>
-                    <groupId>log4j</groupId>
-                    <artifactId>log4j</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.curator</groupId>
-            <artifactId>curator-client</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.curator</groupId>
-            <artifactId>curator-framework</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.zookeeper</groupId>
-            <artifactId>zookeeper</artifactId>
-        </dependency>
-
     </dependencies>
-
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
-
+    
     <build>
+        <finalName>hmily-demo-dubbo-inventory</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

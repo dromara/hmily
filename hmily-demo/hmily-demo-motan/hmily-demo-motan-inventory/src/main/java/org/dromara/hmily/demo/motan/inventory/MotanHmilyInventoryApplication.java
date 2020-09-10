@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.demo.sofa.inventory;
+package org.dromara.hmily.demo.motan.inventory;
 
 import com.weibo.api.motan.common.MotanConstants;
 import com.weibo.api.motan.util.MotanSwitcherUtil;

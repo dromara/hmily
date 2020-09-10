@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.demo.sofa.inventory.configuration;
+package org.dromara.hmily.demo.motan.inventory.configuration;
 
 import com.weibo.api.motan.config.springsupport.BasicServiceConfigBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;

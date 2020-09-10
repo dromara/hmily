@@ -25,7 +25,6 @@ import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.data.mongo.MongoDataAutoConfiguration;
 import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
-import org.springframework.context.ConfigurableApplicationContext;
 
 /**
  * The MotanHmilyAccountApplication.
@@ -44,7 +43,7 @@ public class MotanHmilyAccountApplication {
     public static void main(final String[] args) {
         SpringApplication springApplication = new SpringApplication(MotanHmilyAccountApplication.class);
         springApplication.setWebApplicationType(WebApplicationType.NONE);
-        ConfigurableApplicationContext context = springApplication.run(args);
+        springApplication.run(args);
         MotanSwitcherUtil.setSwitcherValue(MotanConstants.REGISTRY_HEARTBEAT_SWITCHER, true);
         System.out.println("MotanHmilyAccountApplication server start...");
     }
