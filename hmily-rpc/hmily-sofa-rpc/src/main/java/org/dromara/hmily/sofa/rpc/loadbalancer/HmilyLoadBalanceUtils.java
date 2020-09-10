@@ -34,8 +34,15 @@ import org.dromara.hmily.core.context.HmilyTransactionContext;
 public class HmilyLoadBalanceUtils {
 
     private static final Map<String, ProviderInfo> URL_MAP = Maps.newConcurrentMap();
-   
-    public static ProviderInfo doSelect(final ProviderInfo defaultProviderInfo, final List<ProviderInfo> ProviderInfos) {
+    
+    /**
+     * Do select provider info.
+     *
+     * @param defaultProviderInfo the default provider info
+     * @param providerInfos       the provider infos
+     * @return the provider info
+     */
+    public static ProviderInfo doSelect(final ProviderInfo defaultProviderInfo, final List<ProviderInfo> providerInfos) {
         final HmilyTransactionContext hmilyTransactionContext = HmilyContextHolder.get();
         if (Objects.isNull(hmilyTransactionContext)) {
             return defaultProviderInfo;
@@ -49,7 +56,7 @@ public class HmilyLoadBalanceUtils {
         final ProviderInfo oldProviderInfo = URL_MAP.get(key);
         URL_MAP.remove(key);
         if (Objects.nonNull(oldProviderInfo)) {
-            for (ProviderInfo providerInfo : ProviderInfos) {
+            for (ProviderInfo providerInfo : providerInfos) {
                 if (Objects.equals(providerInfo, oldProviderInfo)) {
                     return oldProviderInfo;
                 }

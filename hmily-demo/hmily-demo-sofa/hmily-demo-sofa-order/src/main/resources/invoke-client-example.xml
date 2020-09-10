@@ -8,13 +8,13 @@
 
     <sofa:reference jvm-first="false" id="inventoryService" interface="org.dromara.hmily.demo.common.inventory.api.InventoryService">
         <sofa:binding.bolt>
-            <sofa:global-attrs retries="0" timeout="50000000"/>
+            <sofa:global-attrs retries="0" timeout="5000" loadBalancer ="hmilyRandom"/>
         </sofa:binding.bolt>
     </sofa:reference>
 
     <sofa:reference jvm-first="false" id="accountService" interface="org.dromara.hmily.demo.common.account.api.AccountService">
         <sofa:binding.bolt>
-            <sofa:global-attrs retries="0" timeout="50000000"/>
+            <sofa:global-attrs retries="0" timeout="5000" loadBalancer ="hmilyRandom"/>
         </sofa:binding.bolt>
     </sofa:reference>
 </beans>

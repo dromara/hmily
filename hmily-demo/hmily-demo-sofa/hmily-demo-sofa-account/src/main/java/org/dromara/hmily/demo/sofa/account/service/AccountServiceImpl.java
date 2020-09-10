@@ -78,7 +78,6 @@ public class AccountServiceImpl implements AccountService {
     @Override
     @HmilyTCC(confirmMethod = "confirm", cancelMethod = "cancel")
     public void payment(AccountDTO accountDTO) {
-        System.out.println(accountDTO+"<<<<<<<<<<<<<<<");
         accountMapper.update(accountDTO);
     }
 
@@ -162,7 +161,7 @@ public class AccountServiceImpl implements AccountService {
      */
     @Transactional(rollbackFor = Exception.class)
     public boolean confirmNested(AccountNestedDTO accountNestedDTO) {
-        LOGGER.debug("============motan tcc 执行确认付款接口===============");
+        LOGGER.debug("============ sofa tcc 执行确认付款接口===============");
         AccountDTO accountDTO = new AccountDTO();
         accountDTO.setUserId(accountNestedDTO.getUserId());
         accountDTO.setAmount(accountNestedDTO.getAmount());
@@ -178,7 +177,7 @@ public class AccountServiceImpl implements AccountService {
      */
     @Transactional(rollbackFor = Exception.class)
     public boolean cancelNested(AccountNestedDTO accountNestedDTO) {
-        LOGGER.debug("============ motan tcc 执行取消付款接口===============");
+        LOGGER.debug("============ sofa tcc 执行取消付款接口===============");
         AccountDTO accountDTO = new AccountDTO();
         accountDTO.setUserId(accountNestedDTO.getUserId());
         accountDTO.setAmount(accountNestedDTO.getAmount());
@@ -194,7 +193,7 @@ public class AccountServiceImpl implements AccountService {
      */
     @Transactional(rollbackFor = Exception.class)
     public boolean confirm(AccountDTO accountDTO) {
-        LOGGER.info("============motan tcc 执行确认付款接口===============");
+        LOGGER.info("============sofa tcc 执行确认付款接口===============");
         accountMapper.confirm(accountDTO);
         final int i = confrimCount.incrementAndGet();
         LOGGER.info("调用了account confirm " + i + " 次");
@@ -209,7 +208,7 @@ public class AccountServiceImpl implements AccountService {
      */
     @Transactional(rollbackFor = Exception.class)
     public boolean cancel(AccountDTO accountDTO) {
-        LOGGER.info("============ dubbo tcc 执行取消付款接口===============");
+        LOGGER.info("============ sofa tcc 执行取消付款接口===============");
         final AccountDO accountDO = accountMapper.findByUserId(accountDTO.getUserId());
         accountMapper.cancel(accountDTO);
         return Boolean.TRUE;

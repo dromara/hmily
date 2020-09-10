@@ -44,8 +44,8 @@ public class MotanParameterLoader implements RpcParameterLoader {
                 if (attachments != null && !attachments.isEmpty()) {
                     return attachments.get(key);
                 }
-                return "";
-            }).orElse("");
+                return null;
+            }).orElse(null);
         })).orElse(HmilyContextHolder.get());
     }
 }

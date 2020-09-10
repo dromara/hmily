@@ -18,10 +18,12 @@
 package org.dromara.hmily.core.mediator;
 
 import java.util.Objects;
-import org.dromara.hmily.core.context.HmilyTransactionContext;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
 import org.dromara.hmily.common.constant.CommonConstant;
 import org.dromara.hmily.common.utils.GsonUtils;
 import org.dromara.hmily.common.utils.StringUtils;
+import org.dromara.hmily.core.context.HmilyTransactionContext;
 
 /**
  * The type RpcMediator.
@@ -31,7 +33,7 @@ import org.dromara.hmily.common.utils.StringUtils;
 public class RpcMediator {
     
     private static final RpcMediator INSTANCE = new RpcMediator();
-
+    
     /**
      * Gets instance.
      *
@@ -51,9 +53,8 @@ public class RpcMediator {
         if (Objects.nonNull(context)) {
             rpcTransmit.transmit(CommonConstant.HMILY_TRANSACTION_CONTEXT, GsonUtils.getInstance().toJson(context));
         }
-
     }
-
+    
     /**
      * Acquire hmily transaction context.
      *
@@ -67,5 +68,18 @@ public class RpcMediator {
             hmilyTransactionContext = GsonUtils.getInstance().fromJson(context, HmilyTransactionContext.class);
         }
         return hmilyTransactionContext;
+    }
+    
+    /**
+     * Gets and set.
+     *
+     * @param function   the function
+     * @param biConsumer the bi consumer
+     */
+    public void getAndSet(final Function<String, Object> function, final BiConsumer<String, Object> biConsumer) {
+        Object result = function.apply(CommonConstant.HMILY_TRANSACTION_CONTEXT);
+        if (Objects.nonNull(result)) {
+            biConsumer.accept(CommonConstant.HMILY_TRANSACTION_CONTEXT, result);
+        }
     }
 }

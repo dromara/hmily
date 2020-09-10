@@ -19,7 +19,6 @@ package org.dromara.hmily.sofa.rpc.filter;
 
 import com.alipay.sofa.rpc.common.utils.ClassTypeUtils;
 import com.alipay.sofa.rpc.common.utils.ClassUtils;
-import com.alipay.sofa.rpc.context.RpcInternalContext;
 import com.alipay.sofa.rpc.core.exception.SofaRpcException;
 import com.alipay.sofa.rpc.core.request.SofaRequest;
 import com.alipay.sofa.rpc.core.response.SofaResponse;
@@ -50,7 +49,7 @@ import org.dromara.hmily.repository.spi.entity.HmilyParticipant;
  */
 @Extension(value = "hmilySofaRpcTransactionConsumer")
 @AutoActive(consumerSide = true)
-public class HmilySofaRpcTransactionFilter extends Filter {
+public class HmilySofaRpcTransactionConsumerFilter extends Filter {
     
     @Override
     @SneakyThrows
@@ -70,7 +69,7 @@ public class HmilySofaRpcTransactionFilter extends Filter {
         if (context.getRole() == HmilyRoleEnum.PARTICIPANT.getCode()) {
             context.setParticipantRefId(participantId);
         }
-        RpcMediator.getInstance().transmit(RpcInternalContext.getContext()::setAttachment, context);
+        RpcMediator.getInstance().transmit(sofaRequest::addRequestProp, context);
         final SofaResponse result = invoker.invoke(sofaRequest);
         //if result has not exception
         if (!result.isError()) {
