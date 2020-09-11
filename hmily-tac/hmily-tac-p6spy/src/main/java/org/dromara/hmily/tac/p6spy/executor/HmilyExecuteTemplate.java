@@ -90,17 +90,18 @@ public enum HmilyExecuteTemplate {
         }
         try {
             HmilySqlParserEngine hmilySqlParserEngine = HmilySqlParserEngineFactory.newInstance();
+            // TODO prepared sql will improve performance of parser engine
             String sql = statementInformation.getSqlWithValues();
             SQLStatement statement = hmilySqlParserEngine.parser(sql, DatabaseTypes.INSTANCE.getDatabaseType());
+            // TODO should generate lock-key to avoid dirty data modified by other global transaction.
             //3.然后根据不同的statement生产不同的反向sql
             HmilySqlRevertEngine hmilySqlRevertEngine = HmilySqlRevertEngineFactory.newInstance();
-            String resourceId = ResourceIdUtils.INSTANCE.getResourceId(statementInformation.getConnectionInformation().getUrl());
-            HmilyP6Datasource hmilyP6Datasource = (HmilyP6Datasource) HmilyResourceManager.get(resourceId);
-            HmilyUndoInvocation hmilyUndoInvocation = hmilySqlRevertEngine.revert(statement, hmilyP6Datasource, sql);
+            // TODO it's better to only record the before-after data images here, SQLRevertEngine only called on tx cancel phase
+            HmilyUndoInvocation hmilyUndoInvocation = hmilySqlRevertEngine.revert(statement, statementInformation.getConnectionInformation().getConnection(), sql);
             //4.缓存sql日志记录 ? 存储到哪里呢 threadLocal？
             HmilyUndoContext context = new HmilyUndoContext();
             context.setUndoInvocation(hmilyUndoInvocation);
-            context.setResourceId(resourceId);
+            context.setResourceId(ResourceIdUtils.INSTANCE.getResourceId(statementInformation.getConnectionInformation().getUrl()));
             HmilyTransactionContext transactionContext = HmilyContextHolder.get();
             context.setTransId(transactionContext.getTransId());
             context.setParticipantId(transactionContext.getParticipantId());
