@@ -43,7 +43,12 @@ public abstract class AbstractConfig implements Config {
         return isLoad;
     }
 
+    @Override
     public boolean isPassive() {
         return passive;
+    }
+
+    public void setPassive(boolean passive) {
+        this.passive = passive;
     }
 }

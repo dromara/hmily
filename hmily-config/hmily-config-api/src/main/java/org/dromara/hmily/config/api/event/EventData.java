@@ -17,7 +17,6 @@
 
 package org.dromara.hmily.config.api.event;
 
-import lombok.Data;
 import org.dromara.hmily.config.api.Config;
 
 /**
@@ -26,10 +25,77 @@ import org.dromara.hmily.config.api.Config;
  *
  * @author sixh chenbin
  */
-@Data
 public class EventData {
 
     private Config config;
 
+    /**
+     * Changed value.
+     */
+    private Object value;
 
+    /**
+     * Changed key.
+     */
+    private String properties;
+
+    /**
+     * subscription processing.
+     */
+    private String subscribe;
+
+    private final ChangeEvent event;
+
+    public EventData(ChangeEvent event, String properties, Object value) {
+        this.value = value;
+        this.properties = properties;
+        this.event = event;
+    }
+
+    /**
+     * Gets config.
+     *
+     * @param <M> the type parameter
+     * @return the config
+     */
+    public <M extends Config> M getConfig() {
+        return (M) config;
+    }
+
+    /**
+     * Sets config.
+     *
+     * @param config the config
+     */
+    public void setConfig(Config config) {
+        this.config = config;
+    }
+
+    public String getProperties() {
+        return properties;
+    }
+
+    public void setProperties(String properties) {
+        this.properties = properties;
+    }
+
+    public String getSubscribe() {
+        return subscribe;
+    }
+
+    public void setSubscribe(String subscribe) {
+        this.subscribe = subscribe;
+    }
+
+    public ChangeEvent getEvent() {
+        return event;
+    }
+
+    public Object getValue() {
+        return value;
+    }
+
+    public void setValue(Object value) {
+        this.value = value;
+    }
 }

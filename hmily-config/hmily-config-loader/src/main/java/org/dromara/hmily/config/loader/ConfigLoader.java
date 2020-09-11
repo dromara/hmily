@@ -18,24 +18,22 @@
 
 package org.dromara.hmily.config.loader;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
-import java.util.regex.Pattern;
-
-import org.dromara.hmily.config.api.AbstractConfig;
 import org.dromara.hmily.config.api.Config;
 import org.dromara.hmily.config.api.ConfigEnv;
 import org.dromara.hmily.config.api.event.ChangeEvent;
+import org.dromara.hmily.config.api.event.EventConsumer;
+import org.dromara.hmily.config.api.event.EventData;
 import org.dromara.hmily.config.loader.bind.BindData;
 import org.dromara.hmily.config.loader.bind.Binder;
 import org.dromara.hmily.config.loader.bind.DataType;
-import org.dromara.hmily.config.loader.property.ConfigPropertySource;
-import org.dromara.hmily.config.loader.property.DefaultConfigPropertySource;
-import org.dromara.hmily.config.loader.property.PropertyKeyParse;
-import org.dromara.hmily.config.loader.property.PropertyKeySource;
+import org.dromara.hmily.config.loader.property.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.*;
+import java.util.function.Supplier;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * ConfigLoader.
@@ -45,6 +43,11 @@ import org.dromara.hmily.config.loader.property.PropertyKeySource;
  * @author chenbin sixh
  */
 public interface ConfigLoader<T extends Config> {
+
+    /**
+     * The constant log.
+     */
+    Logger log = LoggerFactory.getLogger(ConfigLoader.class);
 
     /**
      * Load related configuration information.
@@ -58,28 +61,43 @@ public interface ConfigLoader<T extends Config> {
      * Implementation of Active Remote Push.
      *
      * @param context the context
-     * @param key     the key
-     * @param value   the value
-     * @param event   the event
+     * @param data    the data
      */
-    default void push(Supplier<Context> context, String key, String value, ChangeEvent event) {
-        if (event == null) {
+    default void push(Supplier<Context> context,
+                      EventData data) {
+        if (data == null) {
             return;
         }
-        Map<String, Set<Consumer<?>>> events = ConfigEnv.getInstance().getEvents();
+        Set<EventConsumer<EventData>> events = ConfigEnv.getInstance().getEvents();
         if (events.isEmpty()) {
             return;
         }
-        events.forEach((k, v) -> {
-            boolean isMatch = Pattern.matches(k, key);
-            if (isMatch) {
-                v.forEach(consumer -> {
-                    if (event.match(consumer)) {
-                        //todo:这里需要更新ConfigEvn里面的对象数据.
+        String properties = data.getProperties();
+        List<EventConsumer<EventData>> eventsLists = events.stream()
+                .filter(e -> !Objects.isNull(e.properties()))
+                .filter(e -> Pattern.matches(e.properties(), properties))
+                .collect(Collectors.toList());
+        for (EventConsumer<EventData> consumer : eventsLists) {
+            Optional<Config> first = ConfigEnv.getInstance().stream().filter(e -> properties.startsWith(e.prefix())).findFirst();
+            first.ifPresent(x -> {
+                List<PropertyKeySource<?>> sources = new ArrayList<>();
+                Map<String, Object> values = new HashMap<>(1);
+                values.put(properties, data.getValue());
+                sources.add(new MapPropertyKeySource(first.get().prefix(), values));
+                PassiveHandler<Config> handler = (ct, cf) -> {
+                    data.setConfig(cf);
+                    data.setSubscribe(consumer.properties());
+                    try {
+                        consumer.accept(data);
+                    } catch (ClassCastException e) {
+                        if (log.isWarnEnabled()) {
+                            log.warn("EventData of type [{}] not accepted by EventConsumer [{}]", data.getClass(), consumer);
+                        }
                     }
-                });
-            }
-        });
+                };
+                context.get().getOriginal().passive(() -> context.get().withSources(sources), handler, first.get());
+            });
+        }
     }
 
     /**
@@ -87,10 +105,14 @@ public interface ConfigLoader<T extends Config> {
      * the push method is called to push it to subscribers in the system.
      *
      * @param context the context
+     * @param handler the handler
      * @param config  Configuration information of things processed by load method
-     * @see #push(Supplier, String, String, ChangeEvent) #push(Supplier, String, String, ChangeEvent)#push(Supplier, String, String, ChangeEvent)#push(Supplier, String, String, ChangeEvent)#push(Supplier, String, String, ChangeEvent)#push(Supplier, String, String, ChangeEvent)
+     * @see #push(Supplier, String, String, ChangeEvent) #push(Supplier, String, String, ChangeEvent)#push(Supplier, String, String, ChangeEvent)#push(Supplier, String, String, ChangeEvent)#push(Supplier, String, String, ChangeEvent)#push(Supplier, String, String, ChangeEvent)#push(Supplier, String, String, ChangeEvent)#push(Supplier, String, String, ChangeEvent)#push(Supplier, String, String, ChangeEvent)#push(Supplier, String, String, ChangeEvent)#push(Supplier, String, String, ChangeEvent)#push(Supplier, String, String, ChangeEvent)
      */
-    void passive(final Supplier<Context> context, AbstractConfig config);
+    default void passive(final Supplier<Context> context,
+                         final PassiveHandler<Config> handler,
+                         Config config) {
+    }
 
     /**
      * Again load.
@@ -105,7 +127,7 @@ public interface ConfigLoader<T extends Config> {
             ConfigPropertySource configPropertySource = new DefaultConfigPropertySource<>(propertyKeySource, PropertyKeyParse.INSTANCE);
             Binder binder = Binder.of(configPropertySource);
             T newConfig = binder.bind(config.prefix(), BindData.of(DataType.of(tClass), () -> config));
-            handler.finish(context, newConfig).passive(context, newConfig);
+            handler.finish(context, newConfig);
         }
     }
 
@@ -199,7 +221,7 @@ public interface ConfigLoader<T extends Config> {
          * @param config  config.
          * @return the passive handler
          */
-        PassiveHandler<T> finish(Supplier<Context> context, T config);
+        void finish(Supplier<Context> context, T config);
     }
 
     /**
@@ -209,11 +231,13 @@ public interface ConfigLoader<T extends Config> {
      */
     @FunctionalInterface
     interface PassiveHandler<T extends Config> {
+
         /**
-         * Passive.
+         * if done finish this.
          *
          * @param context the context
          * @param config  the config
+         * @return the passive handler
          */
         void passive(Supplier<Context> context, T config);
     }

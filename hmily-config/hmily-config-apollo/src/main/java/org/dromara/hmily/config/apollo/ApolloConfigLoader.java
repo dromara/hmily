@@ -3,9 +3,11 @@ package org.dromara.hmily.config.apollo;
 import com.ctrip.framework.apollo.ConfigService;
 import com.ctrip.framework.apollo.model.ConfigChange;
 import org.dromara.hmily.common.utils.StringUtils;
-import org.dromara.hmily.config.api.AbstractConfig;
 import org.dromara.hmily.config.api.Config;
-import org.dromara.hmily.config.api.event.ChangeEvent;
+import org.dromara.hmily.config.api.event.AddData;
+import org.dromara.hmily.config.api.event.EventData;
+import org.dromara.hmily.config.api.event.ModifyData;
+import org.dromara.hmily.config.api.event.RemoveData;
 import org.dromara.hmily.config.api.exception.ConfigException;
 import org.dromara.hmily.config.loader.ConfigLoader;
 import org.dromara.hmily.config.loader.PropertyLoader;
@@ -25,7 +27,7 @@ import java.util.function.Supplier;
  * The type apollo config loader.
  *
  * @author lilang
- **/
+ */
 @HmilySPI("apollo")
 public class ApolloConfigLoader implements ConfigLoader<ApolloConfig> {
 
@@ -40,10 +42,18 @@ public class ApolloConfigLoader implements ConfigLoader<ApolloConfig> {
         LOADERS.put("properties", new PropertiesLoader());
     }
 
+    /**
+     * Instantiates a new Apollo config loader.
+     */
     public ApolloConfigLoader() {
 
     }
 
+    /**
+     * Instantiates a new Apollo config loader.
+     *
+     * @param apolloClient the apollo client
+     */
     public ApolloConfigLoader(final ApolloClient apolloClient) {
         this.client = apolloClient;
     }
@@ -55,35 +65,35 @@ public class ApolloConfigLoader implements ConfigLoader<ApolloConfig> {
     }
 
     @Override
-    public void passive(final Supplier<Context> context, AbstractConfig config) {
-        if (config.isPassive() && config.isLoad()) {
+    public void passive(Supplier<Context> context, PassiveHandler<Config> handler, Config config) {
+        if (config.isPassive()) {
             LOGGER.info("passive apollo remote started....");
             ApolloConfig apolloConfig = (ApolloConfig) config;
-            com.ctrip.framework.apollo.Config appConfig = ConfigService.getConfig(apolloConfig.getNamespace());
+            com.ctrip.framework.apollo.Config appConfig = ConfigService.getConfig(apolloConfig.getNamespace() + "." + apolloConfig.getFileExtension());
             appConfig.addChangeListener(changeEvent -> {
                 for (String key : changeEvent.changedKeys()) {
                     ConfigChange change = changeEvent.getChange(key);
-                    ChangeEvent event = null;
+                    EventData data = null;
                     switch (change.getChangeType()) {
                         case ADDED:
-                            event = ChangeEvent.ADD;
+                            data = new AddData(change.getPropertyName(), change.getNewValue());
                             break;
                         case DELETED:
-                            event = ChangeEvent.REMOVE;
+                            data = new RemoveData(change.getPropertyName(), change.getNewValue());
                             break;
                         case MODIFIED:
-                            event = ChangeEvent.MODIFY;
+                            data = new ModifyData(change.getPropertyName(), change.getNewValue());
                             break;
                         default:
                             break;
                     }
-                    push(context, change.getPropertyName(), change.getNewValue(), event);
+                    push(context, data);
                 }
             });
         }
     }
 
-    private PassiveHandler<ApolloConfig> apolloLoad(final Supplier<Context> context, final LoaderHandler<ApolloConfig> handler, final ApolloConfig config) {
+    private void apolloLoad(final Supplier<Context> context, final LoaderHandler<ApolloConfig> handler, final ApolloConfig config) {
         if (config != null) {
             check(config);
             LOGGER.info("loader apollo config: {}", config);
@@ -97,7 +107,7 @@ public class ApolloConfigLoader implements ConfigLoader<ApolloConfig> {
                     .map(e -> propertyLoader.load("remote.apollo." + fileExtension, e))
                     .ifPresent(e -> context.get().getOriginal().load(() -> context.get().withSources(e), this::apolloFinish));
             handler.finish(context, config);
-            return (e, e2) -> passive(context, config);
+            passive(context, null, config);
         } else {
             throw new ConfigException("apollo config is null");
         }
@@ -121,9 +131,7 @@ public class ApolloConfigLoader implements ConfigLoader<ApolloConfig> {
         }
     }
 
-    private PassiveHandler<Config> apolloFinish(final Supplier<Context> contextSupplier, final Config config) {
+    private void apolloFinish(final Supplier<Context> contextSupplier, final Config config) {
         LOGGER.info("apollo loader config {}:{}", config != null ? config.prefix() : "", config);
-        return (e, e1) -> {
-        };
     }
 }

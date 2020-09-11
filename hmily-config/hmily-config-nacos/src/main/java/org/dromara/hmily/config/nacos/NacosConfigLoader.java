@@ -83,7 +83,7 @@ public class NacosConfigLoader implements ConfigLoader<NacosConfig> {
 
     }
 
-    private PassiveHandler<NacosConfig> nacosLoad(final Supplier<Context> context, final LoaderHandler<NacosConfig> handler, final NacosConfig config) {
+    private void nacosLoad(final Supplier<Context> context, final LoaderHandler<NacosConfig> handler, final NacosConfig config) {
         if (config != null) {
             check(config);
             LOGGER.info("loader nacos config: {}", config);
@@ -97,15 +97,14 @@ public class NacosConfigLoader implements ConfigLoader<NacosConfig> {
                     .map(e -> propertyLoader.load("remote.nacos." + fileExtension, e))
                     .ifPresent(e -> context.get().getOriginal().load(() -> context.get().withSources(e), this::nacosFinish));
             handler.finish(context, config);
-            return (e, e1) -> passive(context, config);
+            passive(context, config);
         } else {
             throw new ConfigException("nacos config is null");
         }
     }
 
-    private PassiveHandler<Config> nacosFinish(final Supplier<Context> context, final Config config) {
+    private void nacosFinish(final Supplier<Context> context, final Config config) {
         LOGGER.info("nacos loader config {}:{}", config != null ? config.prefix() : "", config);
-        return (e, e1) -> LOGGER.info("nacos passive success....");
     }
 
     private void check(final NacosConfig config) {

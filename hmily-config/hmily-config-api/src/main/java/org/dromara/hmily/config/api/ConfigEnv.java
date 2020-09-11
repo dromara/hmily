@@ -18,11 +18,15 @@
 package org.dromara.hmily.config.api;
 
 import org.apache.commons.lang3.StringUtils;
+import org.dromara.hmily.config.api.event.EventConsumer;
+import org.dromara.hmily.config.api.event.EventData;
 import org.dromara.hmily.config.api.exception.ConfigException;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 /**
@@ -40,7 +44,7 @@ public final class ConfigEnv {
     /**
      * Monitoring event change processing.
      */
-    private static final Map<String, Set<Consumer<?>>> EVENTS = new ConcurrentHashMap<>();
+    private static final Set<EventConsumer<EventData>> EVENTS = new HashSet<>();
 
     /**
      * Save some custom configuration information.
@@ -101,18 +105,12 @@ public final class ConfigEnv {
     /**
      * Add an event subscription processing.
      *
-     * @param key      the key
+     * @param <T>      the type parameter
      * @param consumer the consumer
      */
-    public synchronized void addEvent(String key, Consumer<?> consumer) {
-        Set<Consumer<?>> consumers;
-        if (EVENTS.containsKey(key)) {
-            consumers = EVENTS.get(key);
-        } else {
-            consumers = new HashSet<>();
-        }
-        consumers.add(consumer);
-        EVENTS.put(key, consumers);
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public synchronized <T extends EventData> void addEvent(EventConsumer<T> consumer) {
+        EVENTS.add((EventConsumer) consumer);
     }
 
     /**
@@ -120,8 +118,8 @@ public final class ConfigEnv {
      *
      * @return the events
      */
-    public Map<String, Set<Consumer<?>>> getEvents() {
-        return Collections.unmodifiableMap(EVENTS);
+    public Set<EventConsumer<EventData>> getEvents() {
+        return Collections.unmodifiableSet(EVENTS);
     }
 
     /**
@@ -130,6 +128,6 @@ public final class ConfigEnv {
      * @return stream. stream
      */
     public Stream<Config> stream() {
-        return CONFIGS.values().stream().filter(e -> !e.isLoad());
+        return CONFIGS.values().stream();
     }
 }

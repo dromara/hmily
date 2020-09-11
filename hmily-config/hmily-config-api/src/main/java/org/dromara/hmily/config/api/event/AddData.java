@@ -17,23 +17,24 @@
 
 package org.dromara.hmily.config.api.event;
 
-import java.util.function.Consumer;
+import org.dromara.hmily.config.api.Config;
 
 /**
- * ModifyEventConsumer .
- * modify config event push .
+ * AddData .
+ * Different processing of add data.
  *
- * @param <V> the type parameter
  * @author sixh chenbin
  */
-public interface ModifyEventConsumer<V> extends Consumer<V> {
+public class AddData extends EventData {
+
 
     /**
-     * Event type change event.
+     * Instantiates a new Add data.
      *
-     * @return the change event
+     * @param properties the properties
+     * @param config     the config
      */
-    default ChangeEvent eventType() {
-        return ChangeEvent.MODIFY;
+    public AddData(String properties, Object value) {
+        super(ChangeEvent.ADD, properties, value);
     }
 }

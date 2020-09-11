@@ -23,23 +23,30 @@ package org.dromara.hmily.config.api;
  * @author xiaoyu
  */
 public interface Config {
-    
+
     /**
      * yml file properties prefix.
      *
      * @return string. string
      */
     String prefix();
-    
+
     /**
      * Is load boolean.
      *
      * @return the boolean
      */
     boolean isLoad();
-    
+
     /**
      * Flag load boolean.
      */
     void flagLoad();
+
+    /**
+     * Is passive boolean.
+     *
+     * @return the boolean
+     */
+    boolean isPassive();
 }

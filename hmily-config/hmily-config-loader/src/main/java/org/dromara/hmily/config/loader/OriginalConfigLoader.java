@@ -20,6 +20,7 @@
 package org.dromara.hmily.config.loader;
 
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import org.dromara.hmily.config.api.AbstractConfig;
@@ -44,15 +45,22 @@ public class OriginalConfigLoader implements ConfigLoader<Config> {
     public void load(final Supplier<Context> context, final LoaderHandler<Config> handler) {
         for (PropertyKeySource<?> propertyKeySource : context.get().getSource()) {
             ConfigPropertySource configPropertySource = new DefaultConfigPropertySource<>(propertyKeySource, PropertyKeyParse.INSTANCE);
-            ConfigEnv.getInstance().stream().map(e -> {
-                Binder binder = Binder.of(configPropertySource);
-                return binder.bind(e.prefix(), BindData.of(DataType.of(e.getClass()), () -> e));
-            }).filter(Objects::nonNull).peek(Config::flagLoad).forEach(e -> handler.finish(context, e));
+            ConfigEnv.getInstance().stream()
+                    .filter(e -> !e.isLoad())
+                    .map(e -> {
+                        Binder binder = Binder.of(configPropertySource);
+                        return binder.bind(e.prefix(), BindData.of(DataType.of(e.getClass()), () -> e));
+                    }).filter(Objects::nonNull).peek(Config::flagLoad).forEach(e -> handler.finish(context, e));
         }
     }
 
     @Override
-    public void passive(Supplier<Context> context, AbstractConfig config) {
-        throw new UnsupportedOperationException("No need to implement");
+    public void passive(Supplier<Context> context, final PassiveHandler<Config> handler, Config config) {
+        for (PropertyKeySource<?> propertyKeySource : context.get().getSource()) {
+            ConfigPropertySource configPropertySource = new DefaultConfigPropertySource<>(propertyKeySource, PropertyKeyParse.INSTANCE);
+            Binder binder = Binder.of(configPropertySource);
+            Config bind = binder.bind(config.prefix(), BindData.of(DataType.of(config.getClass()), () -> config));
+            Optional.ofNullable(bind).ifPresent(e -> handler.passive(context, e));
+        }
     }
 }

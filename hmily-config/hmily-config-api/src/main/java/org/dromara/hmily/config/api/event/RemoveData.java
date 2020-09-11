@@ -18,25 +18,20 @@
 package org.dromara.hmily.config.api.event;
 
 /**
- * ChangeEvent .
- * Notify event changes. When the configuration file changes, the processed event will be notified.
+ * RemoveData .
+ * Different handling of deleted data.
  *
  * @author sixh chenbin
  */
-public enum ChangeEvent {
-    /**
-     * Add change event.
-     */
-    ADD,
+public class RemoveData extends EventData {
 
     /**
-     * Update change event.
+     * Instantiates a new Remove data.
+     *
+     * @param properties the properties
+     * @param value      the value
      */
-    MODIFY,
-
-    /**
-     * Remove change event.
-     */
-    REMOVE(),
-    ;
+    public RemoveData(String properties, Object value) {
+        super(ChangeEvent.REMOVE, properties, value);
+    }
 }

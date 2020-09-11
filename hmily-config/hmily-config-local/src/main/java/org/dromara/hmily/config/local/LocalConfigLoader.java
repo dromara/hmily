@@ -40,9 +40,4 @@ public class LocalConfigLoader implements ConfigLoader<Config> {
         ConfigLoader<Config> original = context.get().getOriginal();
         original.load(context, handler);
     }
-
-    @Override
-    public void passive(Supplier<Context> context, AbstractConfig config) {
-
-    }
 }
