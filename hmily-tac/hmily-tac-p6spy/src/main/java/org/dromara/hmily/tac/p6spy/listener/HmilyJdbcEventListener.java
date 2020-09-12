@@ -42,35 +42,27 @@ public class HmilyJdbcEventListener extends JdbcEventListener {
     }
     
     @Override
-    public void onAfterExecute(final PreparedStatementInformation statementInformation, final long timeElapsedNanos, final SQLException e) {
-        super.onAfterExecute(statementInformation, timeElapsedNanos, e);
-        if (Objects.isNull(e)) {
-            HmilyExecuteTemplate.INSTANCE.execute(statementInformation);
-        }
+    public void onBeforeExecute(PreparedStatementInformation statementInformation) {
+        super.onBeforeExecute(statementInformation);
+        HmilyExecuteTemplate.INSTANCE.execute(statementInformation);
     }
     
     @Override
-    public void onAfterExecute(final StatementInformation statementInformation, final long timeElapsedNanos, final String sql, final SQLException e) {
-        super.onAfterExecute(statementInformation, timeElapsedNanos, sql, e);
-        if (Objects.isNull(e)) {
-            HmilyExecuteTemplate.INSTANCE.execute(statementInformation);
-        }
+    public void onBeforeExecute(StatementInformation statementInformation, String sql) {
+        super.onBeforeExecute(statementInformation, sql);
+        HmilyExecuteTemplate.INSTANCE.execute(statementInformation);
     }
     
     @Override
-    public void onAfterExecuteUpdate(final PreparedStatementInformation statementInformation, final long timeElapsedNanos, final int rowCount, final SQLException e) {
-        super.onAfterExecuteUpdate(statementInformation, timeElapsedNanos, rowCount, e);
-        if (Objects.isNull(e)) {
-            HmilyExecuteTemplate.INSTANCE.execute(statementInformation);
-        }
+    public void onBeforeExecuteUpdate(PreparedStatementInformation statementInformation) {
+        super.onBeforeExecuteUpdate(statementInformation);
+        HmilyExecuteTemplate.INSTANCE.execute(statementInformation);
     }
     
     @Override
-    public void onAfterExecuteUpdate(final StatementInformation statementInformation, final long timeElapsedNanos, final String sql, final int rowCount, final SQLException e) {
-        super.onAfterExecuteUpdate(statementInformation, timeElapsedNanos, sql, rowCount, e);
-        if (Objects.isNull(e)) {
-            HmilyExecuteTemplate.INSTANCE.execute(statementInformation);
-        }
+    public void onBeforeExecuteUpdate(StatementInformation statementInformation, String sql) {
+        super.onBeforeExecuteUpdate(statementInformation, sql);
+        HmilyExecuteTemplate.INSTANCE.execute(statementInformation);
     }
     
     @Override
