@@ -20,7 +20,6 @@ package org.dromara.hmily.config.loader;
 
 import org.dromara.hmily.config.api.Config;
 import org.dromara.hmily.config.api.ConfigEnv;
-import org.dromara.hmily.config.api.event.ChangeEvent;
 import org.dromara.hmily.config.api.event.EventConsumer;
 import org.dromara.hmily.config.api.event.EventData;
 import org.dromara.hmily.config.loader.bind.BindData;
@@ -107,7 +106,7 @@ public interface ConfigLoader<T extends Config> {
      * @param context the context
      * @param handler the handler
      * @param config  Configuration information of things processed by load method
-     * @see #push(Supplier, String, String, ChangeEvent) #push(Supplier, String, String, ChangeEvent)#push(Supplier, String, String, ChangeEvent)#push(Supplier, String, String, ChangeEvent)#push(Supplier, String, String, ChangeEvent)#push(Supplier, String, String, ChangeEvent)#push(Supplier, String, String, ChangeEvent)#push(Supplier, String, String, ChangeEvent)#push(Supplier, String, String, ChangeEvent)#push(Supplier, String, String, ChangeEvent)#push(Supplier, String, String, ChangeEvent)#push(Supplier, String, String, ChangeEvent)
+     * @see #push(Supplier, EventData)
      */
     default void passive(final Supplier<Context> context,
                          final PassiveHandler<Config> handler,

@@ -19,6 +19,9 @@
 
 package org.dromara.hmily.config.api;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * The type Abstract config.
  *
@@ -32,6 +35,11 @@ public abstract class AbstractConfig implements Config {
      * Whether to passively receive push
      */
     private boolean passive;
+
+    /**
+     * source map.
+     */
+    private Map<String, Object> source = new HashMap<>();
 
     @Override
     public void flagLoad() {
@@ -50,5 +58,19 @@ public abstract class AbstractConfig implements Config {
 
     public void setPassive(boolean passive) {
         this.passive = passive;
+    }
+
+    public void setLoad(boolean load) {
+        isLoad = load;
+    }
+
+    @Override
+    public void setSource(Map<String, Object> source) {
+        this.source = source;
+    }
+
+    @Override
+    public Map<String, Object> getSource() {
+        return source;
     }
 }

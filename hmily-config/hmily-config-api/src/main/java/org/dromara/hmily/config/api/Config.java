@@ -17,10 +17,13 @@
 
 package org.dromara.hmily.config.api;
 
+import java.util.Map;
+
 /**
  * The interface Config.
  *
  * @author xiaoyu
+ * @author chenbin
  */
 public interface Config {
 
@@ -49,4 +52,19 @@ public interface Config {
      * @return the boolean
      */
     boolean isPassive();
+
+    /**
+     * Sets source.
+     *
+     * @param t the t
+     * @return the source
+     */
+    void setSource(Map<String,Object> t);
+
+    /**
+     * Source map.
+     *
+     * @return the map
+     */
+    Map<String,Object> getSource();
 }

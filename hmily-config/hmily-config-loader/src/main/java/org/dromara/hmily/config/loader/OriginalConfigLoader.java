@@ -19,11 +19,6 @@
 
 package org.dromara.hmily.config.loader;
 
-import java.util.Objects;
-import java.util.Optional;
-import java.util.function.Supplier;
-
-import org.dromara.hmily.config.api.AbstractConfig;
 import org.dromara.hmily.config.api.Config;
 import org.dromara.hmily.config.api.ConfigEnv;
 import org.dromara.hmily.config.loader.bind.BindData;
@@ -33,6 +28,11 @@ import org.dromara.hmily.config.loader.property.ConfigPropertySource;
 import org.dromara.hmily.config.loader.property.DefaultConfigPropertySource;
 import org.dromara.hmily.config.loader.property.PropertyKeyParse;
 import org.dromara.hmily.config.loader.property.PropertyKeySource;
+
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.function.Supplier;
 
 /**
  * The type Original config loader.
@@ -49,8 +49,15 @@ public class OriginalConfigLoader implements ConfigLoader<Config> {
                     .filter(e -> !e.isLoad())
                     .map(e -> {
                         Binder binder = Binder.of(configPropertySource);
-                        return binder.bind(e.prefix(), BindData.of(DataType.of(e.getClass()), () -> e));
-                    }).filter(Objects::nonNull).peek(Config::flagLoad).forEach(e -> handler.finish(context, e));
+                        Config config = binder.bind(e.prefix(), BindData.of(DataType.of(e.getClass()), () -> e));
+                        if (config != null) {
+                            @SuppressWarnings("unchecked")
+                            Map<String, Object> source = (Map<String, Object>) propertyKeySource.getSource();
+                            config.setSource(source);
+                        }
+                        return config;
+                    }).filter(Objects::nonNull).peek(Config::flagLoad)
+                    .forEach(e -> handler.finish(context, e));
         }
     }
 

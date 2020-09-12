@@ -15,24 +15,31 @@
  *  limitations under the License.
  */
 
-package org.dromara.hmily.config.api.event;
+package org.dromara.hmily.config.nacos;
+
+import lombok.Data;
+import org.dromara.hmily.config.api.AbstractConfig;
 
 /**
- * AddData .
- * Different processing of add data.
+ * NacosPassiveConfig .
  *
  * @author sixh chenbin
  */
-public class AddData extends EventData {
+@Data
+public class NacosPassiveConfig extends AbstractConfig {
 
+    private String value;
 
-    /**
-     * Instantiates a new Add data.
-     *
-     * @param properties the properties
-     * @param value      the value
-     */
-    public AddData(String properties, Object value) {
-        super(ChangeEvent.ADD, properties, value);
+    private String fileExtension;
+
+    private String dataId;
+
+    @Override
+    public String prefix() {
+        return "";
+    }
+
+    public String fileName() {
+        return dataId + "." + fileExtension;
     }
 }
