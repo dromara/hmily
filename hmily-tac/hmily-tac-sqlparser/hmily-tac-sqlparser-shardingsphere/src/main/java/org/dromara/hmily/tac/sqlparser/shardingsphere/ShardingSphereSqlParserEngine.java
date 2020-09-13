@@ -90,10 +90,9 @@ public class ShardingSphereSqlParserEngine implements HmilySqlParserEngine {
         HmilyUpdateStatement result = new HmilyUpdateStatement();
         assembleSimpleTableSegment(updateStatement, result);
         assembleSetAssignmentSegment(updateStatement, result);
-        if (!updateStatement.getWhere().isPresent()) {
-            return result;
+        if (updateStatement.getWhere().isPresent()) {
+            assembleWhereSegment(updateStatement, result);
         }
-        assembleWhereSegment(updateStatement, result);
         return result;
     }
     
