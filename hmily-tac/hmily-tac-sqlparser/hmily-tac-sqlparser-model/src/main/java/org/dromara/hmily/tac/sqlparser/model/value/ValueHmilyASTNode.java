@@ -17,14 +17,14 @@
 
 package org.dromara.hmily.tac.sqlparser.model.value;
 
-import org.dromara.hmily.tac.sqlparser.model.ASTNode;
+import org.dromara.hmily.tac.sqlparser.model.HmilyASTNode;
 
 /**
  * Value AST node.
  *
  * @param <T> type of value
  */
-public interface ValueASTNode<T> extends ASTNode {
+public interface ValueHmilyASTNode<T> extends HmilyASTNode {
     
     /**
      * Get value.

@@ -17,12 +17,12 @@
 
 package org.dromara.hmily.tac.sqlparser.model.value.literal;
 
-import org.dromara.hmily.tac.sqlparser.model.value.ValueASTNode;
+import org.dromara.hmily.tac.sqlparser.model.value.ValueHmilyASTNode;
 
 /**
  * Literal value.
  *
  * @param <T> type of value
  */
-public interface LiteralValue<T> extends ValueASTNode<T> {
+public interface LiteralValue<T> extends ValueHmilyASTNode<T> {
 }

@@ -19,14 +19,14 @@ package org.dromara.hmily.tac.sqlparser.model.value.parametermarker;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.dromara.hmily.tac.sqlparser.model.value.ValueASTNode;
+import org.dromara.hmily.tac.sqlparser.model.value.ValueHmilyASTNode;
 
 /**
  * Parameter marker value.
  */
 @RequiredArgsConstructor
 @Getter
-public final class ParameterMarkerValue implements ValueASTNode<Integer> {
+public final class ParameterMarkerValue implements ValueHmilyASTNode<Integer> {
     
     private final Integer value;
 }

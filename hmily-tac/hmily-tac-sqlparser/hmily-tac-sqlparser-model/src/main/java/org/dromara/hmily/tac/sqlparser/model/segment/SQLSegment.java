@@ -17,12 +17,12 @@
 
 package org.dromara.hmily.tac.sqlparser.model.segment;
 
-import org.dromara.hmily.tac.sqlparser.model.ASTNode;
+import org.dromara.hmily.tac.sqlparser.model.HmilyASTNode;
 
 /**
  * SQL segment.
  */
-public interface SQLSegment extends ASTNode {
+public interface SQLSegment extends HmilyASTNode {
     
     /**
      * Get start index.

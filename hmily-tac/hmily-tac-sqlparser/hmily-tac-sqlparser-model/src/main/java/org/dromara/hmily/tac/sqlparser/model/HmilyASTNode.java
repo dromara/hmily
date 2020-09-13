@@ -20,5 +20,5 @@ package org.dromara.hmily.tac.sqlparser.model;
 /**
  * AST node.
  */
-public interface ASTNode {
+public interface HmilyASTNode {
 }

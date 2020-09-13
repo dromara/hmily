@@ -20,13 +20,13 @@ package org.dromara.hmily.tac.sqlparser.model.value.identifier;
 import lombok.Getter;
 import org.dromara.hmily.tac.sqlparser.model.constant.QuoteCharacter;
 import org.dromara.hmily.tac.sqlparser.model.util.SQLUtil;
-import org.dromara.hmily.tac.sqlparser.model.value.ValueASTNode;
+import org.dromara.hmily.tac.sqlparser.model.value.ValueHmilyASTNode;
 
 /**
  * Identifier value.
  */
 @Getter
-public final class IdentifierValue implements ValueASTNode<String> {
+public final class IdentifierValue implements ValueHmilyASTNode<String> {
     
     private final String value;
     

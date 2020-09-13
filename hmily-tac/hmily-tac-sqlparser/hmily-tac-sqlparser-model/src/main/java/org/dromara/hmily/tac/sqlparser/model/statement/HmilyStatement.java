@@ -17,12 +17,12 @@
 
 package org.dromara.hmily.tac.sqlparser.model.statement;
 
-import org.dromara.hmily.tac.sqlparser.model.ASTNode;
+import org.dromara.hmily.tac.sqlparser.model.HmilyASTNode;
 
 /**
  * SQL statement.
  */
-public interface HmilyStatement extends ASTNode {
+public interface HmilyStatement extends HmilyASTNode {
     
     /**
      * Get count of parameters.

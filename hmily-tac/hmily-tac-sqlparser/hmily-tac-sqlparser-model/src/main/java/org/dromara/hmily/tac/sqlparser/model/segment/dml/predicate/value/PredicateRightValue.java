@@ -17,10 +17,10 @@
 
 package org.dromara.hmily.tac.sqlparser.model.segment.dml.predicate.value;
 
-import org.dromara.hmily.tac.sqlparser.model.ASTNode;
+import org.dromara.hmily.tac.sqlparser.model.HmilyASTNode;
 
 /**
  * Predicate right value.
  */
-public interface PredicateRightValue extends ASTNode {
+public interface PredicateRightValue extends HmilyASTNode {
 }
