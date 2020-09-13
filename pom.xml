@@ -73,6 +73,7 @@
         <mockito.version>2.7.21</mockito.version>
         <logback.version>1.2.0</logback.version>
         <powermock.version>2.0.7</powermock.version>
+        <shardingsphere.version>4.1.1</shardingsphere.version>
     </properties>
 
     <dependencyManagement>
@@ -83,6 +84,11 @@
                 <version>${project.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.shardingsphere</groupId>
+                <artifactId>shardingsphere-sql-parser-mysql</artifactId>
+                <version>${shardingsphere.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

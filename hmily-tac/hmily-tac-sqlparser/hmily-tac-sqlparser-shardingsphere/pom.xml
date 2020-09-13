@@ -34,6 +34,9 @@
             <artifactId>hmily-tac-sqlparser-spi</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.shardingsphere</groupId>
+            <artifactId>shardingsphere-sql-parser-mysql</artifactId>
+        </dependency>
     </dependencies>
-
 </project>
