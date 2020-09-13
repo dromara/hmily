@@ -17,11 +17,15 @@
 
 package org.dromara.hmily.tac.sqlparser.shardingsphere;
 
+import org.apache.shardingsphere.sql.parser.sql.statement.SQLStatement;
 import org.apache.shardingsphere.sql.parser.sql.statement.dml.DeleteStatement;
 import org.apache.shardingsphere.sql.parser.sql.statement.dml.InsertStatement;
 import org.apache.shardingsphere.sql.parser.sql.statement.dml.UpdateStatement;
 import org.dromara.hmily.spi.HmilySPI;
 import org.dromara.hmily.tac.sqlparser.model.statement.HmilyStatement;
+import org.dromara.hmily.tac.sqlparser.model.statement.dml.HmilyDeleteStatement;
+import org.dromara.hmily.tac.sqlparser.model.statement.dml.HmilyInsertStatement;
+import org.dromara.hmily.tac.sqlparser.model.statement.dml.HmilyUpdateStatement;
 import org.dromara.hmily.tac.sqlparser.spi.HmilySqlParserEngine;
 import org.dromara.hmily.tac.sqlparser.spi.exception.SqlParserException;
 import org.apache.shardingsphere.sql.parser.SQLParserEngineFactory;
@@ -36,18 +40,33 @@ public class ShardingSphereSqlParserEngine implements HmilySqlParserEngine {
     
     @Override
     public HmilyStatement parser(final String sql, final String databaseType) throws SqlParserException {
-        org.apache.shardingsphere.sql.parser.sql.statement.SQLStatement shardingSphereSQLStatement =
-                SQLParserEngineFactory.getSQLParserEngine(databaseType).parse(sql, false);
-        
-        if (shardingSphereSQLStatement instanceof UpdateStatement) {
-            new org.dromara.hmily.tac.sqlparser.model.statement.dml.UpdateStatement();
-            
-            return null;
-        } else if (shardingSphereSQLStatement instanceof InsertStatement) {
-            return null;
-        } else if (shardingSphereSQLStatement instanceof DeleteStatement) {
-            return null;
+        SQLStatement sqlStatement = SQLParserEngineFactory.getSQLParserEngine(databaseType).parse(sql, false);
+        if (sqlStatement instanceof UpdateStatement) {
+            return generateHmilyUpdateStatement((UpdateStatement) sqlStatement);
+        } else if (sqlStatement instanceof InsertStatement) {
+            return generateHmilyInsertStatement((InsertStatement) sqlStatement);
+        } else if (sqlStatement instanceof DeleteStatement) {
+            return generateHmilyDeleteStatement((DeleteStatement) sqlStatement);
+        } else {
+            throw new SqlParserException("Unsupported SQL Type.");
         }
-        return null;
+    }
+    
+    private HmilyUpdateStatement generateHmilyUpdateStatement(final UpdateStatement updateStatement) {
+        
+        HmilyUpdateStatement result = new HmilyUpdateStatement();
+        return result;
+    }
+    
+    private HmilyInsertStatement generateHmilyInsertStatement(final InsertStatement insertStatement) {
+    
+        HmilyInsertStatement result = new HmilyInsertStatement();
+        return result;
+    }
+    
+    private HmilyDeleteStatement generateHmilyDeleteStatement(final DeleteStatement deleteStatement) {
+    
+        HmilyDeleteStatement result = new HmilyDeleteStatement();
+        return result;
     }
 }
