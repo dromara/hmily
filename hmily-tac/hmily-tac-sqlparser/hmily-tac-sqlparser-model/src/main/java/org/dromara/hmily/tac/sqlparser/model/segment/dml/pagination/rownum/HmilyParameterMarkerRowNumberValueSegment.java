@@ -15,29 +15,21 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.tac.sqlrevert.spi;
+package org.dromara.hmily.tac.sqlparser.model.segment.dml.pagination.rownum;
 
-import org.dromara.hmily.repository.spi.entity.HmilyUndoInvocation;
-import org.dromara.hmily.tac.sqlparser.model.statement.HmilyStatement;
-import org.dromara.hmily.tac.sqlrevert.spi.exception.SqlRevertException;
-
-import java.sql.Connection;
+import lombok.Getter;
+import org.dromara.hmily.tac.sqlparser.model.segment.dml.pagination.HmilyParameterMarkerPaginationValueSegment;
 
 /**
- * The interface Hmily sql revert engine.
- *
- * @author xiaoyu
+ * Row number value segment for parameter marker.
  */
-public interface HmilySqlRevertEngine {
+@Getter
+public final class HmilyParameterMarkerRowNumberValueSegment extends HmilyRowNumberValueSegment implements HmilyParameterMarkerPaginationValueSegment {
     
-    /**
-     * Revert hmily undo invocation.
-     *
-     * @param hmilyStatement the sql statement
-     * @param connection   connection
-     * @param sql          the sql
-     * @return the hmily undo invocation
-     * @throws SqlRevertException the sql revert exception
-     */
-    HmilyUndoInvocation revert(HmilyStatement hmilyStatement, Connection connection, String sql) throws SqlRevertException;
+    private final int parameterIndex;
+    
+    public HmilyParameterMarkerRowNumberValueSegment(final int startIndex, final int stopIndex, final int parameterIndex, final boolean boundOpened) {
+        super(startIndex, stopIndex, boundOpened);
+        this.parameterIndex = parameterIndex;
+    }
 }

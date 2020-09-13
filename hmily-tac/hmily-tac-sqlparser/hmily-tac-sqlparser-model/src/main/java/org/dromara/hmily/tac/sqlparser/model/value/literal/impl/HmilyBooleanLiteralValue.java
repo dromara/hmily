@@ -15,29 +15,25 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.tac.sqlrevert.spi;
+package org.dromara.hmily.tac.sqlparser.model.value.literal.impl;
 
-import org.dromara.hmily.repository.spi.entity.HmilyUndoInvocation;
-import org.dromara.hmily.tac.sqlparser.model.statement.HmilyStatement;
-import org.dromara.hmily.tac.sqlrevert.spi.exception.SqlRevertException;
-
-import java.sql.Connection;
+import lombok.RequiredArgsConstructor;
+import org.dromara.hmily.tac.sqlparser.model.value.literal.HmilyLiteralValue;
 
 /**
- * The interface Hmily sql revert engine.
- *
- * @author xiaoyu
+ * Boolean literal value.
  */
-public interface HmilySqlRevertEngine {
+@RequiredArgsConstructor
+public final class HmilyBooleanLiteralValue implements HmilyLiteralValue<Boolean> {
     
-    /**
-     * Revert hmily undo invocation.
-     *
-     * @param hmilyStatement the sql statement
-     * @param connection   connection
-     * @param sql          the sql
-     * @return the hmily undo invocation
-     * @throws SqlRevertException the sql revert exception
-     */
-    HmilyUndoInvocation revert(HmilyStatement hmilyStatement, Connection connection, String sql) throws SqlRevertException;
+    private final boolean value;
+    
+    public HmilyBooleanLiteralValue(final String value) {
+        this.value = Boolean.parseBoolean(value);
+    }
+    
+    @Override
+    public Boolean getValue() {
+        return value;
+    }
 }

@@ -15,29 +15,21 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.tac.sqlrevert.spi;
+package org.dromara.hmily.tac.sqlparser.model.segment.dml.pagination.limit;
 
-import org.dromara.hmily.repository.spi.entity.HmilyUndoInvocation;
-import org.dromara.hmily.tac.sqlparser.model.statement.HmilyStatement;
-import org.dromara.hmily.tac.sqlrevert.spi.exception.SqlRevertException;
-
-import java.sql.Connection;
+import lombok.Getter;
+import org.dromara.hmily.tac.sqlparser.model.segment.dml.pagination.HmilyNumberLiteralPaginationValueSegment;
 
 /**
- * The interface Hmily sql revert engine.
- *
- * @author xiaoyu
+ * Limit value segment for number literal.
  */
-public interface HmilySqlRevertEngine {
+@Getter
+public final class HmilyNumberLiteralLimitValueSegment extends HmilyLimitValueSegment implements HmilyNumberLiteralPaginationValueSegment {
     
-    /**
-     * Revert hmily undo invocation.
-     *
-     * @param hmilyStatement the sql statement
-     * @param connection   connection
-     * @param sql          the sql
-     * @return the hmily undo invocation
-     * @throws SqlRevertException the sql revert exception
-     */
-    HmilyUndoInvocation revert(HmilyStatement hmilyStatement, Connection connection, String sql) throws SqlRevertException;
+    private final long value;
+    
+    public HmilyNumberLiteralLimitValueSegment(final int startIndex, final int stopIndex, final long value) {
+        super(startIndex, stopIndex);
+        this.value = value;
+    }
 }
