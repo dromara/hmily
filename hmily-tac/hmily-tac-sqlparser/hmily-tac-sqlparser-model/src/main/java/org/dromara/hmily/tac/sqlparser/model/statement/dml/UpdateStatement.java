@@ -32,7 +32,7 @@ import java.util.Optional;
  */
 @Getter
 @Setter
-public final class UpdateStatement extends DMLStatement {
+public final class UpdateStatement extends HmilyDMLStatement {
     
     private final Collection<SimpleTableSegment> tables = new LinkedList<>();
     

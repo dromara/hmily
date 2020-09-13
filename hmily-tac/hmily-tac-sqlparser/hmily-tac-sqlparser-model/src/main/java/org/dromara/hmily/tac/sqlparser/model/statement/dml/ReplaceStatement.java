@@ -39,7 +39,7 @@ import java.util.Optional;
  */
 @Getter
 @Setter
-public final class ReplaceStatement extends DMLStatement {
+public final class ReplaceStatement extends HmilyDMLStatement {
     
     private SimpleTableSegment table;
     

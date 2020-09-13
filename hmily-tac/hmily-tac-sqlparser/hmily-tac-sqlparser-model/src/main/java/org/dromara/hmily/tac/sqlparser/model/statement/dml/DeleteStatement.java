@@ -31,7 +31,7 @@ import java.util.Optional;
  */
 @Getter
 @Setter
-public final class DeleteStatement extends DMLStatement {
+public final class DeleteStatement extends HmilyDMLStatement {
     
     private final Collection<SimpleTableSegment> tables = new LinkedList<>();
     

@@ -40,7 +40,7 @@ import java.util.Optional;
  */
 @Getter
 @Setter
-public final class InsertStatement extends DMLStatement {
+public final class InsertStatement extends HmilyDMLStatement {
     
     private SimpleTableSegment table;
     

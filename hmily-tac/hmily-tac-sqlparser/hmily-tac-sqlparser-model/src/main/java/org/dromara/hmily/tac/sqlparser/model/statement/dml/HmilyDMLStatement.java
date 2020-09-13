@@ -22,5 +22,5 @@ import org.dromara.hmily.tac.sqlparser.model.statement.AbstractHmilyStatement;
 /**
  * DML statement.
  */
-public abstract class DMLStatement extends AbstractHmilyStatement {
+public abstract class HmilyDMLStatement extends AbstractHmilyStatement {
 }
