@@ -25,7 +25,7 @@ import org.dromara.hmily.tac.sqlparser.model.segment.HmilySegment;
 import org.dromara.hmily.tac.sqlparser.model.segment.dml.predicate.value.HmilyPredicateRightValue;
 import org.dromara.hmily.tac.sqlparser.model.segment.generic.HmilyOwnerAvailable;
 import org.dromara.hmily.tac.sqlparser.model.segment.generic.HmilyOwnerSegment;
-import org.dromara.hmily.tac.sqlparser.model.value.identifier.IdentifierValue;
+import org.dromara.hmily.tac.sqlparser.model.value.identifier.HmilyIdentifierValue;
 
 import java.util.Optional;
 
@@ -42,7 +42,7 @@ public final class HmilyColumnSegment implements HmilySegment, HmilyPredicateRig
     
     private final int stopIndex;
     
-    private final IdentifierValue identifier;
+    private final HmilyIdentifierValue identifier;
     
     private HmilyOwnerSegment owner;
     

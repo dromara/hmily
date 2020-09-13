@@ -15,18 +15,18 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.tac.sqlparser.model.value.literal.impl;
+package org.dromara.hmily.tac.sqlparser.model.value.keyword;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.dromara.hmily.tac.sqlparser.model.value.literal.LiteralValue;
+import org.dromara.hmily.tac.sqlparser.model.value.ValueHmilyASTNode;
 
 /**
- * Other literal value.
+ * Keyword value.
  */
 @RequiredArgsConstructor
 @Getter
-public final class OtherLiteralValue implements LiteralValue<String> {
+public final class HmilyKeywordValue implements ValueHmilyASTNode<String> {
     
     private final String value;
 }

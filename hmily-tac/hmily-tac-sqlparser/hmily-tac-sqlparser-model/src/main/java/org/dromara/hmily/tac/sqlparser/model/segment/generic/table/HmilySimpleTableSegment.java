@@ -25,7 +25,7 @@ import org.dromara.hmily.tac.sqlparser.model.segment.generic.HmilyAliasAvailable
 import org.dromara.hmily.tac.sqlparser.model.segment.generic.HmilyAliasSegment;
 import org.dromara.hmily.tac.sqlparser.model.segment.generic.HmilyOwnerAvailable;
 import org.dromara.hmily.tac.sqlparser.model.segment.generic.HmilyOwnerSegment;
-import org.dromara.hmily.tac.sqlparser.model.value.identifier.IdentifierValue;
+import org.dromara.hmily.tac.sqlparser.model.value.identifier.HmilyIdentifierValue;
 
 import java.util.Optional;
 
@@ -45,8 +45,8 @@ public final class HmilySimpleTableSegment implements HmilyTableSegment, HmilyOw
     @Setter
     private HmilyAliasSegment alias;
     
-    public HmilySimpleTableSegment(final int startIndex, final int stopIndex, final IdentifierValue identifierValue) {
-        tableName = new HmilyTableNameSegment(startIndex, stopIndex, identifierValue);
+    public HmilySimpleTableSegment(final int startIndex, final int stopIndex, final HmilyIdentifierValue hmilyIdentifierValue) {
+        tableName = new HmilyTableNameSegment(startIndex, stopIndex, hmilyIdentifierValue);
     }
     
     @Override

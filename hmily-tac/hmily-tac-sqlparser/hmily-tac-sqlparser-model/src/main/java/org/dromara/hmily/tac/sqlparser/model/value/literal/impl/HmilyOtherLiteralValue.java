@@ -18,17 +18,15 @@
 package org.dromara.hmily.tac.sqlparser.model.value.literal.impl;
 
 import lombok.Getter;
-import org.dromara.hmily.tac.sqlparser.model.value.literal.LiteralValue;
+import lombok.RequiredArgsConstructor;
+import org.dromara.hmily.tac.sqlparser.model.value.literal.HmilyLiteralValue;
 
 /**
- * String literal value.
+ * Other literal value.
  */
+@RequiredArgsConstructor
 @Getter
-public final class StringLiteralValue implements LiteralValue<String> {
+public final class HmilyOtherLiteralValue implements HmilyLiteralValue<String> {
     
     private final String value;
-    
-    public StringLiteralValue(final String value) {
-        this.value = value.substring(1, value.length() - 1);
-    }
 }

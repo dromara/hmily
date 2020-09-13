@@ -15,18 +15,14 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.tac.sqlparser.model.value.parametermarker;
+package org.dromara.hmily.tac.sqlparser.model.value.literal;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.dromara.hmily.tac.sqlparser.model.value.ValueHmilyASTNode;
 
 /**
- * Parameter marker value.
+ * Literal value.
+ *
+ * @param <T> type of value
  */
-@RequiredArgsConstructor
-@Getter
-public final class ParameterMarkerValue implements ValueHmilyASTNode<Integer> {
-    
-    private final Integer value;
+public interface HmilyLiteralValue<T> extends ValueHmilyASTNode<T> {
 }

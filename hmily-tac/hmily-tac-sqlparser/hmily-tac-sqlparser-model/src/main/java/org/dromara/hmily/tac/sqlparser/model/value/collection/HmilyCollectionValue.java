@@ -15,25 +15,28 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.tac.sqlparser.model.value.identifier;
+package org.dromara.hmily.tac.sqlparser.model.value.collection;
 
 import lombok.Getter;
-import org.dromara.hmily.tac.sqlparser.model.constant.HmilyQuoteCharacter;
-import org.dromara.hmily.tac.sqlparser.model.util.SQLUtil;
 import org.dromara.hmily.tac.sqlparser.model.value.ValueHmilyASTNode;
 
+import java.util.Collection;
+import java.util.LinkedList;
+
 /**
- * Identifier value.
+ * Collection value.
  */
 @Getter
-public final class IdentifierValue implements ValueHmilyASTNode<String> {
+public final class HmilyCollectionValue<T> implements ValueHmilyASTNode<Collection> {
     
-    private final String value;
+    private final Collection<T> value = new LinkedList<>();
     
-    private final HmilyQuoteCharacter hmilyQuoteCharacter;
-    
-    public IdentifierValue(final String text) {
-        value = SQLUtil.getExactlyValue(text);
-        hmilyQuoteCharacter = HmilyQuoteCharacter.getQuoteCharacter(text);
+    /**
+     * Put all values from another collection value into this one.
+     * 
+     * @param hmilyCollectionValue collection value
+     */
+    public void combine(final HmilyCollectionValue<T> hmilyCollectionValue) {
+        value.addAll(hmilyCollectionValue.getValue());
     }
 }

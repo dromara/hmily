@@ -15,18 +15,25 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.tac.sqlparser.model.value.keyword;
+package org.dromara.hmily.tac.sqlparser.model.value.literal.impl;
 
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.dromara.hmily.tac.sqlparser.model.value.ValueHmilyASTNode;
+import org.dromara.hmily.tac.sqlparser.model.value.literal.HmilyLiteralValue;
 
 /**
- * Keyword value.
+ * Boolean literal value.
  */
 @RequiredArgsConstructor
-@Getter
-public final class KeywordValue implements ValueHmilyASTNode<String> {
+public final class HmilyBooleanLiteralValue implements HmilyLiteralValue<Boolean> {
     
-    private final String value;
+    private final boolean value;
+    
+    public HmilyBooleanLiteralValue(final String value) {
+        this.value = Boolean.parseBoolean(value);
+    }
+    
+    @Override
+    public Boolean getValue() {
+        return value;
+    }
 }

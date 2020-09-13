@@ -22,7 +22,7 @@ import lombok.Setter;
 import org.dromara.hmily.tac.sqlparser.model.segment.dml.expr.complex.HmilyComplexHmilyExpressionSegment;
 import org.dromara.hmily.tac.sqlparser.model.segment.generic.HmilyAliasAvailable;
 import org.dromara.hmily.tac.sqlparser.model.segment.generic.HmilyAliasSegment;
-import org.dromara.hmily.tac.sqlparser.model.util.SQLUtil;
+import org.dromara.hmily.tac.sqlparser.model.util.HmilySQLUtil;
 
 import java.util.Optional;
 
@@ -44,7 +44,7 @@ public final class HmilyExpressionHmilyProjectionSegmentHmily implements HmilyPr
     public HmilyExpressionHmilyProjectionSegmentHmily(final int startIndex, final int stopIndex, final String text) {
         this.startIndex = startIndex;
         this.stopIndex = stopIndex;
-        this.text = SQLUtil.getExpressionWithoutOutsideParentheses(text);
+        this.text = HmilySQLUtil.getExpressionWithoutOutsideParentheses(text);
     }
     
     @Override

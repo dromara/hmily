@@ -18,7 +18,7 @@
 package org.dromara.hmily.tac.sqlparser.model.value.literal.impl;
 
 import lombok.Getter;
-import org.dromara.hmily.tac.sqlparser.model.value.literal.LiteralValue;
+import org.dromara.hmily.tac.sqlparser.model.value.literal.HmilyLiteralValue;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -27,11 +27,11 @@ import java.math.BigInteger;
  * Number literal value.
  */
 @Getter
-public final class NumberLiteralValue implements LiteralValue<Number> {
+public final class HmilyNumberLiteralValue implements HmilyLiteralValue<Number> {
     
     private final Number value;
     
-    public NumberLiteralValue(final String value) {
+    public HmilyNumberLiteralValue(final String value) {
         this.value = getNumber(value);
     }
     

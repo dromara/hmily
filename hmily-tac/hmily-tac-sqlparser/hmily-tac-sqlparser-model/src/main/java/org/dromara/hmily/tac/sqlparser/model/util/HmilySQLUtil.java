@@ -30,7 +30,7 @@ import java.math.BigInteger;
  * SQL utility class.
  */
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public final class SQLUtil {
+public final class HmilySQLUtil {
     
     /**
      * Get exactly number value and type.

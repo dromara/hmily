@@ -19,7 +19,7 @@ package org.dromara.hmily.tac.sqlparser.model.segment.dml.item;
 
 import lombok.Getter;
 import org.dromara.hmily.tac.sqlparser.model.constant.HmilyAggregationType;
-import org.dromara.hmily.tac.sqlparser.model.util.SQLUtil;
+import org.dromara.hmily.tac.sqlparser.model.util.HmilySQLUtil;
 
 /**
  * Aggregation distinct projection segment.
@@ -31,6 +31,6 @@ public final class HmilyHmilyAggregationDistinctHmilyProjectionSegment extends H
     
     public HmilyHmilyAggregationDistinctHmilyProjectionSegment(final int startIndex, final int stopIndex, final HmilyAggregationType type, final int innerExpressionStartIndex, final String distinctExpression) {
         super(startIndex, stopIndex, type, innerExpressionStartIndex);
-        this.distinctExpression = SQLUtil.getExpressionWithoutOutsideParentheses(distinctExpression);
+        this.distinctExpression = HmilySQLUtil.getExpressionWithoutOutsideParentheses(distinctExpression);
     }
 }

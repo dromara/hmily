@@ -15,28 +15,20 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.tac.sqlparser.model.value.collection;
+package org.dromara.hmily.tac.sqlparser.model.value.literal.impl;
 
 import lombok.Getter;
-import org.dromara.hmily.tac.sqlparser.model.value.ValueHmilyASTNode;
-
-import java.util.Collection;
-import java.util.LinkedList;
+import org.dromara.hmily.tac.sqlparser.model.value.literal.HmilyLiteralValue;
 
 /**
- * Collection value.
+ * String literal value.
  */
 @Getter
-public final class CollectionValue<T> implements ValueHmilyASTNode<Collection> {
+public final class HmilyStringLiteralValue implements HmilyLiteralValue<String> {
     
-    private final Collection<T> value = new LinkedList<>();
+    private final String value;
     
-    /**
-     * Put all values from another collection value into this one.
-     * 
-     * @param collectionValue collection value
-     */
-    public void combine(final CollectionValue<T> collectionValue) {
-        value.addAll(collectionValue.getValue());
+    public HmilyStringLiteralValue(final String value) {
+        this.value = value.substring(1, value.length() - 1);
     }
 }

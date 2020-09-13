@@ -20,7 +20,7 @@ package org.dromara.hmily.tac.sqlparser.model.segment.generic.table;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.dromara.hmily.tac.sqlparser.model.segment.HmilySegment;
-import org.dromara.hmily.tac.sqlparser.model.value.identifier.IdentifierValue;
+import org.dromara.hmily.tac.sqlparser.model.value.identifier.HmilyIdentifierValue;
 
 /**
  * Table name segment.
@@ -33,5 +33,5 @@ public final class HmilyTableNameSegment implements HmilySegment {
     
     private final int stopIndex;
     
-    private final IdentifierValue identifier;
+    private final HmilyIdentifierValue identifier;
 }

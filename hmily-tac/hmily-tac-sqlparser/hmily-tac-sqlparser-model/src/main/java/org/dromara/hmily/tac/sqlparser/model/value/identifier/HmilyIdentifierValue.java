@@ -15,25 +15,25 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.tac.sqlparser.model.value.literal.impl;
+package org.dromara.hmily.tac.sqlparser.model.value.identifier;
 
-import lombok.RequiredArgsConstructor;
-import org.dromara.hmily.tac.sqlparser.model.value.literal.LiteralValue;
+import lombok.Getter;
+import org.dromara.hmily.tac.sqlparser.model.constant.HmilyQuoteCharacter;
+import org.dromara.hmily.tac.sqlparser.model.util.HmilySQLUtil;
+import org.dromara.hmily.tac.sqlparser.model.value.ValueHmilyASTNode;
 
 /**
- * Boolean literal value.
+ * Identifier value.
  */
-@RequiredArgsConstructor
-public final class BooleanLiteralValue implements LiteralValue<Boolean> {
+@Getter
+public final class HmilyIdentifierValue implements ValueHmilyASTNode<String> {
     
-    private final boolean value;
+    private final String value;
     
-    public BooleanLiteralValue(final String value) {
-        this.value = Boolean.parseBoolean(value);
-    }
+    private final HmilyQuoteCharacter hmilyQuoteCharacter;
     
-    @Override
-    public Boolean getValue() {
-        return value;
+    public HmilyIdentifierValue(final String text) {
+        value = HmilySQLUtil.getExactlyValue(text);
+        hmilyQuoteCharacter = HmilyQuoteCharacter.getQuoteCharacter(text);
     }
 }
