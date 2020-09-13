@@ -19,11 +19,22 @@ package org.dromara.hmily.config.zookeeper;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.framework.api.ACLProvider;
 import org.apache.curator.framework.api.transaction.TransactionOp;
-import org.apache.curator.framework.recipes.cache.*;
+import org.apache.curator.framework.recipes.cache.ChildData;
+import org.apache.curator.framework.recipes.cache.CuratorCache;
+import org.apache.curator.framework.recipes.cache.NodeCache;
 import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.curator.utils.CloseableUtils;
 import org.apache.zookeeper.CreateMode;
@@ -35,18 +46,6 @@ import org.dromara.hmily.config.loader.ConfigLoader;
 import org.dromara.hmily.config.zookeeper.handler.CuratorZookeeperExceptionHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Supplier;
-
-import static org.apache.curator.framework.recipes.cache.CuratorCacheListener.builder;
 
 /**
  * The type Curator zookeeper client.
@@ -65,7 +64,7 @@ public final class CuratorZookeeperClient implements AutoCloseable {
 
     private CuratorZookeeperClient() {
     }
-
+    
     /**
      * Gets instance.
      *
@@ -125,7 +124,7 @@ public final class CuratorZookeeperClient implements AutoCloseable {
             CuratorZookeeperExceptionHandler.handleException(ex);
         }
     }
-
+    
     /**
      * Pull input stream.
      *
@@ -142,13 +141,16 @@ public final class CuratorZookeeperClient implements AutoCloseable {
         }
         return new ByteArrayInputStream(content.getBytes());
     }
-
+    
     /**
      * Add listener.
      *
-     * @param config the config
+     * @param context        the context
+     * @param passiveHandler the passive handler
+     * @param config         the config
+     * @throws Exception the exception
      */
-    public void addListener(final Supplier<ConfigLoader.Context> context, final ConfigLoader.PassiveHandler<ZkPassiveConfig> passiveHandler, ZookeeperConfig config) throws Exception {
+    public void addListener(final Supplier<ConfigLoader.Context> context, final ConfigLoader.PassiveHandler<ZkPassiveConfig> passiveHandler, final ZookeeperConfig config) throws Exception {
         if (!config.isPassive()) {
             return;
         }
@@ -159,22 +161,19 @@ public final class CuratorZookeeperClient implements AutoCloseable {
         // But using this high version marked as @Deprecated can receive messages normally.。
         //@see CuratorCache
         NodeCache cache = new NodeCache(client, config.getPath());
-        cache.getListenable().addListener(new NodeCacheListener() {
-            @Override
-            public void nodeChanged() throws Exception {
-                byte[] data = cache.getCurrentData().getData();
-                String string = new String(data, StandardCharsets.UTF_8);
-                ZkPassiveConfig zkPassiveConfig = new ZkPassiveConfig();
-                zkPassiveConfig.setPath(config.getPath());
-                zkPassiveConfig.setFileExtension(config.getFileExtension());
-                zkPassiveConfig.setValue(string);
-                passiveHandler.passive(context, zkPassiveConfig);
-            }
+        cache.getListenable().addListener(() -> {
+            byte[] data = cache.getCurrentData().getData();
+            String string = new String(data, StandardCharsets.UTF_8);
+            ZkPassiveConfig zkPassiveConfig = new ZkPassiveConfig();
+            zkPassiveConfig.setPath(config.getPath());
+            zkPassiveConfig.setFileExtension(config.getFileExtension());
+            zkPassiveConfig.setValue(string);
+            passiveHandler.passive(context, zkPassiveConfig);
         });
         cache.start();
         LOGGER.info("passive zookeeper remote started....");
     }
-
+    
     /**
      * Get string.
      *
@@ -192,7 +191,7 @@ public final class CuratorZookeeperClient implements AutoCloseable {
         }
         return getDirectly(path);
     }
-
+    
     /**
      * Persist.
      *

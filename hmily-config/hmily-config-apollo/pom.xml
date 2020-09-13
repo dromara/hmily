@@ -36,20 +36,13 @@
             <version>${apollo.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.dromara</groupId>
-            <artifactId>hmily-common</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
             <groupId>com.google.inject</groupId>
             <artifactId>guice</artifactId>
         </dependency>
         <dependency>
             <groupId>org.dromara</groupId>
-            <artifactId>hmily-spi</artifactId>
+            <artifactId>hmily-config-loader</artifactId>
             <version>${project.version}</version>
-            <scope>compile</scope>
         </dependency>
     </dependencies>
 
