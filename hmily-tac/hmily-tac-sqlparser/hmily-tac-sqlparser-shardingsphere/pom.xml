@@ -39,5 +39,4 @@
             <artifactId>shardingsphere-sql-parser-mysql</artifactId>
         </dependency>
     </dependencies>
-
 </project>
