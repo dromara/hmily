@@ -30,7 +30,8 @@ public final class HmilyIndexOrderByItemSegment extends HmilyOrderByItemSegment 
     
     private final int columnIndex;
     
-    public HmilyIndexOrderByItemSegment(final int startIndex, final int stopIndex, final int columnIndex, final HmilyOrderDirection hmilyOrderDirection, final HmilyOrderDirection nullHmilyOrderDirection) {
+    public HmilyIndexOrderByItemSegment(final int startIndex, final int stopIndex, final int columnIndex,
+                                        final HmilyOrderDirection hmilyOrderDirection, final HmilyOrderDirection nullHmilyOrderDirection) {
         super(startIndex, stopIndex, hmilyOrderDirection, nullHmilyOrderDirection);
         this.columnIndex = columnIndex;
     }

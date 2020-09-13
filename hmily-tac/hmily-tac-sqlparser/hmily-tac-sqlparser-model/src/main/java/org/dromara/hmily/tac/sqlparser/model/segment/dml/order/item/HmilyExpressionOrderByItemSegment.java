@@ -30,7 +30,8 @@ public final class HmilyExpressionOrderByItemSegment extends HmilyTextOrderByIte
     
     private final String expression;
     
-    public HmilyExpressionOrderByItemSegment(final int startIndex, final int stopIndex, final String expression, final HmilyOrderDirection hmilyOrderDirection, final HmilyOrderDirection nullHmilyOrderDirection) {
+    public HmilyExpressionOrderByItemSegment(final int startIndex, final int stopIndex, final String expression,
+                                             final HmilyOrderDirection hmilyOrderDirection, final HmilyOrderDirection nullHmilyOrderDirection) {
         super(startIndex, stopIndex, hmilyOrderDirection, nullHmilyOrderDirection);
         this.expression = expression;
     }
