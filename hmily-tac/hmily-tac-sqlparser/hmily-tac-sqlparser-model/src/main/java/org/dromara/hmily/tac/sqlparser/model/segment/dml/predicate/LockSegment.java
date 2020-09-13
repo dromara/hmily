@@ -19,7 +19,7 @@ package org.dromara.hmily.tac.sqlparser.model.segment.dml.predicate;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.dromara.hmily.tac.sqlparser.model.segment.SQLSegment;
+import org.dromara.hmily.tac.sqlparser.model.segment.HmilySegment;
 
 /**
  * Lock segment.
@@ -27,7 +27,7 @@ import org.dromara.hmily.tac.sqlparser.model.segment.SQLSegment;
 
 @RequiredArgsConstructor
 @Getter
-public final class LockSegment implements SQLSegment {
+public final class LockSegment implements HmilySegment {
 
     private final int startIndex;
 

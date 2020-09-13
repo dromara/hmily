@@ -17,12 +17,12 @@
 
 package org.dromara.hmily.tac.sqlparser.model.segment.dml.pagination;
 
-import org.dromara.hmily.tac.sqlparser.model.segment.SQLSegment;
+import org.dromara.hmily.tac.sqlparser.model.segment.HmilySegment;
 
 /**
  * Pagination value segment.
  */
-public interface PaginationValueSegment extends SQLSegment {
+public interface PaginationValueSegment extends HmilySegment {
     
     /**
      * Is bound opened.

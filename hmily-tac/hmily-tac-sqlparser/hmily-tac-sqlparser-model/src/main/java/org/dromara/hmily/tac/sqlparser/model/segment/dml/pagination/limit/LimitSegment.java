@@ -19,7 +19,7 @@ package org.dromara.hmily.tac.sqlparser.model.segment.dml.pagination.limit;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.dromara.hmily.tac.sqlparser.model.segment.SQLSegment;
+import org.dromara.hmily.tac.sqlparser.model.segment.HmilySegment;
 import org.dromara.hmily.tac.sqlparser.model.segment.dml.pagination.PaginationValueSegment;
 
 import java.util.Optional;
@@ -29,7 +29,7 @@ import java.util.Optional;
  */
 @RequiredArgsConstructor
 @Getter
-public final class LimitSegment implements SQLSegment {
+public final class LimitSegment implements HmilySegment {
     
     private final int startIndex;
     

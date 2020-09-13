@@ -22,7 +22,7 @@ import org.dromara.hmily.tac.sqlparser.model.HmilyASTNode;
 /**
  * SQL segment.
  */
-public interface SQLSegment extends HmilyASTNode {
+public interface HmilySegment extends HmilyASTNode {
     
     /**
      * Get start index.

@@ -20,7 +20,7 @@ package org.dromara.hmily.tac.sqlparser.model.segment.dml.item;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import org.dromara.hmily.tac.sqlparser.model.segment.SQLSegment;
+import org.dromara.hmily.tac.sqlparser.model.segment.HmilySegment;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -30,7 +30,7 @@ import java.util.LinkedList;
  */
 @RequiredArgsConstructor
 @Getter
-public final class ProjectionsSegment implements SQLSegment {
+public final class ProjectionsSegment implements HmilySegment {
     
     private final int startIndex;
     

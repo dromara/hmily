@@ -19,7 +19,7 @@ package org.dromara.hmily.tac.sqlparser.model.segment.dml;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.dromara.hmily.tac.sqlparser.model.segment.SQLSegment;
+import org.dromara.hmily.tac.sqlparser.model.segment.HmilySegment;
 import org.dromara.hmily.tac.sqlparser.model.segment.dml.column.ColumnSegment;
 import org.dromara.hmily.tac.sqlparser.model.segment.dml.predicate.PredicateSegment;
 
@@ -28,7 +28,7 @@ import java.util.LinkedList;
 
 @Setter
 @Getter
-public final class JoinSpecificationSegment implements SQLSegment {
+public final class JoinSpecificationSegment implements HmilySegment {
     
     private int startIndex;
     

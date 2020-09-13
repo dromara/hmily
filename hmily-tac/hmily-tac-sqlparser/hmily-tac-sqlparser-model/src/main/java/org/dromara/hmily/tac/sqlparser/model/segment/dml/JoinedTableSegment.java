@@ -19,13 +19,13 @@ package org.dromara.hmily.tac.sqlparser.model.segment.dml;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.dromara.hmily.tac.sqlparser.model.segment.SQLSegment;
+import org.dromara.hmily.tac.sqlparser.model.segment.HmilySegment;
 import org.dromara.hmily.tac.sqlparser.model.segment.generic.table.SimpleTableSegment;
 import org.dromara.hmily.tac.sqlparser.model.segment.generic.table.TableSegment;
 
 @Getter
 @Setter
-public final class JoinedTableSegment implements SQLSegment {
+public final class JoinedTableSegment implements HmilySegment {
     
     private int startIndex;
     

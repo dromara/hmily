@@ -17,7 +17,7 @@
 
 package org.dromara.hmily.tac.sqlparser.model.segment.generic;
 
-import org.dromara.hmily.tac.sqlparser.model.segment.SQLSegment;
+import org.dromara.hmily.tac.sqlparser.model.segment.HmilySegment;
 
 import java.util.Optional;
 
@@ -25,7 +25,7 @@ import java.util.Optional;
  * Owner available.
  *
  */
-public interface OwnerAvailable extends SQLSegment {
+public interface OwnerAvailable extends HmilySegment {
     
     /**
      * Get owner.

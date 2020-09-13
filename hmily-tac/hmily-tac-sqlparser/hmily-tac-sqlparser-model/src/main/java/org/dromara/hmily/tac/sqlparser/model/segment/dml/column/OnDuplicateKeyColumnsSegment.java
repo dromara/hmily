@@ -19,7 +19,7 @@ package org.dromara.hmily.tac.sqlparser.model.segment.dml.column;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.dromara.hmily.tac.sqlparser.model.segment.SQLSegment;
+import org.dromara.hmily.tac.sqlparser.model.segment.HmilySegment;
 import org.dromara.hmily.tac.sqlparser.model.segment.dml.assignment.AssignmentSegment;
 
 import java.util.Collection;
@@ -29,7 +29,7 @@ import java.util.Collection;
  */
 @RequiredArgsConstructor
 @Getter
-public final class OnDuplicateKeyColumnsSegment implements SQLSegment {
+public final class OnDuplicateKeyColumnsSegment implements HmilySegment {
     
     private final int startIndex;
     

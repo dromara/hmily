@@ -17,10 +17,10 @@
 
 package org.dromara.hmily.tac.sqlparser.model.segment.dml.expr;
 
-import org.dromara.hmily.tac.sqlparser.model.segment.SQLSegment;
+import org.dromara.hmily.tac.sqlparser.model.segment.HmilySegment;
 
 /**
  * Expression segment.
  */
-public interface ExpressionSegment extends SQLSegment {
+public interface ExpressionSegment extends HmilySegment {
 }

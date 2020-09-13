@@ -17,10 +17,10 @@
 
 package org.dromara.hmily.tac.sqlparser.model.segment.generic.table;
 
-import org.dromara.hmily.tac.sqlparser.model.segment.SQLSegment;
+import org.dromara.hmily.tac.sqlparser.model.segment.HmilySegment;
 
 /**
  * Table segment.
  */
-public interface TableSegment extends SQLSegment {
+public interface TableSegment extends HmilySegment {
 }

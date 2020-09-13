@@ -19,7 +19,7 @@ package org.dromara.hmily.tac.sqlparser.model.segment.dml;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.dromara.hmily.tac.sqlparser.model.segment.SQLSegment;
+import org.dromara.hmily.tac.sqlparser.model.segment.HmilySegment;
 import org.dromara.hmily.tac.sqlparser.model.segment.generic.table.SimpleTableSegment;
 
 import java.util.Collection;
@@ -27,7 +27,7 @@ import java.util.LinkedList;
 
 @Getter
 @Setter
-public final class TableReferenceSegment implements SQLSegment {
+public final class TableReferenceSegment implements HmilySegment {
     
     private int startIndex;
     

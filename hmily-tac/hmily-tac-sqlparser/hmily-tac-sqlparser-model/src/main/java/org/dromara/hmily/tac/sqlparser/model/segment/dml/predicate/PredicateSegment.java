@@ -19,7 +19,7 @@ package org.dromara.hmily.tac.sqlparser.model.segment.dml.predicate;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.dromara.hmily.tac.sqlparser.model.segment.SQLSegment;
+import org.dromara.hmily.tac.sqlparser.model.segment.HmilySegment;
 import org.dromara.hmily.tac.sqlparser.model.segment.dml.column.ColumnSegment;
 import org.dromara.hmily.tac.sqlparser.model.segment.dml.predicate.value.PredicateRightValue;
 
@@ -28,7 +28,7 @@ import org.dromara.hmily.tac.sqlparser.model.segment.dml.predicate.value.Predica
  */
 @RequiredArgsConstructor
 @Getter
-public final class PredicateSegment implements SQLSegment {
+public final class PredicateSegment implements HmilySegment {
     
     private final int startIndex;
     

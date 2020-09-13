@@ -20,14 +20,14 @@ package org.dromara.hmily.tac.sqlparser.model.segment.dml.order.item;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.dromara.hmily.tac.sqlparser.model.constant.OrderDirection;
-import org.dromara.hmily.tac.sqlparser.model.segment.SQLSegment;
+import org.dromara.hmily.tac.sqlparser.model.segment.HmilySegment;
 
 /**
  * Order by item segment.
  */
 @RequiredArgsConstructor
 @Getter
-public abstract class OrderByItemSegment implements SQLSegment {
+public abstract class OrderByItemSegment implements HmilySegment {
     
     private final int startIndex;
     

@@ -19,7 +19,7 @@ package org.dromara.hmily.tac.sqlparser.model.segment.generic;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.dromara.hmily.tac.sqlparser.model.segment.SQLSegment;
+import org.dromara.hmily.tac.sqlparser.model.segment.HmilySegment;
 import org.dromara.hmily.tac.sqlparser.model.value.identifier.IdentifierValue;
 
 /**
@@ -27,7 +27,7 @@ import org.dromara.hmily.tac.sqlparser.model.value.identifier.IdentifierValue;
  */
 @RequiredArgsConstructor
 @Getter
-public final class SchemaSegment implements SQLSegment {
+public final class SchemaSegment implements HmilySegment {
     
     private final int startIndex;
     

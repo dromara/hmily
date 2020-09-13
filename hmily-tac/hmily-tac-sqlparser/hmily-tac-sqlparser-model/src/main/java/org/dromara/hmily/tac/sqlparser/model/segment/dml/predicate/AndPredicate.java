@@ -18,7 +18,7 @@
 package org.dromara.hmily.tac.sqlparser.model.segment.dml.predicate;
 
 import lombok.Getter;
-import org.dromara.hmily.tac.sqlparser.model.segment.SQLSegment;
+import org.dromara.hmily.tac.sqlparser.model.segment.HmilySegment;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -27,7 +27,7 @@ import java.util.LinkedList;
  * And predicate.
  */
 @Getter
-public final class AndPredicate implements SQLSegment {
+public final class AndPredicate implements HmilySegment {
     
     private final int startIndex = 0;
     

@@ -17,14 +17,14 @@
 
 package org.dromara.hmily.tac.sqlparser.model.segment.generic;
 
-import org.dromara.hmily.tac.sqlparser.model.segment.SQLSegment;
+import org.dromara.hmily.tac.sqlparser.model.segment.HmilySegment;
 
 import java.util.Optional;
 
 /**
  * Alias available.
  */
-public interface AliasAvailable extends SQLSegment {
+public interface AliasAvailable extends HmilySegment {
     
     /**
      * Get alias.

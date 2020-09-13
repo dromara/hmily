@@ -21,7 +21,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.dromara.hmily.tac.sqlparser.model.segment.SQLSegment;
+import org.dromara.hmily.tac.sqlparser.model.segment.HmilySegment;
 import org.dromara.hmily.tac.sqlparser.model.segment.dml.predicate.value.PredicateRightValue;
 import org.dromara.hmily.tac.sqlparser.model.segment.generic.OwnerAvailable;
 import org.dromara.hmily.tac.sqlparser.model.segment.generic.OwnerSegment;
@@ -36,7 +36,7 @@ import java.util.Optional;
 @Getter
 @Setter
 @ToString
-public final class ColumnSegment implements SQLSegment, PredicateRightValue, OwnerAvailable {
+public final class ColumnSegment implements HmilySegment, PredicateRightValue, OwnerAvailable {
     
     private final int startIndex;
     

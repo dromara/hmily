@@ -17,10 +17,10 @@
 
 package org.dromara.hmily.tac.sqlparser.model.segment.generic;
 
-import org.dromara.hmily.tac.sqlparser.model.segment.SQLSegment;
+import org.dromara.hmily.tac.sqlparser.model.segment.HmilySegment;
 
 /**
  * Remove available.
  */
-public interface RemoveAvailable extends SQLSegment {
+public interface RemoveAvailable extends HmilySegment {
 }
