@@ -20,7 +20,7 @@ package org.dromara.hmily.tac.sqlparser.model.statement;
 /**
  * SQL statement type.
  */
-public enum SQLStatementType {
+public enum HmilyStatementType {
     
     DML, DDL, TCL, DCL, DAL, RL
 }
