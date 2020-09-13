@@ -19,7 +19,7 @@ package org.dromara.hmily.tac.sqlrevert.core;
 
 import org.dromara.hmily.repository.spi.entity.HmilyUndoInvocation;
 import org.dromara.hmily.spi.HmilySPI;
-import org.dromara.hmily.tac.sqlparser.model.statement.SQLStatement;
+import org.dromara.hmily.tac.sqlparser.model.statement.HmilyStatement;
 import org.dromara.hmily.tac.sqlrevert.spi.HmilySqlRevertEngine;
 import org.dromara.hmily.tac.sqlrevert.spi.exception.SqlRevertException;
 
@@ -34,7 +34,7 @@ import java.sql.Connection;
 public class DefaultSqlRevertEngine implements HmilySqlRevertEngine {
     
     @Override
-    public HmilyUndoInvocation revert(final SQLStatement sqlStatement, final Connection connection, final String sql) throws SqlRevertException {
+    public HmilyUndoInvocation revert(final HmilyStatement hmilyStatement, final Connection connection, final String sql) throws SqlRevertException {
         HmilyUndoInvocation undoInvocation = new HmilyUndoInvocation();
         //这里是我的测试验证，写死了
         String revertSql;

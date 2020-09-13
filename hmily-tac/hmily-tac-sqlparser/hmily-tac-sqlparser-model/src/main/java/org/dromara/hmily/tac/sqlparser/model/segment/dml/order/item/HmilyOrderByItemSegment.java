@@ -15,29 +15,25 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.tac.sqlrevert.spi;
+package org.dromara.hmily.tac.sqlparser.model.segment.dml.order.item;
 
-import org.dromara.hmily.repository.spi.entity.HmilyUndoInvocation;
-import org.dromara.hmily.tac.sqlparser.model.statement.HmilyStatement;
-import org.dromara.hmily.tac.sqlrevert.spi.exception.SqlRevertException;
-
-import java.sql.Connection;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import org.dromara.hmily.tac.sqlparser.model.constant.HmilyOrderDirection;
+import org.dromara.hmily.tac.sqlparser.model.segment.HmilySegment;
 
 /**
- * The interface Hmily sql revert engine.
- *
- * @author xiaoyu
+ * Order by item segment.
  */
-public interface HmilySqlRevertEngine {
+@RequiredArgsConstructor
+@Getter
+public abstract class HmilyOrderByItemSegment implements HmilySegment {
     
-    /**
-     * Revert hmily undo invocation.
-     *
-     * @param hmilyStatement the sql statement
-     * @param connection   connection
-     * @param sql          the sql
-     * @return the hmily undo invocation
-     * @throws SqlRevertException the sql revert exception
-     */
-    HmilyUndoInvocation revert(HmilyStatement hmilyStatement, Connection connection, String sql) throws SqlRevertException;
+    private final int startIndex;
+    
+    private final int stopIndex;
+    
+    private final HmilyOrderDirection hmilyOrderDirection;
+    
+    private final HmilyOrderDirection nullHmilyOrderDirection;
 }

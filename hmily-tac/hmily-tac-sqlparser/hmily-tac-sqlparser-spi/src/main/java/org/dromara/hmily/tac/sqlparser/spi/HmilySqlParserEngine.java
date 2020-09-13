@@ -17,7 +17,7 @@
 
 package org.dromara.hmily.tac.sqlparser.spi;
 
-import org.dromara.hmily.tac.sqlparser.model.statement.SQLStatement;
+import org.dromara.hmily.tac.sqlparser.model.statement.HmilyStatement;
 import org.dromara.hmily.tac.sqlparser.spi.exception.SqlParserException;
 
 /**
@@ -35,5 +35,5 @@ public interface HmilySqlParserEngine {
      * @return the sql statement
      * @throws SqlParserException the sql parser exception
      */
-    SQLStatement parser(String sql, String databaseType) throws SqlParserException;
+    HmilyStatement parser(String sql, String databaseType) throws SqlParserException;
 }

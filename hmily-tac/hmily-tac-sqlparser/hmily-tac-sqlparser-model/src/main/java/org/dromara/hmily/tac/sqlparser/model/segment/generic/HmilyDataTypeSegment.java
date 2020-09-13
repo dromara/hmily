@@ -15,29 +15,21 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.tac.sqlrevert.spi;
+package org.dromara.hmily.tac.sqlparser.model.segment.generic;
 
-import org.dromara.hmily.repository.spi.entity.HmilyUndoInvocation;
-import org.dromara.hmily.tac.sqlparser.model.statement.HmilyStatement;
-import org.dromara.hmily.tac.sqlrevert.spi.exception.SqlRevertException;
+import lombok.Getter;
+import lombok.Setter;
+import org.dromara.hmily.tac.sqlparser.model.segment.HmilySegment;
 
-import java.sql.Connection;
-
-/**
- * The interface Hmily sql revert engine.
- *
- * @author xiaoyu
- */
-public interface HmilySqlRevertEngine {
+@Getter
+@Setter
+public final class HmilyDataTypeSegment implements HmilySegment {
     
-    /**
-     * Revert hmily undo invocation.
-     *
-     * @param hmilyStatement the sql statement
-     * @param connection   connection
-     * @param sql          the sql
-     * @return the hmily undo invocation
-     * @throws SqlRevertException the sql revert exception
-     */
-    HmilyUndoInvocation revert(HmilyStatement hmilyStatement, Connection connection, String sql) throws SqlRevertException;
+    private int startIndex;
+    
+    private int stopIndex;
+    
+    private String dataTypeName;
+    
+    private HmilyDataTypeLengthSegment dataLength;
 }

@@ -15,29 +15,29 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.tac.sqlrevert.spi;
+package org.dromara.hmily.tac.sqlparser.model.segment.generic;
 
-import org.dromara.hmily.repository.spi.entity.HmilyUndoInvocation;
-import org.dromara.hmily.tac.sqlparser.model.statement.HmilyStatement;
-import org.dromara.hmily.tac.sqlrevert.spi.exception.SqlRevertException;
+import org.dromara.hmily.tac.sqlparser.model.segment.HmilySegment;
 
-import java.sql.Connection;
+import java.util.Optional;
 
 /**
- * The interface Hmily sql revert engine.
+ * Owner available.
  *
- * @author xiaoyu
  */
-public interface HmilySqlRevertEngine {
+public interface HmilyOwnerAvailable extends HmilySegment {
     
     /**
-     * Revert hmily undo invocation.
+     * Get owner.
      *
-     * @param hmilyStatement the sql statement
-     * @param connection   connection
-     * @param sql          the sql
-     * @return the hmily undo invocation
-     * @throws SqlRevertException the sql revert exception
+     * @return owner
      */
-    HmilyUndoInvocation revert(HmilyStatement hmilyStatement, Connection connection, String sql) throws SqlRevertException;
+    Optional<HmilyOwnerSegment> getOwner();
+    
+    /**
+     * Set owner.
+     *
+     * @param owner owner
+     */
+    void setOwner(HmilyOwnerSegment owner);
 }

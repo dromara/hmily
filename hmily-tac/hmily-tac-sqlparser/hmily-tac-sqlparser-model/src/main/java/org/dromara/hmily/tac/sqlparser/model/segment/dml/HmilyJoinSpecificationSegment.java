@@ -15,29 +15,26 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.tac.sqlrevert.spi;
+package org.dromara.hmily.tac.sqlparser.model.segment.dml;
 
-import org.dromara.hmily.repository.spi.entity.HmilyUndoInvocation;
-import org.dromara.hmily.tac.sqlparser.model.statement.HmilyStatement;
-import org.dromara.hmily.tac.sqlrevert.spi.exception.SqlRevertException;
+import lombok.Getter;
+import lombok.Setter;
+import org.dromara.hmily.tac.sqlparser.model.segment.HmilySegment;
+import org.dromara.hmily.tac.sqlparser.model.segment.dml.column.HmilyColumnSegment;
+import org.dromara.hmily.tac.sqlparser.model.segment.dml.predicate.HmilyPredicateSegment;
 
-import java.sql.Connection;
+import java.util.Collection;
+import java.util.LinkedList;
 
-/**
- * The interface Hmily sql revert engine.
- *
- * @author xiaoyu
- */
-public interface HmilySqlRevertEngine {
+@Setter
+@Getter
+public final class HmilyJoinSpecificationSegment implements HmilySegment {
     
-    /**
-     * Revert hmily undo invocation.
-     *
-     * @param hmilyStatement the sql statement
-     * @param connection   connection
-     * @param sql          the sql
-     * @return the hmily undo invocation
-     * @throws SqlRevertException the sql revert exception
-     */
-    HmilyUndoInvocation revert(HmilyStatement hmilyStatement, Connection connection, String sql) throws SqlRevertException;
+    private int startIndex;
+    
+    private int stopIndex;
+    
+    private HmilyPredicateSegment hmilyPredicateSegment;
+    
+    private Collection<HmilyColumnSegment> usingColumns = new LinkedList<>();
 }

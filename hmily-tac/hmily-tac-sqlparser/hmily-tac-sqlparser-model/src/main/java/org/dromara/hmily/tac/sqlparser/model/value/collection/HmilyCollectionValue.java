@@ -15,29 +15,28 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.tac.sqlrevert.spi;
+package org.dromara.hmily.tac.sqlparser.model.value.collection;
 
-import org.dromara.hmily.repository.spi.entity.HmilyUndoInvocation;
-import org.dromara.hmily.tac.sqlparser.model.statement.HmilyStatement;
-import org.dromara.hmily.tac.sqlrevert.spi.exception.SqlRevertException;
+import lombok.Getter;
+import org.dromara.hmily.tac.sqlparser.model.value.HmilyValueASTNode;
 
-import java.sql.Connection;
+import java.util.Collection;
+import java.util.LinkedList;
 
 /**
- * The interface Hmily sql revert engine.
- *
- * @author xiaoyu
+ * Collection value.
  */
-public interface HmilySqlRevertEngine {
+@Getter
+public final class HmilyCollectionValue<T> implements HmilyValueASTNode<Collection> {
+    
+    private final Collection<T> value = new LinkedList<>();
     
     /**
-     * Revert hmily undo invocation.
-     *
-     * @param hmilyStatement the sql statement
-     * @param connection   connection
-     * @param sql          the sql
-     * @return the hmily undo invocation
-     * @throws SqlRevertException the sql revert exception
+     * Put all values from another collection value into this one.
+     * 
+     * @param hmilyCollectionValue collection value
      */
-    HmilyUndoInvocation revert(HmilyStatement hmilyStatement, Connection connection, String sql) throws SqlRevertException;
+    public void combine(final HmilyCollectionValue<T> hmilyCollectionValue) {
+        value.addAll(hmilyCollectionValue.getValue());
+    }
 }
