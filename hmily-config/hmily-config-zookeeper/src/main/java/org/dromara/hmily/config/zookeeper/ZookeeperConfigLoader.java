@@ -61,17 +61,9 @@ public class ZookeeperConfigLoader implements ConfigLoader<ZookeeperConfig> {
         LOADERS.put("properties", new PropertiesLoader());
     }
 
-    /**
-     * Instantiates a new Zookeeper config loader.
-     */
     public ZookeeperConfigLoader() {
     }
 
-    /**
-     * Instantiates a new Zookeeper config loader.
-     *
-     * @param client the client
-     */
     public ZookeeperConfigLoader(final CuratorZookeeperClient client) {
         this();
         this.client = client;

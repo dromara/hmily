@@ -21,7 +21,7 @@ import lombok.Data;
 import org.dromara.hmily.config.api.AbstractConfig;
 
 /**
- * NacosPassiveConfig .
+ * ZkPassiveConfig .
  *
  * @author sixh chenbin
  */
@@ -38,7 +38,7 @@ public class ZkPassiveConfig extends AbstractConfig {
     public String prefix() {
         return "";
     }
-
+    
     /**
      * File name string.
      *
