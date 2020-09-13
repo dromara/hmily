@@ -15,29 +15,21 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.tac.sqlrevert.spi;
+package org.dromara.hmily.tac.sqlparser.model.value;
 
-import org.dromara.hmily.repository.spi.entity.HmilyUndoInvocation;
-import org.dromara.hmily.tac.sqlparser.model.statement.HmilyStatement;
-import org.dromara.hmily.tac.sqlrevert.spi.exception.SqlRevertException;
-
-import java.sql.Connection;
+import org.dromara.hmily.tac.sqlparser.model.HmilyASTNode;
 
 /**
- * The interface Hmily sql revert engine.
+ * Value AST node.
  *
- * @author xiaoyu
+ * @param <T> type of value
  */
-public interface HmilySqlRevertEngine {
+public interface HmilyValueASTNode<T> extends HmilyASTNode {
     
     /**
-     * Revert hmily undo invocation.
-     *
-     * @param hmilyStatement the sql statement
-     * @param connection   connection
-     * @param sql          the sql
-     * @return the hmily undo invocation
-     * @throws SqlRevertException the sql revert exception
+     * Get value.
+     * 
+     * @return value
      */
-    HmilyUndoInvocation revert(HmilyStatement hmilyStatement, Connection connection, String sql) throws SqlRevertException;
+    T getValue();
 }

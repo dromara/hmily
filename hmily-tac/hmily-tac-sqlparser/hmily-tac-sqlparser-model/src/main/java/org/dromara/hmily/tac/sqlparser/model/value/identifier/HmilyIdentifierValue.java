@@ -15,29 +15,25 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.tac.sqlrevert.spi;
+package org.dromara.hmily.tac.sqlparser.model.value.identifier;
 
-import org.dromara.hmily.repository.spi.entity.HmilyUndoInvocation;
-import org.dromara.hmily.tac.sqlparser.model.statement.HmilyStatement;
-import org.dromara.hmily.tac.sqlrevert.spi.exception.SqlRevertException;
-
-import java.sql.Connection;
+import lombok.Getter;
+import org.dromara.hmily.tac.sqlparser.model.constant.HmilyQuoteCharacter;
+import org.dromara.hmily.tac.sqlparser.model.util.HmilySQLUtil;
+import org.dromara.hmily.tac.sqlparser.model.value.HmilyValueASTNode;
 
 /**
- * The interface Hmily sql revert engine.
- *
- * @author xiaoyu
+ * Identifier value.
  */
-public interface HmilySqlRevertEngine {
+@Getter
+public final class HmilyIdentifierValue implements HmilyValueASTNode<String> {
     
-    /**
-     * Revert hmily undo invocation.
-     *
-     * @param hmilyStatement the sql statement
-     * @param connection   connection
-     * @param sql          the sql
-     * @return the hmily undo invocation
-     * @throws SqlRevertException the sql revert exception
-     */
-    HmilyUndoInvocation revert(HmilyStatement hmilyStatement, Connection connection, String sql) throws SqlRevertException;
+    private final String value;
+    
+    private final HmilyQuoteCharacter hmilyQuoteCharacter;
+    
+    public HmilyIdentifierValue(final String text) {
+        value = HmilySQLUtil.getExactlyValue(text);
+        hmilyQuoteCharacter = HmilyQuoteCharacter.getQuoteCharacter(text);
+    }
 }

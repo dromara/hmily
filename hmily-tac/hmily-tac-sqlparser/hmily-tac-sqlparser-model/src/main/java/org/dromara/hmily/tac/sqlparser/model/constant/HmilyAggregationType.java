@@ -15,29 +15,26 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.tac.sqlrevert.spi;
-
-import org.dromara.hmily.repository.spi.entity.HmilyUndoInvocation;
-import org.dromara.hmily.tac.sqlparser.model.statement.HmilyStatement;
-import org.dromara.hmily.tac.sqlrevert.spi.exception.SqlRevertException;
-
-import java.sql.Connection;
+package org.dromara.hmily.tac.sqlparser.model.constant;
 
 /**
- * The interface Hmily sql revert engine.
- *
- * @author xiaoyu
+ * Aggregation function enum.
  */
-public interface HmilySqlRevertEngine {
+public enum HmilyAggregationType {
+    
+    MAX, MIN, SUM, COUNT, AVG;
     
     /**
-     * Revert hmily undo invocation.
-     *
-     * @param hmilyStatement the sql statement
-     * @param connection   connection
-     * @param sql          the sql
-     * @return the hmily undo invocation
-     * @throws SqlRevertException the sql revert exception
+     * Is aggregation type.
+     * @param aggregationType aggregation type
+     * @return is aggregation type or not
      */
-    HmilyUndoInvocation revert(HmilyStatement hmilyStatement, Connection connection, String sql) throws SqlRevertException;
+    public static boolean isAggregationType(final String aggregationType) {
+        for (HmilyAggregationType each : HmilyAggregationType.values()) {
+            if (aggregationType.equalsIgnoreCase(each.name())) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
