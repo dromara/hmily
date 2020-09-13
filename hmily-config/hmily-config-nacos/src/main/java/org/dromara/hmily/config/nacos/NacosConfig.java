@@ -48,6 +48,11 @@ public class NacosConfig extends AbstractConfig {
         return PrefixConstants.REMOTE_NACOS;
     }
 
+    /**
+     * File name string.
+     *
+     * @return the string
+     */
     public String fileName() {
         return dataId + "." + fileExtension;
     }

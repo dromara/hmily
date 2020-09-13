@@ -37,6 +37,5 @@ public enum ChangeEvent {
     /**
      * Remove change event.
      */
-    REMOVE(),
-    ;
+    REMOVE()
 }

@@ -76,9 +76,12 @@ public class NacosClient {
     /**
      * Add listener.
      *
-     * @param config the config
+     * @param context        the context
+     * @param passiveHandler the passive handler
+     * @param config         the config
+     * @throws NacosException the nacos exception
      */
-    void addListener(Supplier<ConfigLoader.Context> context, ConfigLoader.PassiveHandler<NacosPassiveConfig> passiveHandler, NacosConfig config) throws NacosException {
+    void addListener(final Supplier<ConfigLoader.Context> context, final ConfigLoader.PassiveHandler<NacosPassiveConfig> passiveHandler, final NacosConfig config) throws NacosException {
         if (!config.isPassive()) {
             return;
         }
@@ -92,7 +95,7 @@ public class NacosClient {
             }
 
             @Override
-            public void receiveConfigInfo(String s) {
+            public void receiveConfigInfo(final String s) {
                 NacosPassiveConfig nacosPassiveConfig = new NacosPassiveConfig();
                 nacosPassiveConfig.setValue(s);
                 nacosPassiveConfig.setFileExtension(config.getFileExtension());

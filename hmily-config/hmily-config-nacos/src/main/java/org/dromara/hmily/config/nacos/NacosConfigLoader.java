@@ -85,7 +85,7 @@ public class NacosConfigLoader implements ConfigLoader<NacosConfig> {
     }
 
     @Override
-    public void passive(Supplier<Context> context, PassiveHandler<Config> handler, Config config) {
+    public void passive(final Supplier<Context> context, final PassiveHandler<Config> handler, final Config config) {
         if (config instanceof NacosPassiveConfig) {
             NacosPassiveConfig nacosPassiveConfig = (NacosPassiveConfig) config;
             String value = nacosPassiveConfig.getValue();

@@ -19,10 +19,9 @@
 
 package org.dromara.hmily.config.loader.property;
 
-import java.util.Map;
-import java.util.Set;
-
 import lombok.Getter;
+
+import java.util.Set;
 
 /**
  * The type Property key source.
@@ -71,7 +70,7 @@ public abstract class PropertyKeySource<T> {
     public abstract Set<String> getKeys();
 
     /**
-     * Return original data
+     * Return original data.
      *
      * @return source
      */

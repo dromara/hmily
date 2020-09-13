@@ -32,7 +32,7 @@ public abstract class AbstractConfig implements Config {
     private volatile boolean isLoad;
 
     /**
-     * Whether to passively receive push
+     * Whether to passively receive push.
      */
     private boolean passive;
 
@@ -56,16 +56,26 @@ public abstract class AbstractConfig implements Config {
         return passive;
     }
 
-    public void setPassive(boolean passive) {
+    /**
+     * Sets passive.
+     *
+     * @param passive the passive
+     */
+    public void setPassive(final boolean passive) {
         this.passive = passive;
     }
 
-    public void setLoad(boolean load) {
+    /**
+     * Sets load.
+     *
+     * @param load the load
+     */
+    public void setLoad(final boolean load) {
         isLoad = load;
     }
 
     @Override
-    public void setSource(Map<String, Object> source) {
+    public void setSource(final Map<String, Object> source) {
         this.source = source;
     }
 

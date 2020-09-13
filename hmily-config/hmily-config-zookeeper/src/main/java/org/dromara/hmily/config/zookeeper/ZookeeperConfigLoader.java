@@ -70,7 +70,7 @@ public class ZookeeperConfigLoader implements ConfigLoader<ZookeeperConfig> {
     }
 
     @Override
-    public void passive(Supplier<Context> context, PassiveHandler<Config> handler, Config config) {
+    public void passive(final Supplier<Context> context, final PassiveHandler<Config> handler, Config config) {
         if (config instanceof ZkPassiveConfig) {
             ZkPassiveConfig zkPassiveConfig = (ZkPassiveConfig) config;
             String value = zkPassiveConfig.getValue();

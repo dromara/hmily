@@ -31,7 +31,7 @@ public class RemoveData extends EventData {
      * @param properties the properties
      * @param value      the value
      */
-    public RemoveData(String properties, Object value) {
+    public RemoveData(final String properties, final Object value) {
         super(ChangeEvent.REMOVE, properties, value);
     }
 }

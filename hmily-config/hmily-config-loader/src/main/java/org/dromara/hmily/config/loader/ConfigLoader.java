@@ -25,11 +25,21 @@ import org.dromara.hmily.config.api.event.EventData;
 import org.dromara.hmily.config.loader.bind.BindData;
 import org.dromara.hmily.config.loader.bind.Binder;
 import org.dromara.hmily.config.loader.bind.DataType;
-import org.dromara.hmily.config.loader.property.*;
+import org.dromara.hmily.config.loader.property.ConfigPropertySource;
+import org.dromara.hmily.config.loader.property.DefaultConfigPropertySource;
+import org.dromara.hmily.config.loader.property.MapPropertyKeySource;
+import org.dromara.hmily.config.loader.property.PropertyKeyParse;
+import org.dromara.hmily.config.loader.property.PropertyKeySource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -46,7 +56,7 @@ public interface ConfigLoader<T extends Config> {
     /**
      * The constant log.
      */
-    Logger log = LoggerFactory.getLogger(ConfigLoader.class);
+    Logger LOG = LoggerFactory.getLogger(ConfigLoader.class);
 
     /**
      * Load related configuration information.
@@ -62,8 +72,8 @@ public interface ConfigLoader<T extends Config> {
      * @param context the context
      * @param data    the data
      */
-    default void push(Supplier<Context> context,
-                      EventData data) {
+    default void push(final Supplier<Context> context,
+                      final EventData data) {
         if (data == null) {
             return;
         }
@@ -89,8 +99,8 @@ public interface ConfigLoader<T extends Config> {
                     try {
                         consumer.accept(data);
                     } catch (ClassCastException e) {
-                        if (log.isWarnEnabled()) {
-                            log.warn("EventData of type [{}] not accepted by EventConsumer [{}]", data.getClass(), consumer);
+                        if (LOG.isWarnEnabled()) {
+                            LOG.warn("EventData of type [{}] not accepted by EventConsumer [{}]", data.getClass(), consumer);
                         }
                     }
                 };
@@ -106,7 +116,7 @@ public interface ConfigLoader<T extends Config> {
      * @param context the context
      * @param handler the handler
      * @param config  Configuration information of things processed by load method
-     * @see #push(Supplier, EventData)
+     * @see #push(Supplier, EventData) #push(Supplier, EventData)
      */
     default void passive(final Supplier<Context> context,
                          final PassiveHandler<Config> handler,
@@ -218,7 +228,6 @@ public interface ConfigLoader<T extends Config> {
          *
          * @param context the context
          * @param config  config.
-         * @return the passive handler
          */
         void finish(Supplier<Context> context, T config);
     }
@@ -236,7 +245,6 @@ public interface ConfigLoader<T extends Config> {
          *
          * @param context the context
          * @param config  the config
-         * @return the passive handler
          */
         void passive(Supplier<Context> context, T config);
     }

@@ -31,7 +31,7 @@ public class ModifyData extends EventData {
      * @param properties the properties
      * @param value      the value
      */
-    public ModifyData(String properties, Object value) {
+    public ModifyData(final String properties, final Object value) {
         super(ChangeEvent.MODIFY, properties, value);
     }
 }

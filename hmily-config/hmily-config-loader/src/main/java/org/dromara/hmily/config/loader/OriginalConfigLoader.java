@@ -61,7 +61,7 @@ public class OriginalConfigLoader implements ConfigLoader<Config> {
     }
 
     @Override
-    public void passive(Supplier<Context> context, final PassiveHandler<Config> handler, Config config) {
+    public void passive(final Supplier<Context> context, final PassiveHandler<Config> handler, final Config config) {
         for (PropertyKeySource<?> propertyKeySource : context.get().getSource()) {
             ConfigPropertySource configPropertySource = new DefaultConfigPropertySource<>(propertyKeySource, PropertyKeyParse.INSTANCE);
             Config bindConfig = getBind(config, configPropertySource);
@@ -76,7 +76,7 @@ public class OriginalConfigLoader implements ConfigLoader<Config> {
         }
     }
 
-    private Config getBind(Config config, ConfigPropertySource configPropertySource) {
+    private Config getBind(final Config config, final ConfigPropertySource configPropertySource) {
         Binder binder = Binder.of(configPropertySource);
         return binder.bind(config.prefix(), BindData.of(DataType.of(config.getClass()), () -> config));
     }

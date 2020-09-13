@@ -109,7 +109,7 @@ public final class ConfigEnv {
      * @param consumer the consumer
      */
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public synchronized <T extends EventData> void addEvent(EventConsumer<T> consumer) {
+    public synchronized <T extends EventData> void addEvent(final EventConsumer<T> consumer) {
         EVENTS.add((EventConsumer) consumer);
     }
 

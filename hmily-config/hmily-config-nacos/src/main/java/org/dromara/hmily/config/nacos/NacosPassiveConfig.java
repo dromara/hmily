@@ -39,6 +39,11 @@ public class NacosPassiveConfig extends AbstractConfig {
         return "";
     }
 
+    /**
+     * File name string.
+     *
+     * @return the string
+     */
     public String fileName() {
         return dataId + "." + fileExtension;
     }

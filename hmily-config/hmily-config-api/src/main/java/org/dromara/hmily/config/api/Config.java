@@ -57,14 +57,13 @@ public interface Config {
      * Sets source.
      *
      * @param t the t
-     * @return the source
      */
-    void setSource(Map<String,Object> t);
+    void setSource(Map<String, Object> t);
 
     /**
      * Source map.
      *
      * @return the map
      */
-    Map<String,Object> getSource();
+    Map<String, Object> getSource();
 }

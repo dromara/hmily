@@ -46,7 +46,14 @@ public class EventData {
 
     private final ChangeEvent event;
 
-    public EventData(ChangeEvent event, String properties, Object value) {
+    /**
+     * Instantiates a new Event data.
+     *
+     * @param event      the event
+     * @param properties the properties
+     * @param value      the value
+     */
+    public EventData(final ChangeEvent event, final String properties, final Object value) {
         this.value = value;
         this.properties = properties;
         this.event = event;
@@ -67,35 +74,70 @@ public class EventData {
      *
      * @param config the config
      */
-    public void setConfig(Config config) {
+    public void setConfig(final Config config) {
         this.config = config;
     }
 
+    /**
+     * Gets properties.
+     *
+     * @return the properties
+     */
     public String getProperties() {
         return properties;
     }
 
-    public void setProperties(String properties) {
+    /**
+     * Sets properties.
+     *
+     * @param properties the properties
+     */
+    public void setProperties(final String properties) {
         this.properties = properties;
     }
 
+    /**
+     * Gets subscribe.
+     *
+     * @return the subscribe
+     */
     public String getSubscribe() {
         return subscribe;
     }
 
-    public void setSubscribe(String subscribe) {
+    /**
+     * Sets subscribe.
+     *
+     * @param subscribe the subscribe
+     */
+    public void setSubscribe(final String subscribe) {
         this.subscribe = subscribe;
     }
 
+    /**
+     * Gets event.
+     *
+     * @return the event
+     */
     public ChangeEvent getEvent() {
         return event;
     }
 
+    /**
+     * Gets value.
+     *
+     * @return the value
+     */
     public Object getValue() {
         return value;
     }
 
-    public void setValue(Object value) {
+    /**
+     * Sets value.
+     *
+     * @param value the value
+     */
+    public void setValue(final Object value) {
         this.value = value;
     }
 }

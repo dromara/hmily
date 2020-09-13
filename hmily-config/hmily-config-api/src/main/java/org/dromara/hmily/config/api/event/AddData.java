@@ -32,7 +32,7 @@ public class AddData extends EventData {
      * @param properties the properties
      * @param value      the value
      */
-    public AddData(String properties, Object value) {
+    public AddData(final String properties, final Object value) {
         super(ChangeEvent.ADD, properties, value);
     }
 }

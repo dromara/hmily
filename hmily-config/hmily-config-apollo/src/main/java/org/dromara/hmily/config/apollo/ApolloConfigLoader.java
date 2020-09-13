@@ -65,7 +65,7 @@ public class ApolloConfigLoader implements ConfigLoader<ApolloConfig> {
     }
 
     @Override
-    public void passive(Supplier<Context> context, PassiveHandler<Config> handler, Config config) {
+    public void passive(final Supplier<Context> context, final PassiveHandler<Config> handler, final Config config) {
         if (config.isPassive()) {
             LOGGER.info("passive apollo remote started....");
             ApolloConfig apolloConfig = (ApolloConfig) config;

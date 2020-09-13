@@ -19,12 +19,11 @@
 
 package org.dromara.hmily.config.local;
 
-import java.util.function.Supplier;
-
-import org.dromara.hmily.config.api.AbstractConfig;
 import org.dromara.hmily.config.api.Config;
 import org.dromara.hmily.config.loader.ConfigLoader;
 import org.dromara.hmily.spi.HmilySPI;
+
+import java.util.function.Supplier;
 
 /**
  * LocalConfigLoader .

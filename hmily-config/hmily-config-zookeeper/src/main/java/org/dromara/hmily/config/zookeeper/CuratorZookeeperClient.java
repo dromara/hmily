@@ -148,7 +148,7 @@ public final class CuratorZookeeperClient implements AutoCloseable {
      *
      * @param config the config
      */
-    public void addListener(Supplier<ConfigLoader.Context> context, ConfigLoader.PassiveHandler<ZkPassiveConfig> passiveHandler, ZookeeperConfig config) throws Exception {
+    public void addListener(final Supplier<ConfigLoader.Context> context, final ConfigLoader.PassiveHandler<ZkPassiveConfig> passiveHandler, ZookeeperConfig config) throws Exception {
         if (!config.isPassive()) {
             return;
         }
