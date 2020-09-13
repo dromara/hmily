@@ -175,7 +175,7 @@ public class ZookeeperRepositoryTest {
         result = zookeeperRepository.createHmilyTransaction(hmilyTransaction);
         assertEquals(1L, result);
         Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.HOUR_OF_DAY, -1);
+        calendar.add(Calendar.HOUR_OF_DAY, 1);
         List<HmilyTransaction> listTransactionResult = zookeeperRepository.listLimitByDelay(calendar.getTime(), 2);
         assertNotNull(listTransactionResult);
         assertNotEquals(0L, listTransactionResult.size());
@@ -218,7 +218,7 @@ public class ZookeeperRepositoryTest {
         assertNotEquals(0L, result);
         
         Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.HOUR_OF_DAY, -1);
+        calendar.add(Calendar.HOUR_OF_DAY, 1);
         int removeByDateResult = zookeeperRepository.removeHmilyParticipantUndoByData(calendar.getTime());
         assertEquals(3L, removeByDateResult);
     }
@@ -245,7 +245,7 @@ public class ZookeeperRepositoryTest {
                         .equals(participantId)).findFirst().get().getStatus());
         
         Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.HOUR_OF_DAY, -1);
+        calendar.add(Calendar.HOUR_OF_DAY, 1);
         long id1 = random.nextInt(1000);
         hmilyParticipant = buildHmilyParticipant(transactionId, id1);
         result = zookeeperRepository.createHmilyParticipant(hmilyParticipant);

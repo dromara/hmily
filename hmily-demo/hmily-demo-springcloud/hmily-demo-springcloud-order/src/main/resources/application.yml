@@ -1,5 +1,5 @@
 server:
-  port: 8884
+  port: 8090
   address: 0.0.0.0
   servlet:
     context-path: /
@@ -10,14 +10,14 @@ spring:
         allow-bean-definition-overriding: true
     datasource:
         driver-class-name:  com.mysql.jdbc.Driver
-        url: jdbc:mysql://127.0.01:3306/tcc_order?useUnicode=true&characterEncoding=utf8
+        url: jdbc:mysql://127.0.01:3306/hmily_order?useUnicode=true&characterEncoding=utf8
         username: root
         password:
     application:
       name: order-service
 
 mybatis:
-  type-aliases-package: org.dromara.hmily.demo.springcloud.order.entity
+  type-aliases-package: org.dromara.hmily.demo.common.order.entity
   config-location: classpath:mybatis/mybatis-config.xml
 #${random.int[9000,9999]}
 eureka:

@@ -21,20 +21,21 @@ package org.dromara.hmily.demo.dubbo.order.service.impl;
 import org.dromara.hmily.annotation.HmilyTAC;
 import org.dromara.hmily.annotation.HmilyTCC;
 import org.dromara.hmily.common.exception.HmilyRuntimeException;
-import org.dromara.hmily.demo.dubbo.account.api.dto.AccountDTO;
-import org.dromara.hmily.demo.dubbo.account.api.dto.AccountNestedDTO;
-import org.dromara.hmily.demo.dubbo.account.api.entity.AccountDO;
-import org.dromara.hmily.demo.dubbo.account.api.service.AccountService;
-import org.dromara.hmily.demo.dubbo.inventory.api.dto.InventoryDTO;
-import org.dromara.hmily.demo.dubbo.inventory.api.service.InventoryService;
-import org.dromara.hmily.demo.dubbo.order.entity.Order;
-import org.dromara.hmily.demo.dubbo.order.enums.OrderStatusEnum;
-import org.dromara.hmily.demo.dubbo.order.mapper.OrderMapper;
+import org.dromara.hmily.demo.common.account.api.AccountService;
+import org.dromara.hmily.demo.common.account.dto.AccountDTO;
+import org.dromara.hmily.demo.common.account.dto.AccountNestedDTO;
+import org.dromara.hmily.demo.common.account.entity.AccountDO;
+import org.dromara.hmily.demo.common.inventory.api.InventoryService;
+import org.dromara.hmily.demo.common.inventory.dto.InventoryDTO;
+import org.dromara.hmily.demo.common.order.entity.Order;
+import org.dromara.hmily.demo.common.order.enums.OrderStatusEnum;
+import org.dromara.hmily.demo.common.order.mapper.OrderMapper;
 import org.dromara.hmily.demo.dubbo.order.service.PaymentService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author xiaoyu
@@ -136,7 +137,16 @@ public class PaymentServiceImpl implements PaymentService {
         inventoryService.mockWithTryException(buildInventoryDTO(order));
         return "success";
     }
-
+    
+    @Override
+    @HmilyTAC
+    @Transactional
+    public String mockTacPaymentInventoryWithTryException(Order order) {
+        updateOrderStatus(order, OrderStatusEnum.PAY_SUCCESS);
+        accountService.paymentTAC(buildAccountDTO(order));
+        throw new RuntimeException("");
+    }
+    
     @Override
     @HmilyTCC(confirmMethod = "confirmOrderStatus", cancelMethod = "cancelOrderStatus")
     public String mockPaymentInventoryWithTryTimeout(Order order) {

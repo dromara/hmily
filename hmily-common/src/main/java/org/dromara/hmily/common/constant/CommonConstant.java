@@ -62,7 +62,7 @@ public final class CommonConstant {
     /**
      * The constant HMILY_TRANSACTION_CONTEXT.
      */
-    public static final String HMILY_TRANSACTION_CONTEXT = "HMILY_TRANSACTION_CONTEXT";
+    public static final String HMILY_TRANSACTION_CONTEXT = "_HMILY_TRANSACTION_CONTEXT";
     
     /**
      * The constant LINE_SEPARATOR.

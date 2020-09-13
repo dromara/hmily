@@ -22,13 +22,12 @@ import com.weibo.api.motan.config.springsupport.annotation.MotanService;
 import org.dromara.hmily.annotation.HmilyTAC;
 import org.dromara.hmily.annotation.HmilyTCC;
 import org.dromara.hmily.common.exception.HmilyRuntimeException;
-import org.dromara.hmily.demo.motan.inventory.api.dto.InventoryDTO;
-import org.dromara.hmily.demo.motan.inventory.api.entity.InventoryDO;
-import org.dromara.hmily.demo.motan.inventory.api.service.InventoryService;
-import org.dromara.hmily.demo.motan.inventory.mapper.InventoryMapper;
+import org.dromara.hmily.demo.common.inventory.api.InventoryService;
+import org.dromara.hmily.demo.common.inventory.dto.InventoryDTO;
+import org.dromara.hmily.demo.common.inventory.entity.InventoryDO;
+import org.dromara.hmily.demo.common.inventory.mapper.InventoryMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
@@ -212,5 +211,4 @@ public class InventoryServiceImpl implements InventoryService {
         inventoryMapper.cancel(inventoryDTO);
         return true;
     }
-
 }

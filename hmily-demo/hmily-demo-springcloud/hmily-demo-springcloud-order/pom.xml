@@ -29,6 +29,10 @@
     <artifactId>hmily-demo-springcloud-order</artifactId>
 
     <dependencies>
+        <dependency>
+            <groupId>org.dromara</groupId>
+            <artifactId>hmily-demo-common</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>org.dromara</groupId>
@@ -55,14 +59,11 @@
              <groupId>org.springframework.cloud</groupId>
              <artifactId>spring-cloud-starter-feign</artifactId>
         </dependency>
-
         -->
-
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
         </dependency>
-
 
         <dependency>
             <groupId>org.springframework.cloud</groupId>
@@ -160,10 +161,10 @@
             <groupId>io.springfox</groupId>
             <artifactId>springfox-bean-validators</artifactId>
         </dependency>
-
     </dependencies>
 
     <build>
+        <finalName>hmily-demo-springcloud-order</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -173,7 +174,14 @@
                     <target>1.8</target>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>org.dromara.hmily.demo.springcloud.order.SpringCloudHmilyOrderApplication</mainClass>
+                    <executable>true</executable>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
-
 </project>

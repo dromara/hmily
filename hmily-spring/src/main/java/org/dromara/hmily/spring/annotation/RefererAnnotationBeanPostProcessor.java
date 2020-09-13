@@ -19,7 +19,6 @@ package org.dromara.hmily.spring.annotation;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;

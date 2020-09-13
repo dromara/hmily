@@ -12,6 +12,7 @@ hmily :
             minWorkerThread : 20 #最小工作pool线程数
             maxWorkerThread : 50 #最大工作pool线程数
             filter : statistic
+            serialization: fastjson
         #指定需要解析的包名
         annotation :
             package : org.dromara.hmily
@@ -32,14 +33,15 @@ spring:
         allow-bean-definition-overriding: true
     datasource:
         driver-class-name:  com.mysql.jdbc.Driver
-        url: jdbc:mysql://127.0.01:3306/tcc_stock?useUnicode=true&characterEncoding=utf8
+        url: jdbc:mysql://127.0.01:3306/hmily_stock?useUnicode=true&characterEncoding=utf8
         username: root
         password:
     application:
         name: order-service
 
 mybatis:
-    type-aliases-package: org.dromara.hmily.demo.motan.inventory.api.entity
+    type-aliases-package: org.dromara.hmily.demo.common.inventory.entity
+    config-location: classpath:mybatis/mybatis-config.xml
 
 logging:
     level:

@@ -455,39 +455,20 @@ public abstract class AbstractHmilyDatabase implements HmilyRepository {
      * @return the int
      */
     private int executeUpdate(final String sql, final Object... params) {
-        Connection connection = null;
-        PreparedStatement ps = null;
-        try {
-            connection = dataSource.getConnection();
-            ps = connection.prepareStatement(sql);
-            if (params != null) {
-                for (int i = 0; i < params.length; i++) {
-                    ps.setObject(i + 1, convertDataType(params[i]));
-                }
-            }
+        try (Connection con = dataSource.getConnection();
+             PreparedStatement ps = createPreparedStatement(con, sql, params)) {
             return ps.executeUpdate();
         } catch (SQLException e) {
-            log.error("executeUpdate-> " + e.getMessage());
+            log.error("hmily jdbc executeUpdate repository exception -> ", e);
             return FAIL_ROWS;
-        } finally {
-            close(connection, ps, null);
         }
     }
     
     private List<Map<String, Object>> executeQuery(final String sql, final Object... params) {
-        Connection connection = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
         List<Map<String, Object>> list = null;
-        try {
-            connection = dataSource.getConnection();
-            ps = connection.prepareStatement(sql);
-            if (params != null) {
-                for (int i = 0; i < params.length; i++) {
-                    ps.setObject(i + 1, convertDataType(params[i]));
-                }
-            }
-            rs = ps.executeQuery();
+        try (Connection con = dataSource.getConnection();
+             PreparedStatement ps = createPreparedStatement(con, sql, params);
+             ResultSet rs = ps.executeQuery()) {
             ResultSetMetaData md = rs.getMetaData();
             int columnCount = md.getColumnCount();
             list = new ArrayList<>();
@@ -499,11 +480,19 @@ public abstract class AbstractHmilyDatabase implements HmilyRepository {
                 list.add(rowData);
             }
         } catch (SQLException e) {
-            log.error("executeQuery-> " + e.getMessage());
-        } finally {
-            close(connection, ps, rs);
+            log.error("hmily jdbc executeQuery repository exception -> ", e);
         }
         return list;
+    }
+    
+    private PreparedStatement createPreparedStatement(final Connection con, final String sql, final Object... params) throws SQLException {
+        PreparedStatement ps = con.prepareStatement(sql);
+        if (params != null) {
+            for (int i = 0; i < params.length; i++) {
+                ps.setObject(i + 1, convertDataType(params[i]));
+            }
+        }
+        return ps;
     }
     
     private HmilyTransaction buildHmilyTransactionByResultMap(final Map<String, Object> map) {
@@ -564,23 +553,5 @@ public abstract class AbstractHmilyDatabase implements HmilyRepository {
         }
         hmilyParticipant.setVersion(Integer.parseInt((map.get("version")).toString()));
         return hmilyParticipant;
-    }
-    
-    private static void close(final AutoCloseable... closeables) {
-        if (null != closeables && closeables.length > 0) {
-            for (AutoCloseable closeable : closeables) {
-                close(closeable);
-            }
-        }
-    }
-    
-    private static void close(final AutoCloseable closeable) {
-        if (null != closeable) {
-            try {
-                closeable.close();
-            } catch (Exception e) {
-                log.error(e.getMessage());
-            }
-        }
     }
 }

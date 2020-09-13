@@ -6,12 +6,12 @@ server:
 spring:
     datasource:
         driver-class-name:  com.mysql.jdbc.Driver
-        url: jdbc:mysql://127.0.0.1:3306/tcc_account?useUnicode=true&characterEncoding=utf8
+        url: jdbc:mysql://127.0.0.1:3306/hmily_account?useUnicode=true&characterEncoding=utf8
         username: root
         password:
 
 mybatis:
-  type-aliases-package: com.hmily.tcc.demo.dubbo.account.api.entity
+  type-aliases-package: org.dromara.hmily.demo.common.account.entity
   config-location: classpath:mybatis/mybatis-config.xml
 
 logging:

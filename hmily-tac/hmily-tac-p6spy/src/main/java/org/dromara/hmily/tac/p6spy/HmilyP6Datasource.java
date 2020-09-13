@@ -23,7 +23,10 @@ import java.sql.SQLException;
 import javax.sql.DataSource;
 import org.dromara.hmily.tac.common.HmilyResourceManager;
 import org.dromara.hmily.tac.common.HmilyTacResource;
-import org.dromara.hmily.tac.common.HmilyTacRollbackExecutor;
+import org.dromara.hmily.tac.p6spy.rollback.HmilyTacRollbackExecutor;
+import org.dromara.hmily.tac.common.utils.DatabaseTypes;
+import org.dromara.hmily.tac.common.utils.JdbcUtils;
+import org.dromara.hmily.tac.common.utils.ResourceIdUtils;
 
 /**
  * The type Hmily p 6 datasource.
@@ -47,6 +50,7 @@ public class HmilyP6Datasource extends P6DataSource implements HmilyTacResource 
     private void init(final DataSource dataSource) {
         try (Connection connection = dataSource.getConnection()) {
             jdbcUrl = connection.getMetaData().getURL();
+            DatabaseTypes.INSTANCE.setDatabaseType(JdbcUtils.newDatabaseType(jdbcUrl));
         } catch (SQLException e) {
             throw new IllegalStateException("can not init dataSource", e);
         }
@@ -56,10 +60,6 @@ public class HmilyP6Datasource extends P6DataSource implements HmilyTacResource 
     
     @Override
     public String getResourceId() {
-        if (jdbcUrl.contains("?")) {
-            return jdbcUrl.substring(0, jdbcUrl.indexOf('?'));
-        } else {
-            return jdbcUrl;
-        }
+        return ResourceIdUtils.INSTANCE.getResourceId(jdbcUrl);
     }
 }

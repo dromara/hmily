@@ -17,7 +17,8 @@
         <module>hmily-demo-dubbo</module>
         <module>hmily-demo-springcloud</module>
         <module>hmily-demo-motan</module>
-        <module>hmily-demo-motan</module>
+        <module>hmily-demo-common</module>
+        <module>hmily-demo-sofa</module>
     </modules>
 
     <properties>
@@ -33,9 +34,16 @@
         <dependencies>
             <dependency>
                 <groupId>org.dromara</groupId>
+                <artifactId>hmily-demo-common</artifactId>
+                <version>${parent.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.dromara</groupId>
                 <artifactId>hmily-annotation</artifactId>
                 <version>${hmily.version}</version>
             </dependency>
+
             <dependency>
                 <groupId>org.dromara</groupId>
                 <artifactId>hmily-core</artifactId>
@@ -53,14 +61,22 @@
                 <artifactId>hmily-springcloud</artifactId>
                 <version>${hmily.version}</version>
             </dependency>
+
             <dependency>
                 <groupId>org.dromara</groupId>
                 <artifactId>hmily-spring-boot-starter-dubbo</artifactId>
                 <version>${hmily.version}</version>
             </dependency>
+
             <dependency>
                 <groupId>org.dromara</groupId>
                 <artifactId>hmily-spring-boot-starter-springcloud</artifactId>
+                <version>${hmily.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.dromara</groupId>
+                <artifactId>hmily-spring-boot-starter-sofa-rpc</artifactId>
                 <version>${hmily.version}</version>
             </dependency>
 
@@ -69,16 +85,19 @@
                 <artifactId>springfox-swagger2</artifactId>
                 <version>${springfox.version}</version>
             </dependency>
+
             <dependency>
                 <groupId>io.springfox</groupId>
                 <artifactId>springfox-swagger-ui</artifactId>
                 <version>${springfox.version}</version>
             </dependency>
+
             <dependency>
                 <groupId>io.springfox</groupId>
                 <artifactId>springfox-bean-validators</artifactId>
                 <version>${springfox.version}</version>
             </dependency>
+
             <dependency>
                 <groupId>org.springframework.data</groupId>
                 <artifactId>spring-data-mongodb</artifactId>
@@ -86,7 +105,6 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
-
 
     <build>
         <plugins>
@@ -102,6 +120,4 @@
             </plugin>
         </plugins>
     </build>
-
-
 </project>

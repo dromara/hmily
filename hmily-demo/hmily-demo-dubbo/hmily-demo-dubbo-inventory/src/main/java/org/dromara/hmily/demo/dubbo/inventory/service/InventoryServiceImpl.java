@@ -21,10 +21,10 @@ import com.google.common.collect.Lists;
 import org.dromara.hmily.annotation.HmilyTAC;
 import org.dromara.hmily.annotation.HmilyTCC;
 import org.dromara.hmily.common.exception.HmilyRuntimeException;
-import org.dromara.hmily.demo.dubbo.inventory.api.dto.InventoryDTO;
-import org.dromara.hmily.demo.dubbo.inventory.api.entity.InventoryDO;
-import org.dromara.hmily.demo.dubbo.inventory.api.service.InventoryService;
-import org.dromara.hmily.demo.dubbo.inventory.mapper.InventoryMapper;
+import org.dromara.hmily.demo.common.inventory.api.InventoryService;
+import org.dromara.hmily.demo.common.inventory.dto.InventoryDTO;
+import org.dromara.hmily.demo.common.inventory.entity.InventoryDO;
+import org.dromara.hmily.demo.common.inventory.mapper.InventoryMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,15 +72,13 @@ public class InventoryServiceImpl implements InventoryService {
     @Override
     @HmilyTCC(confirmMethod = "confirmMethod", cancelMethod = "cancelMethod")
     public Boolean decrease(InventoryDTO inventoryDTO) {
-        inventoryMapper.decrease(inventoryDTO);
-        return true;
+        return inventoryMapper.decrease(inventoryDTO) > 0;
     }
     
     @Override
     @HmilyTAC
     public Boolean decreaseTAC(InventoryDTO inventoryDTO) {
-        inventoryMapper.decrease(inventoryDTO);
-        return true;
+        return inventoryMapper.decreaseTAC(inventoryDTO) > 0;
     }
     
     @Override

@@ -40,6 +40,18 @@
             <artifactId>hmily-tac-common</artifactId>
             <version>${project.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.dromara</groupId>
+            <artifactId>hmily-tac-sqlparser-all</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.dromara</groupId>
+            <artifactId>hmily-tac-sqlrevert-all</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 
 </project>

@@ -1,0 +1,6 @@
+hmilyConsistentHash=org.dromara.hmily.sofa.rpc.loadbalancer.HmilyConsistentHashSofaRpcLoadBalancer
+hmilyRandom=org.dromara.hmily.sofa.rpc.loadbalancer.HmilyRandomSofaRpcLoadBalancer
+hmilyLocalPref=org.dromara.hmily.sofa.rpc.loadbalancer.HmilyLocalPrefSofaRpcLoadBalancer
+hmilyRoundRobin=org.dromara.hmily.sofa.rpc.loadbalancer.HmilyRoundRobinSofaRpcLoadBalancer
+hmilyWeightRoundRobin=org.dromara.hmily.sofa.rpc.loadbalancer.HmilyWeightRoundRobinSofaRpcLoadBalancer
+hmilyWeightConsistentHash=org.dromara.hmily.sofa.rpc.loadbalancer.HmilyWeightConsistentHashSofaRpcLoadBalancer

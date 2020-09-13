@@ -1,8 +1,6 @@
-CREATE DATABASE /*!32312 IF NOT EXISTS*/`tcc_account` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin */;
+CREATE DATABASE IF NOT EXISTS `hmily_account` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin ;
 
-USE `tcc_account`;
-
-/*Table structure for table `account` */
+USE `hmily_account`;
 
 DROP TABLE IF EXISTS `account`;
 
@@ -16,19 +14,13 @@ CREATE TABLE `account` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 
-/*Data for the table `account` */
-
 insert  into `account`(`id`,`user_id`,`balance`,`freeze_amount`,`create_time`,`update_time`) values
 
-(1,'1000000',10000,0,'2017-09-18 14:54:22',NULL);
+(1,'10000', 10000000,0,'2017-09-18 14:54:22',NULL);
 
+CREATE DATABASE IF NOT EXISTS `hmily_stock` DEFAULT CHARACTER SET utf8mb4;
 
-
-CREATE DATABASE /*!32312 IF NOT EXISTS*/`tcc_stock` /*!40100 DEFAULT CHARACTER SET utf8mb4 */;
-
-USE `tcc_stock`;
-
-/*Table structure for table `inventory` */
+USE `hmily_stock`;
 
 DROP TABLE IF EXISTS `inventory`;
 
@@ -40,16 +32,14 @@ CREATE TABLE `inventory` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 
-/*Data for the table `inventory` */
-
 insert  into `inventory`(`id`,`product_id`,`total_inventory`,`lock_inventory`) values
 
 (1,'1',10000000,0);
 
+CREATE DATABASE IF NOT EXISTS `hmily_order` DEFAULT CHARACTER SET utf8mb4;
 
-CREATE DATABASE /*!32312 IF NOT EXISTS*/`tcc_order` /*!40100 DEFAULT CHARACTER SET utf8mb4 */;
+USE `hmily_order`;
 
-USE `tcc_order`;
 DROP TABLE IF EXISTS `order`;
 
 CREATE TABLE `order` (

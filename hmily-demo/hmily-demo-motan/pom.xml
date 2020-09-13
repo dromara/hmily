@@ -11,8 +11,6 @@
     <artifactId>hmily-demo-motan</artifactId>
     <packaging>pom</packaging>
     <modules>
-        <module>hmily-demo-motan-account-api</module>
-        <module>hmily-demo-motan-inventory-api</module>
         <module>hmily-demo-motan-account</module>
         <module>hmily-demo-motan-inventory</module>
         <module>hmily-demo-motan-order</module>
@@ -22,28 +20,20 @@
         <motan.version>1.0.0</motan.version>
     </properties>
 
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.dromara</groupId>
-                <artifactId>hmily-demo-motan-inventory-api</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.dromara</groupId>
-                <artifactId>hmily-demo-motan-account-api</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
-
     <dependencies>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>5.1.47</version>
+        </dependency>
+
         <!--motan 依赖-->
         <dependency>
             <groupId>com.weibo</groupId>
             <artifactId>motan-core</artifactId>
             <version>${motan.version}</version>
         </dependency>
+
         <dependency>
             <groupId>com.weibo</groupId>
             <artifactId>motan-transport-netty</artifactId>
@@ -72,5 +62,4 @@
             </exclusions>
         </dependency>
     </dependencies>
-
 </project>

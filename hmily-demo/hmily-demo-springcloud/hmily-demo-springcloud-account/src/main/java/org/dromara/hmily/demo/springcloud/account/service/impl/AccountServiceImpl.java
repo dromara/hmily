@@ -19,12 +19,12 @@ package org.dromara.hmily.demo.springcloud.account.service.impl;
 
 import org.dromara.hmily.annotation.HmilyTCC;
 import org.dromara.hmily.common.exception.HmilyRuntimeException;
+import org.dromara.hmily.demo.common.account.dto.AccountDTO;
+import org.dromara.hmily.demo.common.account.dto.AccountNestedDTO;
+import org.dromara.hmily.demo.common.account.entity.AccountDO;
+import org.dromara.hmily.demo.common.account.mapper.AccountMapper;
+import org.dromara.hmily.demo.common.inventory.dto.InventoryDTO;
 import org.dromara.hmily.demo.springcloud.account.client.InventoryClient;
-import org.dromara.hmily.demo.springcloud.account.dto.AccountDTO;
-import org.dromara.hmily.demo.springcloud.account.dto.AccountNestedDTO;
-import org.dromara.hmily.demo.springcloud.account.dto.InventoryDTO;
-import org.dromara.hmily.demo.springcloud.account.entity.AccountDO;
-import org.dromara.hmily.demo.springcloud.account.mapper.AccountMapper;
 import org.dromara.hmily.demo.springcloud.account.service.AccountService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

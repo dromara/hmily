@@ -24,7 +24,7 @@ import com.alibaba.dubbo.rpc.cluster.loadbalance.ConsistentHashLoadBalance;
 import java.util.List;
 
 /**
- * The type ConsistenHash Dubbo hmily load balance.
+ * The type ConsistentHash Dubbo hmily load balance.
  *
  * @author xiaoyu(Myth)
  */

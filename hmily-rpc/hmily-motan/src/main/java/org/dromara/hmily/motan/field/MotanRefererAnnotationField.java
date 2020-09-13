@@ -18,10 +18,7 @@
 package org.dromara.hmily.motan.field;
 
 import com.weibo.api.motan.config.springsupport.annotation.MotanReferer;
-import com.weibo.api.motan.proxy.RefererInvocationHandler;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Proxy;
 import org.dromara.hmily.core.field.AnnotationField;
 import org.dromara.hmily.spi.HmilySPI;
 

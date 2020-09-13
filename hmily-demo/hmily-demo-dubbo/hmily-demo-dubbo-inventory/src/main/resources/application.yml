@@ -7,13 +7,13 @@ server:
 spring:
     datasource:
         driver-class-name:  com.mysql.jdbc.Driver
-        url: jdbc:mysql://127.0.0.1:3306/tcc_stock?useUnicode=true&characterEncoding=utf8
+        url: jdbc:mysql://127.0.0.1:3306/hmily_stock?useUnicode=true&characterEncoding=utf8
         username: root
         password:
 
 
 mybatis:
-  type-aliases-package: com.hmily.tcc.demo.dubbo.inventory.api.entity
+  type-aliases-package: org.dromara.hmily.demo.common.inventory.entity
   config-location: classpath:mybatis/mybatis-config.xml
 
 logging:
@@ -21,8 +21,8 @@ logging:
         root: error
         org.springframework.web: info
         org.apache.ibatis: debug
-        org.dromara.hmily.bonuspoint: debug
-        org.dromara.hmily.lottery: debug
-        org.dromara.hmily: debug
+        org.dromara.hmily.demo.bonuspoint: debug
+        org.dromara.hmily.demo.lottery: debug
+        org.dromara.hmily.demo: debug
     path: "./logs"
 

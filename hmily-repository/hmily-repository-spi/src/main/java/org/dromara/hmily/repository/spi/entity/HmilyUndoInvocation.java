@@ -33,6 +33,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class HmilyUndoInvocation implements Serializable {
     
-    private String sql;
+    private String revertSql;
+    
+    private String originSql;
     
 }

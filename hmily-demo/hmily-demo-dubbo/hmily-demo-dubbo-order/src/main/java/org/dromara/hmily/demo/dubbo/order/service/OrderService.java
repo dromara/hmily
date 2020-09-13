@@ -17,7 +17,7 @@
 
 package org.dromara.hmily.demo.dubbo.order.service;
 
-import org.dromara.hmily.demo.dubbo.order.entity.Order;
+import org.dromara.hmily.demo.common.order.entity.Order;
 
 import java.math.BigDecimal;
 
@@ -82,6 +82,15 @@ public interface OrderService {
      * @return string string
      */
     String mockInventoryWithTryException(Integer count, BigDecimal amount);
+    
+    /**
+     * Mock tac inventory with try exception string.
+     *
+     * @param count  the count
+     * @param amount the amount
+     * @return the string
+     */
+    String mockTacInventoryWithTryException(Integer count, BigDecimal amount);
     
     /**
      * 模拟在订单支付操作中，库存在try阶段中的timeout

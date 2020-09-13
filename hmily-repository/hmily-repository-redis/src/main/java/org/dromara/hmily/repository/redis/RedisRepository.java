@@ -162,7 +162,7 @@ public class RedisRepository implements HmilyRepository {
         return listByFilter(key, HmilyTransaction.class, (hmilyTransaction, params) -> {
             Date dateParam = (Date) params[0];
             int limitParam = (int) params[1];
-            boolean filterResult = dateParam.before(hmilyTransaction.getUpdateTime())
+            boolean filterResult = dateParam.after(hmilyTransaction.getUpdateTime())
                     && appName.equals(hmilyTransaction.getAppName())
                     && limitParam-- > 0;
             // write back to params
@@ -232,7 +232,7 @@ public class RedisRepository implements HmilyRepository {
         String key = buildHmilyTransactionRootPath();
         return removeByFilter(key, HmilyTransaction.class, (hmilyTransaction, params) -> {
             Date dateParam = (Date) params[0];
-            return dateParam.before(hmilyTransaction.getUpdateTime()) && hmilyTransaction.getStatus() == HmilyActionEnum.DELETE.getCode();
+            return dateParam.after(hmilyTransaction.getUpdateTime()) && hmilyTransaction.getStatus() == HmilyActionEnum.DELETE.getCode();
         }, date);
     }
     
@@ -273,7 +273,7 @@ public class RedisRepository implements HmilyRepository {
             Date dateParam = (Date) params[0];
             String transTypeParam = (String) params[1];
             int limitParam = (int) params[2];
-            boolean filterResult = dateParam.before(hmilyParticipant.getUpdateTime()) && appName.equals(hmilyParticipant.getAppName())
+            boolean filterResult = dateParam.after(hmilyParticipant.getUpdateTime()) && appName.equals(hmilyParticipant.getAppName())
                     && transTypeParam.equals(hmilyParticipant.getTransType())
                     && (hmilyParticipant.getStatus().compareTo(HmilyActionEnum.DELETE.getCode()) != 0 && hmilyParticipant.getStatus().compareTo(HmilyActionEnum.DEATH.getCode()) != 0)
                     && limitParam-- > 0;
@@ -334,7 +334,7 @@ public class RedisRepository implements HmilyRepository {
         String key = buildHmilyParticipantRootPath();
         return removeByFilter(key, HmilyParticipant.class, (hmilyParticipant, params) -> {
             Date dateParam = (Date) params[0];
-            return dateParam.before(hmilyParticipant.getUpdateTime()) && hmilyParticipant.getStatus().compareTo(HmilyActionEnum.DELETE.getCode()) == 0;
+            return dateParam.after(hmilyParticipant.getUpdateTime()) && hmilyParticipant.getStatus().compareTo(HmilyActionEnum.DELETE.getCode()) == 0;
         }, date);
     }
     
@@ -401,7 +401,7 @@ public class RedisRepository implements HmilyRepository {
         String key = buildHmilyParticipantUndoRootPath();
         return removeByFilter(key, HmilyParticipantUndo.class, (undo, params) -> {
             Date dateParam = (Date) params[0];
-            return dateParam.before(undo.getUpdateTime()) && undo.getStatus().compareTo(HmilyActionEnum.DELETE.getCode()) == 0;
+            return dateParam.after(undo.getUpdateTime()) && undo.getStatus().compareTo(HmilyActionEnum.DELETE.getCode()) == 0;
         }, date);
     }
     

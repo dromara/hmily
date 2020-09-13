@@ -28,16 +28,16 @@ import org.springframework.context.annotation.Configuration;
  * @author bbaiggey
  */
 @Configuration
-public class MotanServerConfig
-{
+public class MotanServerConfig {
+    
     /**
-     * 服务端配置
-     * @return
+     * Base service config basic service config bean.
+     *
+     * @return the basic service config bean
      */
     @Bean
     @ConfigurationProperties(prefix = "hmily.motan.server")
     public BasicServiceConfigBean baseServiceConfig() {
-        BasicServiceConfigBean config = new BasicServiceConfigBean();
-        return config;
+        return new BasicServiceConfigBean();
     }
 }
