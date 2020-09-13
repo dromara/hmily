@@ -18,7 +18,7 @@
 package org.dromara.hmily.tac.sqlparser.model.value.collection;
 
 import lombok.Getter;
-import org.dromara.hmily.tac.sqlparser.model.value.ValueHmilyASTNode;
+import org.dromara.hmily.tac.sqlparser.model.value.HmilyValueASTNode;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -27,7 +27,7 @@ import java.util.LinkedList;
  * Collection value.
  */
 @Getter
-public final class HmilyCollectionValue<T> implements ValueHmilyASTNode<Collection> {
+public final class HmilyCollectionValue<T> implements HmilyValueASTNode<Collection> {
     
     private final Collection<T> value = new LinkedList<>();
     

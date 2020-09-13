@@ -19,14 +19,14 @@ package org.dromara.hmily.tac.sqlparser.model.value.keyword;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.dromara.hmily.tac.sqlparser.model.value.ValueHmilyASTNode;
+import org.dromara.hmily.tac.sqlparser.model.value.HmilyValueASTNode;
 
 /**
  * Keyword value.
  */
 @RequiredArgsConstructor
 @Getter
-public final class HmilyKeywordValue implements ValueHmilyASTNode<String> {
+public final class HmilyKeywordValue implements HmilyValueASTNode<String> {
     
     private final String value;
 }

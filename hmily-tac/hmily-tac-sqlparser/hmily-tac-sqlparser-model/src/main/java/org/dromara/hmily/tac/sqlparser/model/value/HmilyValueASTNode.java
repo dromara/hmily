@@ -24,7 +24,7 @@ import org.dromara.hmily.tac.sqlparser.model.HmilyASTNode;
  *
  * @param <T> type of value
  */
-public interface ValueHmilyASTNode<T> extends HmilyASTNode {
+public interface HmilyValueASTNode<T> extends HmilyASTNode {
     
     /**
      * Get value.
