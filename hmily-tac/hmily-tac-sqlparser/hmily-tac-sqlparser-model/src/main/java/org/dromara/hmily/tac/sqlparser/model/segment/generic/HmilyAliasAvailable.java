@@ -15,34 +15,28 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.tac.sqlparser.model.statement.dml;
+package org.dromara.hmily.tac.sqlparser.model.segment.generic;
 
-import lombok.Getter;
-import lombok.Setter;
-import org.dromara.hmily.tac.sqlparser.model.segment.dml.predicate.HmilyWhereSegment;
-import org.dromara.hmily.tac.sqlparser.model.segment.generic.table.HmilySimpleTableSegment;
+import org.dromara.hmily.tac.sqlparser.model.segment.HmilySegment;
 
-import java.util.Collection;
-import java.util.LinkedList;
 import java.util.Optional;
 
 /**
- * Delete statement.
+ * Alias available.
  */
-@Getter
-@Setter
-public final class HmilyDeleteStatement extends HmilyDMLStatement {
-    
-    private final Collection<HmilySimpleTableSegment> tables = new LinkedList<>();
-    
-    private HmilyWhereSegment where;
+public interface HmilyAliasAvailable extends HmilySegment {
     
     /**
-     * Get where.
+     * Get alias.
      *
-     * @return where segment
+     * @return alias
      */
-    public Optional<HmilyWhereSegment> getWhere() {
-        return Optional.ofNullable(where);
-    }
+    Optional<String> getAlias();
+    
+    /**
+     * Set alias.
+     *
+     * @param alias alias
+     */
+    void setAlias(HmilyAliasSegment alias);
 }

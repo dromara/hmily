@@ -15,34 +15,25 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.tac.sqlparser.model.statement.dml;
+package org.dromara.hmily.tac.sqlparser.model.segment.dml.assignment;
 
 import lombok.Getter;
-import lombok.Setter;
-import org.dromara.hmily.tac.sqlparser.model.segment.dml.predicate.HmilyWhereSegment;
-import org.dromara.hmily.tac.sqlparser.model.segment.generic.table.HmilySimpleTableSegment;
+import lombok.RequiredArgsConstructor;
+import org.dromara.hmily.tac.sqlparser.model.segment.HmilySegment;
+import org.dromara.hmily.tac.sqlparser.model.segment.dml.expr.HmilyExpressionSegment;
 
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.Optional;
+import java.util.List;
 
 /**
- * Delete statement.
+ * Insert values segment.
  */
+@RequiredArgsConstructor
 @Getter
-@Setter
-public final class HmilyDeleteStatement extends HmilyDMLStatement {
+public final class HmilyInsertValuesSegment implements HmilySegment {
     
-    private final Collection<HmilySimpleTableSegment> tables = new LinkedList<>();
+    private final int startIndex;
     
-    private HmilyWhereSegment where;
+    private final int stopIndex;
     
-    /**
-     * Get where.
-     *
-     * @return where segment
-     */
-    public Optional<HmilyWhereSegment> getWhere() {
-        return Optional.ofNullable(where);
-    }
+    private final List<HmilyExpressionSegment> values;
 }

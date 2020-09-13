@@ -19,13 +19,13 @@ package org.dromara.hmily.tac.sqlparser.model.statement.dml;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.dromara.hmily.tac.sqlparser.model.segment.dml.assignment.AssignmentSegment;
-import org.dromara.hmily.tac.sqlparser.model.segment.dml.assignment.InsertValuesSegment;
-import org.dromara.hmily.tac.sqlparser.model.segment.dml.assignment.SetAssignmentSegment;
-import org.dromara.hmily.tac.sqlparser.model.segment.dml.column.ColumnSegment;
-import org.dromara.hmily.tac.sqlparser.model.segment.dml.column.InsertColumnsSegment;
-import org.dromara.hmily.tac.sqlparser.model.segment.dml.expr.ExpressionSegment;
-import org.dromara.hmily.tac.sqlparser.model.segment.generic.table.SimpleTableSegment;
+import org.dromara.hmily.tac.sqlparser.model.segment.dml.assignment.HmilyAssignmentSegment;
+import org.dromara.hmily.tac.sqlparser.model.segment.dml.assignment.HmilyInsertValuesSegment;
+import org.dromara.hmily.tac.sqlparser.model.segment.dml.assignment.HmilySetAssignmentSegment;
+import org.dromara.hmily.tac.sqlparser.model.segment.dml.column.HmilyColumnSegment;
+import org.dromara.hmily.tac.sqlparser.model.segment.dml.column.HmilyInsertColumnsSegment;
+import org.dromara.hmily.tac.sqlparser.model.segment.dml.expr.HmilyExpressionSegment;
+import org.dromara.hmily.tac.sqlparser.model.segment.generic.table.HmilySimpleTableSegment;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -41,20 +41,20 @@ import java.util.Optional;
 @Setter
 public final class HmilyReplaceStatement extends HmilyDMLStatement {
     
-    private SimpleTableSegment table;
+    private HmilySimpleTableSegment table;
     
-    private InsertColumnsSegment replaceColumns;
+    private HmilyInsertColumnsSegment replaceColumns;
     
-    private SetAssignmentSegment setAssignment;
+    private HmilySetAssignmentSegment setAssignment;
     
-    private final Collection<InsertValuesSegment> values = new LinkedList<>();
+    private final Collection<HmilyInsertValuesSegment> values = new LinkedList<>();
     
     /**
      * Get replace columns segment.
      * 
      * @return replace columns segment
      */
-    public Optional<InsertColumnsSegment> getInsertColumns() {
+    public Optional<HmilyInsertColumnsSegment> getInsertColumns() {
         return Optional.ofNullable(replaceColumns);
     }
     
@@ -63,7 +63,7 @@ public final class HmilyReplaceStatement extends HmilyDMLStatement {
      * 
      * @return columns
      */
-    public Collection<ColumnSegment> getColumns() {
+    public Collection<HmilyColumnSegment> getColumns() {
         return null == replaceColumns ? Collections.emptyList() : replaceColumns.getColumns();
     }
     
@@ -72,7 +72,7 @@ public final class HmilyReplaceStatement extends HmilyDMLStatement {
      * 
      * @return set assignment segment
      */
-    public Optional<SetAssignmentSegment> getSetAssignment() {
+    public Optional<HmilySetAssignmentSegment> getSetAssignment() {
         return Optional.ofNullable(setAssignment);
     }
     
@@ -96,7 +96,7 @@ public final class HmilyReplaceStatement extends HmilyDMLStatement {
     
     private List<String> getColumnNamesForReplaceColumns() {
         List<String> result = new LinkedList<>();
-        for (ColumnSegment each : getColumns()) {
+        for (HmilyColumnSegment each : getColumns()) {
             result.add(each.getIdentifier().getValue().toLowerCase());
         }
         return result;
@@ -104,7 +104,7 @@ public final class HmilyReplaceStatement extends HmilyDMLStatement {
     
     private List<String> getColumnNamesForSetAssignment() {
         List<String> result = new LinkedList<>();
-        for (AssignmentSegment each : setAssignment.getAssignments()) {
+        for (HmilyAssignmentSegment each : setAssignment.getAssignments()) {
             result.add(each.getColumn().getIdentifier().getValue().toLowerCase());
         }
         return result;
@@ -139,21 +139,21 @@ public final class HmilyReplaceStatement extends HmilyDMLStatement {
      * 
      * @return all value expressions
      */
-    public List<List<ExpressionSegment>> getAllValueExpressions() {
+    public List<List<HmilyExpressionSegment>> getAllValueExpressions() {
         return null == setAssignment ? getAllValueExpressionsFromValues() : Collections.singletonList(getAllValueExpressionsFromSetAssignment());
     }
     
-    private List<List<ExpressionSegment>> getAllValueExpressionsFromValues() {
-        List<List<ExpressionSegment>> result = new ArrayList<>(values.size());
-        for (InsertValuesSegment each : values) {
+    private List<List<HmilyExpressionSegment>> getAllValueExpressionsFromValues() {
+        List<List<HmilyExpressionSegment>> result = new ArrayList<>(values.size());
+        for (HmilyInsertValuesSegment each : values) {
             result.add(each.getValues());
         }
         return result;
     }
     
-    private List<ExpressionSegment> getAllValueExpressionsFromSetAssignment() {
-        List<ExpressionSegment> result = new ArrayList<>(setAssignment.getAssignments().size());
-        for (AssignmentSegment each : setAssignment.getAssignments()) {
+    private List<HmilyExpressionSegment> getAllValueExpressionsFromSetAssignment() {
+        List<HmilyExpressionSegment> result = new ArrayList<>(setAssignment.getAssignments().size());
+        for (HmilyAssignmentSegment each : setAssignment.getAssignments()) {
             result.add(each.getValue());
         }
         return result;

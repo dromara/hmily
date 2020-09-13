@@ -15,37 +15,45 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.tac.sqlparser.model.statement.dml;
+package org.dromara.hmily.tac.sqlparser.model.segment.dml.pagination.limit;
 
 import lombok.Getter;
-import lombok.Setter;
-import org.dromara.hmily.tac.sqlparser.model.segment.dml.assignment.HmilySetAssignmentSegment;
-import org.dromara.hmily.tac.sqlparser.model.segment.dml.predicate.HmilyWhereSegment;
-import org.dromara.hmily.tac.sqlparser.model.segment.generic.table.HmilySimpleTableSegment;
+import lombok.RequiredArgsConstructor;
+import org.dromara.hmily.tac.sqlparser.model.segment.HmilySegment;
+import org.dromara.hmily.tac.sqlparser.model.segment.dml.pagination.HmilyPaginationValueSegment;
 
-import java.util.Collection;
-import java.util.LinkedList;
 import java.util.Optional;
 
 /**
- * Update statement.
+ * Limit segment.
  */
+@RequiredArgsConstructor
 @Getter
-@Setter
-public final class HmilyUpdateStatement extends HmilyDMLStatement {
+public final class HmilyLimitSegment implements HmilySegment {
     
-    private final Collection<HmilySimpleTableSegment> tables = new LinkedList<>();
+    private final int startIndex;
     
-    private HmilySetAssignmentSegment setAssignment;
+    private final int stopIndex;
     
-    private HmilyWhereSegment where;
+    private final HmilyPaginationValueSegment offset;
+    
+    private final HmilyPaginationValueSegment rowCount;
     
     /**
-     * Get where.
+     * Get offset.
      * 
-     * @return where segment
+     * @return offset
      */
-    public Optional<HmilyWhereSegment> getWhere() {
-        return Optional.ofNullable(where);
+    public Optional<HmilyPaginationValueSegment> getOffset() {
+        return Optional.ofNullable(offset);
+    }
+    
+    /**
+     * Get row count.
+     *
+     * @return row count
+     */
+    public Optional<HmilyPaginationValueSegment> getRowCount() {
+        return Optional.ofNullable(rowCount);
     }
 }

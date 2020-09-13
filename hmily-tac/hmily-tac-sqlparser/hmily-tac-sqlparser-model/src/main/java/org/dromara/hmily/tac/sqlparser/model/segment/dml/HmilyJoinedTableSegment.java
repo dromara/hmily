@@ -15,37 +15,36 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.tac.sqlparser.model.statement.dml;
+package org.dromara.hmily.tac.sqlparser.model.segment.dml;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.dromara.hmily.tac.sqlparser.model.segment.dml.assignment.HmilySetAssignmentSegment;
-import org.dromara.hmily.tac.sqlparser.model.segment.dml.predicate.HmilyWhereSegment;
+import org.dromara.hmily.tac.sqlparser.model.segment.HmilySegment;
 import org.dromara.hmily.tac.sqlparser.model.segment.generic.table.HmilySimpleTableSegment;
+import org.dromara.hmily.tac.sqlparser.model.segment.generic.table.HmilyTableSegment;
 
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.Optional;
-
-/**
- * Update statement.
- */
 @Getter
 @Setter
-public final class HmilyUpdateStatement extends HmilyDMLStatement {
+public final class HmilyJoinedTableSegment implements HmilySegment {
     
-    private final Collection<HmilySimpleTableSegment> tables = new LinkedList<>();
+    private int startIndex;
     
-    private HmilySetAssignmentSegment setAssignment;
+    private int stopIndex;
     
-    private HmilyWhereSegment where;
+    private HmilyTableFactorSegment tableFactor;
+    
+    private HmilyJoinSpecificationSegment joinSpecification;
     
     /**
-     * Get where.
-     * 
-     * @return where segment
+     * get table.
+     * @return tableSegment.
      */
-    public Optional<HmilyWhereSegment> getWhere() {
-        return Optional.ofNullable(where);
+    public HmilyTableSegment getTable() {
+        if (null != tableFactor.getTable()) {
+            if (tableFactor.getTable() instanceof HmilySimpleTableSegment) {
+                return tableFactor.getTable();
+            }
+        }
+        return null;
     }
 }

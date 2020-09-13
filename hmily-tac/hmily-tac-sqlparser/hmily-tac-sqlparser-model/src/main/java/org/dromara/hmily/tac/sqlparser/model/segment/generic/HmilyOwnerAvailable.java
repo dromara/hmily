@@ -15,34 +15,29 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.tac.sqlparser.model.statement.dml;
+package org.dromara.hmily.tac.sqlparser.model.segment.generic;
 
-import lombok.Getter;
-import lombok.Setter;
-import org.dromara.hmily.tac.sqlparser.model.segment.dml.predicate.HmilyWhereSegment;
-import org.dromara.hmily.tac.sqlparser.model.segment.generic.table.HmilySimpleTableSegment;
+import org.dromara.hmily.tac.sqlparser.model.segment.HmilySegment;
 
-import java.util.Collection;
-import java.util.LinkedList;
 import java.util.Optional;
 
 /**
- * Delete statement.
+ * Owner available.
+ *
  */
-@Getter
-@Setter
-public final class HmilyDeleteStatement extends HmilyDMLStatement {
-    
-    private final Collection<HmilySimpleTableSegment> tables = new LinkedList<>();
-    
-    private HmilyWhereSegment where;
+public interface HmilyOwnerAvailable extends HmilySegment {
     
     /**
-     * Get where.
+     * Get owner.
      *
-     * @return where segment
+     * @return owner
      */
-    public Optional<HmilyWhereSegment> getWhere() {
-        return Optional.ofNullable(where);
-    }
+    Optional<HmilyOwnerSegment> getOwner();
+    
+    /**
+     * Set owner.
+     *
+     * @param owner owner
+     */
+    void setOwner(HmilyOwnerSegment owner);
 }

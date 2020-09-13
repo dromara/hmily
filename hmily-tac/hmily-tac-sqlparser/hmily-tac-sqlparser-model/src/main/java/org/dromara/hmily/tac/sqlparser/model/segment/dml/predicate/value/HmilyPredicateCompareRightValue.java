@@ -15,34 +15,20 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.tac.sqlparser.model.statement.dml;
+package org.dromara.hmily.tac.sqlparser.model.segment.dml.predicate.value;
 
 import lombok.Getter;
-import lombok.Setter;
-import org.dromara.hmily.tac.sqlparser.model.segment.dml.predicate.HmilyWhereSegment;
-import org.dromara.hmily.tac.sqlparser.model.segment.generic.table.HmilySimpleTableSegment;
-
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.Optional;
+import lombok.RequiredArgsConstructor;
+import org.dromara.hmily.tac.sqlparser.model.segment.dml.expr.HmilyExpressionSegment;
 
 /**
- * Delete statement.
+ * Predicate right value for compare operator.
  */
+@RequiredArgsConstructor
 @Getter
-@Setter
-public final class HmilyDeleteStatement extends HmilyDMLStatement {
+public final class HmilyPredicateCompareRightValue implements HmilyPredicateRightValue {
     
-    private final Collection<HmilySimpleTableSegment> tables = new LinkedList<>();
+    private final String operator;
     
-    private HmilyWhereSegment where;
-    
-    /**
-     * Get where.
-     *
-     * @return where segment
-     */
-    public Optional<HmilyWhereSegment> getWhere() {
-        return Optional.ofNullable(where);
-    }
+    private final HmilyExpressionSegment expression;
 }
