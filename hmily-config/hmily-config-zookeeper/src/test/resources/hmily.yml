@@ -9,4 +9,5 @@ remote:
     serverList: 127.0.0.1:2181
     fileExtension: yml
     path: /hmily/config
+    passive: true
 

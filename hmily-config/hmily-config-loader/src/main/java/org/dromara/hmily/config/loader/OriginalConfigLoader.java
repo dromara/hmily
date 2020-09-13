@@ -48,8 +48,7 @@ public class OriginalConfigLoader implements ConfigLoader<Config> {
             ConfigEnv.getInstance().stream()
                     .filter(e -> !e.isLoad())
                     .map(e -> {
-                        Binder binder = Binder.of(configPropertySource);
-                        Config config = binder.bind(e.prefix(), BindData.of(DataType.of(e.getClass()), () -> e));
+                        Config config = getBind(e, configPropertySource);
                         if (config != null) {
                             @SuppressWarnings("unchecked")
                             Map<String, Object> source = (Map<String, Object>) propertyKeySource.getSource();
@@ -65,9 +64,20 @@ public class OriginalConfigLoader implements ConfigLoader<Config> {
     public void passive(Supplier<Context> context, final PassiveHandler<Config> handler, Config config) {
         for (PropertyKeySource<?> propertyKeySource : context.get().getSource()) {
             ConfigPropertySource configPropertySource = new DefaultConfigPropertySource<>(propertyKeySource, PropertyKeyParse.INSTANCE);
-            Binder binder = Binder.of(configPropertySource);
-            Config bind = binder.bind(config.prefix(), BindData.of(DataType.of(config.getClass()), () -> config));
-            Optional.ofNullable(bind).ifPresent(e -> handler.passive(context, e));
+            Config bindConfig = getBind(config, configPropertySource);
+            if (bindConfig != null) {
+                @SuppressWarnings("unchecked")
+                Map<String, Object> source = (Map<String, Object>) propertyKeySource.getSource();
+                Optional.ofNullable(config.getSource()).ifPresent(e -> {
+                    e.putAll(source);
+                });
+            }
+            Optional.ofNullable(bindConfig).ifPresent(e -> handler.passive(context, e));
         }
+    }
+
+    private Config getBind(Config config, ConfigPropertySource configPropertySource) {
+        Binder binder = Binder.of(configPropertySource);
+        return binder.bind(config.prefix(), BindData.of(DataType.of(config.getClass()), () -> config));
     }
 }

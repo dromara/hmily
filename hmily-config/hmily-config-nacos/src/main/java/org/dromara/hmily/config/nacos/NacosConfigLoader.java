@@ -130,7 +130,7 @@ public class NacosConfigLoader implements ConfigLoader<NacosConfig> {
             try {
                 client.addListener(context, (c1, c2) -> this.passive(c1, null, c2), config);
             } catch (NacosException e) {
-                LOGGER.error("passive apollo remote started error....");
+                LOGGER.error("passive nacos remote started error....");
             }
         } else {
             throw new ConfigException("nacos config is null");
