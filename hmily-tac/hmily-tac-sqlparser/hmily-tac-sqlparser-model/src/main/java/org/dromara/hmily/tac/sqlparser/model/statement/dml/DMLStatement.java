@@ -17,10 +17,10 @@
 
 package org.dromara.hmily.tac.sqlparser.model.statement.dml;
 
-import org.dromara.hmily.tac.sqlparser.model.statement.AbstractSQLStatement;
+import org.dromara.hmily.tac.sqlparser.model.statement.AbstractHmilyStatement;
 
 /**
  * DML statement.
  */
-public abstract class DMLStatement extends AbstractSQLStatement {
+public abstract class DMLStatement extends AbstractHmilyStatement {
 }

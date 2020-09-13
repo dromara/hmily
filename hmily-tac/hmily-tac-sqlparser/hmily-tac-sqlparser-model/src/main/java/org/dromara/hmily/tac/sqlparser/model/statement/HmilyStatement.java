@@ -17,15 +17,17 @@
 
 package org.dromara.hmily.tac.sqlparser.model.statement;
 
-import lombok.Getter;
-import lombok.Setter;
+import org.dromara.hmily.tac.sqlparser.model.ASTNode;
 
 /**
- * SQL statement abstract class.
+ * SQL statement.
  */
-@Getter
-@Setter
-public abstract class AbstractSQLStatement implements SQLStatement {
+public interface HmilyStatement extends ASTNode {
     
-    private int parameterCount;
+    /**
+     * Get count of parameters.
+     *
+     * @return count of parameters
+     */
+    int getParameterCount();
 }
