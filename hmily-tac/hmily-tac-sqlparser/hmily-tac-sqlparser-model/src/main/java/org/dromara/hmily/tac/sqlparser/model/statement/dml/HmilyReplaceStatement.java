@@ -24,7 +24,6 @@ import org.dromara.hmily.tac.sqlparser.model.segment.dml.assignment.InsertValues
 import org.dromara.hmily.tac.sqlparser.model.segment.dml.assignment.SetAssignmentSegment;
 import org.dromara.hmily.tac.sqlparser.model.segment.dml.column.ColumnSegment;
 import org.dromara.hmily.tac.sqlparser.model.segment.dml.column.InsertColumnsSegment;
-import org.dromara.hmily.tac.sqlparser.model.segment.dml.column.OnDuplicateKeyColumnsSegment;
 import org.dromara.hmily.tac.sqlparser.model.segment.dml.expr.ExpressionSegment;
 import org.dromara.hmily.tac.sqlparser.model.segment.generic.table.SimpleTableSegment;
 
@@ -36,29 +35,27 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Insert statement.
+ * Replace statement.
  */
 @Getter
 @Setter
-public final class InsertStatement extends HmilyDMLStatement {
+public final class HmilyReplaceStatement extends HmilyDMLStatement {
     
     private SimpleTableSegment table;
     
-    private InsertColumnsSegment insertColumns;
+    private InsertColumnsSegment replaceColumns;
     
     private SetAssignmentSegment setAssignment;
-    
-    private OnDuplicateKeyColumnsSegment onDuplicateKeyColumns;
     
     private final Collection<InsertValuesSegment> values = new LinkedList<>();
     
     /**
-     * Get insert columns segment.
+     * Get replace columns segment.
      * 
-     * @return insert columns segment
+     * @return replace columns segment
      */
     public Optional<InsertColumnsSegment> getInsertColumns() {
-        return Optional.ofNullable(insertColumns);
+        return Optional.ofNullable(replaceColumns);
     }
     
     /**
@@ -67,7 +64,7 @@ public final class InsertStatement extends HmilyDMLStatement {
      * @return columns
      */
     public Collection<ColumnSegment> getColumns() {
-        return null == insertColumns ? Collections.emptyList() : insertColumns.getColumns();
+        return null == replaceColumns ? Collections.emptyList() : replaceColumns.getColumns();
     }
     
     /**
@@ -77,15 +74,6 @@ public final class InsertStatement extends HmilyDMLStatement {
      */
     public Optional<SetAssignmentSegment> getSetAssignment() {
         return Optional.ofNullable(setAssignment);
-    }
-    
-    /**
-     * Get on duplicate key columns segment.
-     *
-     * @return on duplicate key columns segment
-     */
-    public Optional<OnDuplicateKeyColumnsSegment> getOnDuplicateKeyColumns() {
-        return Optional.ofNullable(onDuplicateKeyColumns);
     }
     
     /**
@@ -103,10 +91,10 @@ public final class InsertStatement extends HmilyDMLStatement {
      * @return column names
      */
     public List<String> getColumnNames() {
-        return null == setAssignment ? getColumnNamesForInsertColumns() : getColumnNamesForSetAssignment();
+        return null == setAssignment ? getColumnNamesForReplaceColumns() : getColumnNamesForSetAssignment();
     }
     
-    private List<String> getColumnNamesForInsertColumns() {
+    private List<String> getColumnNamesForReplaceColumns() {
         List<String> result = new LinkedList<>();
         for (ColumnSegment each : getColumns()) {
             result.add(each.getIdentifier().getValue().toLowerCase());

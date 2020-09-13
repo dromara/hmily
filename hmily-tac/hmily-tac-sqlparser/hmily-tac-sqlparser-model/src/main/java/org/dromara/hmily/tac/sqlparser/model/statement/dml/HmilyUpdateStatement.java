@@ -19,6 +19,7 @@ package org.dromara.hmily.tac.sqlparser.model.statement.dml;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.dromara.hmily.tac.sqlparser.model.segment.dml.assignment.SetAssignmentSegment;
 import org.dromara.hmily.tac.sqlparser.model.segment.dml.predicate.WhereSegment;
 import org.dromara.hmily.tac.sqlparser.model.segment.generic.table.SimpleTableSegment;
 
@@ -27,19 +28,21 @@ import java.util.LinkedList;
 import java.util.Optional;
 
 /**
- * Delete statement.
+ * Update statement.
  */
 @Getter
 @Setter
-public final class DeleteStatement extends HmilyDMLStatement {
+public final class HmilyUpdateStatement extends HmilyDMLStatement {
     
     private final Collection<SimpleTableSegment> tables = new LinkedList<>();
+    
+    private SetAssignmentSegment setAssignment;
     
     private WhereSegment where;
     
     /**
      * Get where.
-     *
+     * 
      * @return where segment
      */
     public Optional<WhereSegment> getWhere() {
