@@ -38,7 +38,7 @@ public class NacosConfig extends AbstractConfig {
     private String dataId;
 
     private String group;
-    
+
     private long timeoutMs = 5000;
 
     private String fileExtension;
@@ -46,5 +46,14 @@ public class NacosConfig extends AbstractConfig {
     @Override
     public String prefix() {
         return PrefixConstants.REMOTE_NACOS;
+    }
+
+    /**
+     * File name string.
+     *
+     * @return the string
+     */
+    public String fileName() {
+        return dataId + "." + fileExtension;
     }
 }

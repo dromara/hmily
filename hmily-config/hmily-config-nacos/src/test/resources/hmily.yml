@@ -6,9 +6,10 @@ hmily:
 
 remote:
   nacos:
-    server: 127.0.0.1:2181
-    dataId: test
-    group: test
+    server: 192.168.3.22:8848
+    dataId: common-mongo.properties
+    group: DEFAULT_GROUP
     timeoutMs: 6000
     fileExtension: yml
+    passive: true
 

@@ -6,9 +6,11 @@ hmily:
 
 remote:
   apollo:
-    appId: 10001234
-    configService: 127.0.0.1:8080
-    namespace: test
-    secret: 469af76eb84b4a40b2e3fd905a576ff0
+    appId: byin-in
+    configService: http://192.168.3.22:8080
+    namespace: byin_hmily
+    secret:
     fileExtension: yml
-
+    passive: true
+    env: dev
+    meta: http://192.168.3.22:8080

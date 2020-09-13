@@ -13,7 +13,7 @@ import java.io.InputStream;
 /**
  * The type apollo client.
  *
- * @author  lilang
+ * @author lilang
  **/
 public class ApolloClient {
 
@@ -50,7 +50,9 @@ public class ApolloClient {
 
     private void setApolloConfig(final ApolloConfig config) {
         System.setProperty(APOLLO_CONFIG_APPID_KEY, config.getAppId());
-        System.setProperty(APOLLO_CONFIG_SERVER_ADDR_KEY, config.getConfigService());
+        if (StringUtils.isNoneBlank(config.getConfigService())) {
+            System.setProperty(APOLLO_CONFIG_SERVER_ADDR_KEY, config.getConfigService());
+        }
         if (StringUtils.isNoneBlank(config.getMeta())) {
             System.setProperty(APOLLO_CONFIG_META_KEY, config.getMeta());
         }

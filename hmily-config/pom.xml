@@ -38,6 +38,4 @@
         <module>hmily-config-all</module>
         <module>hmily-config-etcd</module>
     </modules>
-
-
 </project>

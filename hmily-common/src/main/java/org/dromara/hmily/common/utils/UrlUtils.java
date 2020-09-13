@@ -15,55 +15,14 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.config.api;
-
-import java.util.Map;
+package org.dromara.hmily.common.utils;
 
 /**
- * The interface Config.
+ * UrlUtils .
+ * Generate url address.
  *
- * @author xiaoyu
- * @author chenbin
+ * @author sixh chenbin
  */
-public interface Config {
+public class UrlUtils {
 
-    /**
-     * yml file properties prefix.
-     *
-     * @return string. string
-     */
-    String prefix();
-
-    /**
-     * Is load boolean.
-     *
-     * @return the boolean
-     */
-    boolean isLoad();
-
-    /**
-     * Flag load boolean.
-     */
-    void flagLoad();
-
-    /**
-     * Is passive boolean.
-     *
-     * @return the boolean
-     */
-    boolean isPassive();
-
-    /**
-     * Sets source.
-     *
-     * @param t the t
-     */
-    void setSource(Map<String, Object> t);
-
-    /**
-     * Source map.
-     *
-     * @return the map
-     */
-    Map<String, Object> getSource();
 }

@@ -19,6 +19,23 @@ package org.dromara.hmily.config.zookeeper;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
+import org.apache.curator.framework.CuratorFramework;
+import org.apache.curator.framework.CuratorFrameworkFactory;
+import org.apache.curator.framework.api.ACLProvider;
+import org.apache.curator.framework.api.transaction.TransactionOp;
+import org.apache.curator.framework.recipes.cache.*;
+import org.apache.curator.retry.ExponentialBackoffRetry;
+import org.apache.curator.utils.CloseableUtils;
+import org.apache.zookeeper.CreateMode;
+import org.apache.zookeeper.KeeperException.OperationTimeoutException;
+import org.apache.zookeeper.ZooDefs;
+import org.apache.zookeeper.data.ACL;
+import org.dromara.hmily.common.utils.StringUtils;
+import org.dromara.hmily.config.loader.ConfigLoader;
+import org.dromara.hmily.config.zookeeper.handler.CuratorZookeeperExceptionHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -27,22 +44,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
-import org.apache.curator.framework.CuratorFramework;
-import org.apache.curator.framework.CuratorFrameworkFactory;
-import org.apache.curator.framework.api.ACLProvider;
-import org.apache.curator.framework.api.transaction.TransactionOp;
-import org.apache.curator.framework.recipes.cache.ChildData;
-import org.apache.curator.framework.recipes.cache.CuratorCache;
-import org.apache.curator.retry.ExponentialBackoffRetry;
-import org.apache.curator.utils.CloseableUtils;
-import org.apache.zookeeper.CreateMode;
-import org.apache.zookeeper.KeeperException.OperationTimeoutException;
-import org.apache.zookeeper.ZooDefs;
-import org.apache.zookeeper.data.ACL;
-import org.dromara.hmily.common.utils.StringUtils;
-import org.dromara.hmily.config.zookeeper.handler.CuratorZookeeperExceptionHandler;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.function.Supplier;
+
+import static org.apache.curator.framework.recipes.cache.CuratorCacheListener.builder;
 
 /**
  * The type Curator zookeeper client.
@@ -50,18 +54,18 @@ import org.slf4j.LoggerFactory;
  * @author xiaoyu
  */
 public final class CuratorZookeeperClient implements AutoCloseable {
-    
+
     private static final Logger LOGGER = LoggerFactory.getLogger(CuratorZookeeperClient.class);
-    
+
     private static final Map<String, CuratorCache> CACHES = new HashMap<>();
-    
+
     private static volatile CuratorZookeeperClient instance;
-    
+
     private CuratorFramework client;
-    
+
     private CuratorZookeeperClient() {
     }
-    
+
     /**
      * Gets instance.
      *
@@ -79,7 +83,7 @@ public final class CuratorZookeeperClient implements AutoCloseable {
         }
         return instance;
     }
-    
+
     private void initCuratorClient(final ZookeeperConfig zookeeperConfig) {
         int retryIntervalMilliseconds = zookeeperConfig.getRetryIntervalMilliseconds();
         int maxRetries = zookeeperConfig.getMaxRetries();
@@ -87,8 +91,8 @@ public final class CuratorZookeeperClient implements AutoCloseable {
         int operationTimeoutMilliseconds = zookeeperConfig.getOperationTimeoutMilliseconds();
         String digest = zookeeperConfig.getDigest();
         CuratorFrameworkFactory.Builder builder = CuratorFrameworkFactory.builder()
-            .connectString(zookeeperConfig.getServerList())
-            .retryPolicy(new ExponentialBackoffRetry(retryIntervalMilliseconds, maxRetries, retryIntervalMilliseconds * maxRetries));
+                .connectString(zookeeperConfig.getServerList())
+                .retryPolicy(new ExponentialBackoffRetry(retryIntervalMilliseconds, maxRetries, retryIntervalMilliseconds * maxRetries));
         if (0 != timeToLiveSeconds) {
             builder.sessionTimeoutMs(timeToLiveSeconds * 1000);
         }
@@ -97,18 +101,18 @@ public final class CuratorZookeeperClient implements AutoCloseable {
         }
         if (!Strings.isNullOrEmpty(digest)) {
             builder.authorization("digest", digest.getBytes(Charsets.UTF_8))
-                .aclProvider(new ACLProvider() {
-                    
-                    @Override
-                    public List<ACL> getDefaultAcl() {
-                        return ZooDefs.Ids.CREATOR_ALL_ACL;
-                    }
-                    
-                    @Override
-                    public List<ACL> getAclForPath(final String path) {
-                        return ZooDefs.Ids.CREATOR_ALL_ACL;
-                    }
-                });
+                    .aclProvider(new ACLProvider() {
+
+                        @Override
+                        public List<ACL> getDefaultAcl() {
+                            return ZooDefs.Ids.CREATOR_ALL_ACL;
+                        }
+
+                        @Override
+                        public List<ACL> getAclForPath(final String path) {
+                            return ZooDefs.Ids.CREATOR_ALL_ACL;
+                        }
+                    });
         }
         client = builder.build();
         client.start();
@@ -121,7 +125,7 @@ public final class CuratorZookeeperClient implements AutoCloseable {
             CuratorZookeeperExceptionHandler.handleException(ex);
         }
     }
-    
+
     /**
      * Pull input stream.
      *
@@ -138,7 +142,39 @@ public final class CuratorZookeeperClient implements AutoCloseable {
         }
         return new ByteArrayInputStream(content.getBytes());
     }
-    
+
+    /**
+     * Add listener.
+     *
+     * @param config the config
+     */
+    public void addListener(final Supplier<ConfigLoader.Context> context, final ConfigLoader.PassiveHandler<ZkPassiveConfig> passiveHandler, ZookeeperConfig config) throws Exception {
+        if (!config.isPassive()) {
+            return;
+        }
+        if (client == null) {
+            LOGGER.warn("zookeeper client is null...");
+        }
+        // Use CuratorCache to monitor and find that the lower version of zk cannot monitor the message.
+        // But using this high version marked as @Deprecated can receive messages normally.。
+        //@see CuratorCache
+        NodeCache cache = new NodeCache(client, config.getPath());
+        cache.getListenable().addListener(new NodeCacheListener() {
+            @Override
+            public void nodeChanged() throws Exception {
+                byte[] data = cache.getCurrentData().getData();
+                String string = new String(data, StandardCharsets.UTF_8);
+                ZkPassiveConfig zkPassiveConfig = new ZkPassiveConfig();
+                zkPassiveConfig.setPath(config.getPath());
+                zkPassiveConfig.setFileExtension(config.getFileExtension());
+                zkPassiveConfig.setValue(string);
+                passiveHandler.passive(context, zkPassiveConfig);
+            }
+        });
+        cache.start();
+        LOGGER.info("passive zookeeper remote started....");
+    }
+
     /**
      * Get string.
      *
@@ -156,7 +192,7 @@ public final class CuratorZookeeperClient implements AutoCloseable {
         }
         return getDirectly(path);
     }
-    
+
     /**
      * Persist.
      *
@@ -176,7 +212,7 @@ public final class CuratorZookeeperClient implements AutoCloseable {
             CuratorZookeeperExceptionHandler.handleException(ex);
         }
     }
-    
+
     private void update(final String key, final String value) {
         try {
             TransactionOp transactionOp = client.transactionOp();
@@ -187,18 +223,18 @@ public final class CuratorZookeeperClient implements AutoCloseable {
             CuratorZookeeperExceptionHandler.handleException(ex);
         }
     }
-    
+
     @Override
     public void close() {
         CACHES.values().forEach(CuratorCache::close);
         waitForCacheClose();
         CloseableUtils.closeQuietly(client);
     }
-    
+
     private CuratorCache findTreeCache(final String key) {
         return CACHES.entrySet().stream().filter(entry -> key.startsWith(entry.getKey())).findFirst().map(Map.Entry::getValue).orElse(null);
     }
-    
+
     private boolean isExisted(final String key) {
         try {
             return null != client.checkExists().forPath(key);
@@ -207,7 +243,7 @@ public final class CuratorZookeeperClient implements AutoCloseable {
             return false;
         }
     }
-    
+
     private String getDirectly(final String key) {
         try {
             return new String(client.getData().forPath(key), Charsets.UTF_8);
@@ -216,7 +252,7 @@ public final class CuratorZookeeperClient implements AutoCloseable {
             return null;
         }
     }
-    
+
     private void waitForCacheClose() {
         try {
             Thread.sleep(500L);
@@ -224,5 +260,5 @@ public final class CuratorZookeeperClient implements AutoCloseable {
             Thread.currentThread().interrupt();
         }
     }
-    
+
 }
