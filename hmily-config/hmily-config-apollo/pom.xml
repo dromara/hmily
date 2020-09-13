@@ -49,7 +49,11 @@
             <groupId>org.dromara</groupId>
             <artifactId>hmily-spi</artifactId>
             <version>${project.version}</version>
-            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.dromara</groupId>
+            <artifactId>hmily-config-loader</artifactId>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
 

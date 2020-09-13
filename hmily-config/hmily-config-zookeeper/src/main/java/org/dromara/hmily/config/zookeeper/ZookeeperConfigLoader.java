@@ -61,16 +61,24 @@ public class ZookeeperConfigLoader implements ConfigLoader<ZookeeperConfig> {
         LOADERS.put("properties", new PropertiesLoader());
     }
 
+    /**
+     * Instantiates a new Zookeeper config loader.
+     */
     public ZookeeperConfigLoader() {
     }
 
+    /**
+     * Instantiates a new Zookeeper config loader.
+     *
+     * @param client the client
+     */
     public ZookeeperConfigLoader(final CuratorZookeeperClient client) {
         this();
         this.client = client;
     }
 
     @Override
-    public void passive(final Supplier<Context> context, final PassiveHandler<Config> handler, Config config) {
+    public void passive(final Supplier<Context> context, final PassiveHandler<Config> handler, final Config config) {
         if (config instanceof ZkPassiveConfig) {
             ZkPassiveConfig zkPassiveConfig = (ZkPassiveConfig) config;
             String value = zkPassiveConfig.getValue();

@@ -23,7 +23,10 @@ import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.framework.api.ACLProvider;
 import org.apache.curator.framework.api.transaction.TransactionOp;
-import org.apache.curator.framework.recipes.cache.*;
+import org.apache.curator.framework.recipes.cache.ChildData;
+import org.apache.curator.framework.recipes.cache.CuratorCache;
+import org.apache.curator.framework.recipes.cache.NodeCache;
+import org.apache.curator.framework.recipes.cache.NodeCacheListener;
 import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.curator.utils.CloseableUtils;
 import org.apache.zookeeper.CreateMode;
@@ -45,8 +48,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
-
-import static org.apache.curator.framework.recipes.cache.CuratorCacheListener.builder;
 
 /**
  * The type Curator zookeeper client.
@@ -146,9 +147,12 @@ public final class CuratorZookeeperClient implements AutoCloseable {
     /**
      * Add listener.
      *
-     * @param config the config
+     * @param context        the context
+     * @param passiveHandler the passive handler
+     * @param config         the config
+     * @throws Exception the exception
      */
-    public void addListener(final Supplier<ConfigLoader.Context> context, final ConfigLoader.PassiveHandler<ZkPassiveConfig> passiveHandler, ZookeeperConfig config) throws Exception {
+    public void addListener(final Supplier<ConfigLoader.Context> context, final ConfigLoader.PassiveHandler<ZkPassiveConfig> passiveHandler, final ZookeeperConfig config) throws Exception {
         if (!config.isPassive()) {
             return;
         }
