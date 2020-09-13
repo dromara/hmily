@@ -36,4 +36,9 @@ public final class HmilyIdentifierValue implements HmilyValueASTNode<String> {
         value = HmilySQLUtil.getExactlyValue(text);
         hmilyQuoteCharacter = HmilyQuoteCharacter.getQuoteCharacter(text);
     }
+    
+    public HmilyIdentifierValue(final String value, final HmilyQuoteCharacter hmilyQuoteCharacter) {
+        this.value = value;
+        this.hmilyQuoteCharacter = hmilyQuoteCharacter;
+    }
 }
