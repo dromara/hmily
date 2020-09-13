@@ -27,7 +27,7 @@ import lombok.ToString;
 @RequiredArgsConstructor
 @Getter
 @ToString
-public class HmilyParameterMarkerHmilyExpressionSegmentHmily implements HmilySimpleHmilyExpressionSegment {
+public class HmilyParameterMarkerExpressionSegment implements HmilySimpleExpressionSegment {
     
     private final int startIndex;
     

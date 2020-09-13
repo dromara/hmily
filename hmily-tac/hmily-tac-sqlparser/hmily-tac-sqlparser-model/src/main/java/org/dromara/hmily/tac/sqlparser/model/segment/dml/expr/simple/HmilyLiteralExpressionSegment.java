@@ -15,23 +15,23 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.tac.sqlparser.model.segment.dml.expr.complex;
+package org.dromara.hmily.tac.sqlparser.model.segment.dml.expr.simple;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
 /**
- * Common expression segment.
+ * Literal expression segment.
  */
 @RequiredArgsConstructor
 @Getter
 @ToString
-public final class HmilyCommonHmilyExpressionSegmentHmily implements HmilyComplexHmilyExpressionSegment {
+public class HmilyLiteralExpressionSegment implements HmilySimpleExpressionSegment {
     
     private final int startIndex;
     
     private final int stopIndex;
     
-    private final String text;
+    private final Object literals;
 }

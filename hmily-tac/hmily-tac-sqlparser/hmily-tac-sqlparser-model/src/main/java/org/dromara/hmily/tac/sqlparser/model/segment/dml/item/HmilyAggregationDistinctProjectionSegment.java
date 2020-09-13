@@ -15,23 +15,22 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.tac.sqlparser.model.segment.dml.expr.simple;
+package org.dromara.hmily.tac.sqlparser.model.segment.dml.item;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.ToString;
+import org.dromara.hmily.tac.sqlparser.model.constant.HmilyAggregationType;
+import org.dromara.hmily.tac.sqlparser.model.util.HmilySQLUtil;
 
 /**
- * Literal expression segment.
+ * Aggregation distinct projection segment.
  */
-@RequiredArgsConstructor
 @Getter
-@ToString
-public class HmilyLiteralHmilyExpressionSegmentHmily implements HmilySimpleHmilyExpressionSegment {
+public final class HmilyAggregationDistinctProjectionSegment extends HmilyAggregationProjectionSegment {
     
-    private final int startIndex;
+    private final String distinctExpression;
     
-    private final int stopIndex;
-    
-    private final Object literals;
+    public HmilyAggregationDistinctProjectionSegment(final int startIndex, final int stopIndex, final HmilyAggregationType type, final int innerExpressionStartIndex, final String distinctExpression) {
+        super(startIndex, stopIndex, type, innerExpressionStartIndex);
+        this.distinctExpression = HmilySQLUtil.getExpressionWithoutOutsideParentheses(distinctExpression);
+    }
 }

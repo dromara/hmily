@@ -19,41 +19,38 @@ package org.dromara.hmily.tac.sqlparser.model.segment.dml.item;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.dromara.hmily.tac.sqlparser.model.segment.dml.column.HmilyColumnSegment;
+import org.dromara.hmily.tac.sqlparser.model.constant.HmilyAggregationType;
 import org.dromara.hmily.tac.sqlparser.model.segment.generic.HmilyAliasAvailable;
 import org.dromara.hmily.tac.sqlparser.model.segment.generic.HmilyAliasSegment;
 
 import java.util.Optional;
 
 /**
- * Column projection segment.
+ * Aggregation projection segment.
  */
-public final class HmilyColumnHmilyProjectionSegment implements HmilyProjectionSegment, HmilyAliasAvailable {
+@Getter
+public class HmilyAggregationProjectionSegment implements HmilyProjectionSegment, HmilyAliasAvailable {
     
-    @Getter
-    private final HmilyColumnSegment column;
+    private final int startIndex;
+    
+    private final int stopIndex;
+    
+    private final HmilyAggregationType type;
+    
+    private final int innerExpressionStartIndex;
     
     @Setter
     private HmilyAliasSegment alias;
     
-    public HmilyColumnHmilyProjectionSegment(final HmilyColumnSegment hmilyColumnSegment) {
-        column = hmilyColumnSegment;
+    public HmilyAggregationProjectionSegment(final int startIndex, final int stopIndex, final HmilyAggregationType type, final int innerExpressionStartIndex) {
+        this.startIndex = startIndex;
+        this.stopIndex = stopIndex;
+        this.type = type;
+        this.innerExpressionStartIndex = innerExpressionStartIndex;
     }
     
     @Override
-    public Optional<String> getAlias() {
+    public final Optional<String> getAlias() {
         return null == alias ? Optional.empty() : Optional.ofNullable(alias.getIdentifier().getValue());
-    }
-    
-    @Override
-    public int getStartIndex() {
-        return column.getStartIndex();
-    }
-    
-    @Override
-    public int getStopIndex() {
-        return column.getStopIndex();
-        // TODO
-        // return null == alias ? alias.getStopIndex() : column.getStopIndex();
     }
 }

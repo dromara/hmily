@@ -15,12 +15,19 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.tac.sqlparser.model.segment.dml.expr.simple;
+package org.dromara.hmily.tac.sqlparser.model.segment.dml.expr.complex;
 
 import org.dromara.hmily.tac.sqlparser.model.segment.dml.expr.HmilyExpressionSegment;
 
 /**
- * Simple expression segment.
+ * Complex expression segment.
  */
-public interface HmilySimpleHmilyExpressionSegment extends HmilyExpressionSegment {
+public interface HmilyComplexExpressionSegment extends HmilyExpressionSegment {
+    
+    /**
+     * Get text.
+     * 
+     * @return text
+     */
+    String getText();
 }

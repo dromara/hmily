@@ -19,7 +19,7 @@ package org.dromara.hmily.tac.sqlparser.model.segment.dml.item;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.dromara.hmily.tac.sqlparser.model.segment.dml.expr.complex.HmilyComplexHmilyExpressionSegment;
+import org.dromara.hmily.tac.sqlparser.model.segment.dml.expr.complex.HmilyComplexExpressionSegment;
 import org.dromara.hmily.tac.sqlparser.model.segment.generic.HmilyAliasAvailable;
 import org.dromara.hmily.tac.sqlparser.model.segment.generic.HmilyAliasSegment;
 import org.dromara.hmily.tac.sqlparser.model.util.HmilySQLUtil;
@@ -30,7 +30,7 @@ import java.util.Optional;
  * Expression projection segment.
  */
 @Getter
-public final class HmilyExpressionHmilyProjectionSegmentHmily implements HmilyProjectionSegment, HmilyComplexHmilyExpressionSegment, HmilyAliasAvailable {
+public final class HmilyExpressionProjectionSegment implements HmilyProjectionSegment, HmilyComplexExpressionSegment, HmilyAliasAvailable {
     
     private final int startIndex;
     
@@ -41,7 +41,7 @@ public final class HmilyExpressionHmilyProjectionSegmentHmily implements HmilyPr
     @Setter
     private HmilyAliasSegment alias;
     
-    public HmilyExpressionHmilyProjectionSegmentHmily(final int startIndex, final int stopIndex, final String text) {
+    public HmilyExpressionProjectionSegment(final int startIndex, final int stopIndex, final String text) {
         this.startIndex = startIndex;
         this.stopIndex = stopIndex;
         this.text = HmilySQLUtil.getExpressionWithoutOutsideParentheses(text);

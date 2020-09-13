@@ -17,17 +17,21 @@
 
 package org.dromara.hmily.tac.sqlparser.model.segment.dml.expr.complex;
 
-import org.dromara.hmily.tac.sqlparser.model.segment.dml.expr.HmilyExpressionSegment;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
 /**
- * Complex expression segment.
+ * Common expression segment.
  */
-public interface HmilyComplexHmilyExpressionSegment extends HmilyExpressionSegment {
+@RequiredArgsConstructor
+@Getter
+@ToString
+public final class HmilyCommonExpressionSegment implements HmilyComplexExpressionSegment {
     
-    /**
-     * Get text.
-     * 
-     * @return text
-     */
-    String getText();
+    private final int startIndex;
+    
+    private final int stopIndex;
+    
+    private final String text;
 }
