@@ -19,7 +19,7 @@ package org.dromara.hmily.tac.sqlparser.model.segment.dml.order.item;
 
 import lombok.Getter;
 import lombok.ToString;
-import org.dromara.hmily.tac.sqlparser.model.constant.OrderDirection;
+import org.dromara.hmily.tac.sqlparser.model.constant.HmilyOrderDirection;
 
 /**
  * Order by item segment for index.
@@ -30,13 +30,13 @@ public final class HmilyIndexOrderByItemSegment extends HmilyOrderByItemSegment 
     
     private final int columnIndex;
     
-    public HmilyIndexOrderByItemSegment(final int startIndex, final int stopIndex, final int columnIndex, final OrderDirection orderDirection, final OrderDirection nullOrderDirection) {
-        super(startIndex, stopIndex, orderDirection, nullOrderDirection);
+    public HmilyIndexOrderByItemSegment(final int startIndex, final int stopIndex, final int columnIndex, final HmilyOrderDirection hmilyOrderDirection, final HmilyOrderDirection nullHmilyOrderDirection) {
+        super(startIndex, stopIndex, hmilyOrderDirection, nullHmilyOrderDirection);
         this.columnIndex = columnIndex;
     }
     
-    public HmilyIndexOrderByItemSegment(final int startIndex, final int stopIndex, final int columnIndex, final OrderDirection orderDirection) {
-        super(startIndex, stopIndex, orderDirection, OrderDirection.ASC);
+    public HmilyIndexOrderByItemSegment(final int startIndex, final int stopIndex, final int columnIndex, final HmilyOrderDirection hmilyOrderDirection) {
+        super(startIndex, stopIndex, hmilyOrderDirection, HmilyOrderDirection.ASC);
         this.columnIndex = columnIndex;
     }
 }

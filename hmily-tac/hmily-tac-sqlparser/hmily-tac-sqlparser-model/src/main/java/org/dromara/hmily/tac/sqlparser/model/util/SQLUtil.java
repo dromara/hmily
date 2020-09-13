@@ -21,7 +21,7 @@ import com.google.common.base.CharMatcher;
 import com.google.common.base.Strings;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import org.dromara.hmily.tac.sqlparser.model.constant.Paren;
+import org.dromara.hmily.tac.sqlparser.model.constant.HmilyParen;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -95,7 +95,7 @@ public final class SQLUtil {
     
     private static int getParenthesesOffset(final String value) {
         int result = 0;
-        while (Paren.PARENTHESES.getLeftParen() == value.charAt(result)) {
+        while (HmilyParen.PARENTHESES.getLeftParen() == value.charAt(result)) {
             result++;
         }
         return result;

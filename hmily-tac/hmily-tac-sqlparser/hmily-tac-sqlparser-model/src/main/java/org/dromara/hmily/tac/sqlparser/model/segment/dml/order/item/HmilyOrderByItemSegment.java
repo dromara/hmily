@@ -19,7 +19,7 @@ package org.dromara.hmily.tac.sqlparser.model.segment.dml.order.item;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.dromara.hmily.tac.sqlparser.model.constant.OrderDirection;
+import org.dromara.hmily.tac.sqlparser.model.constant.HmilyOrderDirection;
 import org.dromara.hmily.tac.sqlparser.model.segment.HmilySegment;
 
 /**
@@ -33,7 +33,7 @@ public abstract class HmilyOrderByItemSegment implements HmilySegment {
     
     private final int stopIndex;
     
-    private final OrderDirection orderDirection;
+    private final HmilyOrderDirection hmilyOrderDirection;
     
-    private final OrderDirection nullOrderDirection;
+    private final HmilyOrderDirection nullHmilyOrderDirection;
 }

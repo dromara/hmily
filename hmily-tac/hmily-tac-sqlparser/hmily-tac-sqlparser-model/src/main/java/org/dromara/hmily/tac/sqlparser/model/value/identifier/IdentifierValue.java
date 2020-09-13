@@ -18,7 +18,7 @@
 package org.dromara.hmily.tac.sqlparser.model.value.identifier;
 
 import lombok.Getter;
-import org.dromara.hmily.tac.sqlparser.model.constant.QuoteCharacter;
+import org.dromara.hmily.tac.sqlparser.model.constant.HmilyQuoteCharacter;
 import org.dromara.hmily.tac.sqlparser.model.util.SQLUtil;
 import org.dromara.hmily.tac.sqlparser.model.value.ValueHmilyASTNode;
 
@@ -30,10 +30,10 @@ public final class IdentifierValue implements ValueHmilyASTNode<String> {
     
     private final String value;
     
-    private final QuoteCharacter quoteCharacter;
+    private final HmilyQuoteCharacter hmilyQuoteCharacter;
     
     public IdentifierValue(final String text) {
         value = SQLUtil.getExactlyValue(text);
-        quoteCharacter = QuoteCharacter.getQuoteCharacter(text);
+        hmilyQuoteCharacter = HmilyQuoteCharacter.getQuoteCharacter(text);
     }
 }

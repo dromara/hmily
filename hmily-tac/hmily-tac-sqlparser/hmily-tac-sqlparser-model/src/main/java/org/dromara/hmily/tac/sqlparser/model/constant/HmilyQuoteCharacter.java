@@ -26,7 +26,7 @@ import lombok.RequiredArgsConstructor;
  */
 @RequiredArgsConstructor
 @Getter
-public enum QuoteCharacter {
+public enum HmilyQuoteCharacter {
     
     BACK_QUOTE("`", "`"),
     
@@ -48,15 +48,15 @@ public enum QuoteCharacter {
      * @param value value to be get quote character
      * @return value of quote character
      */
-    public static QuoteCharacter getQuoteCharacter(final String value) {
+    public static HmilyQuoteCharacter getQuoteCharacter(final String value) {
         if (Strings.isNullOrEmpty(value)) {
-            return QuoteCharacter.NONE;
+            return HmilyQuoteCharacter.NONE;
         }
-        for (QuoteCharacter each : QuoteCharacter.values()) {
-            if (QuoteCharacter.NONE != each && each.startDelimiter.charAt(0) == value.charAt(0)) {
+        for (HmilyQuoteCharacter each : HmilyQuoteCharacter.values()) {
+            if (HmilyQuoteCharacter.NONE != each && each.startDelimiter.charAt(0) == value.charAt(0)) {
                 return each;
             }
         }
-        return QuoteCharacter.NONE;
+        return HmilyQuoteCharacter.NONE;
     }
 }

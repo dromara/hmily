@@ -19,7 +19,7 @@ package org.dromara.hmily.tac.sqlparser.model.segment.dml.item;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.dromara.hmily.tac.sqlparser.model.constant.AggregationType;
+import org.dromara.hmily.tac.sqlparser.model.constant.HmilyAggregationType;
 import org.dromara.hmily.tac.sqlparser.model.segment.generic.HmilyAliasAvailable;
 import org.dromara.hmily.tac.sqlparser.model.segment.generic.HmilyAliasSegment;
 
@@ -35,14 +35,14 @@ public class HmilyAggregationHmilyProjectionSegment implements HmilyProjectionSe
     
     private final int stopIndex;
     
-    private final AggregationType type;
+    private final HmilyAggregationType type;
     
     private final int innerExpressionStartIndex;
     
     @Setter
     private HmilyAliasSegment alias;
     
-    public HmilyAggregationHmilyProjectionSegment(final int startIndex, final int stopIndex, final AggregationType type, final int innerExpressionStartIndex) {
+    public HmilyAggregationHmilyProjectionSegment(final int startIndex, final int stopIndex, final HmilyAggregationType type, final int innerExpressionStartIndex) {
         this.startIndex = startIndex;
         this.stopIndex = stopIndex;
         this.type = type;

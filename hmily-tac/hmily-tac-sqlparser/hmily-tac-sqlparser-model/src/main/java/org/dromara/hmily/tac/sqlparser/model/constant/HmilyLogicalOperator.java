@@ -17,24 +17,37 @@
 
 package org.dromara.hmily.tac.sqlparser.model.constant;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Optional;
+import java.util.TreeSet;
+
 /**
- * Aggregation function enum.
+ * Logical operator.
  */
-public enum AggregationType {
+public enum HmilyLogicalOperator {
     
-    MAX, MIN, SUM, COUNT, AVG;
+    AND("AND", "&&"), 
+    OR("OR", "||");
+    
+    private final Collection<String> texts = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
+    
+    HmilyLogicalOperator(final String... texts) {
+        this.texts.addAll(Arrays.asList(texts));
+    }
     
     /**
-     * Is aggregation type.
-     * @param aggregationType aggregation type
-     * @return is aggregation type or not
+     * Get logical operator value from text.
+     *
+     * @param text text
+     * @return logical operator value
      */
-    public static boolean isAggregationType(final String aggregationType) {
-        for (AggregationType each : AggregationType.values()) {
-            if (aggregationType.equalsIgnoreCase(each.name())) {
-                return true;
+    public static Optional<HmilyLogicalOperator> valueFrom(final String text) {
+        for (HmilyLogicalOperator each : HmilyLogicalOperator.values()) {
+            if (each.texts.contains(text)) {
+                return Optional.of(each);
             }
         }
-        return false;
+        return Optional.empty();
     }
 }

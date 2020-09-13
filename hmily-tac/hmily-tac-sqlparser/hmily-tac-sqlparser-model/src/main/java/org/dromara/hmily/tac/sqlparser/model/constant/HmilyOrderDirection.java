@@ -20,7 +20,7 @@ package org.dromara.hmily.tac.sqlparser.model.constant;
 /**
  * Order direction.
  */
-public enum OrderDirection {
+public enum HmilyOrderDirection {
     
     /**
      * Ascending direction.

@@ -17,15 +17,15 @@
 
 package org.dromara.hmily.tac.sqlparser.model.segment.dml.order.item;
 
-import org.dromara.hmily.tac.sqlparser.model.constant.OrderDirection;
+import org.dromara.hmily.tac.sqlparser.model.constant.HmilyOrderDirection;
 
 /**
  * Order by item segment for text.
  */
 public abstract class HmilyTextOrderByItemSegment extends HmilyOrderByItemSegment {
     
-    public HmilyTextOrderByItemSegment(final int startIndex, final int stopIndex, final OrderDirection orderDirection, final OrderDirection nullOrderDirection) {
-        super(startIndex, stopIndex, orderDirection, nullOrderDirection);
+    public HmilyTextOrderByItemSegment(final int startIndex, final int stopIndex, final HmilyOrderDirection hmilyOrderDirection, final HmilyOrderDirection nullHmilyOrderDirection) {
+        super(startIndex, stopIndex, hmilyOrderDirection, nullHmilyOrderDirection);
     }
     
     /**
