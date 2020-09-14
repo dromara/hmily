@@ -17,7 +17,6 @@
 
 package org.dromara.hmily.tac.sqlparser.model.constant;
 
-import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -49,14 +48,16 @@ public enum HmilyQuoteCharacter {
      * @return value of quote character
      */
     public static HmilyQuoteCharacter getQuoteCharacter(final String value) {
-        if (Strings.isNullOrEmpty(value)) {
+        if ("BACK_QUOTE".equals(value)) {
+            return HmilyQuoteCharacter.BACK_QUOTE;
+        } else if ("SINGLE_QUOTE".equals(value)) {
+            return HmilyQuoteCharacter.SINGLE_QUOTE;
+        } else if ("QUOTE".equals(value)) {
+            return HmilyQuoteCharacter.QUOTE;
+        } else if ("BRACKETS".equals(value)) {
+            return HmilyQuoteCharacter.BRACKETS;
+        } else {
             return HmilyQuoteCharacter.NONE;
         }
-        for (HmilyQuoteCharacter each : HmilyQuoteCharacter.values()) {
-            if (HmilyQuoteCharacter.NONE != each && each.startDelimiter.charAt(0) == value.charAt(0)) {
-                return each;
-            }
-        }
-        return HmilyQuoteCharacter.NONE;
     }
 }
