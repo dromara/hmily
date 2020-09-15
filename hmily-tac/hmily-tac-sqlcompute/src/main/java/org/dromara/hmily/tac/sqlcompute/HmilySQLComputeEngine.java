@@ -15,37 +15,27 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.repository.spi.entity;
+package org.dromara.hmily.tac.sqlcompute;
 
-import java.io.Serializable;
-import java.util.Map;
+import org.dromara.hmily.repository.spi.entity.HmilyUndoInvocation;
+import org.dromara.hmily.tac.sqlcompute.exception.SQLComputeException;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
+import java.sql.Connection;
 
 /**
- * HmilyUndoInvocation.
+ * Hmily SQL compute engine interface.
  *
- * @author xiaoyu
+ * @author zhaojun
  */
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class HmilyUndoInvocation implements Serializable {
+public interface HmilySQLComputeEngine {
     
-    private static final long serialVersionUID = -4406133196112007765L;
-    
-    private String revertSql;
-    
-    private String originSql;
-    
-    private String tableName;
-    
-    private String manipulationType;
-    
-    private Map<String, Object> beforeImage;
-    
-    private Map<String, Object> afterImage;
+    /**
+     * Revert hmily undo invocation.
+     *
+     * @param connection   connection
+     * @param sql          the sql
+     * @return the hmily undo invocation
+     * @throws SQLComputeException the SQL compute exception
+     */
+    HmilyUndoInvocation generateImage(Connection connection, String sql) throws SQLComputeException;
 }
