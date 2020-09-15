@@ -52,6 +52,12 @@
             <artifactId>hmily-tac-sqlrevert-all</artifactId>
             <version>${project.version}</version>
         </dependency>
+    
+        <dependency>
+            <groupId>org.dromara</groupId>
+            <artifactId>hmily-tac-sqlcompute</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 
 </project>
