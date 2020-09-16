@@ -19,6 +19,7 @@
         <module>hmily-demo-motan</module>
         <module>hmily-demo-common</module>
         <module>hmily-demo-sofa</module>
+        <module>hmily-demo-bprc</module>
     </modules>
 
     <properties>
@@ -35,7 +36,7 @@
             <dependency>
                 <groupId>org.dromara</groupId>
                 <artifactId>hmily-demo-common</artifactId>
-                <version>${parent.version}</version>
+                <version>2.0.2-RELEASE</version>
             </dependency>
 
             <dependency>
