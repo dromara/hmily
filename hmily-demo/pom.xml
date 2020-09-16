@@ -19,6 +19,7 @@
         <module>hmily-demo-motan</module>
         <module>hmily-demo-common</module>
         <module>hmily-demo-sofa</module>
+        <module>hmily-demo-tars</module>
     </modules>
 
     <properties>

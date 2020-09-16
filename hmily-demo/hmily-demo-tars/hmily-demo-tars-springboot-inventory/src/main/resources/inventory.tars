@@ -1,0 +1,7 @@
+module InventoryApp
+{
+    interface Inventory
+    {
+        bool decrease(string productId, int count);
+    };
+};
