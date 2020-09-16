@@ -60,7 +60,5 @@
                 <version>2.1.0-SNAPSHOT</version>
             </dependency>
         </dependencies>
-
     </dependencyManagement>
-
 </project>
