@@ -19,6 +19,7 @@
         <module>hmily-demo-motan</module>
         <module>hmily-demo-common</module>
         <module>hmily-demo-sofa</module>
+        <module>hmily-demo-grpc</module>
     </modules>
 
     <properties>
@@ -59,6 +60,12 @@
             <dependency>
                 <groupId>org.dromara</groupId>
                 <artifactId>hmily-springcloud</artifactId>
+                <version>${hmily.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.dromara</groupId>
+                <artifactId>hmily-grpc</artifactId>
                 <version>${hmily.version}</version>
             </dependency>
 
