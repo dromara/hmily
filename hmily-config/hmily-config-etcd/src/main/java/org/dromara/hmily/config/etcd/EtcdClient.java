@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -89,7 +90,7 @@ public class EtcdClient {
             EventData eventData = null;
             switch (eventType) {
                 case PUT:
-                    eventData = new AddData(keyValue.getKey().toString(), keyValue.getValue().toStringUtf8());
+                    eventData = new AddData(keyValue.getKey().toStringUtf8(), keyValue.getValue().toStringUtf8());
                     break;
                 case DELETE:
                     eventData = new RemoveData(prevKV.getKey().toStringUtf8(), null);
@@ -97,11 +98,13 @@ public class EtcdClient {
                 default:
                     break;
             }
-            EtcdPassiveConfig etcdPassiveConfig = new EtcdPassiveConfig();
-            etcdPassiveConfig.setKey(config.getKey());
-            etcdPassiveConfig.setFileExtension(config.getFileExtension());
-            etcdPassiveConfig.setValue(eventData);
-            passiveHandler.passive(context, etcdPassiveConfig);
+            Optional.of(eventData).ifPresent(e -> {
+                EtcdPassiveConfig etcdPassiveConfig = new EtcdPassiveConfig();
+                etcdPassiveConfig.setKey(config.getKey());
+                etcdPassiveConfig.setFileExtension(config.getFileExtension());
+                etcdPassiveConfig.setValue(e);
+                passiveHandler.passive(context, etcdPassiveConfig);
+            });
         });
         LOGGER.info("passive Etcd remote started....");
     }
