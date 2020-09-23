@@ -58,6 +58,17 @@ public class EtcdConfigLoader implements ConfigLoader<EtcdConfig> {
         againLoad(context, etcdHandler, EtcdConfig.class);
     }
 
+    @Override
+    public void passive(final Supplier<Context> context, final PassiveHandler<Config> handler, final Config config) {
+        if (config.isPassive()) {
+            try {
+                client.addListener(context, (c, cfg) -> push(c, cfg.getValue()), (EtcdConfig) config);
+            } catch (InterruptedException e) {
+                throw new ConfigException("etcd passive config failed.");
+            }
+        }
+    }
+
     private void etcdLoad(final Supplier<Context> context, final LoaderHandler<EtcdConfig> handler, final EtcdConfig config) {
         if (config != null) {
             check(config);
@@ -72,6 +83,7 @@ public class EtcdConfigLoader implements ConfigLoader<EtcdConfig> {
                     .map(e -> propertyLoader.load("remote.etcd." + fileExtension, e))
                     .ifPresent(e -> context.get().getOriginal().load(() -> context.get().withSources(e), this::etcdFinish));
             handler.finish(context, config);
+            passive(context, null, config);
         } else {
             throw new ConfigException("etcd config is null");
         }
