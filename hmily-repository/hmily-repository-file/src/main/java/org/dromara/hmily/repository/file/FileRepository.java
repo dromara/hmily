@@ -180,7 +180,7 @@ public class FileRepository implements HmilyRepository {
             boolean delete = deleteFile(getTransationPath(), transId);
             return delete ? HmilyRepository.ROWS : HmilyRepository.FAIL_ROWS;
         } catch (IOException e) {
-            LogUtil.error(LOGGER, "updateHmilyTransactionStatus occur a exception {}", e::getMessage);
+            LogUtil.error(LOGGER, "removeHmilyTransaction occur a exception {}", e::getMessage);
         }
         return HmilyRepository.FAIL_ROWS;
     }
@@ -273,7 +273,7 @@ public class FileRepository implements HmilyRepository {
             boolean delete = deleteFile(getParticipantPath(), participantId);
             return delete ? HmilyRepository.ROWS : HmilyRepository.FAIL_ROWS;
         } catch (IOException e) {
-            LogUtil.error(LOGGER, "updateHmilyTransactionStatus occur a exception {}", e::getMessage);
+            LogUtil.error(LOGGER, "removeHmilyParticipant occur a exception {}", e::getMessage);
         }
         return HmilyRepository.FAIL_ROWS;
     }
@@ -334,7 +334,7 @@ public class FileRepository implements HmilyRepository {
             boolean delete = deleteFile(getParticipantUndoPath(), undoId);
             return delete ? HmilyRepository.ROWS : HmilyRepository.FAIL_ROWS;
         } catch (IOException e) {
-            LogUtil.error(LOGGER, "updateHmilyTransactionStatus occur a exception {}", e::getMessage);
+            LogUtil.error(LOGGER, "removeHmilyParticipantUndo occur a exception {}", e::getMessage);
         }
         return HmilyRepository.FAIL_ROWS;
     }
@@ -479,7 +479,7 @@ public class FileRepository implements HmilyRepository {
         LOCK.writeLock().lock();
         try {
             byte[] serialize = hmilySerializer.serialize(hmilyTransaction);
-            Files.write(Paths.get(filePath), serialize, StandardOpenOption.WRITE);
+            Files.write(Paths.get(filePath), serialize, StandardOpenOption.CREATE);
             return HmilyRepository.ROWS;
         } catch (IOException | HmilySerializerException e) {
             LogUtil.error(LOGGER, " read file exception ,because is {}", e::getMessage);

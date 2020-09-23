@@ -71,7 +71,7 @@ public class ZookeeperRepository implements HmilyRepository {
     
     private HmilySerializer hmilySerializer;
 
-    private String rootPathPrefix = "/hmily";
+    private String rootPathPrefix = "/hmily-repository";
 
     private String appName;
 
@@ -98,6 +98,7 @@ public class ZookeeperRepository implements HmilyRepository {
         try {
             create(path);
             Stat stat = zooKeeper.exists(path + "/" + hmilyTransaction.getTransId(), false);
+            hmilyTransaction.setAppName(appName);
             if (stat == null) {
                 hmilyTransaction.setRetry(0);
                 hmilyTransaction.setVersion(0);
@@ -198,8 +199,8 @@ public class ZookeeperRepository implements HmilyRepository {
             return HmilyRepository.ROWS;
         } catch (KeeperException | InterruptedException e) {
             LOGGER.error("updateHmilyTransactionStatus occur a exception", e);
+            return HmilyRepository.FAIL_ROWS;
         }
-        return HmilyRepository.FAIL_ROWS;
     }
 
     @Override
@@ -232,6 +233,7 @@ public class ZookeeperRepository implements HmilyRepository {
             String path = buildHmilyParticipantRootPath();
             create(path);
             Stat stat = zooKeeper.exists(path + "/" + hmilyParticipant.getTransId(), false);
+            hmilyParticipant.setAppName(appName);
             if (stat == null) {
                 hmilyParticipant.setRetry(0);
                 hmilyParticipant.setVersion(0);
