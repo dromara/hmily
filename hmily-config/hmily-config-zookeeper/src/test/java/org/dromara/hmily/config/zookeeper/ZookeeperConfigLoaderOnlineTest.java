@@ -21,28 +21,17 @@ package org.dromara.hmily.config.zookeeper;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.dromara.hmily.common.utils.FileUtils;
 import org.dromara.hmily.config.api.ConfigEnv;
 import org.dromara.hmily.config.api.ConfigScan;
-import org.dromara.hmily.config.api.entity.*;
 import org.dromara.hmily.config.api.event.EventConsumer;
-import org.dromara.hmily.config.api.event.EventData;
 import org.dromara.hmily.config.api.event.ModifyData;
 import org.dromara.hmily.config.loader.ConfigLoader;
 import org.dromara.hmily.config.loader.ServerConfigLoader;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.io.ByteArrayInputStream;
 import java.util.function.Supplier;
-
-import static org.mockito.ArgumentMatchers.any;
 
 /**
  * @author xiaoyu
@@ -74,7 +63,7 @@ public class ZookeeperConfigLoaderOnlineTest {
             }
 
             @Override
-            public String properties() {
+            public String regex() {
                 return "hmily.config.*";
             }
         });
