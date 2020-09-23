@@ -50,6 +50,7 @@ public final class ConfigEnv {
     static {
         EVENTS.add(new DefaultConsumer());
     }
+
     /**
      * Save some custom configuration information.
      */

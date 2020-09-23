@@ -30,7 +30,7 @@ public class DefaultConsumer implements EventConsumer<EventData> {
     private final Logger logger = LoggerFactory.getLogger(DefaultConsumer.class);
 
     @Override
-    public void accept(EventData data) {
+    public void accept(final EventData data) {
         logger.info("{}:config has changed....", data);
     }
 
@@ -45,7 +45,7 @@ public class DefaultConsumer implements EventConsumer<EventData> {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         return super.equals(obj);
     }
 }
