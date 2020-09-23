@@ -17,26 +17,35 @@
 
 package org.dromara.hmily.config.api.event;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
- * ModifyEventConsumer .
- * modify config event push .
+ * Custom monitor all changes.
  *
- * @param <T> the type parameter
  * @author sixh chenbin
  */
-public interface EventConsumer<T extends EventData> {
+public class DefaultConsumer implements EventConsumer<EventData> {
 
-    /**
-     * Accept.
-     *
-     * @param t the t
-     */
-    void accept(T t);
+    private final Logger logger = LoggerFactory.getLogger(DefaultConsumer.class);
 
-    /**
-     * listener properties Regular expression.
-     *
-     * @return the string
-     */
-    String regex();
+    @Override
+    public void accept(final EventData data) {
+        logger.info("{}:config has changed....", data);
+    }
+
+    @Override
+    public String regex() {
+        return "[\\s\\S\\d\\D]*";
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        return super.equals(obj);
+    }
 }
