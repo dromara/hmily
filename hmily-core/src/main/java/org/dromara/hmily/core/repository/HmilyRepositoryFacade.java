@@ -42,7 +42,6 @@ public final class HmilyRepositoryFacade {
     @Setter
     private HmilyRepository hmilyRepository;
     
-    
     private HmilyRepositoryFacade() {
     }
     
