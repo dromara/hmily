@@ -19,12 +19,16 @@ package org.dromara.hmily.repository.file;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Method;
+import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -68,7 +72,7 @@ public class FileRepository implements HmilyRepository {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FileRepository.class);
 
-    private static final String HMILY_TRANSATION_FILE_DIRECTORY = ".hmily";
+    private static final String HMILY_ROOT_TRANSACTION = "hmily";
 
     private static final String HMILY_TRANSATION_PARTICIPANT_FILE_DIRECTORY = "participant";
 
@@ -358,15 +362,15 @@ public class FileRepository implements HmilyRepository {
     }
 
     private String getTransationPath() {
-        return filePath + File.separator + HMILY_TRANSATION_FILE_DIRECTORY;
+        return filePath + File.separator + HMILY_ROOT_TRANSACTION + File.separator + appName;
     }
 
     private String getParticipantPath() {
-        return getTransationPath() + File.separator + appName;
+        return getTransationPath() + File.separator + HMILY_TRANSATION_PARTICIPANT_FILE_DIRECTORY;
     }
 
     private String getParticipantUndoPath() {
-        return getParticipantPath() + File.separator + HMILY_PARTICIPANT_UNDO;
+        return getTransationPath() + File.separator + HMILY_PARTICIPANT_UNDO;
     }
 
     private void makeDir() {
@@ -462,6 +466,7 @@ public class FileRepository implements HmilyRepository {
             byte[] dst = new byte[(int) inChannel.size()];
             mappedByteBuffer.get(dst);
             T t = hmilySerializer.deSerialize(dst, clazz);
+            clean(mappedByteBuffer);
             return t;
         } catch (IOException | HmilySerializerException e) {
             LogUtil.error(LOGGER, " read file exception ,because is {}", e::getMessage);
@@ -479,7 +484,7 @@ public class FileRepository implements HmilyRepository {
         LOCK.writeLock().lock();
         try {
             byte[] serialize = hmilySerializer.serialize(hmilyTransaction);
-            Files.write(Paths.get(filePath), serialize, StandardOpenOption.CREATE);
+            Files.write(Paths.get(filePath), serialize, StandardOpenOption.WRITE);
             return HmilyRepository.ROWS;
         } catch (IOException | HmilySerializerException e) {
             LogUtil.error(LOGGER, " read file exception ,because is {}", e::getMessage);
@@ -621,6 +626,60 @@ public class FileRepository implements HmilyRepository {
     private boolean isRead(final String filePath) {
         Path path = Paths.get(filePath);
         return Files.isReadable(path);
+    }
+
+    /**
+     * The file handle is occupied help gc clean buffer.
+     * http://bugs.java.com/bugdatabase/view_bug.do?bug_id=4724038
+     * @param buffer buffer
+     */
+    public static void clean(final ByteBuffer buffer) {
+        if (buffer == null || !buffer.isDirect() || buffer.capacity() == 0) {
+            return;
+        }
+        invoke(invoke(viewed(buffer), "cleaner"), "clean");
+    }
+
+    private static Object invoke(final Object target, final String methodName, final Class<?>... args) {
+        return AccessController.doPrivileged(new PrivilegedAction<Object>() {
+            @Override
+            public Object run() {
+                try {
+                    Method method = method(target, methodName, args);
+                    method.setAccessible(true);
+                    return method.invoke(target);
+                } catch (Exception e) {
+                    throw new IllegalStateException(e);
+                }
+            }
+        });
+    }
+
+    private static Method method(final Object target, final String methodName, final Class<?>[] args)
+            throws NoSuchMethodException {
+        try {
+            return target.getClass().getMethod(methodName, args);
+        } catch (NoSuchMethodException e) {
+            return target.getClass().getDeclaredMethod(methodName, args);
+        }
+    }
+
+    private static ByteBuffer viewed(final ByteBuffer buffer) {
+        String methodName = "viewedBuffer";
+        Method[] methods = buffer.getClass().getMethods();
+        for (int i = 0; i < methods.length; i++) {
+            if (methods[i].getName().equals("attachment")) {
+                methodName = "attachment";
+                break;
+            }
+        }
+
+        ByteBuffer viewedBuffer = (ByteBuffer) invoke(buffer, methodName);
+        if (viewedBuffer == null) {
+            return buffer;
+        } else {
+            return viewed(viewedBuffer);
+        }
     }
 
     /**
