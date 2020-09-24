@@ -83,8 +83,8 @@ public interface ConfigLoader<T extends Config> {
         }
         String properties = data.getProperties();
         List<EventConsumer<EventData>> eventsLists = events.stream()
-                .filter(e -> !Objects.isNull(e.properties()))
-                .filter(e -> Pattern.matches(e.properties(), properties))
+                .filter(e -> !Objects.isNull(e.regex()))
+                .filter(e -> Pattern.matches(e.regex(), properties))
                 .collect(Collectors.toList());
         for (EventConsumer<EventData> consumer : eventsLists) {
             Optional<Config> first = ConfigEnv.getInstance().stream().filter(e -> properties.startsWith(e.prefix())).findFirst();
@@ -95,7 +95,7 @@ public interface ConfigLoader<T extends Config> {
                 sources.add(new MapPropertyKeySource(first.get().prefix(), values));
                 PassiveHandler<Config> handler = (ct, cf) -> {
                     data.setConfig(cf);
-                    data.setSubscribe(consumer.properties());
+                    data.setSubscribe(consumer.regex());
                     try {
                         consumer.accept(data);
                     } catch (ClassCastException e) {
