@@ -57,17 +57,14 @@ public final class HmilyTacRollbackExecutor {
     }
     
     private void registerRollback() {
-        UndoHook.INSTANCE.register(undo -> {
-            HmilyP6Datasource hmilyP6Datasource = (HmilyP6Datasource) HmilyResourceManager.get(undo.getResourceId());
-            return doRollback(hmilyP6Datasource, undo);
-        });
+        UndoHook.INSTANCE.register(this::doRollback);
     }
     
-    private boolean doRollback(final HmilyP6Datasource hmilyP6Datasource, final HmilyParticipantUndo undo) {
+    private boolean doRollback(final HmilyParticipantUndo undo) {
         //1 . 根据undo生成 反向sql来执行
         HmilyUndoInvocation undoInvocation = undo.getUndoInvocation();
         String revertSql = undoInvocation.getRevertSql();
-        return executeUpdate(revertSql, hmilyP6Datasource) > 0;
+        return executeUpdate(revertSql, HmilyResourceManager.get(undo.getResourceId()).getTargetDataSource()) > 0;
     }
     
     private int executeUpdate(final String sql, final DataSource dataSource) {

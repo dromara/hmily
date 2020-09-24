@@ -21,6 +21,8 @@ import com.p6spy.engine.spy.P6DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 import javax.sql.DataSource;
+
+import lombok.Getter;
 import org.dromara.hmily.tac.common.HmilyResourceManager;
 import org.dromara.hmily.tac.common.HmilyTacResource;
 import org.dromara.hmily.tac.p6spy.rollback.HmilyTacRollbackExecutor;
@@ -35,6 +37,11 @@ import org.dromara.hmily.tac.common.utils.ResourceIdUtils;
  */
 public class HmilyP6Datasource extends P6DataSource implements HmilyTacResource {
     
+    private static final long serialVersionUID = -5117674683387217309L;
+    
+    @Getter
+    private final DataSource targetDataSource;
+    
     private String jdbcUrl;
     
     /**
@@ -44,11 +51,12 @@ public class HmilyP6Datasource extends P6DataSource implements HmilyTacResource 
      */
     public HmilyP6Datasource(final DataSource delegate) {
         super(delegate);
-        init(delegate);
+        targetDataSource = delegate;
+        init();
     }
     
-    private void init(final DataSource dataSource) {
-        try (Connection connection = dataSource.getConnection()) {
+    private void init() {
+        try (Connection connection = targetDataSource.getConnection()) {
             jdbcUrl = connection.getMetaData().getURL();
             DatabaseTypes.INSTANCE.setDatabaseType(JdbcUtils.newDatabaseType(jdbcUrl));
         } catch (SQLException e) {
@@ -62,4 +70,5 @@ public class HmilyP6Datasource extends P6DataSource implements HmilyTacResource 
     public String getResourceId() {
         return ResourceIdUtils.INSTANCE.getResourceId(jdbcUrl);
     }
+    
 }
