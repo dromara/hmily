@@ -18,7 +18,7 @@ hmily:
     retryMax: 10
     bufferSize: 8192
     consumerThreads: 16
-    asyncRepository: false
+    asyncRepository: true
     autoSql: true
     phyDeleted: true
     storeDays: 3

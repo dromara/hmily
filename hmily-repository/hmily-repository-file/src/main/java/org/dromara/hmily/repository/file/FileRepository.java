@@ -38,7 +38,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
-
 import lombok.SneakyThrows;
 import org.dromara.hmily.common.enums.HmilyActionEnum;
 import org.dromara.hmily.common.exception.HmilyException;
@@ -74,7 +73,7 @@ public class FileRepository implements HmilyRepository {
 
     private static final String HMILY_ROOT_TRANSACTION = "hmily";
 
-    private static final String HMILY_TRANSATION_PARTICIPANT_FILE_DIRECTORY = "participant";
+    private static final String HMILY_TRANSATION_PARTICIPANT = "participant";
 
     private static final String HMILY_PARTICIPANT_UNDO = "undo";
 
@@ -362,17 +361,21 @@ public class FileRepository implements HmilyRepository {
     }
 
     private String getTransationPath() {
-        return filePath + File.separator + HMILY_ROOT_TRANSACTION + File.separator + appName;
+        return filePath + File.separator + HMILY_ROOT_TRANSACTION;
     }
-
+    
     private String getParticipantPath() {
-        return getTransationPath() + File.separator + HMILY_TRANSATION_PARTICIPANT_FILE_DIRECTORY;
+        return getTransationPath() + getParticipantPrefix() + HMILY_TRANSATION_PARTICIPANT;
     }
-
+    
     private String getParticipantUndoPath() {
-        return getTransationPath() + File.separator + HMILY_PARTICIPANT_UNDO;
+        return getTransationPath() + getParticipantPrefix() + HMILY_PARTICIPANT_UNDO;
     }
-
+    
+    private String getParticipantPrefix() {
+        return File.separator + appName + File.separator;
+    }
+    
     private void makeDir() {
         if (!initialized) {
             synchronized (FileRepository.class) {
