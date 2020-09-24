@@ -44,7 +44,7 @@ public enum PropertyKeyParse {
      * @param propertyName the property name
      * @return the property key [ ]
      */
-    public PropertyKey[] parse(PropertyName propertyName) {
+    public PropertyKey[] parse(final PropertyName propertyName) {
         LastKey<PropertyName> last = this.lastKeyObj;
         if (last != null && last.isFrom(propertyName)) {
             return last.getKeys();
@@ -61,7 +61,7 @@ public enum PropertyKeyParse {
      * @param propertyName the property name
      * @return the property key [ ]
      */
-    public PropertyKey[] parse(String propertyName) {
+    public PropertyKey[] parse(final String propertyName) {
         // Use a local copy in case another thread changes things
         LastKey<String> last = this.lastKeyStr;
         if (last != null && last.isFrom(propertyName)) {
@@ -72,7 +72,7 @@ public enum PropertyKeyParse {
         return mapping;
     }
 
-    private PropertyKey[] tryMap(String propertyName) {
+    private PropertyKey[] tryMap(final String propertyName) {
         PropertyName name = PropertyName.of(propertyName);
         if (!name.isEmpty()) {
             return new PropertyKey[]{new PropertyKey(propertyName, name)};
@@ -93,7 +93,7 @@ public enum PropertyKeyParse {
          * @param from the from
          * @param keys the keys
          */
-        LastKey(T from, PropertyKey[] keys) {
+        LastKey(final T from, final PropertyKey[] keys) {
             this.from = from;
             this.keys = keys;
         }
@@ -104,7 +104,7 @@ public enum PropertyKeyParse {
          * @param from the from
          * @return the boolean
          */
-        boolean isFrom(T from) {
+        boolean isFrom(final T from) {
             return Objects.equals(from, this.from);
         }
     

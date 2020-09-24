@@ -130,6 +130,16 @@ public class HmilyConfig extends AbstractConfig {
      */
     private String repository = "mysql";
     
+    /**
+     * tac sqlParserType.
+     */
+    private String sqlParserType = "calcite";
+    
+    /**
+     * tac sqlRevert.
+     */
+    private String sqlRevert = "default";
+    
     @Override
     public String prefix() {
         return PrefixConstants.CONFIG_PREFIX;

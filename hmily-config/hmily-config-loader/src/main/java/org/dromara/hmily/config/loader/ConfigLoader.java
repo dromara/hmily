@@ -53,7 +53,7 @@ public interface ConfigLoader<T extends Config> {
      * @param handler the handler
      * @param tClass  the t class
      */
-    default void againLoad(Supplier<Context> context, LoaderHandler<T> handler, Class<T> tClass) {
+    default void againLoad(final Supplier<Context> context, final LoaderHandler<T> handler, final Class<T> tClass) {
         T config = ConfigEnv.getInstance().getConfig(tClass);
         for (PropertyKeySource<?> propertyKeySource : context.get().getSource()) {
             ConfigPropertySource configPropertySource = new DefaultConfigPropertySource<>(propertyKeySource, PropertyKeyParse.INSTANCE);
@@ -83,7 +83,7 @@ public interface ConfigLoader<T extends Config> {
          *
          * @param propertyKeySources the property key sources
          */
-        public Context(List<PropertyKeySource<?>> propertyKeySources) {
+        public Context(final List<PropertyKeySource<?>> propertyKeySources) {
             this(null, propertyKeySources);
         }
     
@@ -93,7 +93,7 @@ public interface ConfigLoader<T extends Config> {
          * @param original           the original
          * @param propertyKeySources the property key sources
          */
-        public Context(ConfigLoader<Config> original, List<PropertyKeySource<?>> propertyKeySources) {
+        public Context(final ConfigLoader<Config> original, final List<PropertyKeySource<?>> propertyKeySources) {
             this.original = original;
             this.propertyKeySources = propertyKeySources;
         }
@@ -105,7 +105,7 @@ public interface ConfigLoader<T extends Config> {
          * @param original the original
          * @return the context.
          */
-        public Context with(List<PropertyKeySource<?>> sources, ConfigLoader<Config> original) {
+        public Context with(final List<PropertyKeySource<?>> sources, final ConfigLoader<Config> original) {
             return new Context(original, sources);
         }
     
@@ -115,7 +115,7 @@ public interface ConfigLoader<T extends Config> {
          * @param sources the sources
          * @return the context.
          */
-        public Context withSources(List<PropertyKeySource<?>> sources) {
+        public Context withSources(final List<PropertyKeySource<?>> sources) {
             return with(sources, this.original);
         }
     

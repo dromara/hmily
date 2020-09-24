@@ -22,6 +22,7 @@ import com.p6spy.engine.common.PreparedStatementInformation;
 import com.p6spy.engine.common.StatementInformation;
 import com.p6spy.engine.event.JdbcEventListener;
 import java.sql.SQLException;
+import java.util.Objects;
 
 /**
  * The type Hmily jdbc event listener.
@@ -29,24 +30,53 @@ import java.sql.SQLException;
  * @author xiaoyu
  */
 public class HmilyJdbcEventListener extends JdbcEventListener {
+    
+    @Override
+    public void onAfterExecute(final PreparedStatementInformation statementInformation, final long timeElapsedNanos, final SQLException e) {
+        super.onAfterExecute(statementInformation, timeElapsedNanos, e);
+        if (Objects.nonNull(e)) {
+            HmilyExecuteTemplate.INSTANCE.execute(statementInformation);
+        }
+    }
+    
+    @Override
+    public void onAfterExecute(final StatementInformation statementInformation, final long timeElapsedNanos, final String sql, final SQLException e) {
+        super.onAfterExecute(statementInformation, timeElapsedNanos, sql, e);
+        if (Objects.nonNull(e)) {
+            HmilyExecuteTemplate.INSTANCE.execute(statementInformation);
+        }
+    }
+    
     @Override
     public void onAfterExecuteUpdate(final PreparedStatementInformation statementInformation, final long timeElapsedNanos, final int rowCount, final SQLException e) {
         super.onAfterExecuteUpdate(statementInformation, timeElapsedNanos, rowCount, e);
+        if (Objects.nonNull(e)) {
+            HmilyExecuteTemplate.INSTANCE.execute(statementInformation);
+        }
     }
     
     @Override
     public void onAfterExecuteUpdate(final StatementInformation statementInformation, final long timeElapsedNanos, final String sql, final int rowCount, final SQLException e) {
         super.onAfterExecuteUpdate(statementInformation, timeElapsedNanos, sql, rowCount, e);
+        if (Objects.nonNull(e)) {
+            HmilyExecuteTemplate.INSTANCE.execute(statementInformation);
+        }
     }
     
     @Override
     public void onAfterCommit(final ConnectionInformation connectionInformation, final long timeElapsedNanos, final SQLException e) {
         super.onAfterCommit(connectionInformation, timeElapsedNanos, e);
+        if (Objects.nonNull(e)) {
+            HmilyExecuteTemplate.INSTANCE.commit();
+        } else {
+            HmilyExecuteTemplate.INSTANCE.clean();
+        }
     }
     
     @Override
     public void onAfterRollback(final ConnectionInformation connectionInformation, final long timeElapsedNanos, final SQLException e) {
         super.onAfterRollback(connectionInformation, timeElapsedNanos, e);
+        HmilyExecuteTemplate.INSTANCE.clean();
     }
     
     @Override

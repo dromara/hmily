@@ -20,6 +20,7 @@ package org.dromara.hmily.demo.dubbo.account.service;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.dromara.hmily.annotation.HmilyTAC;
 import org.dromara.hmily.annotation.HmilyTCC;
+import org.dromara.hmily.common.exception.HmilyRuntimeException;
 import org.dromara.hmily.demo.dubbo.account.api.dto.AccountDTO;
 import org.dromara.hmily.demo.dubbo.account.api.dto.AccountNestedDTO;
 import org.dromara.hmily.demo.dubbo.account.api.entity.AccountDO;
@@ -81,14 +82,28 @@ public class AccountServiceImpl implements AccountService {
     @HmilyTCC(confirmMethod = "confirm", cancelMethod = "cancel")
     public void payment(AccountDTO accountDTO) {
         accountMapper.update(accountDTO);
-        /*final int i = trycount.incrementAndGet();
-        System.out.println("调用了account try " + i + " 次");*/
-
-        //内嵌 本地的service
-        //inlineService.testInline();
-
-        //内嵌 远端的rpc服务  注意如果是内嵌的调用rpc，那么在这次事务里面，不能再调用该RPC
-        // inventoryService.testInLine();
+    }
+    
+    @Override
+    @HmilyTCC(confirmMethod = "confirm", cancelMethod = "cancel")
+    public void mockTryPaymentException(AccountDTO accountDTO) {
+        throw new HmilyRuntimeException("账户扣减异常！");
+    }
+    
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    @HmilyTCC(confirmMethod = "confirm", cancelMethod = "cancel")
+    public void mockTryPaymentTimeout(AccountDTO accountDTO) {
+        try {
+            //模拟延迟 当前线程暂停10秒
+            Thread.sleep(10000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        final int decrease = accountMapper.update(accountDTO);
+        if (decrease != 1) {
+            throw new HmilyRuntimeException("库存不足");
+        }
     }
     
     @Override
@@ -100,7 +115,7 @@ public class AccountServiceImpl implements AccountService {
     
     @Override
     public boolean testPayment(AccountDTO accountDTO) {
-        accountMapper.update(accountDTO);
+        accountMapper.testUpdate(accountDTO);
         return Boolean.TRUE;
     }
 
@@ -112,9 +127,7 @@ public class AccountServiceImpl implements AccountService {
         dto.setAmount(accountNestedDTO.getAmount());
         dto.setUserId(accountNestedDTO.getUserId());
         accountMapper.update(dto);
-    
         InventoryDTO inventoryDTO = new InventoryDTO();
-    
         inventoryDTO.setCount(accountNestedDTO.getCount());
         inventoryDTO.setProductId(accountNestedDTO.getProductId());
         inventoryService.decrease(inventoryDTO);
@@ -129,13 +142,10 @@ public class AccountServiceImpl implements AccountService {
         dto.setAmount(accountNestedDTO.getAmount());
         dto.setUserId(accountNestedDTO.getUserId());
         accountMapper.update(dto);
-        
         InventoryDTO inventoryDTO = new InventoryDTO();
-        
         inventoryDTO.setCount(accountNestedDTO.getCount());
         inventoryDTO.setProductId(accountNestedDTO.getProductId());
         inventoryService.decrease(inventoryDTO);
-        
         //下面这个且套服务异常
         inventoryService.mockWithTryException(inventoryDTO);
         return Boolean.TRUE;
@@ -192,8 +202,7 @@ public class AccountServiceImpl implements AccountService {
         LOGGER.info("调用了account confirm " + i + " 次");
         return Boolean.TRUE;
     }
-
-
+    
     /**
      * Cancel boolean.
      *

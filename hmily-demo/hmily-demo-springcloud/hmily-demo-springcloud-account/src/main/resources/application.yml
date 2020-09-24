@@ -27,17 +27,25 @@ eureka:
  instance:
    prefer-ip-address: true
 
-account-service :
-   ribbon.NFLoadBalancerRuleClassName : com.netflix.loadbalancer.RandomRule
+#Ribbon的负载均衡策略
+ribbon:
+  NFLoadBalancerRuleClassName:  com.netflix.loadbalancer.RandomRule
+  MaxAutoRetriesNextServer : 0
+  MaxAutoRetries: 0
+  ReadTimeout: 3000
+feign:
+  hystrix:
+    enabled : false
+    # 在feign中开启hystrix功能，默认情况下feign不开启hystrix功能
 
 logging:
     level:
         root: error
         org.springframework.web: info
-        org.apache.ibatis: info
-        org.dromara.hmily.bonuspoint: debug
-        org.dromara.hmily.lottery: debug
-        org.dromara.hmily: debug
+        org.apache.ibatis: debug
+        org.dromara.hmily.demo.bonuspoint: debug
+        org.dromara.hmily.demo.lottery: debug
+        org.dromara.hmily.demo: debug
         io.netty: info
     path: "./logs"
 

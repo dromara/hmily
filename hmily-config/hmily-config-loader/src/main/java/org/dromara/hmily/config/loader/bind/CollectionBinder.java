@@ -44,12 +44,10 @@ public final class CollectionBinder extends IndexedBinder<Collection<Object>> {
     @Override
     public Object bind(final PropertyName propertyName, final BindData<?> target, final Binder.Env env, final AggregateElementBinder elementBinder) {
         DataType type = target.getType();
-        Class<?> collectionType = (target.getValue() != null ? List.class
-                : type.getTypeClass());
+        Class<?> collectionType = target.getValue() != null ? List.class : type.getTypeClass();
         DataType aggregateType = DataType.of(collectionType);
         DataType elementType = type.getGenerics().length > 0 ? type.getGenerics()[0] : DataType.of(Object.class);
-        IndexedBinder.IndexedCollectionSupplier result = new IndexedBinder.IndexedCollectionSupplier(
-                () -> CollectionUtils.createFactory().create(collectionType, 0));
+        IndexedBinder.IndexedCollectionSupplier result = new IndexedBinder.IndexedCollectionSupplier(() -> CollectionUtils.createFactory().create(collectionType, 0));
         bindIndexed(propertyName, target, elementBinder, aggregateType, elementType, result);
         if (result.wasSupplied()) {
             return result.get();

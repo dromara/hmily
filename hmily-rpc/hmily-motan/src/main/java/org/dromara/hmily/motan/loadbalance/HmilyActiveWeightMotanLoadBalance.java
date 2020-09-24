@@ -18,7 +18,6 @@
 package org.dromara.hmily.motan.loadbalance;
 
 import com.weibo.api.motan.cluster.loadbalance.ActiveWeightLoadBalance;
-import com.weibo.api.motan.cluster.loadbalance.RoundRobinLoadBalance;
 import com.weibo.api.motan.common.MotanConstants;
 import com.weibo.api.motan.core.extension.Activation;
 import com.weibo.api.motan.core.extension.SpiMeta;

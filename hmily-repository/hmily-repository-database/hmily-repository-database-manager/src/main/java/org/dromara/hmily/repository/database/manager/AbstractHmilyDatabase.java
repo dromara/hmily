@@ -217,6 +217,7 @@ public abstract class AbstractHmilyDatabase implements HmilyRepository {
      * Execte schema.sql by different database.
      *
      * @param hmilyDbConfig the hmilyDbConfig
+     * @throws Exception the exception
      */
     protected abstract void initScript(HmilyDatabaseConfig hmilyDbConfig) throws Exception;
     
@@ -232,7 +233,6 @@ public abstract class AbstractHmilyDatabase implements HmilyRepository {
     public void init(final String appName) {
         this.appName = appName;
         try {
-            HmilyConfig hmilyConfig = ConfigEnv.getInstance().getConfig(HmilyConfig.class);
             HmilyDatabaseConfig hmilyDatabaseConfig = ConfigEnv.getInstance().getConfig(HmilyDatabaseConfig.class);
             HikariDataSource hikariDataSource = new HikariDataSource();
             hikariDataSource.setJdbcUrl(hmilyDatabaseConfig.getUrl());
@@ -248,6 +248,7 @@ public abstract class AbstractHmilyDatabase implements HmilyRepository {
             if (hmilyDatabaseConfig.getPropertyMap() != null && !hmilyDatabaseConfig.getPropertyMap().isEmpty()) {
                 hmilyDatabaseConfig.getPropertyMap().forEach(hikariDataSource::addDataSourceProperty);
             }
+            HmilyConfig hmilyConfig = ConfigEnv.getInstance().getConfig(HmilyConfig.class);
             this.dataSource = hikariDataSource;
             if (hmilyConfig.isAutoSql()) {
                 this.initScript(hmilyDatabaseConfig);

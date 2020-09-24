@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.core.hook;
+package org.dromara.hmily.common.hook;
 
 import java.util.HashSet;
 import java.util.Set;

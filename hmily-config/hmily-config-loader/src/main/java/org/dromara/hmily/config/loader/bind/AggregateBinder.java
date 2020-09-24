@@ -39,21 +39,21 @@ public abstract class AggregateBinder<T> {
     private Binder.Env env;
     
     /**
-     * Gets env.
-     *
-     * @return the env
-     */
-    Binder.Env getEnv() {
-        return env;
-    }
-    
-    /**
      * Instantiates a new Aggregate binder.
      *
      * @param env the env
      */
     AggregateBinder(final Binder.Env env) {
         this.env = env;
+    }
+    
+    /**
+     * Gets env.
+     *
+     * @return the env
+     */
+    Binder.Env getEnv() {
+        return env;
     }
     
     /**
@@ -138,7 +138,7 @@ public abstract class AggregateBinder<T> {
          *
          * @param supplier the supplier
          */
-        public AggregateSupplier(Supplier<T> supplier) {
+        public AggregateSupplier(final Supplier<T> supplier) {
             this.supplier = supplier;
         }
     

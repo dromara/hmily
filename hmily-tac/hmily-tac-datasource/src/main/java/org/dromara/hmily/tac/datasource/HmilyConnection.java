@@ -34,7 +34,7 @@ public class HmilyConnection extends AbstractHmilyConnection {
      * @param hmilyDatasource  the hmily datasource
      * @param targetConnection the target connection
      */
-    public HmilyConnection(HmilyTacDatasource hmilyDatasource, Connection targetConnection) {
+    public HmilyConnection(final HmilyTacDatasource hmilyDatasource, final Connection targetConnection) {
         super(hmilyDatasource, targetConnection);
     }
     
@@ -49,21 +49,20 @@ public class HmilyConnection extends AbstractHmilyConnection {
         }
     }
 
-    private void doCommit() throws SQLException {
-        targetConnection.commit();
-    }
-
     @Override
     public void rollback() throws SQLException {
-        targetConnection.rollback();
+        getTargetConnection().rollback();
     }
 
     @Override
-    public void setAutoCommit(boolean autoCommit) throws SQLException {
+    public void setAutoCommit(final boolean autoCommit) throws SQLException {
         if (autoCommit && !getAutoCommit()) {
-            // change autocommit from false to true, we should commit() first according to JDBC spec.
             doCommit();
         }
-        targetConnection.setAutoCommit(autoCommit);
+        getTargetConnection().setAutoCommit(autoCommit);
+    }
+    
+    private void doCommit() throws SQLException {
+        getTargetConnection().commit();
     }
 }

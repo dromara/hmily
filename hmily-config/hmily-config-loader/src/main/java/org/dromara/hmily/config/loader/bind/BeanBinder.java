@@ -19,7 +19,6 @@
 
 package org.dromara.hmily.config.loader.bind;
 
-
 import org.dromara.hmily.config.loader.property.PropertyName;
 
 /**

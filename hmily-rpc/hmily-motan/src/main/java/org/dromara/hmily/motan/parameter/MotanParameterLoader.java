@@ -37,13 +37,15 @@ public class MotanParameterLoader implements RpcParameterLoader {
     
     @Override
     public HmilyTransactionContext load() {
-       return Optional.ofNullable(RpcMediator.getInstance().acquire(key -> {
+        return Optional.ofNullable(RpcMediator.getInstance().acquire(key -> {
             final Request request = RpcContext.getContext().getRequest();
-            final Map<String, String> attachments = request.getAttachments();
-            if (attachments != null && !attachments.isEmpty()) {
-                return attachments.get(key);
-            }
-            return "";
+            return Optional.ofNullable(request).map(r -> {
+                final Map<String, String> attachments = request.getAttachments();
+                if (attachments != null && !attachments.isEmpty()) {
+                    return attachments.get(key);
+                }
+                return "";
+            }).orElse("");
         })).orElse(HmilyContextHolder.get());
     }
 }

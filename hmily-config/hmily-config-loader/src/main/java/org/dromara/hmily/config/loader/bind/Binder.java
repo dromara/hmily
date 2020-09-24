@@ -33,7 +33,7 @@ import org.dromara.hmily.config.loader.property.PropertyName;
  *
  * @author xiaoyu
  */
-public class Binder {
+public final class Binder {
 
     private final BeanBinder beanBinder = new JavaBeanBinder();
     
@@ -74,7 +74,7 @@ public class Binder {
      * @return the t
      */
     @SuppressWarnings("unchecked")
-    public <T> T bind(PropertyName propertyName, BindData<T> target) {
+    public <T> T bind(final PropertyName propertyName, final BindData<T> target) {
         Env env = new Env();
         return (T) bind(propertyName, target, env, false);
     }
@@ -90,11 +90,11 @@ public class Binder {
      * @param allowRecursiveBinding the allow recursive binding
      * @return the object
      */
-    protected final <T> Object bind(PropertyName name, BindData<T> target, Env env, boolean allowRecursiveBinding) {
+    protected <T> Object bind(final PropertyName name, final BindData<T> target, final Env env, final boolean allowRecursiveBinding) {
         return bindObject(name, target, env, allowRecursiveBinding);
     }
 
-    private <T> Object bindObject(PropertyName propertyName, BindData<T> target, Env env, boolean allowRecursiveBinding) {
+    private <T> Object bindObject(final PropertyName propertyName, final BindData<T> target, final Env env, final boolean allowRecursiveBinding) {
         ConfigProperty property = findProperty(propertyName, env);
 
         //查找属性，并判断不是一个属结点.
@@ -122,8 +122,7 @@ public class Binder {
         return bindBean(propertyName, target, allowRecursiveBinding, env);
     }
 
-    private <T> Object bindAggregate(PropertyName name, BindData<T> target,
-                                     AggregateBinder<?> aggregateBinder, Env env) {
+    private <T> Object bindAggregate(final PropertyName name, final BindData<T> target, final AggregateBinder<?> aggregateBinder, final Env env) {
         AggregateElementBinder elementBinder = (itemName, itemTarget, source) -> {
             boolean allowRecursiveBinding = aggregateBinder.isAllowRecursiveBinding(source);
             Supplier<?> value = () -> bind(itemName, itemTarget, env, allowRecursiveBinding);
@@ -138,7 +137,7 @@ public class Binder {
         return ConvertUtils.convert(value, target.getType().getTypeClass());
     }
 
-    private <T> Object bindBean(final PropertyName name, final BindData<T> target, final boolean allowRecursiveBinding, Env env) {
+    private <T> Object bindBean(final PropertyName name, final BindData<T> target, final boolean allowRecursiveBinding, final Env env) {
         if (containsNoDescendantOf(env, name)
                 || isUnbindableBean(name, target, env)) {
             return null;
@@ -153,12 +152,10 @@ public class Binder {
     }
 
     private boolean containsNoDescendantOf(final Env env, final PropertyName name) {
-        
         return env.getSource().containsDescendantOf(name);
     }
 
-    private boolean isUnbindableBean(final PropertyName name, BindData<?> target,  Env env) {
-        
+    private boolean isUnbindableBean(final PropertyName name, final BindData<?> target, final Env env) {
         if (env.getSource().containsDescendantOf(name)) {
             return false;
         }
@@ -166,11 +163,11 @@ public class Binder {
         return packageName.startsWith("java.");
     }
 
-    private AggregateBinder<?> getAggregateBinder(BindData<?> target, Env env) {
+    private AggregateBinder<?> getAggregateBinder(final BindData<?> target, final Env env) {
         return AggregateBinder.binder(target, env);
     }
 
-    private static ConfigProperty findProperty(PropertyName propertyName, Env env) {
+    private static ConfigProperty findProperty(final PropertyName propertyName, final Env env) {
         if (propertyName.isEmpty()) {
             return null;
         }

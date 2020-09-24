@@ -39,7 +39,7 @@ import org.yaml.snakeyaml.representer.Representer;
 import org.yaml.snakeyaml.resolver.Resolver;
 
 /**
- * Class to load {@code .yml} files into a map of {@code String} to
+ * Class to load {@code .yml} files into a map of {@code String} to.
  *
  * @author xiaoyu
  */
@@ -47,6 +47,11 @@ public class OriginTrackedYamlLoader extends YamlProcessor {
     
     private final InputStream resource;
     
+    /**
+     * Instantiates a new Origin tracked yaml loader.
+     *
+     * @param resource the resource
+     */
     public OriginTrackedYamlLoader(final InputStream resource) {
         this.resource = resource;
         setResources(resource);
@@ -63,6 +68,11 @@ public class OriginTrackedYamlLoader extends YamlProcessor {
         return new Yaml(constructor, representer, dumperOptions, loaderOptions, resolver);
     }
     
+    /**
+     * Load list.
+     *
+     * @return the list
+     */
     public List<Map<String, Object>> load() {
         final List<Map<String, Object>> result = new ArrayList<>();
         process((properties, map) -> result.add(getFlattenedMap(map)));
@@ -90,25 +100,35 @@ public class OriginTrackedYamlLoader extends YamlProcessor {
             node.setValue(node.getValue().stream().map(KeyScalarNode::get).collect(Collectors.toList()));
         }
         
-        private Object constructTrackedObject(final Node node, Object value) {
+        private Object constructTrackedObject(final Node node, final Object value) {
             return value;
         }
         
         private Object getValue(final Object value) {
-            return (value != null ? value : "");
+            return value != null ? value : "";
         }
-        
     }
     
     /**
      * {@link ScalarNode} that replaces the key node in a {@link NodeTuple}.
      */
     private static class KeyScalarNode extends ScalarNode {
-        
-        public KeyScalarNode(final ScalarNode node) {
+    
+        /**
+         * Instantiates a new Key scalar node.
+         *
+         * @param node the node
+         */
+        KeyScalarNode(final ScalarNode node) {
             super(node.getTag(), true, node.getValue(), node.getStartMark(), node.getEndMark(), node.getStyle());
         }
-        
+    
+        /**
+         * Get node tuple.
+         *
+         * @param nodeTuple the node tuple
+         * @return the node tuple
+         */
         public static NodeTuple get(final NodeTuple nodeTuple) {
             Node keyNode = nodeTuple.getKeyNode();
             Node valueNode = nodeTuple.getValueNode();

@@ -19,8 +19,8 @@ logging:
         root: error
         org.springframework.web: info
         org.apache.ibatis: debug
-        org.dromara.hmily.bonuspoint: debug
-        org.dromara.hmily.lottery: debug
-        org.dromara.hmily: debug
+        org.dromara.hmily.demo.bonuspoint: debug
+        org.dromara.hmily.demo.lottery: debug
+        org.dromara.hmily.demo: debug
     path: "./logs"
 

@@ -73,17 +73,6 @@ public abstract class YamlProcessor {
             }
         }
     }
-    
-    /**
-     * Create yaml yaml.
-     *
-     * @return the yaml
-     */
-    protected Yaml createYaml() {
-        LoaderOptions options = new LoaderOptions();
-        options.setAllowDuplicateKeys(false);
-        return new Yaml(options);
-    }
 
     private boolean process(final MatchCallback callback, final Yaml yaml, final InputStream resource) {
         int count = 0;
@@ -101,51 +90,15 @@ public abstract class YamlProcessor {
                     }
                 }
                 if (logger.isDebugEnabled()) {
-                    logger.debug("Loaded " + count + " document" + (count > 1 ? "s" : "") +
-                            " from YAML resource: " + resource);
+                    logger.debug("Loaded " + count + " document" + (count > 1 ? "s" : "") + " from YAML resource: " + resource);
                 }
             }
         } catch (IOException ex) {
             handleProcessError(resource, ex);
         }
-        return (count > 0);
+        return count > 0;
     }
-
-    private void handleProcessError(final InputStream resource, final IOException ex) {
-        if (this.resolutionMethod != ResolutionMethod.FIRST_FOUND &&
-                this.resolutionMethod != ResolutionMethod.OVERRIDE_AND_IGNORE) {
-            throw new IllegalStateException(ex);
-        }
-        if (logger.isWarnEnabled()) {
-            logger.warn("Could not load map from " + resource + ": " + ex.getMessage());
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    private Map<String, Object> asMap(final Object object) {
-        // YAML can have numbers as keys
-        Map<String, Object> result = new LinkedHashMap<>();
-        if (!(object instanceof Map)) {
-            // A document can be a text literal
-            result.put("document", object);
-            return result;
-        }
-
-        Map<Object, Object> map = (Map<Object, Object>) object;
-        map.forEach((key, value) -> {
-            if (value instanceof Map) {
-                value = asMap(value);
-            }
-            if (key instanceof CharSequence) {
-                result.put(key.toString(), value);
-            } else {
-                // It has to be a map key in this case
-                result.put("[" + key.toString() + "]", value);
-            }
-        });
-        return result;
-    }
-
+    
     private boolean process(final Map<String, Object> map, final MatchCallback callback) {
         Properties properties = new Properties();
         properties.putAll(getFlattenedMap(map));
@@ -180,6 +133,46 @@ public abstract class YamlProcessor {
             logger.debug("Unmatched document: " + map);
         }
         return false;
+    }
+    
+    protected Yaml createYaml() {
+        LoaderOptions options = new LoaderOptions();
+        options.setAllowDuplicateKeys(false);
+        return new Yaml(options);
+    }
+    
+    private void handleProcessError(final InputStream resource, final IOException ex) {
+        if (this.resolutionMethod != ResolutionMethod.FIRST_FOUND && this.resolutionMethod != ResolutionMethod.OVERRIDE_AND_IGNORE) {
+            throw new IllegalStateException(ex);
+        }
+        if (logger.isWarnEnabled()) {
+            logger.warn("Could not load map from " + resource + ": " + ex.getMessage());
+        }
+    }
+    
+    @SuppressWarnings("unchecked")
+    private Map<String, Object> asMap(final Object object) {
+        // YAML can have numbers as keys
+        Map<String, Object> result = new LinkedHashMap<>();
+        if (!(object instanceof Map)) {
+            // A document can be a text literal
+            result.put("document", object);
+            return result;
+        }
+        
+        Map<Object, Object> map = (Map<Object, Object>) object;
+        map.forEach((key, value) -> {
+            if (value instanceof Map) {
+                value = asMap(value);
+            }
+            if (key instanceof CharSequence) {
+                result.put(key.toString(), value);
+            } else {
+                // It has to be a map key in this case
+                result.put("[" + key.toString() + "]", value);
+            }
+        });
+        return result;
     }
     
     /**
@@ -224,7 +217,7 @@ public abstract class YamlProcessor {
                     }
                 }
             } else {
-                result.put(key, (value != null ? value : ""));
+                result.put(key, value != null ? value : "");
             }
         });
     }
@@ -261,7 +254,7 @@ public abstract class YamlProcessor {
     
     
     /**
-     * Status returned from {@link DocumentMatcher#matches(Properties)}
+     * Status returned from {@link DocumentMatcher#matches(Properties)}.
      */
     public enum MatchStatus {
     
@@ -282,8 +275,8 @@ public abstract class YamlProcessor {
          * @param b the b
          * @return the most specific
          */
-        public static MatchStatus getMostSpecific(MatchStatus a, MatchStatus b) {
-            return (a.ordinal() < b.ordinal() ? a : b);
+        public static MatchStatus getMostSpecific(final MatchStatus a, final MatchStatus b) {
+            return a.ordinal() < b.ordinal() ? a : b;
         }
     }
     
@@ -308,5 +301,4 @@ public abstract class YamlProcessor {
          */
         FIRST_FOUND
     }
-    
 }

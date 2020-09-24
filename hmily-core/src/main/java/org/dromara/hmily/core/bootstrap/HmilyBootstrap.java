@@ -29,7 +29,7 @@ import org.dromara.hmily.config.loader.ConfigLoader;
 import org.dromara.hmily.config.loader.ServerConfigLoader;
 import org.dromara.hmily.core.disruptor.publisher.HmilyRepositoryEventPublisher;
 import org.dromara.hmily.core.holder.SingletonHolder;
-import org.dromara.hmily.core.hook.HmilyShutdownHook;
+import org.dromara.hmily.common.hook.HmilyShutdownHook;
 import org.dromara.hmily.core.logo.HmilyLogo;
 import org.dromara.hmily.core.provide.ObjectProvide;
 import org.dromara.hmily.core.provide.ReflectObject;

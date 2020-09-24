@@ -25,6 +25,7 @@ import java.sql.Statement;
 import javax.sql.rowset.CachedRowSet;
 import javax.sql.rowset.RowSetProvider;
 import lombok.Getter;
+import lombok.Setter;
 
 
 /**
@@ -35,24 +36,35 @@ import lombok.Getter;
  * @author xiaoyu
  */
 @Getter
+@Setter
 public abstract class AbstractHmilyStatement<T extends Statement> implements Statement {
     
     /**
      * The Connection wrapper.
      */
-    protected AbstractHmilyConnection connectionWrapper;
+    private AbstractHmilyConnection connectionWrapper;
     
     /**
      * The Target statement.
      */
-    protected T targetStatement;
+    private T targetStatement;
     
     private CachedRowSet generatedKeysRowSet;
     
     /**
      * The Target sql.
      */
-    protected String targetSQL;
+    private String targetSQL;
+    
+    /**
+     * Instantiates a new Abstract hmily statement.
+     *
+     * @param hmilyConnection the hmily connection
+     * @param targetStatement the target statement
+     */
+    public AbstractHmilyStatement(final HmilyConnection hmilyConnection, final T targetStatement) {
+        this(hmilyConnection, targetStatement, null);
+    }
     
     /**
      * Instantiates a new Abstract hmily statement.
@@ -67,17 +79,6 @@ public abstract class AbstractHmilyStatement<T extends Statement> implements Sta
         this.targetSQL = targetSQL;
     }
     
-    /**
-     * Instantiates a new Abstract hmily statement.
-     *
-     * @param hmilyConnection the hmily connection
-     * @param targetStatement the target statement
-     */
-    public AbstractHmilyStatement(final HmilyConnection hmilyConnection, final T targetStatement) {
-        this(hmilyConnection, targetStatement, null);
-    }
-    
-
     @Override
     public void close() throws SQLException {
         targetStatement.close();
@@ -114,7 +115,7 @@ public abstract class AbstractHmilyStatement<T extends Statement> implements Sta
     }
 
     @Override
-    public void setQueryTimeout(int seconds) throws SQLException {
+    public void setQueryTimeout(final int seconds) throws SQLException {
         targetStatement.setQueryTimeout(seconds);
     }
 
@@ -152,11 +153,15 @@ public abstract class AbstractHmilyStatement<T extends Statement> implements Sta
     public boolean getMoreResults() throws SQLException {
         return targetStatement.getMoreResults();
     }
+    
+    @Override
+    public boolean getMoreResults(final int current) throws SQLException {
+        return targetStatement.getMoreResults(current);
+    }
 
     @Override
     public void setFetchDirection(final int direction) throws SQLException {
         targetStatement.setFetchDirection(direction);
-
     }
 
     @Override
@@ -167,7 +172,6 @@ public abstract class AbstractHmilyStatement<T extends Statement> implements Sta
     @Override
     public void setFetchSize(final int rows) throws SQLException {
         targetStatement.setFetchSize(rows);
-
     }
 
     @Override
@@ -207,11 +211,6 @@ public abstract class AbstractHmilyStatement<T extends Statement> implements Sta
     }
 
     @Override
-    public boolean getMoreResults(final int current) throws SQLException {
-        return targetStatement.getMoreResults(current);
-    }
-
-    @Override
     public ResultSet getGeneratedKeys() throws SQLException {
         if (generatedKeysRowSet != null) {
             return generatedKeysRowSet;
@@ -235,7 +234,6 @@ public abstract class AbstractHmilyStatement<T extends Statement> implements Sta
     @Override
     public void setPoolable(final boolean poolable) throws SQLException {
         targetStatement.setPoolable(poolable);
-
     }
 
     @Override
@@ -246,7 +244,6 @@ public abstract class AbstractHmilyStatement<T extends Statement> implements Sta
     @Override
     public void closeOnCompletion() throws SQLException {
         targetStatement.closeOnCompletion();
-
     }
 
     @Override
@@ -255,7 +252,7 @@ public abstract class AbstractHmilyStatement<T extends Statement> implements Sta
     }
 
     @Override
-    public <t> t unwrap(final Class<t> clazz) throws SQLException {
+    public <E> E unwrap(final Class<E> clazz) throws SQLException {
         return targetStatement.unwrap(clazz);
     }
 

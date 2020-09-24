@@ -17,13 +17,14 @@
 
 package org.dromara.hmily.repository.redis.jedis;
 
+import java.util.Map;
 import java.util.Set;
 import redis.clients.jedis.JedisCluster;
 
 /**
  * JedisClientCluster.
  *
- * @author xiaoyu(Myth)
+ * @author xiaoyu(Myth)、dzc
  */
 public class JedisClientCluster implements JedisClient {
     
@@ -74,8 +75,18 @@ public class JedisClientCluster implements JedisClient {
     }
     
     @Override
+    public Long hset(final byte[] key, final byte[] field, final byte[] value) {
+        return jedisCluster.hset(key, field, value);
+    }
+    
+    @Override
     public String hget(final String key, final String item) {
         return jedisCluster.hget(key, item);
+    }
+    
+    @Override
+    public byte[] hget(final byte[] key, final byte[] field) {
+        return jedisCluster.hget(key, field);
     }
     
     @Override
@@ -103,4 +114,13 @@ public class JedisClientCluster implements JedisClient {
         return jedisCluster.zrange(key, start, end);
     }
     
+    @Override
+    public Map<byte[], byte[]> hgetAll(final byte[] key) {
+        return jedisCluster.hgetAll(key);
+    }
+    
+    @Override
+    public boolean hexists(final byte[] key, final byte[] field) {
+        return jedisCluster.hexists(key, field);
+    }
 }

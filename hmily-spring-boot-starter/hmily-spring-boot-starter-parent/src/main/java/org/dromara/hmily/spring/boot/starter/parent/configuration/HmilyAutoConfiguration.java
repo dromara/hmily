@@ -18,8 +18,11 @@
 package org.dromara.hmily.spring.boot.starter.parent.configuration;
 
 import org.dromara.hmily.spring.HmilyApplicationContextAware;
+import org.dromara.hmily.spring.annotation.RefererAnnotationBeanPostProcessor;
 import org.dromara.hmily.spring.aop.SpringHmilyTransactionAspect;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
@@ -42,6 +45,17 @@ public class HmilyAutoConfiguration {
     @Bean
     public SpringHmilyTransactionAspect hmilyTransactionAspect() {
         return new SpringHmilyTransactionAspect();
+    }
+    
+    /**
+     * Referer annotation bean post processor referer annotation bean post processor.
+     *
+     * @return the referer annotation bean post processor
+     */
+    @Bean
+    @ConditionalOnProperty(value = "hmily.support.rpc.annotation", havingValue = "true")
+    public BeanPostProcessor refererAnnotationBeanPostProcessor() {
+        return new RefererAnnotationBeanPostProcessor();
     }
     
     /**

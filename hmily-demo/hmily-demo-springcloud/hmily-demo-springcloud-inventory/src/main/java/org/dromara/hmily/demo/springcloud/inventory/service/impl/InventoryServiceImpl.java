@@ -36,10 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service("inventoryService")
 public class InventoryServiceImpl implements InventoryService {
-
-    /**
-     * logger.
-     */
+    
     private static final Logger LOGGER = LoggerFactory.getLogger(InventoryServiceImpl.class);
 
     private final InventoryMapper inventoryMapper;
@@ -59,11 +56,17 @@ public class InventoryServiceImpl implements InventoryService {
     @Override
     @HmilyTCC(confirmMethod = "confirmMethod", cancelMethod = "cancelMethod")
     public Boolean decrease(InventoryDTO inventoryDTO) {
-        LOGGER.info("==========springcloud调用扣减库存decrease===========");
+        LOGGER.info("==========try扣减库存decrease===========");
         inventoryMapper.decrease(inventoryDTO);
         return true;
     }
-
+    
+    @Override
+    public Boolean testDecrease(InventoryDTO inventoryDTO) {
+        inventoryMapper.testDecrease(inventoryDTO);
+        return true;
+    }
+    
     /**
      * 获取商品库存信息.
      *
@@ -124,18 +127,14 @@ public class InventoryServiceImpl implements InventoryService {
         return true;
         // throw new TccRuntimeException("库存扣减确认异常！");
     }
-
-
+    
     public Boolean confirmMethod(InventoryDTO inventoryDTO) {
-        LOGGER.info("==========Springcloud调用扣减库存确认方法===========");
-        final int rows = inventoryMapper.confirm(inventoryDTO);
-        return true;
+        LOGGER.info("==========confirmMethod库存确认方法===========");
+        return inventoryMapper.confirm(inventoryDTO) > 0;
     }
 
     public Boolean cancelMethod(InventoryDTO inventoryDTO) {
-        LOGGER.info("==========Springcloud调用扣减库存取消方法===========");
-        int rows = inventoryMapper.cancel(inventoryDTO);
-        return true;
+        LOGGER.info("==========cancelMethod库存取消方法===========");
+        return inventoryMapper.cancel(inventoryDTO) > 0;
     }
-
 }

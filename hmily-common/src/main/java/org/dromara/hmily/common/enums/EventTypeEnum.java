@@ -46,11 +46,9 @@ public enum EventTypeEnum {
     
     REMOVE_HMILY_PARTICIPANT_UNDO(30, "删除undo日志"),
     
-    /**
-     * Delete coordinator action enum.
-     */
-    DELETE(20, "删除"),
-
+    CREATE_HMILY_PARTICIPANT_UNDO(31, "创建undo日志"),
+    
+  
     /**
      * Update coordinator action enum.
      */

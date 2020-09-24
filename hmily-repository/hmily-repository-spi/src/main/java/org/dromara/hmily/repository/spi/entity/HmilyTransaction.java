@@ -86,7 +86,6 @@ public class HmilyTransaction implements Serializable {
         this.createTime = new Date();
         this.updateTime = new Date();
         hmilyParticipants = new CopyOnWriteArrayList<>();
-
     }
     
     /**
@@ -98,7 +97,7 @@ public class HmilyTransaction implements Serializable {
         this.transId = transId;
         this.createTime = new Date();
         this.updateTime = new Date();
-        hmilyParticipants = new CopyOnWriteArrayList<>();;
+        hmilyParticipants = new CopyOnWriteArrayList<>();
     }
     
     /**
@@ -120,5 +119,4 @@ public class HmilyTransaction implements Serializable {
     public void registerParticipantList(final List<HmilyParticipant> hmilyParticipantList) {
         hmilyParticipants.addAll(hmilyParticipantList);
     }
-    
 }

@@ -24,6 +24,11 @@ hmily:
     storeDays: 3
     repository: mysql
 
+remote:
+  zookeeper:
+    serverList: 127.0.0.1:2181
+    fileExtension: yml
+    path: /hmily/xiaoyu
 repository:
   database:
     driverClassName: com.mysql.jdbc.Driver

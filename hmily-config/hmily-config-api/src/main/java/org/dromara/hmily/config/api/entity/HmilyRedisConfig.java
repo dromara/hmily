@@ -31,9 +31,9 @@ import org.dromara.hmily.spi.HmilySPI;
 @HmilySPI("hmilyRedisConfig")
 public class HmilyRedisConfig extends AbstractConfig {
 
-    private boolean cluster = false;
+    private boolean cluster;
 
-    private boolean sentinel = false;
+    private boolean sentinel;
 
     /**
      * cluster url example:ip:port;ip:port.
@@ -67,13 +67,13 @@ public class HmilyRedisConfig extends AbstractConfig {
 
     private int numTestsPerEvictionRun = 3;
 
-    private boolean testOnCreate = false;
+    private boolean testOnCreate;
 
-    private boolean testOnBorrow = false;
+    private boolean testOnBorrow;
 
-    private boolean testOnReturn = false;
+    private boolean testOnReturn;
 
-    private boolean testWhileIdle = false;
+    private boolean testWhileIdle;
 
     private long timeBetweenEvictionRunsMillis = -1;
 

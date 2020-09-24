@@ -64,13 +64,13 @@ public class HmilyTacDatasource extends AbstractHmilyDataSource implements Hmily
     
     @Override
     public Connection getConnection() throws SQLException {
-        Connection targetConnection = targetDataSource.getConnection();
+        Connection targetConnection = getTargetDataSource().getConnection();
         return new HmilyConnection(this, targetConnection);
     }
     
     @Override
     public Connection getConnection(final String username, final String password) throws SQLException {
-        Connection targetConnection = targetDataSource.getConnection(username, password);
+        Connection targetConnection = getTargetDataSource().getConnection(username, password);
         return new HmilyConnection(this, targetConnection);
     }
 }

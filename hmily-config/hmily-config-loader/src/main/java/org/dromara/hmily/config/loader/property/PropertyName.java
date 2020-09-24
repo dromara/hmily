@@ -40,7 +40,7 @@ import org.slf4j.LoggerFactory;
 @Data
 public class PropertyName {
 
-    private static final Logger logger = LoggerFactory.getLogger(PropertyName.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PropertyName.class);
 
     private static final PropertyName EMPTY = new PropertyName(new String[0]);
 
@@ -232,7 +232,7 @@ public class PropertyName {
      */
     public String getLastElement() {
         int elementSize = getElementSize();
-        return (elementSize != 0 ? getElement(elementSize - 1) : "");
+        return elementSize != 0 ? getElement(elementSize - 1) : "";
     }
     
     /**
@@ -251,17 +251,17 @@ public class PropertyName {
     private static boolean isIndexed(final CharSequence element) {
         return element.charAt(0) == '[' && possibleIsIndexed(element);
     }
-
-    private static boolean possibleIsIndexed(final CharSequence element) {
-        return element.charAt(element.length() - 1) == ']';
-    }
-
+    
     /**
      * Whether the parameter of the index type list array.
      */
     private boolean isIndexed(final int index) {
         String element = getElement(index);
         return isIndexed(element);
+    }
+    
+    private static boolean possibleIsIndexed(final CharSequence element) {
+        return element.charAt(element.length() - 1) == ']';
     }
     
     /**
@@ -275,8 +275,8 @@ public class PropertyName {
             return this;
         }
         process(elementValue, (e, indexed) -> {
-            if (StringUtils.isBlank(e.get()) && logger.isDebugEnabled()) {
-                logger.debug("{} Did not find the corresponding property.", elementValue);
+            if (StringUtils.isBlank(e.get()) && LOGGER.isDebugEnabled()) {
+                LOGGER.debug("{} Did not find the corresponding property.", elementValue);
             }
         });
         if (!isIndexed(elementValue)) {
@@ -301,8 +301,7 @@ public class PropertyName {
             return false;
         }
         PropertyName that = (PropertyName) o;
-        return Objects.equals(name, that.name) &&
-                Arrays.equals(elements, that.elements);
+        return Objects.equals(name, that.name) && Arrays.equals(elements, that.elements);
     }
 
     @Override

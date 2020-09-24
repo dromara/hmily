@@ -87,12 +87,37 @@ public class HmilyRepositoryStorage {
     }
     
     /**
+     * Remove hmily transaction.
+     *
+     * @param hmilyTransaction the hmily transaction
+     */
+    public static void removeHmilyTransaction(final HmilyTransaction hmilyTransaction) {
+        if (Objects.nonNull(hmilyTransaction)) {
+            PUBLISHER.asyncPublishEvent(hmilyTransaction, EventTypeEnum.REMOVE_HMILY_TRANSACTION.getCode());
+        }
+    }
+    
+    
+    /**
+     * Create hmily participant undo.
+     *
+     * @param hmilyParticipantUndo the hmily participant undo
+     */
+    public static void createHmilyParticipantUndo(final HmilyParticipantUndo hmilyParticipantUndo) {
+        if (Objects.nonNull(hmilyParticipantUndo)) {
+            PUBLISHER.publishEvent(hmilyParticipantUndo, EventTypeEnum.CREATE_HMILY_PARTICIPANT_UNDO.getCode());
+        }
+    }
+    
+    /**
      * Remove hmily participant undo.
      *
      * @param hmilyParticipantUndo the hmily participant undo
      */
     public static void removeHmilyParticipantUndo(final HmilyParticipantUndo hmilyParticipantUndo) {
-        PUBLISHER.publishEvent(hmilyParticipantUndo, EventTypeEnum.REMOVE_HMILY_PARTICIPANT_UNDO.getCode());
+        if (Objects.nonNull(hmilyParticipantUndo)) {
+            PUBLISHER.publishEvent(hmilyParticipantUndo, EventTypeEnum.REMOVE_HMILY_PARTICIPANT_UNDO.getCode());
+        }
     }
     
 }

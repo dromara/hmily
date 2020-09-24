@@ -42,10 +42,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 @Service("inventoryService")
 public class InventoryServiceImpl implements InventoryService {
-
-    /**
-     * logger.
-     */
+    
     private static final Logger LOGGER = LoggerFactory.getLogger(InventoryServiceImpl.class);
 
     private static AtomicInteger tryCount = new AtomicInteger(0);
@@ -109,11 +106,10 @@ public class InventoryServiceImpl implements InventoryService {
         System.out.println("cancelTest in line for rpc.......");
         return new ArrayList<>();
     }
-
-
+    
     @Override
     public Boolean testDecrease(InventoryDTO inventoryDTO) {
-        inventoryMapper.decrease(inventoryDTO);
+        inventoryMapper.testDecrease(inventoryDTO);
         return true;
     }
 
@@ -153,21 +149,10 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     @Override
-    @HmilyTCC(confirmMethod = "confirmMethodException", cancelMethod = "cancelMethod")
-    @Transactional(rollbackFor = Exception.class)
-    public String mockWithConfirmException(InventoryDTO inventoryDTO) {
-        final int decrease = inventoryMapper.decrease(inventoryDTO);
-        if (decrease != 1) {
-            throw new HmilyRuntimeException("库存不足");
-        }
-        return "success";
-    }
-
-    @Override
     @HmilyTCC(confirmMethod = "confirmMethodTimeout", cancelMethod = "cancelMethod")
     @Transactional(rollbackFor = Exception.class)
     public Boolean mockWithConfirmTimeout(InventoryDTO inventoryDTO) {
-        LOGGER.info("==========调用扣减库存确认方法mockWithConfirmTimeout===========");
+        LOGGER.info("==========调用扣减库存try mockWithConfirmTimeout===========");
         final int decrease = inventoryMapper.decrease(inventoryDTO);
         if (decrease != 1) {
             throw new HmilyRuntimeException("库存不足");
@@ -190,7 +175,7 @@ public class InventoryServiceImpl implements InventoryService {
             e.printStackTrace();
         }
         LOGGER.info("==========调用扣减库存确认方法===========");
-        inventoryMapper.decrease(inventoryDTO);
+        inventoryMapper.confirm(inventoryDTO);
         return true;
     }
 

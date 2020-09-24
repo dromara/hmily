@@ -20,6 +20,7 @@
 package org.dromara.hmily.config.loader.property;
 
 import java.util.Set;
+import lombok.Getter;
 
 /**
  * The type Property key source.
@@ -27,26 +28,18 @@ import java.util.Set;
  * @param <T> the type parameter
  * @author xiaoyu
  */
+@Getter
 public abstract class PropertyKeySource<T> {
     
     /**
      * The Name.
      */
-    protected final String name;
+    private String name;
     
     /**
      * The Source.
      */
-    protected final T source;
-    
-    /**
-     * Gets source.
-     *
-     * @return the source
-     */
-    public T getSource() {
-        return source;
-    }
+    private T source;
     
     /**
      * Instantiates a new Property key source.

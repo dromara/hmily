@@ -17,9 +17,7 @@
 
 package org.dromara.hmily.dubbo.filter;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
 import org.apache.dubbo.common.Constants;
@@ -30,8 +28,7 @@ import org.apache.dubbo.rpc.Invoker;
 import org.apache.dubbo.rpc.Result;
 import org.apache.dubbo.rpc.RpcContext;
 import org.apache.dubbo.rpc.RpcException;
-import org.dromara.hmily.annotation.HmilyTAC;
-import org.dromara.hmily.annotation.HmilyTCC;
+import org.dromara.hmily.annotation.Hmily;
 import org.dromara.hmily.common.enums.HmilyActionEnum;
 import org.dromara.hmily.common.enums.HmilyRoleEnum;
 import org.dromara.hmily.common.exception.HmilyRuntimeException;
@@ -64,24 +61,22 @@ public class DubboHmilyTransactionFilter implements Filter {
         }
         Class<?> clazz = invoker.getInterface();
         Class<?>[] args = invocation.getParameterTypes();
-        final Object[] arguments = invocation.getArguments();
         String methodName = invocation.getMethodName();
         try {
-            converterParamsClass(args, arguments);
             Method method = clazz.getMethod(methodName, args);
-            Annotation[] annotations = method.getAnnotations();
-            boolean match = Arrays.stream(annotations)
-                    .anyMatch(annotation -> annotation.annotationType().equals(HmilyTCC.class)
-                            || annotation.annotationType().equals(HmilyTAC.class));
-            if (!match) {
+            Hmily hmily = method.getAnnotation(Hmily.class);
+            if (Objects.isNull(hmily)) {
                 return invoker.invoke(invocation);
             }
         } catch (Exception ex) {
             LogUtil.error(LOGGER, "hmily find method error {} ", ex::getMessage);
+            return invoker.invoke(invocation);
         }
+        final Object[] arguments = invocation.getArguments();
+        converterParamsClass(args, arguments);
         Long participantId = context.getParticipantId();
         final HmilyParticipant hmilyParticipant = buildParticipant(context, invoker, invocation);
-        Optional.ofNullable(hmilyParticipant).ifPresent(h -> context.setParticipantId(h.getParticipantId()));
+        Optional.ofNullable(hmilyParticipant).ifPresent(participant -> context.setParticipantId(participant.getParticipantId()));
         if (context.getRole() == HmilyRoleEnum.PARTICIPANT.getCode()) {
             context.setParticipantRefId(participantId);
         }

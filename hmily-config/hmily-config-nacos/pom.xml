@@ -28,5 +28,16 @@
 
     <artifactId>hmily-config-nacos</artifactId>
 
-
+    <dependencies>
+        <dependency>
+            <groupId>org.dromara</groupId>
+            <artifactId>hmily-config-loader</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.alibaba.nacos</groupId>
+            <artifactId>nacos-client</artifactId>
+            <version>1.1.3</version>
+        </dependency>
+    </dependencies>
 </project>

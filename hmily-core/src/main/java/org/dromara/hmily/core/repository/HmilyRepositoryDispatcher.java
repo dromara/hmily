@@ -70,6 +70,9 @@ public final class HmilyRepositoryDispatcher {
             case REMOVE_HMILY_PARTICIPANT:
                 HmilyRepositoryFacade.getInstance().removeHmilyParticipant(hmilyParticipant.getParticipantId());
                 break;
+            case CREATE_HMILY_PARTICIPANT_UNDO:
+                HmilyRepositoryFacade.getInstance().createHmilyParticipantUndo(hmilyParticipantUndo);
+                break;
             case REMOVE_HMILY_PARTICIPANT_UNDO:
                 HmilyRepositoryFacade.getInstance().removeHmilyParticipantUndo(hmilyParticipantUndo.getUndoId());
                 break;
