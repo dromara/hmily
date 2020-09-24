@@ -43,7 +43,7 @@ public class EtcdClient {
      * @return the input stream
      */
     public InputStream pull(final EtcdConfig config) {
-        Client client = Client.builder().endpoints(config.getServer()).build();
+        client = Client.builder().endpoints(config.getServer()).build();
         try {
             CompletableFuture<GetResponse> future = client.getKVClient().get(ByteSequence.fromString(config.getKey()));
             List<KeyValue> kvs;
@@ -77,35 +77,45 @@ public class EtcdClient {
      * @throws InterruptedException exception
      */
     void addListener(final Supplier<ConfigLoader.Context> context, final ConfigLoader.PassiveHandler<EtcdPassiveConfig> passiveHandler, final EtcdConfig config) throws InterruptedException {
-        if (!config.isPassive()) {
-            return;
-        }
+//        if (!config.isPassive()) {
+//            return;
+//        }
         if (client == null) {
             LOGGER.warn("Etcd client is null...");
         }
-        client.getWatchClient().watch(ByteSequence.fromString(config.getKey())).listen().getEvents().stream().forEach(watchEvent -> {
-            WatchEvent.EventType eventType = watchEvent.getEventType();
-            KeyValue keyValue = watchEvent.getKeyValue();
-            KeyValue prevKV = watchEvent.getPrevKV();
-            EventData eventData = null;
-            switch (eventType) {
-                case PUT:
-                    eventData = new AddData(keyValue.getKey().toStringUtf8(), keyValue.getValue().toStringUtf8());
-                    break;
-                case DELETE:
-                    eventData = new RemoveData(prevKV.getKey().toStringUtf8(), null);
-                    break;
-                default:
-                    break;
+        new Thread(() -> {
+            while (true) {
+                try {
+                    client.getWatchClient().watch(ByteSequence.fromString(config.getKey())).listen().getEvents().stream().forEach(watchEvent -> {
+                        WatchEvent.EventType eventType = watchEvent.getEventType();
+                        KeyValue keyValue = watchEvent.getKeyValue();
+                        KeyValue prevKV = watchEvent.getPrevKV();
+                        EventData eventData = null;
+                        switch (eventType) {
+                            case PUT:
+                                eventData = new AddData(keyValue.getKey().toStringUtf8(), keyValue.getValue().toStringUtf8());
+                                break;
+                            case DELETE:
+                                eventData = new RemoveData(prevKV.getKey().toStringUtf8(), null);
+                                break;
+                            default:
+                                break;
+                        }
+                        Optional.of(eventData).ifPresent(e -> {
+                            System.out.println(e);
+                            EtcdPassiveConfig etcdPassiveConfig = new EtcdPassiveConfig();
+                            etcdPassiveConfig.setKey(config.getKey());
+                            etcdPassiveConfig.setFileExtension(config.getFileExtension());
+                            etcdPassiveConfig.setValue(e);
+                            passiveHandler.passive(context, etcdPassiveConfig);
+                        });
+                    });
+                } catch (InterruptedException e) {
+                    LOGGER.error("", e);
+                }
             }
-            Optional.of(eventData).ifPresent(e -> {
-                EtcdPassiveConfig etcdPassiveConfig = new EtcdPassiveConfig();
-                etcdPassiveConfig.setKey(config.getKey());
-                etcdPassiveConfig.setFileExtension(config.getFileExtension());
-                etcdPassiveConfig.setValue(e);
-                passiveHandler.passive(context, etcdPassiveConfig);
-            });
-        });
+        }).start();
+
         LOGGER.info("passive Etcd remote started....");
     }
 }

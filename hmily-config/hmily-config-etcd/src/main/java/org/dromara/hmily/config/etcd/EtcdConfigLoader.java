@@ -60,12 +60,10 @@ public class EtcdConfigLoader implements ConfigLoader<EtcdConfig> {
 
     @Override
     public void passive(final Supplier<Context> context, final PassiveHandler<Config> handler, final Config config) {
-        if (config.isPassive()) {
-            try {
-                client.addListener(context, (c, cfg) -> push(c, cfg.getValue()), (EtcdConfig) config);
-            } catch (InterruptedException e) {
-                throw new ConfigException("etcd passive config failed.");
-            }
+        try {
+            client.addListener(context, (c, cfg) -> push(c, cfg.getValue()), (EtcdConfig) config);
+        } catch (InterruptedException e) {
+            throw new ConfigException("etcd passive config failed.");
         }
     }
 
