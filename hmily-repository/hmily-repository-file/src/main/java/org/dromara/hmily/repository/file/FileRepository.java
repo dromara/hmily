@@ -484,7 +484,7 @@ public class FileRepository implements HmilyRepository {
         LOCK.writeLock().lock();
         try {
             byte[] serialize = hmilySerializer.serialize(hmilyTransaction);
-            Files.write(Paths.get(filePath), serialize, StandardOpenOption.CREATE);
+            Files.write(Paths.get(filePath), serialize, StandardOpenOption.WRITE);
             return HmilyRepository.ROWS;
         } catch (IOException | HmilySerializerException e) {
             LogUtil.error(LOGGER, " read file exception ,because is {}", e::getMessage);
