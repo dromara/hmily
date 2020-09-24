@@ -17,27 +17,26 @@
 
 package org.dromara.hmily.repository.file;
 
-import java.lang.reflect.Field;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Random;
-import java.util.concurrent.TimeUnit;
-
 import org.dromara.hmily.annotation.TransTypeEnum;
-import org.dromara.hmily.config.api.Config;
-import org.dromara.hmily.config.api.ConfigEnv;
 import org.dromara.hmily.config.api.entity.HmilyConfig;
 import org.dromara.hmily.config.api.entity.HmilyFileConfig;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipant;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipantUndo;
 import org.dromara.hmily.repository.spi.entity.HmilyTransaction;
-import org.dromara.hmily.serializer.jdk.JDKSerializer;
-import org.dromara.hmily.serializer.kryo.KryoSerializer;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.io.File;
+import java.io.RandomAccessFile;
+import java.nio.MappedByteBuffer;
+import java.nio.channels.FileChannel;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
+import java.util.List;
+import java.util.Random;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
@@ -68,13 +67,13 @@ public class FileRepositoryTest {
      */
     @Before
     public void setUp() throws Exception {
-        hmilyFileConfig.setPath(System.getProperty("hmily.file.path"));
-
-        ConfigEnv.getInstance().putBean(hmilyFileConfig);
-        hmilyConfig.setAppName(appName);
-
-        fileRepository.init(appName);
-        fileRepository.setSerializer(new KryoSerializer());
+//        hmilyFileConfig.setPath(System.getProperty("hmily.file.path"));
+//
+//        ConfigEnv.getInstance().putBean(hmilyFileConfig);
+//        hmilyConfig.setAppName(appName);
+//
+//        fileRepository.init(appName);
+//        fileRepository.setSerializer(new KryoSerializer());
 //        fileRepository.setSerializer(new JDKSerializer());
 //        fileRepository.setSerializer(new JDKSerializer());
 //        fileRepository.setSerializer(new JDKSerializer());
@@ -93,6 +92,17 @@ public class FileRepositoryTest {
 
         Long undoId = (long) random.nextInt(1000);
         testParticipantUndo(transactionId, participantId, undoId);
+    }
+
+    @Test
+    public void testNio() throws Exception {
+        File data = new File("C:\\Users\\FU\\logs\\ons.log");
+        data.createNewFile();
+        FileChannel fileChannel = new RandomAccessFile(data, "rw").getChannel();
+        MappedByteBuffer map = fileChannel.map(FileChannel.MapMode.READ_WRITE, 0, 1024L * 1024 * 1024);
+//        System.in.read();
+        FileRepository.clean(map);
+        new CountDownLatch(1).await();
     }
 
     private void testTransaction(Long transactionId) throws Exception {
