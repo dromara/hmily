@@ -32,7 +32,8 @@ public interface HmilySQLRevertEngine {
      * Revert hmily undo invocation.
      *
      * @param participantUndo  hmily participant undo
+     * @return true or false
      * @throws SQLRevertException the sql revert exception
      */
-    boolean revert(final HmilyParticipantUndo participantUndo) throws SQLRevertException;
+    boolean revert(HmilyParticipantUndo participantUndo) throws SQLRevertException;
 }
