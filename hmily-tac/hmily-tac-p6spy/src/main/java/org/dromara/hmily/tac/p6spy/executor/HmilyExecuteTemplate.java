@@ -93,10 +93,6 @@ public enum HmilyExecuteTemplate {
             String sql = statementInformation.getSqlWithValues();
             HmilyStatement statement = hmilySqlParserEngine.parser(sql, DatabaseTypes.INSTANCE.getDatabaseType());
             // TODO should generate lock-key to avoid dirty data modified by other global transaction.
-            //3.然后根据不同的statement生产不同的反向sql
-            // TODO it's better to only record the before-after data images here, SQLRevertEngine only called on tx cancel phase
-//            HmilySqlRevertEngine hmilySqlRevertEngine = HmilySqlRevertEngineFactory.newInstance();
-//            HmilyUndoInvocation hmilyUndoInvocation = hmilySqlRevertEngine.revert(statement, statementInformation.getConnectionInformation().getConnection(), sql);
             HmilySQLComputeEngine hmilySQLComputeEngine = HmilySQLComputeEngineFactory.newInstance(statement);
             HmilyUndoInvocation hmilyUndoInvocation = hmilySQLComputeEngine.generateImage(statementInformation.getConnectionInformation().getConnection(), sql);
             //4.缓存sql日志记录 ? 存储到哪里呢 threadLocal？

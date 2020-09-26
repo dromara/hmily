@@ -18,37 +18,39 @@
 package org.dromara.hmily.tac.sqlrevert.spi.exception;
 
 /**
- * The type Sql revert exception.
+ * The type SQL revert exception.
  *
  * @author xiaoyu
  */
-public class SqlRevertException extends RuntimeException {
+public class SQLRevertException extends RuntimeException {
+    
+    private static final long serialVersionUID = 6198557340448247119L;
     
     /**
-     * Instantiates a new Sql revert exception.
+     * Instantiates a new SQL revert exception.
      *
      * @param e the e
      */
-    public SqlRevertException(final Throwable e) {
+    public SQLRevertException(final Throwable e) {
         super(e);
     }
     
     /**
-     * Instantiates a new Sql revert exception.
+     * Instantiates a new SQL revert exception.
      *
      * @param message the message
      */
-    public SqlRevertException(final String message) {
+    public SQLRevertException(final String message) {
         super(message);
     }
     
     /**
-     * Instantiates a new Sql revert exception.
+     * Instantiates a new SQL revert exception.
      *
      * @param message   the message
      * @param throwable the throwable
      */
-    public SqlRevertException(final String message, final Throwable throwable) {
+    public SQLRevertException(final String message, final Throwable throwable) {
         super(message, throwable);
     }
 }

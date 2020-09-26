@@ -37,8 +37,6 @@ public class HmilyUndoInvocation implements Serializable {
     
     private static final long serialVersionUID = -4406133196112007765L;
     
-    private String revertSql;
-    
     private String originSql;
     
     private String tableName;

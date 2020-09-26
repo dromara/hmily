@@ -22,25 +22,25 @@ import org.dromara.hmily.config.api.entity.HmilyConfig;
 import org.dromara.hmily.spi.ExtensionLoaderFactory;
 
 /**
- * The type Hmily sql revert engine factory.
+ * The type Hmily SQL revert engine factory.
  *
  * @author xiaoyu
  */
-public class HmilySqlRevertEngineFactory {
+public class HmilySQLRevertEngineFactory {
     
-    private static volatile HmilySqlRevertEngine hmilySqlRevertEngine;
+    private static volatile HmilySQLRevertEngine hmilySqlRevertEngine;
     
     /**
-     * New instance hmily sql revert engine.
+     * New instance hmily SQL revert engine.
      *
-     * @return the hmily sql revert engine
+     * @return the hmily SQL revert engine
      */
-    public static HmilySqlRevertEngine newInstance() {
+    public static HmilySQLRevertEngine newInstance() {
         if (hmilySqlRevertEngine == null) {
-            synchronized (HmilySqlRevertEngineFactory.class) {
+            synchronized (HmilySQLRevertEngineFactory.class) {
                 if (hmilySqlRevertEngine == null) {
                     HmilyConfig config = ConfigEnv.getInstance().getConfig(HmilyConfig.class);
-                    hmilySqlRevertEngine = ExtensionLoaderFactory.load(HmilySqlRevertEngine.class, config.getSqlRevert());
+                    hmilySqlRevertEngine = ExtensionLoaderFactory.load(HmilySQLRevertEngine.class, config.getSqlRevert());
                 }
             }
         }
