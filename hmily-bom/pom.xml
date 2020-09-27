@@ -26,6 +26,42 @@
     <version>2.1.0</version>
     <packaging>pom</packaging>
 
+    <organization>
+        <name>dromara</name>
+        <url>https://dromara.org</url>
+    </organization>
+
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    <scm>
+        <url>https://github.com/dromara/hmily.git</url>
+        <connection>scm:git:https://github.com/dromara/hmily</connection>
+        <developerConnection>scm:git:git@github.com:dromara/hmily</developerConnection>
+        <tag>${project.version}</tag>
+    </scm>
+
+    <issueManagement>
+        <system>GitHub Issues</system>
+        <url>https://github.com/dromara/hmily/issues</url>
+    </issueManagement>
+
+    <developers>
+        <developer>
+            <id>xiaoyu</id>
+            <name>xiaoyu(Myth)</name>
+            <email>549477611@qq.com</email>
+            <organization>dromara.org</organization>
+            <roles>
+                <role>author</role>
+            </roles>
+        </developer>
+    </developers>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <jdk.version>1.8</jdk.version>

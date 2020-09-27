@@ -36,6 +36,4 @@
         <module>hmily-repository-database-sqlserver</module>
         <module>hmily-repository-database-postgresql</module>
     </modules>
-
-
 </project>

@@ -12,7 +12,6 @@
     <artifactId>hmily-springcloud</artifactId>
 
     <dependencies>
-
         <dependency>
             <groupId>org.dromara</groupId>
             <artifactId>hmily-spring</artifactId>
@@ -55,30 +54,11 @@
             <artifactId>spring-web</artifactId>
             <scope>provided</scope>
         </dependency>
-
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
             <version>4.0.1</version>
             <scope>provided</scope>
         </dependency>
-
-
     </dependencies>
-
-    <build>
-        <finalName>hmily-springcloud</finalName>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>${jdk.version}</source>
-                    <target>${jdk.version}</target>
-                    <encoding>${project.build.sourceEncoding}</encoding>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-
 </project>

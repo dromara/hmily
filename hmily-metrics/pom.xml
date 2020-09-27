@@ -33,6 +33,4 @@
         <module>hmily-metrics-prometheus</module>
         <module>hmily-metrics-facade</module>
     </modules>
-
-
 </project>
