@@ -73,8 +73,7 @@ public class AccountServiceImpl implements AccountService {
         this.inlineService = inlineService;
         this.inventoryService = inventoryService;
     }
-
-
+    
     @Override
     @HmilyTCC(confirmMethod = "confirm", cancelMethod = "cancel")
     public void payment(AccountDTO accountDTO) {
