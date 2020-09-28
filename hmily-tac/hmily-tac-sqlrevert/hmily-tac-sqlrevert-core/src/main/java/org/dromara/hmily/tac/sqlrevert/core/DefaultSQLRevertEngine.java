@@ -29,6 +29,7 @@ import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.LinkedList;
 
 /**
  * The type Default SQL revert engine.
@@ -42,13 +43,13 @@ public class DefaultSQLRevertEngine implements HmilySQLRevertEngine {
     
     @Override
     public boolean revert(final HmilyParticipantUndo participantUndo) throws SQLRevertException {
-        String revertSQL = generateRevertSQL(participantUndo.getUndoInvocation());
+        RevertSQLUnit revertSQLUnit = generateRevertSQL(participantUndo.getUndoInvocation());
         DataSource dataSource = HmilyResourceManager.get(participantUndo.getResourceId()).getTargetDataSource();
-        return executeUpdate(revertSQL, dataSource) > 0;
+        return executeUpdate(revertSQLUnit, dataSource) > 0;
     }
     
     // TODO generate RevertSQLUnit (revert SQL and parameters) here, we need a RevertSQLGenerateFactory
-    private String generateRevertSQL(final HmilyUndoInvocation undoInvocation) {
+    private RevertSQLUnit generateRevertSQL(final HmilyUndoInvocation undoInvocation) {
         String sql = undoInvocation.getOriginSql();
         String result;
         if (sql.contains("order")) {
@@ -59,13 +60,18 @@ public class DefaultSQLRevertEngine implements HmilySQLRevertEngine {
         } else {
             result = "update inventory set total_inventory = total_inventory + 1 where product_id = 1";
         }
-        return result;
+        return new RevertSQLUnit(result, new LinkedList<>());
     }
     
-    private int executeUpdate(final String sql, final DataSource dataSource) {
+    private int executeUpdate(final RevertSQLUnit unit, final DataSource dataSource) {
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement ps = connection.prepareStatement(sql)) {
-            return ps.executeUpdate();
+             PreparedStatement preparedStatement = connection.prepareStatement(unit.getSql())) {
+            int index = 1;
+            for (Object each : unit.getParameters()) {
+                preparedStatement.setObject(index, each);
+                index++;
+            }
+            return preparedStatement.executeUpdate();
         } catch (SQLException e) {
             log.error("hmily tac rollback exception -> ", e);
             return 0;
