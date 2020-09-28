@@ -49,6 +49,10 @@ public class ZookeeperConfig extends AbstractConfig {
     
     private String path;
     
+    private boolean update;
+    
+    private String updateFileName;
+    
     @Override
     public String prefix() {
         return PrefixConstants.REMOTE_ZOOKEEPER;

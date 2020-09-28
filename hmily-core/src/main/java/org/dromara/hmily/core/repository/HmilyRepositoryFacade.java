@@ -20,10 +20,13 @@ package org.dromara.hmily.core.repository;
 import java.util.List;
 import lombok.Setter;
 import org.dromara.hmily.common.enums.HmilyActionEnum;
+import org.dromara.hmily.config.api.ConfigEnv;
+import org.dromara.hmily.config.api.entity.HmilyConfig;
 import org.dromara.hmily.repository.spi.HmilyRepository;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipant;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipantUndo;
 import org.dromara.hmily.repository.spi.entity.HmilyTransaction;
+import org.dromara.hmily.repository.spi.exception.HmilyRepositoryException;
 
 /**
  * The type Hmily coordinator facade.
@@ -34,11 +37,10 @@ public final class HmilyRepositoryFacade {
     
     private static final HmilyRepositoryFacade INSTANCE = new HmilyRepositoryFacade();
     
-    @Setter
-    private HmilyRepository hmilyRepository;
+    private final HmilyConfig hmilyConfig = ConfigEnv.getInstance().getConfig(HmilyConfig.class);
     
     @Setter
-    private boolean phyDeleted;
+    private HmilyRepository hmilyRepository;
     
     private HmilyRepositoryFacade() {
     }
@@ -56,10 +58,9 @@ public final class HmilyRepositoryFacade {
      * Create hmily transaction string.
      *
      * @param hmilyTransaction the hmily transaction
-     * @return the string
      */
-    public boolean createHmilyTransaction(final HmilyTransaction hmilyTransaction) {
-        return hmilyRepository.createHmilyTransaction(hmilyTransaction) > 0;
+    public void createHmilyTransaction(final HmilyTransaction hmilyTransaction) {
+        checkRows(hmilyRepository.createHmilyTransaction(hmilyTransaction));
     }
     
     /**
@@ -67,58 +68,53 @@ public final class HmilyRepositoryFacade {
      *
      * @param transId the trans id
      * @param status  the status
-     * @return the int
      */
-    public boolean updateHmilyTransactionStatus(final Long transId, final Integer status) {
-        return hmilyRepository.updateHmilyTransactionStatus(transId, status) > 0;
+    public void updateHmilyTransactionStatus(final Long transId, final Integer status) {
+        checkRows(hmilyRepository.updateHmilyTransactionStatus(transId, status));
     }
     
     /**
-     * Remove hmily transaction boolean.
+     * Remove hmily transaction.
      *
      * @param transId the trans id
-     * @return the boolean
      */
-    public boolean removeHmilyTransaction(final Long transId) {
-        if (phyDeleted) {
-            return hmilyRepository.removeHmilyTransaction(transId) > 0;
+    public void removeHmilyTransaction(final Long transId) {
+        if (hmilyConfig.isPhyDeleted()) {
+            checkRows(hmilyRepository.removeHmilyTransaction(transId));
         } else {
-            return updateHmilyTransactionStatus(transId, HmilyActionEnum.DELETE.getCode());
+            updateHmilyTransactionStatus(transId, HmilyActionEnum.DELETE.getCode());
         }
     }
     
     /**
-     * Create hmily participant boolean.
+     * Create hmily participant.
      *
      * @param hmilyParticipant the hmily participant
-     * @return the boolean
      */
-    public boolean createHmilyParticipant(final HmilyParticipant hmilyParticipant) {
-        return hmilyRepository.createHmilyParticipant(hmilyParticipant) > 0;
+    public void createHmilyParticipant(final HmilyParticipant hmilyParticipant) {
+        checkRows(hmilyRepository.createHmilyParticipant(hmilyParticipant));
     }
     
     /**
-     * Update hmily participant status int.
+     * Update hmily participant status.
      *
      * @param transId the trans id
      * @param status  the status
-     * @return the int
      */
-    public boolean updateHmilyParticipantStatus(final Long transId, final Integer status) {
-        return hmilyRepository.updateHmilyParticipantStatus(transId, status) > 0;
+    public void updateHmilyParticipantStatus(final Long transId, final Integer status) {
+        checkRows(hmilyRepository.updateHmilyParticipantStatus(transId, status));
     }
     
     /**
-     * Remove hmily participant boolean.
+     * Remove hmily participant.
      *
      * @param participantId the participant id
-     * @return the boolean
      */
-    public boolean removeHmilyParticipant(final Long participantId) {
-        if (phyDeleted) {
-            return hmilyRepository.removeHmilyParticipant(participantId) > 0;
+    public void removeHmilyParticipant(final Long participantId) {
+        if (hmilyConfig.isPhyDeleted()) {
+            checkRows(hmilyRepository.removeHmilyParticipant(participantId));
         } else {
-            return updateHmilyParticipantStatus(participantId, HmilyActionEnum.DELETE.getCode());
+            updateHmilyParticipantStatus(participantId, HmilyActionEnum.DELETE.getCode());
         }
     }
     
@@ -133,13 +129,12 @@ public final class HmilyRepositoryFacade {
     }
     
     /**
-     * Create hmily participant undo boolean.
+     * Create hmily participant undo.
      *
      * @param undo the undo
-     * @return the boolean
      */
-    public boolean createHmilyParticipantUndo(final HmilyParticipantUndo undo) {
-        return hmilyRepository.createHmilyParticipantUndo(undo) > 0;
+    public void createHmilyParticipantUndo(final HmilyParticipantUndo undo) {
+        checkRows(hmilyRepository.createHmilyParticipantUndo(undo));
     }
     
     /**
@@ -153,27 +148,31 @@ public final class HmilyRepositoryFacade {
     }
     
     /**
-     * Remove hmily participant undo boolean.
+     * Remove hmily participant undo.
      *
      * @param undoId the undo id
-     * @return the boolean
      */
-    public boolean removeHmilyParticipantUndo(final Long undoId) {
-        if (phyDeleted) {
-            return hmilyRepository.removeHmilyParticipantUndo(undoId) > 0;
+    public void removeHmilyParticipantUndo(final Long undoId) {
+        if (hmilyConfig.isPhyDeleted()) {
+            checkRows(hmilyRepository.removeHmilyParticipantUndo(undoId));
         } else {
-            return updateHmilyParticipantUndoStatus(undoId, HmilyActionEnum.DELETE.getCode());
+            updateHmilyParticipantUndoStatus(undoId, HmilyActionEnum.DELETE.getCode());
         }
     }
     
     /**
-     * Update hmily participant undo status boolean.
+     * Update hmily participant undo status.
      *
      * @param undoId the undo id
      * @param status the status
-     * @return the boolean
      */
-    public boolean updateHmilyParticipantUndoStatus(final Long undoId, final Integer status) {
-        return hmilyRepository.updateHmilyParticipantUndoStatus(undoId, status) > 0;
+    public void updateHmilyParticipantUndoStatus(final Long undoId, final Integer status) {
+        checkRows(hmilyRepository.updateHmilyParticipantUndoStatus(undoId, status));
+    }
+    
+    private void checkRows(final int rows) {
+        if (rows != 1) {
+            throw new HmilyRepositoryException("hmily repository have exception");
+        }
     }
 }

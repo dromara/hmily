@@ -17,27 +17,23 @@
 
 package org.dromara.hmily.tac.sqlrevert.spi;
 
-import org.dromara.hmily.repository.spi.entity.HmilyUndoInvocation;
-import org.dromara.hmily.tac.sqlparser.model.statement.HmilyStatement;
-import org.dromara.hmily.tac.sqlrevert.spi.exception.SqlRevertException;
-
-import java.sql.Connection;
+import org.dromara.hmily.repository.spi.entity.HmilyParticipantUndo;
+import org.dromara.hmily.tac.sqlrevert.spi.exception.SQLRevertException;
 
 /**
- * The interface Hmily sql revert engine.
+ * The interface Hmily SQL revert engine.
  *
  * @author xiaoyu
+ * @author zhaojun
  */
-public interface HmilySqlRevertEngine {
+public interface HmilySQLRevertEngine {
     
     /**
      * Revert hmily undo invocation.
      *
-     * @param hmilyStatement the sql statement
-     * @param connection   connection
-     * @param sql          the sql
-     * @return the hmily undo invocation
-     * @throws SqlRevertException the sql revert exception
+     * @param participantUndo  hmily participant undo
+     * @return true or false
+     * @throws SQLRevertException the sql revert exception
      */
-    HmilyUndoInvocation revert(HmilyStatement hmilyStatement, Connection connection, String sql) throws SqlRevertException;
+    boolean revert(HmilyParticipantUndo participantUndo) throws SQLRevertException;
 }

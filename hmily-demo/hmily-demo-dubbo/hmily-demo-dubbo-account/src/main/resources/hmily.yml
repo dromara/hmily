@@ -36,7 +36,7 @@ repository:
     idleTimeout: 600000
     maxLifetime: 1800000
   file:
-    path:
+    path: D:\hmilyLog
     prefix: /hmily
   mongo:
     databaseName:
@@ -45,7 +45,7 @@ repository:
     password:
   zookeeper:
     host: localhost:2181
-    sessionTimeOut: 1000
+    sessionTimeOut: 1000000000
     rootPath: /hmily
   redis:
     cluster: false

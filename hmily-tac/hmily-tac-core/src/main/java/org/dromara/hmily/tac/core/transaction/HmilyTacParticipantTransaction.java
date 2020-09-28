@@ -108,6 +108,7 @@ public class HmilyTacParticipantTransaction {
                 LOGGER.error("HmilyParticipant rollback exception :{} ", participant.toString());
                 throw new HmilyRuntimeException(" hmilyParticipant execute rollback exception:" + participant.toString());
             } finally {
+                // FIXME why remove context after first participator handled
                 HmilyContextHolder.remove();
             }
         }
@@ -140,6 +141,7 @@ public class HmilyTacParticipantTransaction {
             } catch (Throwable throwable) {
                 throw new HmilyRuntimeException(" hmilyParticipant execute confirm exception:" + hmilyParticipant.toString());
             } finally {
+                // FIXME why remove context after first participator handled
                 HmilyContextHolder.remove();
             }
         }
