@@ -3,30 +3,31 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>hmily-demo</artifactId>
+        <artifactId>hmily-rpc</artifactId>
         <groupId>org.dromara</groupId>
-        <version>2.0.2-RELEASE</version>
+        <version>2.1.1</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>hmily-demo-tars</artifactId>
-    <packaging>pom</packaging>
-    <modules>
-        <module>hmily-demo-tars-springboot-account</module>
-        <module>hmily-demo-tars-springboot-inventory</module>
-        <module>hmily-demo-tars-springboot-order</module>
-    </modules>
+    <artifactId>hmily-tars</artifactId>
 
     <dependencies>
         <dependency>
             <groupId>org.dromara</groupId>
-            <artifactId>hmily-spring-boot-starter-tars</artifactId>
-            <version>${hmily.version}</version>
+            <artifactId>hmily-spring</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.dromara</groupId>
+            <artifactId>hmily-tcc</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.tencent.tars</groupId>
+            <artifactId>tars-spring-boot-starter</artifactId>
             <exclusions>
-                <exclusion>
-                    <groupId>org.dromara</groupId>
-                    <artifactId>hmily-repository-mongodb</artifactId>
-                </exclusion>
                 <exclusion>
                     <groupId>org.slf4j</groupId>
                     <artifactId>slf4j-api</artifactId>
@@ -39,18 +40,18 @@
                     <groupId>log4j</groupId>
                     <artifactId>log4j</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-dependencies</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.google.guava</groupId>
+                    <artifactId>guava</artifactId>
+                </exclusion>
             </exclusions>
-        </dependency>
-
-        <dependency>
-            <groupId>org.dromara</groupId>
-            <artifactId>hmily-demo-common</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
+            <version>1.7.2</version>
         </dependency>
     </dependencies>
+
 
 </project>
