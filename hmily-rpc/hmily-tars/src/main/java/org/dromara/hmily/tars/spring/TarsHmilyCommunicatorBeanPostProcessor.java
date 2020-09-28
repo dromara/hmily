@@ -1,4 +1,4 @@
-package org.dromara.hmily.tars.startup;
+package org.dromara.hmily.tars.spring;
 
 import com.qq.tars.client.Communicator;
 import com.qq.tars.client.CommunicatorConfig;
@@ -7,8 +7,8 @@ import com.qq.tars.common.util.StringUtils;
 import com.qq.tars.protocol.annotation.Servant;
 import com.qq.tars.server.config.ConfigurationManager;
 import com.qq.tars.spring.annotation.TarsClient;
-import org.dromara.hmily.tars.loadbalance.HmilyRoundRobinLoadBalance;
 import org.dromara.hmily.tars.loadbalance.HmilyLoadBalance;
+import org.dromara.hmily.tars.loadbalance.HmilyRoundRobinLoadBalance;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.support.MergedBeanDefinitionPostProcessor;
 import org.springframework.beans.factory.support.RootBeanDefinition;
@@ -78,7 +78,7 @@ public class TarsHmilyCommunicatorBeanPostProcessor implements MergedBeanDefinit
 
             Object proxy = communicator.stringToProxy(field.getType(),
                     config,
-                    new HmilyLoadBalance(new HmilyRoundRobinLoadBalance(config)));
+                    new HmilyLoadBalance(new HmilyRoundRobinLoadBalance(config), config));
 
             ReflectionUtils.makeAccessible(field);
             ReflectionUtils.setField(field, bean, proxy);

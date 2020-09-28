@@ -1,4 +1,4 @@
-package org.dromara.hmily.tars.startup;
+package org.dromara.hmily.tars.spring;
 
 import com.qq.tars.client.Communicator;
 import org.springframework.context.annotation.Bean;
@@ -29,8 +29,8 @@ public class TarsHmilyConfiguration {
      * @return TarsHmilyStartup
      */
     @Bean
-    public TarsHmilyStartup tarsHmilyStartup() {
-        return new TarsHmilyStartup();
+    public TarsHmilyFilterStartup tarsHmilyStartup() {
+        return new TarsHmilyFilterStartup();
     }
 
 }

@@ -1,2 +1,2 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-org.dromara.hmily.tars.startup.TarsHmilyConfiguration
+org.dromara.hmily.tars.spring.TarsHmilyConfiguration
