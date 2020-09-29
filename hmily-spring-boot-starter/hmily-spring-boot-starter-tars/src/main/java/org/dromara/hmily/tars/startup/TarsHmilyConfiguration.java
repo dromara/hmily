@@ -1,6 +1,7 @@
-package org.dromara.hmily.tars.spring;
+package org.dromara.hmily.tars.startup;
 
 import com.qq.tars.client.Communicator;
+import org.dromara.hmily.tars.spring.TarsHmilyCommunicatorBeanPostProcessor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
