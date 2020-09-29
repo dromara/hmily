@@ -143,12 +143,12 @@ public class EventData {
 
     @Override
     public String toString() {
-        return "EventData{" +
-                "config=" + config +
-                ", value=" + value +
-                ", properties='" + properties + '\'' +
-                ", subscribe='" + subscribe + '\'' +
-                ", event=" + event +
-                '}';
+        return "EventData{"
+                + "config=" + config
+                + ", value=" + value
+                + ", properties='" + properties + '\''
+                + ", subscribe='" + subscribe + '\''
+                + ", event=" + event
+                + '}';
     }
 }

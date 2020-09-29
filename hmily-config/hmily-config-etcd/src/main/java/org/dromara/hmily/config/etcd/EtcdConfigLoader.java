@@ -6,7 +6,6 @@ import org.dromara.hmily.config.api.ConfigEnv;
 import org.dromara.hmily.config.api.event.AddData;
 import org.dromara.hmily.config.api.event.EventData;
 import org.dromara.hmily.config.api.event.ModifyData;
-import org.dromara.hmily.config.api.event.RemoveData;
 import org.dromara.hmily.config.api.exception.ConfigException;
 import org.dromara.hmily.config.loader.ConfigLoader;
 import org.dromara.hmily.config.loader.PropertyLoader;
