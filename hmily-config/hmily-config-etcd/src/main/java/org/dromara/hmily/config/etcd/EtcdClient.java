@@ -77,9 +77,9 @@ public class EtcdClient {
      * @throws InterruptedException exception
      */
     void addListener(final Supplier<ConfigLoader.Context> context, final ConfigLoader.PassiveHandler<EtcdPassiveConfig> passiveHandler, final EtcdConfig config) throws InterruptedException {
-//        if (!config.isPassive()) {
-//            return;
-//        }
+        if (!config.isPassive()) {
+            return;
+        }
         if (client == null) {
             LOGGER.warn("Etcd client is null...");
         }
@@ -87,28 +87,12 @@ public class EtcdClient {
             while (true) {
                 try {
                     client.getWatchClient().watch(ByteSequence.fromString(config.getKey())).listen().getEvents().stream().forEach(watchEvent -> {
-                        WatchEvent.EventType eventType = watchEvent.getEventType();
                         KeyValue keyValue = watchEvent.getKeyValue();
-                        KeyValue prevKV = watchEvent.getPrevKV();
-                        EventData eventData = null;
-                        switch (eventType) {
-                            case PUT:
-                                eventData = new AddData(keyValue.getKey().toStringUtf8(), keyValue.getValue().toStringUtf8());
-                                break;
-                            case DELETE:
-                                eventData = new RemoveData(prevKV.getKey().toStringUtf8(), null);
-                                break;
-                            default:
-                                break;
-                        }
-                        Optional.of(eventData).ifPresent(e -> {
-                            System.out.println(e);
-                            EtcdPassiveConfig etcdPassiveConfig = new EtcdPassiveConfig();
-                            etcdPassiveConfig.setKey(config.getKey());
-                            etcdPassiveConfig.setFileExtension(config.getFileExtension());
-                            etcdPassiveConfig.setValue(e);
-                            passiveHandler.passive(context, etcdPassiveConfig);
-                        });
+                        EtcdPassiveConfig etcdPassiveConfig = new EtcdPassiveConfig();
+                        etcdPassiveConfig.setKey(config.getKey());
+                        etcdPassiveConfig.setFileExtension(config.getFileExtension());
+                        etcdPassiveConfig.setValue(keyValue.getValue() != null ? keyValue.getValue().toStringUtf8() : null);
+                        passiveHandler.passive(context, etcdPassiveConfig);
                     });
                 } catch (InterruptedException e) {
                     LOGGER.error("", e);

@@ -10,3 +10,4 @@ remote:
     key: test
     timeoutMs: 6000
     fileExtension: yml
+    passive: true

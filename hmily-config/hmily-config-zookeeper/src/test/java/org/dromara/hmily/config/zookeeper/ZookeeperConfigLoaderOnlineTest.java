@@ -23,14 +23,19 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.dromara.hmily.config.api.ConfigEnv;
 import org.dromara.hmily.config.api.ConfigScan;
+import org.dromara.hmily.config.api.entity.HmilyConfig;
 import org.dromara.hmily.config.api.event.EventConsumer;
 import org.dromara.hmily.config.api.event.ModifyData;
 import org.dromara.hmily.config.loader.ConfigLoader;
 import org.dromara.hmily.config.loader.ServerConfigLoader;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
+import sun.misc.IOUtils;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.function.Supplier;
 
 /**
@@ -41,7 +46,20 @@ import java.util.function.Supplier;
 public class ZookeeperConfigLoaderOnlineTest {
 
     @Test
-    public void realZookeeperLoad() throws InterruptedException { ConfigScan.scan();
+    public void realZookeeperLoad() throws InterruptedException {
+        new Thread(() -> {
+            try {
+                Thread.sleep(3000);
+                changeData();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }).start();
+
+
+        ConfigScan.scan();
         ZookeeperConfigLoader configLoader = new ZookeeperConfigLoader();
         ServerConfigLoader loader = new ServerConfigLoader();
         loader.load(ConfigLoader.Context::new, (context, config) -> {
@@ -67,10 +85,69 @@ public class ZookeeperConfigLoaderOnlineTest {
                 return "hmily.config.*";
             }
         });
-        Thread.sleep(Integer.MAX_VALUE);
     }
 
-    
+    private void changeData() throws IOException {
+        ZookeeperConfig zookeeperConfig = buildZookeeperConfig();
+        CuratorZookeeperClient client = CuratorZookeeperClient.getInstance(zookeeperConfig);
+        InputStream resourceAsStream = getClass().getResourceAsStream("/hmily-zookeeper.yml");
+        int available = resourceAsStream.available();
+        byte[] bytes = IOUtils.readFully(resourceAsStream, available, false);
+        client.persist(zookeeperConfig.getPath(), new String(bytes));
+        System.out.println("init zookeeper resource completed. start update zookeeper resource...");
+
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        Assert.assertEquals("xiaoyu", ConfigEnv.getInstance().getConfig(HmilyConfig.class).getAppName());
+        Assert.assertEquals("kryo", ConfigEnv.getInstance().getConfig(HmilyConfig.class).getSerializer());
+        Assert.assertEquals("threadLocal", ConfigEnv.getInstance().getConfig(HmilyConfig.class).getContextTransmittalMode());
+
+        resourceAsStream = getClass().getResourceAsStream("/hmily-zookeeper-update.yml");
+        available = resourceAsStream.available();
+        bytes = IOUtils.readFully(resourceAsStream, available, false);
+        client.persist(zookeeperConfig.getPath(), new String(bytes));
+        System.out.println("zookeeper resource updated.");
+
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        Assert.assertEquals("xiaoyu1", ConfigEnv.getInstance().getConfig(HmilyConfig.class).getAppName());
+        Assert.assertEquals("kryo1", ConfigEnv.getInstance().getConfig(HmilyConfig.class).getSerializer());
+        Assert.assertEquals("threadLocal1", ConfigEnv.getInstance().getConfig(HmilyConfig.class).getContextTransmittalMode());
+    }
+
+    private ZookeeperConfig buildZookeeperConfig() {
+        ZookeeperConfig zookeeperConfig = new ZookeeperConfig();
+        zookeeperConfig.setServerList("localhost:2181");
+        zookeeperConfig.setPath("/hmily/config");
+        return zookeeperConfig;
+    }
+
+    @Test
+    public void testPull() throws IOException {
+        ZookeeperConfig zookeeperConfig = buildZookeeperConfig();
+        CuratorZookeeperClient client = CuratorZookeeperClient.getInstance(zookeeperConfig);
+        InputStream resourceAsStream = getClass().getResourceAsStream("/hmily-zookeeper-update.yml");
+        int available = resourceAsStream.available();
+        byte[] bytes = IOUtils.readFully(resourceAsStream, available, false);
+        String local = new String(bytes);
+
+        client.persist(zookeeperConfig.getPath(), local);
+
+        InputStream pull = client.pull(zookeeperConfig.getPath());
+        available = pull.available();
+        bytes = IOUtils.readFully(pull, available, false);
+        Assert.assertNotNull(pull);
+        Assert.assertEquals(local, new String(bytes));
+    }
+
+
     private void assertTest(final Supplier<ConfigLoader.Context> supplier, final ZookeeperConfig zookeeperConfig) {
 
     }

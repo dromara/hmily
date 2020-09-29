@@ -8,6 +8,7 @@ import com.coreos.jetcd.watch.WatchEvent;
 import org.apache.commons.lang3.StringUtils;
 import org.dromara.hmily.config.api.ConfigEnv;
 import org.dromara.hmily.config.api.ConfigScan;
+import org.dromara.hmily.config.api.entity.HmilyConfig;
 import org.dromara.hmily.config.api.event.*;
 import org.dromara.hmily.config.loader.ConfigLoader;
 import org.dromara.hmily.config.loader.ServerConfigLoader;
@@ -51,31 +52,20 @@ public class EtcdRealTest {
         InputStream is = etcdClient.pull(config);
         byte[] remoteConfig = IOUtils.readFully(is, available, false);
         Assert.assertArrayEquals(bytes, remoteConfig);
+        client.getKVClient().delete(ByteSequence.fromString(config.getKey())).get();
     }
 
     @Test
     public void testLoad() throws InterruptedException, IOException, ExecutionException {
         ConfigScan.scan();
-        ConfigEnv.getInstance().addEvent(new EventConsumer<RemoveData>() {
+        ConfigEnv.getInstance().addEvent(new EventConsumer<ModifyData>() {
             @Override
-            public void accept(RemoveData data) {
+            public void accept(ModifyData data) {
                 System.out.println(data);
             }
 
             @Override
-            public String properties() {
-                return "hmily.config.*";
-            }
-        });
-
-        ConfigEnv.getInstance().addEvent(new EventConsumer<AddData>() {
-            @Override
-            public void accept(AddData data) {
-                System.out.println(data);
-            }
-
-            @Override
-            public String properties() {
+            public String regex() {
                 return "hmily.config.*";
             }
         });
@@ -120,8 +110,6 @@ public class EtcdRealTest {
 //        }).start();
 
         changeRemoteData();
-
-        Thread.sleep(20000);
     }
 
     private void changeRemoteData() throws IOException, ExecutionException, InterruptedException {
@@ -130,12 +118,43 @@ public class EtcdRealTest {
         byte[] bytes = IOUtils.readFully(resourceAsStream, available, false);
         client.getKVClient().put(ByteSequence.fromString(config.getKey()), ByteSequence.fromBytes(bytes)).get();
 
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        Assert.assertEquals("xiaoyu1", ConfigEnv.getInstance().getConfig(HmilyConfig.class).getAppName());
+        Assert.assertEquals("kryo1", ConfigEnv.getInstance().getConfig(HmilyConfig.class).getSerializer());
+        Assert.assertEquals("threadLocal1", ConfigEnv.getInstance().getConfig(HmilyConfig.class).getContextTransmittalMode());
+
         resourceAsStream = getClass().getResourceAsStream("/hmily-etcd.yml");
         available = resourceAsStream.available();
         bytes = IOUtils.readFully(resourceAsStream, available, false);
         client.getKVClient().put(ByteSequence.fromString(config.getKey()), ByteSequence.fromBytes(bytes)).get();
 
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        Assert.assertEquals("xiaoyu", ConfigEnv.getInstance().getConfig(HmilyConfig.class).getAppName());
+        Assert.assertEquals("kryo", ConfigEnv.getInstance().getConfig(HmilyConfig.class).getSerializer());
+        Assert.assertEquals("threadLocal", ConfigEnv.getInstance().getConfig(HmilyConfig.class).getContextTransmittalMode());
+
         client.getKVClient().delete(ByteSequence.fromString(config.getKey())).get();
+
+        // 删除 目前相当于无操作，当前生效的还是删除前的配置
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        Assert.assertEquals("xiaoyu", ConfigEnv.getInstance().getConfig(HmilyConfig.class).getAppName());
+        Assert.assertEquals("kryo", ConfigEnv.getInstance().getConfig(HmilyConfig.class).getSerializer());
+        Assert.assertEquals("threadLocal", ConfigEnv.getInstance().getConfig(HmilyConfig.class).getContextTransmittalMode());
     }
 
 
