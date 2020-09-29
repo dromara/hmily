@@ -15,23 +15,19 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.tac.sqlrevert.core;
-
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-
-import java.util.List;
+package org.dromara.hmily.tac.sqlrevert.core.image;
 
 /**
- * Revert SQL unit.
+ * SQL image mapper interface.
  *
  * @author zhaojun
  */
-@RequiredArgsConstructor
-@Getter
-public final class RevertSQLUnit {
+public interface SQLImageMapper {
     
-    private final String sql;
-    
-    private final List<Object> parameters;
+    /**
+     * Cast image data to revert SQL unit.
+     *
+     * @return revert SQL unit
+     */
+    RevertSQLUnit cast();
 }

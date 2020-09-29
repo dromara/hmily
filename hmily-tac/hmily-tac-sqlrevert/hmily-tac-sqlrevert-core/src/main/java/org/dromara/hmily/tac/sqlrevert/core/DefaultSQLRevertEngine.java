@@ -19,9 +19,10 @@ package org.dromara.hmily.tac.sqlrevert.core;
 
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipantUndo;
-import org.dromara.hmily.repository.spi.entity.HmilyUndoInvocation;
 import org.dromara.hmily.spi.HmilySPI;
 import org.dromara.hmily.tac.common.HmilyResourceManager;
+import org.dromara.hmily.tac.sqlrevert.core.image.RevertSQLUnit;
+import org.dromara.hmily.tac.sqlrevert.core.image.SQLImageMapperFactory;
 import org.dromara.hmily.tac.sqlrevert.spi.HmilySQLRevertEngine;
 import org.dromara.hmily.tac.sqlrevert.spi.exception.SQLRevertException;
 
@@ -29,7 +30,6 @@ import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.LinkedList;
 
 /**
  * The type Default SQL revert engine.
@@ -43,24 +43,9 @@ public class DefaultSQLRevertEngine implements HmilySQLRevertEngine {
     
     @Override
     public boolean revert(final HmilyParticipantUndo participantUndo) throws SQLRevertException {
-        RevertSQLUnit revertSQLUnit = generateRevertSQL(participantUndo.getUndoInvocation());
+        RevertSQLUnit revertSQLUnit = SQLImageMapperFactory.newInstance(participantUndo.getUndoInvocation()).cast();
         DataSource dataSource = HmilyResourceManager.get(participantUndo.getResourceId()).getTargetDataSource();
         return executeUpdate(revertSQLUnit, dataSource) > 0;
-    }
-    
-    // TODO generate RevertSQLUnit (revert SQL and parameters) here, we need a RevertSQLGenerateFactory
-    private RevertSQLUnit generateRevertSQL(final HmilyUndoInvocation undoInvocation) {
-        String sql = undoInvocation.getOriginSql();
-        String result;
-        if (sql.contains("order")) {
-            String number = sql.substring(sql.indexOf("'") + 1, sql.length() - 1);
-            result = "update `order` set status = 3 where number = " + number;
-        } else if (sql.contains("account")) {
-            result = "update account set balance = balance + 1  where user_id = 10000 ";
-        } else {
-            result = "update inventory set total_inventory = total_inventory + 1 where product_id = 1";
-        }
-        return new RevertSQLUnit(result, new LinkedList<>());
     }
     
     private int executeUpdate(final RevertSQLUnit unit, final DataSource dataSource) {

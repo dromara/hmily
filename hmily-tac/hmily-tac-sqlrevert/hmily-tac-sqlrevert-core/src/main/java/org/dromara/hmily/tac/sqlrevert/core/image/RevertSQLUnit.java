@@ -15,31 +15,23 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.tac.sqlcompute.impl;
+package org.dromara.hmily.tac.sqlrevert.core.image;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.dromara.hmily.repository.spi.entity.HmilyUndoInvocation;
-import org.dromara.hmily.tac.sqlcompute.HmilySQLComputeEngine;
-import org.dromara.hmily.tac.sqlcompute.exception.SQLComputeException;
-import org.dromara.hmily.tac.sqlparser.model.statement.dml.HmilyUpdateStatement;
 
-import java.sql.Connection;
+import java.util.List;
 
 /**
- * Hmily update SQL compute engine.
+ * Revert SQL unit.
  *
  * @author zhaojun
  */
 @RequiredArgsConstructor
-public final class HmilyUpdateSQLComputeEngine implements HmilySQLComputeEngine {
+@Getter
+public final class RevertSQLUnit {
     
-    private final HmilyUpdateStatement statement;
+    private final String sql;
     
-    @Override
-    public HmilyUndoInvocation generateImage(final Connection connection, final String sql) throws SQLComputeException {
-        HmilyUndoInvocation undoInvocation = new HmilyUndoInvocation();
-        undoInvocation.setManipulationType("update");
-        undoInvocation.setOriginSql(sql);
-        return undoInvocation;
-    }
+    private final List<Object> parameters;
 }
