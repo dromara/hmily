@@ -27,6 +27,10 @@ public class HmilyLoadBalance<T> implements LoadBalance<T> {
 
     private final Object hashLoadBalanceLock = new Object();
 
+    private volatile HmilyConsistentHashLoadBalance<T> consistentHashLoadBalance;
+
+    private final Object consistentHashLoadBalanceLock = new Object();
+
     public HmilyLoadBalance(final HmilyRoundRobinLoadBalance hmilyRoundRobinLoadBalance, final ServantProxyConfig config) {
         this.hmilyRoundRobinLoadBalance = hmilyRoundRobinLoadBalance;
         this.config = config;
@@ -35,6 +39,20 @@ public class HmilyLoadBalance<T> implements LoadBalance<T> {
     @Override
     public Invoker<T> select(final InvokeContext invocation) throws NoInvokerException {
         long hash = Math.abs(StringUtils.convertLong(invocation.getAttachment(Constants.TARS_HASH), 0));
+        long consistentHash = Math.abs(StringUtils.convertLong(invocation.getAttachment(Constants.TARS_CONSISTENT_HASH), 0));
+
+        if (consistentHash > 0) {
+            if (consistentHashLoadBalance == null) {
+                synchronized (consistentHashLoadBalanceLock) {
+                    if (consistentHashLoadBalance == null) {
+                        HmilyConsistentHashLoadBalance<T> tmp = new HmilyConsistentHashLoadBalance<T>(config);
+                        tmp.refresh(lastRefreshInvokers);
+                        consistentHashLoadBalance = tmp;
+                    }
+                }
+            }
+            return consistentHashLoadBalance.select(invocation);
+        }
 
         if (hash > 0) {
             if (hashLoadBalance == null) {
@@ -59,6 +77,12 @@ public class HmilyLoadBalance<T> implements LoadBalance<T> {
         synchronized (hashLoadBalanceLock) {
             if (hashLoadBalance != null) {
                 hashLoadBalance.refresh(invokers);
+            }
+        }
+
+        synchronized (consistentHashLoadBalanceLock) {
+            if (consistentHashLoadBalance != null) {
+                consistentHashLoadBalance.refresh(invokers);
             }
         }
 
