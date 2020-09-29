@@ -56,7 +56,7 @@
    
    *  可观测性 ：Metrics多项指标性能监控，以及admin管理后台UI展示
    
-   *  多种RPC ： 支持 `Dubbo`, `SpringCloud`,`Montan` 等知名RPC框架
+   *  多种RPC ： 支持 `Dubbo`, `SpringCloud`,`Motan`, `Sofa-rpc`, `brpc`, `tars` 等知名RPC框架
    
    *  日志存储 ： 支持 `mysql`, `oracle`, `mongodb`, `redis`, `zookeeper` 等方式
    

@@ -17,11 +17,12 @@
 
 package org.dromara.hmily.tac.datasource;
 
+import org.dromara.hmily.tac.common.HmilyResourceManager;
+import org.dromara.hmily.tac.common.HmilyTacResource;
+
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
-import javax.sql.DataSource;
-import org.dromara.hmily.tac.common.HmilyTacResource;
-import org.dromara.hmily.tac.common.HmilyResourceManager;
 
 /**
  * The type Hmily datasource.
@@ -39,11 +40,11 @@ public class HmilyTacDatasource extends AbstractHmilyDataSource implements Hmily
      */
     public HmilyTacDatasource(final DataSource targetDataSource) {
         super(targetDataSource);
-        init(targetDataSource);
+        init();
     }
     
-    private void init(final DataSource dataSource) {
-        try (Connection connection = dataSource.getConnection()) {
+    private void init() {
+        try (Connection connection = getTargetDataSource().getConnection()) {
             jdbcUrl = connection.getMetaData().getURL();
         } catch (SQLException e) {
             throw new IllegalStateException("can not init dataSource", e);

@@ -1,0 +1,80 @@
+hmily:
+  server:
+    configMode: local
+    appName: account-tars
+  #  如果server.configMode eq local 的时候才会读取到这里的配置信息.
+  config:
+    appName: account-tars
+    serializer: kryo
+    contextTransmittalMode: threadLocal
+    scheduledThreadMax: 16
+    scheduledRecoveryDelay: 60
+    scheduledCleanDelay: 60
+    scheduledPhyDeletedDelay: 600
+    scheduledInitDelay: 30
+    recoverDelayTime: 60
+    cleanDelayTime: 180
+    limit: 200
+    retryMax: 10
+    bufferSize: 8192
+    consumerThreads: 16
+    asyncRepository: true
+    autoSql: true
+    phyDeleted: true
+    storeDays: 3
+    repository: mysql
+
+repository:
+  database:
+    driverClassName: com.mysql.jdbc.Driver
+    url : jdbc:mysql://127.0.0.1:3306/hmily?useUnicode=true&characterEncoding=utf8
+    username: root
+    password:
+    maxActive: 20
+    minIdle: 10
+    connectionTimeout: 30000
+    idleTimeout: 600000
+    maxLifetime: 1800000
+  file:
+    path:
+    prefix: /hmily
+  mongo:
+    databaseName:
+    url:
+    userName:
+    password:
+  zookeeper:
+    host: localhost:2181
+    sessionTimeOut: 1000
+    rootPath: /hmily
+  redis:
+    cluster: false
+    sentinel: false
+    clusterUrl:
+    sentinelUrl:
+    masterName:
+    hostName:
+    port:
+    password:
+    maxTotal: 8
+    maxIdle: 8
+    minIdle: 2
+    maxWaitMillis: -1
+    minEvictableIdleTimeMillis: 1800000
+    softMinEvictableIdleTimeMillis: 1800000
+    numTestsPerEvictionRun: 3
+    testOnCreate: false
+    testOnBorrow: false
+    testOnReturn: false
+    testWhileIdle: false
+    timeBetweenEvictionRunsMillis: -1
+    blockWhenExhausted: true
+    timeOut: 1000
+
+metrics:
+  metricsName: prometheus
+  host:
+  port: 9071
+  async: true
+  threadCount : 16
+  jmxConfig:

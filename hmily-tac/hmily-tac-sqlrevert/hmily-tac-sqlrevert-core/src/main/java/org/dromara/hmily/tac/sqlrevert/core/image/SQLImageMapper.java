@@ -15,40 +15,19 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.tac.sqlrevert.spi.exception;
+package org.dromara.hmily.tac.sqlrevert.core.image;
 
 /**
- * The type Sql revert exception.
+ * SQL image mapper interface.
  *
- * @author xiaoyu
+ * @author zhaojun
  */
-public class SqlRevertException extends RuntimeException {
+public interface SQLImageMapper {
     
     /**
-     * Instantiates a new Sql revert exception.
+     * Cast image data to revert SQL unit.
      *
-     * @param e the e
+     * @return revert SQL unit
      */
-    public SqlRevertException(final Throwable e) {
-        super(e);
-    }
-    
-    /**
-     * Instantiates a new Sql revert exception.
-     *
-     * @param message the message
-     */
-    public SqlRevertException(final String message) {
-        super(message);
-    }
-    
-    /**
-     * Instantiates a new Sql revert exception.
-     *
-     * @param message   the message
-     * @param throwable the throwable
-     */
-    public SqlRevertException(final String message, final Throwable throwable) {
-        super(message, throwable);
-    }
+    RevertSQLUnit cast();
 }
