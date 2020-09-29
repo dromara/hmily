@@ -155,6 +155,22 @@ public class EtcdRealTest {
         Assert.assertEquals("xiaoyu", ConfigEnv.getInstance().getConfig(HmilyConfig.class).getAppName());
         Assert.assertEquals("kryo", ConfigEnv.getInstance().getConfig(HmilyConfig.class).getSerializer());
         Assert.assertEquals("threadLocal", ConfigEnv.getInstance().getConfig(HmilyConfig.class).getContextTransmittalMode());
+
+        // test add after delete
+        resourceAsStream = getClass().getResourceAsStream("/hmily-etcd-update.yml");
+        available = resourceAsStream.available();
+        bytes = IOUtils.readFully(resourceAsStream, available, false);
+        client.getKVClient().put(ByteSequence.fromString(config.getKey()), ByteSequence.fromBytes(bytes)).get();
+
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        Assert.assertEquals("xiaoyu1", ConfigEnv.getInstance().getConfig(HmilyConfig.class).getAppName());
+        Assert.assertEquals("kryo1", ConfigEnv.getInstance().getConfig(HmilyConfig.class).getSerializer());
+        Assert.assertEquals("threadLocal1", ConfigEnv.getInstance().getConfig(HmilyConfig.class).getContextTransmittalMode());
     }
 
 
