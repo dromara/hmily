@@ -18,6 +18,8 @@
 package org.dromara.hmily.repository.spi.entity;
 
 import java.io.Serializable;
+import java.util.Map;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -33,8 +35,15 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class HmilyUndoInvocation implements Serializable {
     
-    private String revertSql;
+    private static final long serialVersionUID = -4406133196112007765L;
     
     private String originSql;
     
+    private String tableName;
+    
+    private String manipulationType;
+    
+    private Map<String, Object> beforeImage;
+    
+    private Map<String, Object> afterImage;
 }

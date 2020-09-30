@@ -27,7 +27,7 @@ import org.dromara.hmily.spi.ExtensionLoaderFactory;
  */
 @Slf4j
 public class ConfigLoaderServer {
-    
+
     /**
      * Load config.
      */

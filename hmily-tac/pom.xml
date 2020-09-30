@@ -22,7 +22,7 @@
     <parent>
         <artifactId>hmily</artifactId>
         <groupId>org.dromara</groupId>
-        <version>2.1.0-SNAPSHOT</version>
+        <version>2.1.1</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -34,6 +34,7 @@
         <module>hmily-tac-sqlparser</module>
         <module>hmily-tac-p6spy</module>
         <module>hmily-tac-common</module>
+        <module>hmily-tac-sqlcompute</module>
         <module>hmily-tac-sqlrevert</module>
     </modules>
 </project>

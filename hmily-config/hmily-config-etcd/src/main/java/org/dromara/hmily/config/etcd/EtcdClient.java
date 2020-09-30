@@ -7,6 +7,7 @@ import com.coreos.jetcd.kv.GetResponse;
 import org.dromara.hmily.common.utils.CollectionUtils;
 import org.dromara.hmily.common.utils.StringUtils;
 import org.dromara.hmily.config.api.exception.ConfigException;
+import org.dromara.hmily.config.loader.ConfigLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,6 +18,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.function.Supplier;
 
 /**
  * etcd client.
@@ -27,6 +29,8 @@ public class EtcdClient {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EtcdClient.class);
 
+    private Client client;
+
     /**
      * Pull input stream.
      *
@@ -34,7 +38,7 @@ public class EtcdClient {
      * @return the input stream
      */
     public InputStream pull(final EtcdConfig config) {
-        Client client = Client.builder().endpoints(config.getServer()).build();
+        client = Client.builder().endpoints(config.getServer()).build();
         try {
             CompletableFuture<GetResponse> future = client.getKVClient().get(ByteSequence.fromString(config.getKey()));
             List<KeyValue> kvs;
@@ -57,5 +61,40 @@ public class EtcdClient {
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
             throw new ConfigException(e);
         }
+    }
+
+    /**
+     * Add listener.
+     *
+     * @param context        the context
+     * @param passiveHandler the passive handler
+     * @param config         the config
+     * @throws InterruptedException exception
+     */
+    void addListener(final Supplier<ConfigLoader.Context> context, final ConfigLoader.PassiveHandler<EtcdPassiveConfig> passiveHandler, final EtcdConfig config) throws InterruptedException {
+        if (!config.isPassive()) {
+            return;
+        }
+        if (client == null) {
+            LOGGER.warn("Etcd client is null...");
+        }
+        new Thread(() -> {
+            while (true) {
+                try {
+                    client.getWatchClient().watch(ByteSequence.fromString(config.getKey())).listen().getEvents().stream().forEach(watchEvent -> {
+                        KeyValue keyValue = watchEvent.getKeyValue();
+                        EtcdPassiveConfig etcdPassiveConfig = new EtcdPassiveConfig();
+                        etcdPassiveConfig.setKey(config.getKey());
+                        etcdPassiveConfig.setFileExtension(config.getFileExtension());
+                        etcdPassiveConfig.setValue(keyValue.getValue() != null ? keyValue.getValue().toStringUtf8() : null);
+                        passiveHandler.passive(context, etcdPassiveConfig);
+                    });
+                } catch (InterruptedException e) {
+                    LOGGER.error("", e);
+                }
+            }
+        }).start();
+
+        LOGGER.info("passive Etcd remote started....");
     }
 }

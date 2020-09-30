@@ -19,17 +19,15 @@ package org.dromara.hmily.core.bootstrap;
 
 import java.util.Objects;
 import org.dromara.hmily.common.exception.HmilyRuntimeException;
+import org.dromara.hmily.common.hook.HmilyShutdownHook;
 import org.dromara.hmily.common.utils.StringUtils;
 import org.dromara.hmily.config.api.ConfigEnv;
-import org.dromara.hmily.config.api.ConfigScan;
 import org.dromara.hmily.config.api.entity.HmilyConfig;
 import org.dromara.hmily.config.api.entity.HmilyMetricsConfig;
 import org.dromara.hmily.config.api.entity.HmilyServer;
-import org.dromara.hmily.config.loader.ConfigLoader;
-import org.dromara.hmily.config.loader.ServerConfigLoader;
+import org.dromara.hmily.config.loader.ConfigLoaderServer;
 import org.dromara.hmily.core.disruptor.publisher.HmilyRepositoryEventPublisher;
 import org.dromara.hmily.core.holder.SingletonHolder;
-import org.dromara.hmily.common.hook.HmilyShutdownHook;
 import org.dromara.hmily.core.logo.HmilyLogo;
 import org.dromara.hmily.core.provide.ObjectProvide;
 import org.dromara.hmily.core.provide.ReflectObject;
@@ -71,7 +69,7 @@ public final class HmilyBootstrap {
      */
     public void start() {
         try {
-            loadConfig();
+            ConfigLoaderServer.load();
             HmilyConfig hmilyConfig = ConfigEnv.getInstance().getConfig(HmilyConfig.class);
             check(hmilyConfig);
             registerProvide();
@@ -91,24 +89,9 @@ public final class HmilyBootstrap {
         }
     }
     
-    private void loadConfig() {
-        ConfigScan.scan();
-        ServerConfigLoader loader = new ServerConfigLoader();
-        loader.load(ConfigLoader.Context::new, (context, config) -> {
-            if (config != null) {
-                if (StringUtils.isNoneBlank(config.getConfigMode())) {
-                    String configMode = config.getConfigMode();
-                    ConfigLoader<?> configLoader = ExtensionLoaderFactory.load(ConfigLoader.class, configMode);
-                    LOGGER.info("Load the configuration【{}】information...", configMode);
-                    configLoader.load(context, (contextAfter, configAfter) -> LOGGER.info("Configuration information: {}", configAfter));
-                }
-            }
-        });
-    }
-    
     private void initMetrics() {
         HmilyMetricsConfig metricsConfig = ConfigEnv.getInstance().getConfig(HmilyMetricsConfig.class);
-        if (Objects.nonNull(metricsConfig)) {
+        if (Objects.nonNull(metricsConfig) && StringUtils.isNoneBlank(metricsConfig.getMetricsName())) {
             MetricsInit metricsInit = ExtensionLoaderFactory.load(MetricsInit.class);
             metricsInit.init(metricsConfig);
             registerAutoCloseable(metricsInit);
@@ -133,7 +116,6 @@ public final class HmilyBootstrap {
         hmilyRepository.setSerializer(hmilySerializer);
         hmilyRepository.init(buildAppName(hmilyConfig));
         HmilyRepositoryFacade.getInstance().setHmilyRepository(hmilyRepository);
-        HmilyRepositoryFacade.getInstance().setPhyDeleted(hmilyConfig.isPhyDeleted());
     }
     
     private String buildAppName(final HmilyConfig hmilyConfig) {

@@ -1,0 +1,15 @@
+server:
+  port: 18085
+  servlet:
+    context-path: /
+  address: 0.0.0.0
+spring:
+    datasource:
+        driver-class-name:  com.mysql.jdbc.Driver
+        url: jdbc:mysql://127.0.0.1:3306/hmily_stock?useUnicode=true&characterEncoding=utf8
+        username: root
+        password:
+
+mybatis:
+  type-aliases-package: org.dromara.hmily.demo.common.inventory.entity
+  config-location: classpath:mybatis/mybatis-config.xml
