@@ -25,7 +25,9 @@
     <artifactId>hmily-bom</artifactId>
     <version>2.1.2-SNAPSHOT</version>
     <packaging>pom</packaging>
-
+    <name>Hmily bom ${project.version}</name>
+    <description>Hmily bom</description>
+    <url>http://dromara.org</url>
     <organization>
         <name>dromara</name>
         <url>https://dromara.org</url>
