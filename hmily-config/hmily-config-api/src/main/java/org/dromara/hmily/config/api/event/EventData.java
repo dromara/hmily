@@ -140,4 +140,15 @@ public class EventData {
     public void setValue(final Object value) {
         this.value = value;
     }
+
+    @Override
+    public String toString() {
+        return "EventData{"
+                + "config=" + config
+                + ", value=" + value
+                + ", properties='" + properties + '\''
+                + ", subscribe='" + subscribe + '\''
+                + ", event=" + event
+                + '}';
+    }
 }
