@@ -34,18 +34,6 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.dromara</groupId>
-            <artifactId>hmily-tcc</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.dromara</groupId>
-            <artifactId>hmily-tac-p6spy</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.dromara</groupId>
-            <artifactId>hmily-spring-boot-starter-parent</artifactId>
-        </dependency>
-        <dependency>
             <groupId>io.springfox</groupId>
             <artifactId>springfox-swagger2</artifactId>
             <exclusions>
