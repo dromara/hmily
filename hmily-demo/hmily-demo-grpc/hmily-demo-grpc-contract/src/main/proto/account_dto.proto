@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "org.dromara.hmily.demo.grpc.account.dto";
+option objc_class_prefix = "HLW";
+
+message AccountRequest {
+
+    string userId = 1;
+
+    string amount = 2;
+}
+
+message AccountNestedRequest {
+
+    string userId = 1;
+
+    string amount = 2;
+
+    string productId = 3;
+
+    int32 count = 4;
+}
+
+message AccountResponse {
+    bool result = 1;
+}
+
+message AccountDO {
+    int32 id = 1;
+
+    string userId = 2;
+
+    string balance = 3;
+
+    string freezeAmount = 4;
+
+    string createTime = 5;
+
+    string updateTime = 6;
+}
+
