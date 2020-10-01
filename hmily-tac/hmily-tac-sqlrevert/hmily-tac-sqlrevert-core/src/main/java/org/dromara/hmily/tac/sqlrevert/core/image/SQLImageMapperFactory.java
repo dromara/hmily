@@ -41,7 +41,7 @@ public class SQLImageMapperFactory {
             case "insert":
                 return new InsertSQLImageMapper(undoInvocation.getTableName(), undoInvocation.getAfterImage());
             case "update":
-                return new UpdateSQLImageMapper(undoInvocation.getTableName(), undoInvocation.getBeforeImage(), undoInvocation.getAfterImage(), undoInvocation.getOriginSql());
+                return new UpdateSQLImageMapper(undoInvocation.getTableName(), undoInvocation.getBeforeImage(), undoInvocation.getAfterImage());
             case "delete":
                 return new DeleteSQLImageMapper(undoInvocation.getTableName(), undoInvocation.getBeforeImage());
             default:
