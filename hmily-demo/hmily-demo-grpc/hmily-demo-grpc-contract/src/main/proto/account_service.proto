@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "org.dromara.hmily.demo.grpc.account.service";
+option java_outer_classname = "AccountServiceProto";
+option objc_class_prefix = "HLW";
+
+import "account_dto.proto";
+
+service AccountService {
+
+    rpc payment (AccountRequest) returns (AccountResponse);
+
+    rpc mockTryPaymentException (AccountRequest) returns (AccountResponse);
+
+    rpc mockTryPaymentTimeout (AccountRequest) returns (AccountResponse);
+
+    rpc paymentTAC (AccountRequest) returns (AccountResponse);
+
+    rpc testPayment (AccountRequest) returns (AccountResponse);
+
+    rpc paymentWithNested (AccountNestedRequest) returns (AccountResponse);
+
+    rpc paymentWithNestedException (AccountNestedRequest) returns (AccountResponse);
+
+    rpc findByUserId (AccountRequest) returns (AccountDO);
+}
+

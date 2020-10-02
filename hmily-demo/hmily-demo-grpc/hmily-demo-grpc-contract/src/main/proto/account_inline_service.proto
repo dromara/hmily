@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "org.dromara.hmily.demo.grpc.account.service";
+option java_outer_classname = "InlineAccountServiceProto";
+option objc_class_prefix = "HLW";
+
+import "account_dto.proto";
+
+service InlineAccountService {
+    rpc testInline (AccountRequest) returns (AccountResponse);
+}
+

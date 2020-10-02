@@ -19,9 +19,10 @@ package org.dromara.hmily.tac.sqlrevert.core;
 
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipantUndo;
-import org.dromara.hmily.repository.spi.entity.HmilyUndoInvocation;
 import org.dromara.hmily.spi.HmilySPI;
 import org.dromara.hmily.tac.common.HmilyResourceManager;
+import org.dromara.hmily.tac.sqlrevert.core.image.RevertSQLUnit;
+import org.dromara.hmily.tac.sqlrevert.core.image.SQLImageMapperFactory;
 import org.dromara.hmily.tac.sqlrevert.spi.HmilySQLRevertEngine;
 import org.dromara.hmily.tac.sqlrevert.spi.exception.SQLRevertException;
 
@@ -42,30 +43,20 @@ public class DefaultSQLRevertEngine implements HmilySQLRevertEngine {
     
     @Override
     public boolean revert(final HmilyParticipantUndo participantUndo) throws SQLRevertException {
-        String revertSQL = generateRevertSQL(participantUndo.getUndoInvocation());
+        RevertSQLUnit revertSQLUnit = SQLImageMapperFactory.newInstance(participantUndo.getUndoInvocation()).cast();
         DataSource dataSource = HmilyResourceManager.get(participantUndo.getResourceId()).getTargetDataSource();
-        return executeUpdate(revertSQL, dataSource) > 0;
+        return executeUpdate(revertSQLUnit, dataSource) > 0;
     }
     
-    // TODO generate RevertSQLUnit (revert SQL and parameters) here, we need a RevertSQLGenerateFactory
-    private String generateRevertSQL(final HmilyUndoInvocation undoInvocation) {
-        String sql = undoInvocation.getOriginSql();
-        String result;
-        if (sql.contains("order")) {
-            String number = sql.substring(sql.indexOf("'") + 1, sql.length() - 1);
-            result = "update `order` set status = 3 where number = " + number;
-        } else if (sql.contains("account")) {
-            result = "update account set balance = balance + 1  where user_id = 10000 ";
-        } else {
-            result = "update inventory set total_inventory = total_inventory + 1 where product_id = 1";
-        }
-        return result;
-    }
-    
-    private int executeUpdate(final String sql, final DataSource dataSource) {
+    private int executeUpdate(final RevertSQLUnit unit, final DataSource dataSource) {
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement ps = connection.prepareStatement(sql)) {
-            return ps.executeUpdate();
+             PreparedStatement preparedStatement = connection.prepareStatement(unit.getSql())) {
+            int index = 1;
+            for (Object each : unit.getParameters()) {
+                preparedStatement.setObject(index, each);
+                index++;
+            }
+            return preparedStatement.executeUpdate();
         } catch (SQLException e) {
             log.error("hmily tac rollback exception -> ", e);
             return 0;
