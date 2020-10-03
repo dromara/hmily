@@ -19,6 +19,7 @@ package org.dromara.hmily.tac.sqlrevert.core;
 
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipantUndo;
+import org.dromara.hmily.repository.spi.entity.HmilySQLTuple;
 import org.dromara.hmily.spi.HmilySPI;
 import org.dromara.hmily.tac.common.HmilyResourceManager;
 import org.dromara.hmily.tac.sqlrevert.core.image.RevertSQLUnit;
@@ -26,10 +27,10 @@ import org.dromara.hmily.tac.sqlrevert.core.image.SQLImageMapperFactory;
 import org.dromara.hmily.tac.sqlrevert.spi.HmilySQLRevertEngine;
 import org.dromara.hmily.tac.sqlrevert.spi.exception.SQLRevertException;
 
-import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.Collection;
 
 /**
  * The type Default SQL revert engine.
@@ -43,22 +44,36 @@ public class DefaultSQLRevertEngine implements HmilySQLRevertEngine {
     
     @Override
     public boolean revert(final HmilyParticipantUndo participantUndo) throws SQLRevertException {
-        RevertSQLUnit revertSQLUnit = SQLImageMapperFactory.newInstance(participantUndo.getUndoInvocation()).cast();
-        DataSource dataSource = HmilyResourceManager.get(participantUndo.getResourceId()).getTargetDataSource();
-        return executeUpdate(revertSQLUnit, dataSource) > 0;
+        try (Connection connection = HmilyResourceManager.get(participantUndo.getResourceId()).getTargetDataSource().getConnection()) {
+            return doRevertInTransaction(connection, participantUndo.getUndoInvocation().getTuples());
+        } catch (final SQLException ex) {
+            log.error("hmily tac rollback exception -> ", ex);
+            return false;
+        }
     }
     
-    private int executeUpdate(final RevertSQLUnit unit, final DataSource dataSource) {
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(unit.getSql())) {
+    private boolean doRevertInTransaction(final Connection connection, final Collection<HmilySQLTuple> tuples) throws SQLException {
+        connection.setAutoCommit(false);
+        for (HmilySQLTuple tuple : tuples) {
+            if (executeUpdate(connection, SQLImageMapperFactory.newInstance(tuple).cast()) == 0) {
+                connection.rollback();
+                return false;
+            }
+        }
+        connection.commit();
+        return true;
+    }
+    
+    private int executeUpdate(final Connection connection, final RevertSQLUnit unit) {
+        try (PreparedStatement preparedStatement = connection.prepareStatement(unit.getSql())) {
             int index = 1;
             for (Object each : unit.getParameters()) {
                 preparedStatement.setObject(index, each);
                 index++;
             }
             return preparedStatement.executeUpdate();
-        } catch (SQLException e) {
-            log.error("hmily tac rollback exception -> ", e);
+        } catch (SQLException ex) {
+            log.error("hmily tac rollback exception -> ", ex);
             return 0;
         }
     }
