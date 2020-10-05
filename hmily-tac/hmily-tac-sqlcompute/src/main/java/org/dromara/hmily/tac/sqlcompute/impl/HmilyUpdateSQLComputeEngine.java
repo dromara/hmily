@@ -20,12 +20,12 @@ package org.dromara.hmily.tac.sqlcompute.impl;
 import lombok.RequiredArgsConstructor;
 import org.dromara.hmily.repository.spi.entity.HmilySQLTuple;
 import org.dromara.hmily.repository.spi.entity.HmilyUndoInvocation;
-import org.dromara.hmily.tac.sqlcompute.HmilySQLComputeEngine;
 import org.dromara.hmily.tac.sqlcompute.exception.SQLComputeException;
 import org.dromara.hmily.tac.sqlparser.model.statement.dml.HmilyUpdateStatement;
 
 import java.sql.Connection;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -34,15 +34,12 @@ import java.util.Map;
  * @author zhaojun
  */
 @RequiredArgsConstructor
-public final class HmilyUpdateSQLComputeEngine implements HmilySQLComputeEngine {
+public final class HmilyUpdateSQLComputeEngine extends AbstractHmilySQLComputeEngine {
     
     private final HmilyUpdateStatement statement;
     
     @Override
-    // TODO fix undoInvocation for poc test
-    // Implementation should be:
-    // 1.get beforeImage according to query undo sql
-    // 2.get afterImage according to query redo sql
+    // TODO fixture undoInvocation for poc test
     public HmilyUndoInvocation generateImage(final Connection connection, final String sql) throws SQLComputeException {
         Map<String, Object> beforeImage = new LinkedHashMap<>();
         Map<String, Object> afterImage = new LinkedHashMap<>();
@@ -61,5 +58,11 @@ public final class HmilyUpdateSQLComputeEngine implements HmilySQLComputeEngine 
             result.getTuples().add(new HmilySQLTuple("inventory", "update", beforeImage, afterImage));
         }
         return result;
+    }
+    
+    @Override
+    List<ImageSQLUnit> generateQueryImageSQLs(final String originalSQL) {
+        // TODO generate image SQL group according to parsed statement
+        return null;
     }
 }
