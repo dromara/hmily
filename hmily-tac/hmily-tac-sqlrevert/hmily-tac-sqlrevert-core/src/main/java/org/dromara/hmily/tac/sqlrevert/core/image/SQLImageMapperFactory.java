@@ -17,7 +17,7 @@
 
 package org.dromara.hmily.tac.sqlrevert.core.image;
 
-import org.dromara.hmily.repository.spi.entity.HmilyUndoInvocation;
+import org.dromara.hmily.repository.spi.entity.HmilySQLTuple;
 import org.dromara.hmily.tac.sqlrevert.core.image.impl.DeleteSQLImageMapper;
 import org.dromara.hmily.tac.sqlrevert.core.image.impl.InsertSQLImageMapper;
 import org.dromara.hmily.tac.sqlrevert.core.image.impl.UpdateSQLImageMapper;
@@ -33,19 +33,19 @@ public class SQLImageMapperFactory {
     /**
      * Create new instance of SQL image mapper.
      *
-     * @param undoInvocation undo invocation
+     * @param sqlTuple SQL tuple
      * @return SQL image mapper
      */
-    public static SQLImageMapper newInstance(final HmilyUndoInvocation undoInvocation) {
-        switch (undoInvocation.getManipulationType()) {
+    public static SQLImageMapper newInstance(final HmilySQLTuple sqlTuple) {
+        switch (sqlTuple.getManipulationType()) {
             case "insert":
-                return new InsertSQLImageMapper(undoInvocation.getTableName(), undoInvocation.getAfterImage());
+                return new InsertSQLImageMapper(sqlTuple.getTableName(), sqlTuple.getAfterImage());
             case "update":
-                return new UpdateSQLImageMapper(undoInvocation.getTableName(), undoInvocation.getBeforeImage(), undoInvocation.getAfterImage());
+                return new UpdateSQLImageMapper(sqlTuple.getTableName(), sqlTuple.getBeforeImage(), sqlTuple.getAfterImage());
             case "delete":
-                return new DeleteSQLImageMapper(undoInvocation.getTableName(), undoInvocation.getBeforeImage());
+                return new DeleteSQLImageMapper(sqlTuple.getTableName(), sqlTuple.getBeforeImage());
             default:
-                throw new SQLRevertException(String.format("unsupported SQL manipulate type [%s]", undoInvocation.getManipulationType()));
+                throw new SQLRevertException(String.format("unsupported SQL manipulate type [%s]", sqlTuple.getManipulationType()));
         }
     }
 }
