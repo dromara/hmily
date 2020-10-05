@@ -4,18 +4,20 @@ import org.dromara.hmily.annotation.HmilyTCC;
 import org.dromara.hmily.demo.common.inventory.dto.InventoryDTO;
 import org.dromara.hmily.demo.common.inventory.mapper.InventoryMapper;
 import org.dromara.hmily.demo.tars.inventory.service.InventoryService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.concurrent.atomic.AtomicInteger;
-
-import static com.sun.xml.internal.ws.spi.db.BindingContextFactory.LOGGER;
 
 /**
  * @Author tydhot
  */
 @Service("inventoryService")
 public class InventoryServiceImpl implements InventoryService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(InventoryServiceImpl.class);
 
     private final InventoryMapper inventoryMapper;
 

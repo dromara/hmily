@@ -8,16 +8,18 @@ import org.dromara.hmily.demo.common.order.mapper.OrderMapper;
 import org.dromara.hmily.demo.tars.order.servant.accountapp.AccountPrx;
 import org.dromara.hmily.demo.tars.order.servant.inventoryapp.InventoryPrx;
 import org.dromara.hmily.demo.tars.order.service.PaymentService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import static com.sun.xml.internal.ws.spi.db.BindingContextFactory.LOGGER;
 
 /**
  * @Author tydhot
  */
 @Service("paymentService")
 public class PaymentServiceImpl implements PaymentService{
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(PaymentServiceImpl.class);
 
     @TarsClient("TestInventory.InventoryApp.InventoryObj")
     InventoryPrx inventoryPrx;
