@@ -2,10 +2,6 @@ package org.dromara.hmily.config.etcd;
 
 import com.coreos.jetcd.Client;
 import com.coreos.jetcd.data.ByteSequence;
-import com.coreos.jetcd.data.KeyValue;
-import com.coreos.jetcd.kv.PutResponse;
-import com.coreos.jetcd.watch.WatchEvent;
-import org.apache.commons.lang3.StringUtils;
 import org.dromara.hmily.config.api.ConfigEnv;
 import org.dromara.hmily.config.api.ConfigScan;
 import org.dromara.hmily.config.api.entity.HmilyConfig;
@@ -19,8 +15,6 @@ import sun.misc.IOUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 /**
