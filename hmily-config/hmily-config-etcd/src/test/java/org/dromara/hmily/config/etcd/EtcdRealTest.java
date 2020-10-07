@@ -48,7 +48,7 @@ public class EtcdRealTest {
         int available = resourceAsStream.available();
         byte[] bytes = IOUtils.readFully(resourceAsStream, available, false);
         client.getKVClient().put(ByteSequence.fromString(config.getKey()), ByteSequence.fromBytes(bytes)).get();
-        EtcdClient etcdClient = new EtcdClient();
+        EtcdClient etcdClient = EtcdClient.getInstance(buildConfig());
         InputStream is = etcdClient.pull(config);
         byte[] remoteConfig = IOUtils.readFully(is, available, false);
         Assert.assertArrayEquals(bytes, remoteConfig);
