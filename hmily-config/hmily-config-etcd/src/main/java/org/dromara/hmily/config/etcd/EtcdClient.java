@@ -31,6 +31,20 @@ public class EtcdClient {
 
     private Client client;
 
+    private EtcdClient() {
+    }
+
+    public void setClient(Client client) {
+        this.client = client;
+    }
+
+    public static EtcdClient getInstance(EtcdConfig config) {
+        Client client = Client.builder().endpoints(config.getServer()).build();
+        EtcdClient etcdClient = new EtcdClient();
+        etcdClient.setClient(client);
+        return etcdClient;
+    }
+
     /**
      * Pull input stream.
      *
@@ -59,6 +73,14 @@ public class EtcdClient {
             }
             return null;
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
+            throw new ConfigException(e);
+        }
+    }
+
+    public void put(String key, String content) {
+        try {
+            client.getKVClient().put(ByteSequence.fromString(key), ByteSequence.fromString(content)).get();
+        } catch (InterruptedException | ExecutionException e) {
             throw new ConfigException(e);
         }
     }
