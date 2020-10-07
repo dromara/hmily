@@ -23,7 +23,7 @@
     <parent>
         <groupId>org.dromara</groupId>
         <artifactId>hmily-tac</artifactId>
-        <version>2.1.1</version>
+        <version>2.1.2-SNAPSHOT</version>
     </parent>
     <artifactId>hmily-tac-sqlcompute</artifactId>
     

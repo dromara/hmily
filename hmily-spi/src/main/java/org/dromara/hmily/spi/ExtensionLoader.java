@@ -281,22 +281,22 @@ public final class ExtensionLoader<T> {
     
     private void loadClass(final List<ExtensionEntity> entityList, final String className, final ClassLoader loader) throws ClassNotFoundException {
         if (!containsClazz(className, loader)) {
-            Class<?> clazz = Class.forName(className, true, loader);
-            if (!clazz.isAssignableFrom(clazz)) {
-                throw new IllegalStateException("load extension resources error," + clazz + " subtype is not of " + clazz);
+            Class<?> subClazz = Class.forName(className, true, loader);
+            if (!clazz.isAssignableFrom(subClazz)) {
+                throw new IllegalStateException("load extension resources error," + clazz + " subtype is not of " + subClazz);
             }
             String name = null;
             int order = 0;
             ScopeType scope = ScopeType.SINGLETON;
-            HmilySPI hmilySPI = clazz.getAnnotation(HmilySPI.class);
+            HmilySPI hmilySPI = subClazz.getAnnotation(HmilySPI.class);
             if (null != hmilySPI) {
                 name = hmilySPI.value();
                 order = hmilySPI.order();
                 scope = hmilySPI.scopeType();
             }
-            ExtensionEntity result = new ExtensionEntity(name, clazz, order, scope);
+            ExtensionEntity result = new ExtensionEntity(name, subClazz, order, scope);
             entityList.add(result);
-            classToEntityMap.put(clazz, result);
+            classToEntityMap.put(subClazz, result);
             if (null != name) {
                 nameToEntityMap.put(name, result);
             }

@@ -18,12 +18,15 @@
 package org.dromara.hmily.tac.sqlcompute.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.dromara.hmily.repository.spi.entity.HmilySQLTuple;
 import org.dromara.hmily.repository.spi.entity.HmilyUndoInvocation;
-import org.dromara.hmily.tac.sqlcompute.HmilySQLComputeEngine;
 import org.dromara.hmily.tac.sqlcompute.exception.SQLComputeException;
 import org.dromara.hmily.tac.sqlparser.model.statement.dml.HmilyUpdateStatement;
 
 import java.sql.Connection;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Hmily update SQL compute engine.
@@ -31,15 +34,35 @@ import java.sql.Connection;
  * @author zhaojun
  */
 @RequiredArgsConstructor
-public final class HmilyUpdateSQLComputeEngine implements HmilySQLComputeEngine {
+public final class HmilyUpdateSQLComputeEngine extends AbstractHmilySQLComputeEngine {
     
     private final HmilyUpdateStatement statement;
     
     @Override
+    // TODO fixture undoInvocation for poc test
     public HmilyUndoInvocation generateImage(final Connection connection, final String sql) throws SQLComputeException {
-        HmilyUndoInvocation undoInvocation = new HmilyUndoInvocation();
-        undoInvocation.setManipulationType("update");
-        undoInvocation.setOriginSql(sql);
-        return undoInvocation;
+        Map<String, Object> beforeImage = new LinkedHashMap<>();
+        Map<String, Object> afterImage = new LinkedHashMap<>();
+        HmilyUndoInvocation result = new HmilyUndoInvocation();
+        if (sql.contains("order")) {
+            beforeImage.put("status", 3);
+            afterImage.put("number", sql.substring(sql.indexOf("'") + 1, sql.length() - 1));
+            result.getTuples().add(new HmilySQLTuple("order", "update", beforeImage, afterImage));
+        } else if (sql.contains("account")) {
+            beforeImage.put("balance", 100);
+            afterImage.put("user_id", 10000);
+            result.getTuples().add(new HmilySQLTuple("account", "update", beforeImage, afterImage));
+        } else {
+            beforeImage.put("total_inventory", 100);
+            afterImage.put("product_id", 1);
+            result.getTuples().add(new HmilySQLTuple("inventory", "update", beforeImage, afterImage));
+        }
+        return result;
+    }
+    
+    @Override
+    List<ImageSQLUnit> generateQueryImageSQLs(final String originalSQL) {
+        // TODO generate image SQL group according to parsed statement
+        return null;
     }
 }

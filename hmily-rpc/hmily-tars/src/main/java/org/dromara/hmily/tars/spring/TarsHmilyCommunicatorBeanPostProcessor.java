@@ -10,8 +10,8 @@ import com.qq.tars.spring.annotation.TarsClient;
 import org.dromara.hmily.tars.loadbalance.HmilyLoadBalance;
 import org.dromara.hmily.tars.loadbalance.HmilyRoundRobinLoadBalance;
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.support.MergedBeanDefinitionPostProcessor;
-import org.springframework.beans.factory.support.RootBeanDefinition;
+import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.core.Ordered;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.ReflectionUtils;
 
@@ -22,7 +22,7 @@ import java.lang.reflect.Field;
  *
  * @author tydhot
  */
-public class TarsHmilyCommunicatorBeanPostProcessor implements MergedBeanDefinitionPostProcessor {
+public class TarsHmilyCommunicatorBeanPostProcessor implements BeanPostProcessor, Ordered {
 
     private final Communicator communicator;
 
@@ -86,7 +86,7 @@ public class TarsHmilyCommunicatorBeanPostProcessor implements MergedBeanDefinit
     }
 
     @Override
-    public void postProcessMergedBeanDefinition(final RootBeanDefinition rootBeanDefinition, final Class<?> aClass, final String s) {
-
+    public int getOrder() {
+        return 0;
     }
 }
