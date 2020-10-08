@@ -5,13 +5,13 @@ import org.dromara.hmily.demo.common.account.dto.AccountDTO;
 import org.dromara.hmily.demo.common.account.entity.AccountDO;
 import org.dromara.hmily.demo.common.account.mapper.AccountMapper;
 import org.dromara.hmily.demo.tars.account.service.AccountService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.concurrent.atomic.AtomicInteger;
-
-import static com.sun.xml.internal.ws.spi.db.BindingContextFactory.LOGGER;
 
 /**
  * @Author tydhot
@@ -19,6 +19,8 @@ import static com.sun.xml.internal.ws.spi.db.BindingContextFactory.LOGGER;
 @Service("accountService")
 public class AccountServiceImpl implements AccountService {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(AccountServiceImpl.class);
+    
     private final AccountMapper accountMapper;
 
     /**
