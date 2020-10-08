@@ -1,5 +1,6 @@
 package org.dromara.hmily.config.etcd;
 
+import org.dromara.hmily.common.utils.FileUtils;
 import org.dromara.hmily.common.utils.StringUtils;
 import org.dromara.hmily.config.api.Config;
 import org.dromara.hmily.config.api.ConfigEnv;
@@ -35,7 +36,7 @@ public class EtcdConfigLoader implements ConfigLoader<EtcdConfig> {
 
     private static final Map<String, PropertyLoader> LOADERS = new HashMap<>();
 
-    private EtcdClient client = new EtcdClient();
+    private EtcdClient client;
 
     static {
         LOADERS.put("yml", new YamlPropertyLoader());
@@ -96,6 +97,12 @@ public class EtcdConfigLoader implements ConfigLoader<EtcdConfig> {
     private void etcdLoad(final Supplier<Context> context, final LoaderHandler<EtcdConfig> handler, final EtcdConfig config) {
         if (config != null) {
             check(config);
+            if (Objects.isNull(client)) {
+                client = EtcdClient.getInstance(config);
+            }
+            if (config.isUpdate()) {
+                client.put(config.getKey(), FileUtils.readYAML(config.getUpdateFileName()));
+            }
             LOGGER.info("loader etcd config: {}", config);
             String fileExtension = config.getFileExtension();
             PropertyLoader propertyLoader = LOADERS.get(fileExtension);
