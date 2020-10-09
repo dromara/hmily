@@ -22,9 +22,6 @@ import lombok.RequiredArgsConstructor;
 import org.dromara.hmily.repository.spi.entity.HmilySQLTuple;
 import org.dromara.hmily.repository.spi.entity.HmilyUndoInvocation;
 import org.dromara.hmily.tac.sqlcompute.exception.SQLComputeException;
-import org.dromara.hmily.tac.sqlparser.model.segment.dml.expr.complex.HmilyCommonExpressionSegment;
-import org.dromara.hmily.tac.sqlparser.model.segment.dml.expr.simple.HmilyLiteralExpressionSegment;
-import org.dromara.hmily.tac.sqlparser.model.segment.dml.item.HmilyExpressionProjectionSegment;
 import org.dromara.hmily.tac.sqlparser.model.segment.generic.table.HmilySimpleTableSegment;
 import org.dromara.hmily.tac.sqlparser.model.statement.dml.HmilyUpdateStatement;
 
@@ -47,7 +44,7 @@ public final class HmilyUpdateSQLComputeEngine extends AbstractHmilySQLComputeEn
     private final HmilyUpdateStatement statement;
     
     @Override
-    // TODO fixture undoInvocation for poc test
+    // FIXME fixture undoInvocation for poc test
     public HmilyUndoInvocation generateImage(final Connection connection, final String sql) throws SQLComputeException {
         Map<String, Object> beforeImage = new LinkedHashMap<>();
         Map<String, Object> afterImage = new LinkedHashMap<>();
@@ -70,12 +67,11 @@ public final class HmilyUpdateSQLComputeEngine extends AbstractHmilySQLComputeEn
     
     @Override
     Collection<ImageSQLUnit> generateQueryImageSQLs(final String sql) {
-        // TODO generate image SQL group according to parsed statement
         Collection<ImageSQLUnit> result = new LinkedList<>();
         String tables = getTables(sql);
         String whereCondition = getWhereCondition(sql);
         statement.getTables().forEach(segment -> {
-            String imageSQL = String.format("SELECT %s FROM %s %s", Joiner.on(",").join(getUndoItems(segment), getRedoItems(segment)), tables, whereCondition);
+            String imageSQL = String.format("SELECT %s FROM %s %s", Joiner.on(",").join(getUndoItems(segment), getRedoItems(segment, new LinkedList<>())), tables, whereCondition);
             result.add(new ImageSQLUnit(imageSQL, new LinkedList<>(), "update", sql.substring(segment.getStartIndex(), segment.getStopIndex())));
         });
         return result;
@@ -93,19 +89,11 @@ public final class HmilyUpdateSQLComputeEngine extends AbstractHmilySQLComputeEn
         return result;
     }
     
-    private List<String> getRedoItems(final HmilySimpleTableSegment tableSegment) {
+    private List<String> getRedoItems(final HmilySimpleTableSegment tableSegment, final List<Object> parameters) {
         List<String> result = new LinkedList<>();
         // TODO filter the column which don't belong to current table
         statement.getSetAssignment().getAssignments().forEach(assignment -> {
-            Object value;
-            if (assignment.getValue() instanceof HmilyLiteralExpressionSegment) {
-                value = ((HmilyLiteralExpressionSegment) assignment.getValue()).getLiterals();
-            } else if (assignment.getValue() instanceof HmilyExpressionProjectionSegment) {
-                value = ((HmilyExpressionProjectionSegment) assignment.getValue()).getText();
-            } else {
-                value = ((HmilyCommonExpressionSegment) assignment.getValue()).getText();
-            }
-            result.add(String.format("%s AS $after_image$%s", value, assignment.getColumn().getIdentifier().getValue()));
+            result.add(String.format("%s AS $after_image$%s", ExpressionHandler.getValue(parameters, assignment.getValue()), assignment.getColumn().getIdentifier().getValue()));
         });
         return result;
     }
