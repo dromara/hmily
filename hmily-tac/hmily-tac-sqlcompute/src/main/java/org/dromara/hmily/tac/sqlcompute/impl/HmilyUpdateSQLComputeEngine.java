@@ -22,9 +22,6 @@ import lombok.RequiredArgsConstructor;
 import org.dromara.hmily.repository.spi.entity.HmilySQLTuple;
 import org.dromara.hmily.repository.spi.entity.HmilyUndoInvocation;
 import org.dromara.hmily.tac.sqlcompute.exception.SQLComputeException;
-import org.dromara.hmily.tac.sqlparser.model.segment.dml.expr.complex.HmilyCommonExpressionSegment;
-import org.dromara.hmily.tac.sqlparser.model.segment.dml.expr.simple.HmilyLiteralExpressionSegment;
-import org.dromara.hmily.tac.sqlparser.model.segment.dml.item.HmilyExpressionProjectionSegment;
 import org.dromara.hmily.tac.sqlparser.model.segment.generic.table.HmilySimpleTableSegment;
 import org.dromara.hmily.tac.sqlparser.model.statement.dml.HmilyUpdateStatement;
 
