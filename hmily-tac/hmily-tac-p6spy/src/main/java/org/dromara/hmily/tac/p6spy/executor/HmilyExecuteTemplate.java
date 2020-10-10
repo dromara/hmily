@@ -163,9 +163,4 @@ public enum HmilyExecuteTemplate {
         HmilyTransactionContext transactionContext = HmilyContextHolder.get();
         return Objects.isNull(transactionContext) || !TransTypeEnum.TAC.name().equalsIgnoreCase(transactionContext.getTransType());
     }
-    
-    @Override
-    public String toString() {
-        return super.toString();
-    }
 }
