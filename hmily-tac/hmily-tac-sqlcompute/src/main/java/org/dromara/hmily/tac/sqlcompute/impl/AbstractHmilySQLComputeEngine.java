@@ -31,6 +31,7 @@ import java.sql.SQLException;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -43,20 +44,20 @@ import java.util.Map;
 public abstract class AbstractHmilySQLComputeEngine implements HmilySQLComputeEngine {
     
     @Override
-    public HmilyUndoInvocation generateImage(final Connection connection, final String sql) throws SQLComputeException {
+    public HmilyUndoInvocation generateImage(final String sql, final List<Object> parameters, final Connection connection) throws SQLComputeException {
         HmilyUndoInvocation result = new HmilyUndoInvocation();
         try {
-            result.getTuples().addAll(generateSQLTuples(connection, sql));
+            result.getTuples().addAll(generateSQLTuples(connection, sql, parameters));
         } catch (final SQLException ex) {
             throw new SQLComputeException(ex);
         }
         return result;
     }
     
-    private Collection<HmilySQLTuple> generateSQLTuples(final Connection connection, final String originalSQL) throws SQLException {
+    private Collection<HmilySQLTuple> generateSQLTuples(final Connection connection, final String originalSQL, final List<Object> parameters) throws SQLException {
         Collection<HmilySQLTuple> result = new LinkedList<>();
-        for (ImageSQLUnit each : generateQueryImageSQLs(originalSQL)) {
-            Collection<Map<String, Object>> data = doQueryImage(connection, each.getSql());
+        for (ImageSQLUnit each : generateQueryImageSQLs(originalSQL, parameters)) {
+            Collection<Map<String, Object>> data = doQueryImage(connection, each.getSql(), each.getParameters());
             result.addAll(doGenerateSQLTuples(data, each.getTableName(), each.getManipulationType()));
         }
         return result;
@@ -68,17 +69,22 @@ public abstract class AbstractHmilySQLComputeEngine implements HmilySQLComputeEn
      * @param originalSQL original SQL
      * @return list of image SQL unit
      */
-    abstract Collection<ImageSQLUnit> generateQueryImageSQLs(String originalSQL);
+    abstract Collection<ImageSQLUnit> generateQueryImageSQLs(String originalSQL, List<Object> parameters);
     
-    private Collection<Map<String, Object>> doQueryImage(final Connection connection, final String sql) throws SQLException {
+    private Collection<Map<String, Object>> doQueryImage(final Connection connection, final String sql, final List<Object> parameters) throws SQLException {
         Collection<Map<String, Object>> result = new LinkedList<>();
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            int parameterIndex = 1;
+            for (Object each : parameters) {
+                preparedStatement.setObject(parameterIndex, each);
+                parameterIndex++;
+            }
             ResultSet resultSet = preparedStatement.executeQuery();
             ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
             while (resultSet.next()) {
                 Map<String, Object> record = new LinkedHashMap<>();
-                for (int index = 1; index <= resultSetMetaData.getColumnCount(); index++) {
-                    record.put(resultSetMetaData.getColumnLabel(index), resultSet.getObject(index));
+                for (int columnIndex = 1; columnIndex <= resultSetMetaData.getColumnCount(); columnIndex++) {
+                    record.put(resultSetMetaData.getColumnLabel(columnIndex), resultSet.getObject(columnIndex));
                     result.add(record);
                 }
             }
