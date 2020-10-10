@@ -2,6 +2,7 @@ package org.dromara.hmily.tars.startup;
 
 import com.qq.tars.client.Communicator;
 import org.dromara.hmily.tars.spring.TarsHmilyCommunicatorBeanPostProcessor;
+import org.dromara.hmily.tars.spring.TarsHmilyFilterStartupBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -30,8 +31,8 @@ public class TarsHmilyConfiguration {
      * @return TarsHmilyStartup
      */
     @Bean
-    public TarsHmilyFilterStartup tarsHmilyStartup() {
-        return new TarsHmilyFilterStartup();
+    public TarsHmilyFilterStartupBean tarsHmilyStartupBean() {
+        return new TarsHmilyFilterStartupBean();
     }
 
 }

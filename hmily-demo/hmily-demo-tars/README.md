@@ -19,7 +19,8 @@
 # 建立tars节点
 根据[此文] (https://tarscloud.github.io/TarsDocs/dev/tarsjava/tars-quick-start.html)在当前tars平台建立       
 - 应用名:TestInventory,服务名称:InventoryApp,Obj名:InventoryObj,端口29740的节点。        
-- 应用名:HmilyAccount,服务名称:AccountApp,Obj名:AccountObj,端口10386的节点。       
+- 应用名:HmilyAccount,服务名称:AccountApp,Obj名:AccountObj,端口10386的节点。         
+在完成节点的建立后，分别到hmily-demo-tars-springboot-account和hmily-demo-tars-springboot-inventory目录下执行mvn clean package命令打包并按照[此文] (https://tarscloud.github.io/TarsDocs/dev/tarsjava/tars-quick-start.html)在两个前面建立的节点上使用打包的成果物进行节点发布。     
 
 # 使用你的工具 idea 打开项目，找到hmily-demo-tars-springboot项目。
 ## 修改项目配置（hmily-demo-tars-springboot-account为列子）
@@ -41,7 +42,7 @@ repository:
     username: root #改成你的用户名
     password: #改成你的密码
 ```
-- 将rescouces目录下的config.conf后缀文件里的192.168.41.102全部替换成tars平台ip,并在启动参数中添加-Dconfig=该文件的路径
+- 将rescouces目录下的config.conf后缀文件里的192.168.41.102全局替换成tars平台ip,并在启动参数中添加-Dconfig=该文件的路径
 
 - run TarsHmilyAccountApplication.java
 
