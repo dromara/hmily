@@ -48,9 +48,9 @@ public final class HmilyInsertSQLComputeEngine implements HmilySQLComputeEngine 
     private final HmilyInsertStatement sqlStatement;
     
     @Override
-    public HmilyUndoInvocation generateImage(final Connection connection, final String sql) throws SQLComputeException {
+    public HmilyUndoInvocation generateImage(final String sql, final List<Object> parameters, final Connection connection) throws SQLComputeException {
         HmilyUndoInvocation result = new HmilyUndoInvocation();
-        result.getTuples().addAll(generateSQLTuples(sql, new LinkedList<>()));
+        result.getTuples().addAll(generateSQLTuples(sql, parameters));
         return result;
     }
     

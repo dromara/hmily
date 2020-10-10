@@ -41,11 +41,11 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public final class HmilyUpdateSQLComputeEngine extends AbstractHmilySQLComputeEngine {
     
-    private final HmilyUpdateStatement statement;
+    private final HmilyUpdateStatement sqlStatement;
     
     @Override
     // FIXME fixture undoInvocation for poc test
-    public HmilyUndoInvocation generateImage(final Connection connection, final String sql) throws SQLComputeException {
+    public HmilyUndoInvocation generateImage(final String sql, final List<Object> parameters, final Connection connection) throws SQLComputeException {
         Map<String, Object> beforeImage = new LinkedHashMap<>();
         Map<String, Object> afterImage = new LinkedHashMap<>();
         HmilyUndoInvocation result = new HmilyUndoInvocation();
@@ -66,12 +66,12 @@ public final class HmilyUpdateSQLComputeEngine extends AbstractHmilySQLComputeEn
     }
     
     @Override
-    Collection<ImageSQLUnit> generateQueryImageSQLs(final String sql) {
+    Collection<ImageSQLUnit> generateQueryImageSQLs(final String sql, final List<Object> parameters) {
         Collection<ImageSQLUnit> result = new LinkedList<>();
         String tables = getTables(sql);
         String whereCondition = getWhereCondition(sql);
-        statement.getTables().forEach(segment -> {
-            String imageSQL = String.format("SELECT %s FROM %s %s", Joiner.on(",").join(getUndoItems(segment), getRedoItems(segment, new LinkedList<>())), tables, whereCondition);
+        sqlStatement.getTables().forEach(segment -> {
+            String imageSQL = String.format("SELECT %s FROM %s %s", Joiner.on(",").join(getUndoItems(segment), getRedoItems(segment, parameters)), tables, whereCondition);
             result.add(new ImageSQLUnit(imageSQL, new LinkedList<>(), "update", sql.substring(segment.getStartIndex(), segment.getStopIndex())));
         });
         return result;
@@ -92,19 +92,19 @@ public final class HmilyUpdateSQLComputeEngine extends AbstractHmilySQLComputeEn
     private List<String> getRedoItems(final HmilySimpleTableSegment tableSegment, final List<Object> parameters) {
         List<String> result = new LinkedList<>();
         // TODO filter the column which don't belong to current table
-        statement.getSetAssignment().getAssignments().forEach(assignment -> {
+        sqlStatement.getSetAssignment().getAssignments().forEach(assignment -> {
             result.add(String.format("%s AS $after_image$%s", ExpressionHandler.getValue(parameters, assignment.getValue()), assignment.getColumn().getIdentifier().getValue()));
         });
         return result;
     }
     
     private String getTables(final String sql) {
-        List<String> tables = statement.getTables().stream().map(segment -> sql.substring(segment.getStartIndex(), segment.getStopIndex())).collect(Collectors.toList());
+        List<String> tables = sqlStatement.getTables().stream().map(segment -> sql.substring(segment.getStartIndex(), segment.getStopIndex())).collect(Collectors.toList());
         return Joiner.on(",").join(tables);
     }
     
     private String getWhereCondition(final String sql) {
-        return statement.getWhere().map(segment -> sql.substring(segment.getStartIndex(), segment.getStopIndex()))
+        return sqlStatement.getWhere().map(segment -> sql.substring(segment.getStartIndex(), segment.getStopIndex()))
             .orElseThrow(() -> new SQLComputeException("DML SQL should contain where condition"));
     }
 }

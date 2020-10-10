@@ -95,7 +95,7 @@ public enum HmilyExecuteTemplate {
             HmilyStatement statement = hmilySqlParserEngine.parser(sql, DatabaseTypes.INSTANCE.getDatabaseType());
             // TODO should generate lock-key to avoid dirty data modified by other global transaction.
             HmilySQLComputeEngine hmilySQLComputeEngine = HmilySQLComputeEngineFactory.newInstance(statement);
-            HmilyUndoInvocation hmilyUndoInvocation = hmilySQLComputeEngine.generateImage(connectionInformation.getConnection(), sql);
+            HmilyUndoInvocation hmilyUndoInvocation = hmilySQLComputeEngine.generateImage(sql, parameters, connectionInformation.getConnection());
             //4.缓存sql日志记录 ? 存储到哪里呢 threadLocal？
             HmilyUndoContext context = new HmilyUndoContext();
             context.setUndoInvocation(hmilyUndoInvocation);
