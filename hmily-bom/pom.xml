@@ -33,6 +33,7 @@
         <spring.version>5.0.7.RELEASE</spring.version>
         <spring-cloud.version>Finchley.RELEASE</spring-cloud.version>
         <dubbo.version>2.6.2</dubbo.version>
+        <brpc.version>3.0.2</brpc.version>
         <apache.dubbo.version>2.7.1</apache.dubbo.version>
         <sofa.rpc.version>5.5.3</sofa.rpc.version>
         <mongo.driver.version>3.8.0</mongo.driver.version>
@@ -168,6 +169,23 @@
                 <groupId>org.apache.dubbo</groupId>
                 <artifactId>dubbo</artifactId>
                 <version>${apache.dubbo.version}</version>
+            </dependency>
+
+            <!-- baidu-brpc config-->
+            <dependency>
+                <groupId>com.baidu</groupId>
+                <artifactId>brpc-java</artifactId>
+                <version>${brpc.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.baidu</groupId>
+                <artifactId>brpc-spring</artifactId>
+                <version>${brpc.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.baidu</groupId>
+                <artifactId>brpc-spring-boot-starter</artifactId>
+                <version>${brpc.version}</version>
             </dependency>
 
             <dependency>
