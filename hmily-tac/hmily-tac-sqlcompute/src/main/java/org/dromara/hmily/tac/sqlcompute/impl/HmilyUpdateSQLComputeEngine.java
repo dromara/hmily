@@ -17,16 +17,21 @@
 
 package org.dromara.hmily.tac.sqlcompute.impl;
 
+import com.google.common.base.Joiner;
 import lombok.RequiredArgsConstructor;
 import org.dromara.hmily.repository.spi.entity.HmilySQLTuple;
 import org.dromara.hmily.repository.spi.entity.HmilyUndoInvocation;
-import org.dromara.hmily.tac.sqlcompute.HmilySQLComputeEngine;
 import org.dromara.hmily.tac.sqlcompute.exception.SQLComputeException;
+import org.dromara.hmily.tac.sqlparser.model.segment.generic.table.HmilySimpleTableSegment;
 import org.dromara.hmily.tac.sqlparser.model.statement.dml.HmilyUpdateStatement;
 
 import java.sql.Connection;
+import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Hmily update SQL compute engine.
@@ -34,15 +39,12 @@ import java.util.Map;
  * @author zhaojun
  */
 @RequiredArgsConstructor
-public final class HmilyUpdateSQLComputeEngine implements HmilySQLComputeEngine {
+public final class HmilyUpdateSQLComputeEngine extends AbstractHmilySQLComputeEngine {
     
     private final HmilyUpdateStatement statement;
     
     @Override
-    // TODO fix undoInvocation for poc test
-    // Implementation should be:
-    // 1.get beforeImage according to query undo sql
-    // 2.get afterImage according to query redo sql
+    // FIXME fixture undoInvocation for poc test
     public HmilyUndoInvocation generateImage(final Connection connection, final String sql) throws SQLComputeException {
         Map<String, Object> beforeImage = new LinkedHashMap<>();
         Map<String, Object> afterImage = new LinkedHashMap<>();
@@ -61,5 +63,48 @@ public final class HmilyUpdateSQLComputeEngine implements HmilySQLComputeEngine 
             result.getTuples().add(new HmilySQLTuple("inventory", "update", beforeImage, afterImage));
         }
         return result;
+    }
+    
+    @Override
+    Collection<ImageSQLUnit> generateQueryImageSQLs(final String sql) {
+        Collection<ImageSQLUnit> result = new LinkedList<>();
+        String tables = getTables(sql);
+        String whereCondition = getWhereCondition(sql);
+        statement.getTables().forEach(segment -> {
+            String imageSQL = String.format("SELECT %s FROM %s %s", Joiner.on(",").join(getUndoItems(segment), getRedoItems(segment, new LinkedList<>())), tables, whereCondition);
+            result.add(new ImageSQLUnit(imageSQL, new LinkedList<>(), "update", sql.substring(segment.getStartIndex(), segment.getStopIndex())));
+        });
+        return result;
+    }
+    
+    private String getUndoItems(final HmilySimpleTableSegment segment) {
+        String result;
+        if (segment.getAlias().isPresent()) {
+            result = String.format("%s.*", segment.getAlias().get());
+        } else if (segment.getOwner().isPresent()) {
+            result = String.format("%s.%s.*", segment.getOwner(), segment.getTableName().getIdentifier().getValue());
+        } else {
+            result = String.format("%s.*", segment.getTableName().getIdentifier().getValue());
+        }
+        return result;
+    }
+    
+    private List<String> getRedoItems(final HmilySimpleTableSegment tableSegment, final List<Object> parameters) {
+        List<String> result = new LinkedList<>();
+        // TODO filter the column which don't belong to current table
+        statement.getSetAssignment().getAssignments().forEach(assignment -> {
+            result.add(String.format("%s AS $after_image$%s", ExpressionHandler.getValue(parameters, assignment.getValue()), assignment.getColumn().getIdentifier().getValue()));
+        });
+        return result;
+    }
+    
+    private String getTables(final String sql) {
+        List<String> tables = statement.getTables().stream().map(segment -> sql.substring(segment.getStartIndex(), segment.getStopIndex())).collect(Collectors.toList());
+        return Joiner.on(",").join(tables);
+    }
+    
+    private String getWhereCondition(final String sql) {
+        return statement.getWhere().map(segment -> sql.substring(segment.getStartIndex(), segment.getStopIndex()))
+            .orElseThrow(() -> new SQLComputeException("DML SQL should contain where condition"));
     }
 }

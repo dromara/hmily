@@ -2,10 +2,6 @@ package org.dromara.hmily.config.etcd;
 
 import com.coreos.jetcd.Client;
 import com.coreos.jetcd.data.ByteSequence;
-import com.coreos.jetcd.data.KeyValue;
-import com.coreos.jetcd.kv.PutResponse;
-import com.coreos.jetcd.watch.WatchEvent;
-import org.apache.commons.lang3.StringUtils;
 import org.dromara.hmily.config.api.ConfigEnv;
 import org.dromara.hmily.config.api.ConfigScan;
 import org.dromara.hmily.config.api.entity.HmilyConfig;
@@ -19,8 +15,6 @@ import sun.misc.IOUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -48,7 +42,7 @@ public class EtcdRealTest {
         int available = resourceAsStream.available();
         byte[] bytes = IOUtils.readFully(resourceAsStream, available, false);
         client.getKVClient().put(ByteSequence.fromString(config.getKey()), ByteSequence.fromBytes(bytes)).get();
-        EtcdClient etcdClient = new EtcdClient();
+        EtcdClient etcdClient = EtcdClient.getInstance(buildConfig());
         InputStream is = etcdClient.pull(config);
         byte[] remoteConfig = IOUtils.readFully(is, available, false);
         Assert.assertArrayEquals(bytes, remoteConfig);

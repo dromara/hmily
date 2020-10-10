@@ -25,11 +25,36 @@ import java.util.function.Supplier;
  *
  * @author lilang
  **/
-public class EtcdClient {
+public final class EtcdClient {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EtcdClient.class);
 
     private Client client;
+
+    private EtcdClient() {
+    }
+
+    /**
+     * set client.
+     *
+     * @param client client
+     */
+    public void setClient(final Client client) {
+        this.client = client;
+    }
+
+    /**
+     * get instance of EtcdClient.
+     *
+     * @param config etcdConfig
+     * @return etcd Client
+     */
+    public static EtcdClient getInstance(final EtcdConfig config) {
+        Client client = Client.builder().endpoints(config.getServer()).build();
+        EtcdClient etcdClient = new EtcdClient();
+        etcdClient.setClient(client);
+        return etcdClient;
+    }
 
     /**
      * Pull input stream.
@@ -59,6 +84,20 @@ public class EtcdClient {
             }
             return null;
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
+            throw new ConfigException(e);
+        }
+    }
+
+    /**
+     * put config content.
+     *
+     * @param key config key
+     * @param content config content
+     */
+    public void put(final String key, final String content) {
+        try {
+            client.getKVClient().put(ByteSequence.fromString(key), ByteSequence.fromString(content)).get();
+        } catch (InterruptedException | ExecutionException e) {
             throw new ConfigException(e);
         }
     }

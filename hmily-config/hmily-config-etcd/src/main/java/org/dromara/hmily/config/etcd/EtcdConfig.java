@@ -22,6 +22,10 @@ public class EtcdConfig extends AbstractConfig {
 
     private String fileExtension;
 
+    private boolean update;
+
+    private String updateFileName;
+
     @Override
     public String prefix() {
         return PrefixConstants.REMOTE_ETCD;
