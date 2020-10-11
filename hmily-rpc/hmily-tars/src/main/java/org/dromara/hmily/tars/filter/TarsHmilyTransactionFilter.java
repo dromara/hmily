@@ -89,7 +89,7 @@ public class TarsHmilyTransactionFilter implements Filter {
             if (context.getRole() == HmilyRoleEnum.PARTICIPANT.getCode()) {
                 context.setParticipantRefId(participantId);
             }
-            RpcMediator.getInstance().transmit(ContextManager.getContext()::getAttribute, context);
+            RpcMediator.getInstance().transmit(ContextManager.getContext()::setAttribute, context);
 
             chain.doFilter(request, response);
 
