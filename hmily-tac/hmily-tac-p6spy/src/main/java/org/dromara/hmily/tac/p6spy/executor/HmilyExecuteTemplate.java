@@ -17,7 +17,7 @@
 
 package org.dromara.hmily.tac.p6spy.executor;
 
-import com.p6spy.engine.common.StatementInformation;
+import com.p6spy.engine.common.ConnectionInformation;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.hmily.annotation.TransTypeEnum;
@@ -81,24 +81,25 @@ public enum HmilyExecuteTemplate {
     /**
      * Execute.
      *
-     * @param statementInformation the statement information
+     * @param sql SQL
+     * @param parameters parameters
+     * @param connectionInformation connection information
      */
-    public void execute(final StatementInformation statementInformation) {
+    public void execute(final String sql, final List<Object> parameters, final ConnectionInformation connectionInformation) {
         if (check()) {
             return;
         }
         try {
             HmilySqlParserEngine hmilySqlParserEngine = HmilySqlParserEngineFactory.newInstance();
             // TODO prepared sql will improve performance of parser engine
-            String sql = statementInformation.getSqlWithValues();
             HmilyStatement statement = hmilySqlParserEngine.parser(sql, DatabaseTypes.INSTANCE.getDatabaseType());
             // TODO should generate lock-key to avoid dirty data modified by other global transaction.
             HmilySQLComputeEngine hmilySQLComputeEngine = HmilySQLComputeEngineFactory.newInstance(statement);
-            HmilyUndoInvocation hmilyUndoInvocation = hmilySQLComputeEngine.generateImage(statementInformation.getConnectionInformation().getConnection(), sql);
+            HmilyUndoInvocation hmilyUndoInvocation = hmilySQLComputeEngine.generateImage(sql, parameters, connectionInformation.getConnection());
             //4.缓存sql日志记录 ? 存储到哪里呢 threadLocal？
             HmilyUndoContext context = new HmilyUndoContext();
             context.setUndoInvocation(hmilyUndoInvocation);
-            context.setResourceId(ResourceIdUtils.INSTANCE.getResourceId(statementInformation.getConnectionInformation().getUrl()));
+            context.setResourceId(ResourceIdUtils.INSTANCE.getResourceId(connectionInformation.getUrl()));
             HmilyTransactionContext transactionContext = HmilyContextHolder.get();
             context.setTransId(transactionContext.getTransId());
             context.setParticipantId(transactionContext.getParticipantId());
