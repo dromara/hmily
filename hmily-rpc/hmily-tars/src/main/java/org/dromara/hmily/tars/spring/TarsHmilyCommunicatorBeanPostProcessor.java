@@ -1,3 +1,20 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.dromara.hmily.tars.spring;
 
 import com.qq.tars.client.Communicator;
@@ -52,13 +69,11 @@ public class TarsHmilyCommunicatorBeanPostProcessor implements BeanPostProcessor
             if (field.getType().getAnnotation(Servant.class) == null) {
                 throw new RuntimeException("[TARS] autowire client failed: target field is not  tars  client");
             }
-
             String objName = annotation.name();
 
             if (StringUtils.isEmpty(annotation.value())) {
                 throw new RuntimeException("[TARS] autowire client failed: objName is empty");
             }
-
             ServantProxyConfig config = new ServantProxyConfig(objName);
             CommunicatorConfig communicatorConfig = ConfigurationManager.getInstance().getServerConfig().getCommunicatorConfig();
             config.setModuleName(communicatorConfig.getModuleName(), communicatorConfig.isEnableSet(), communicatorConfig.getSetDivision());
@@ -75,11 +90,9 @@ public class TarsHmilyCommunicatorBeanPostProcessor implements BeanPostProcessor
             config.setAsyncTimeout(annotation.asyncTimeout());
             config.setTcpNoDelay(annotation.tcpNoDelay());
             config.setCharsetName(annotation.charsetName());
-
             Object proxy = communicator.stringToProxy(field.getType(),
                     config,
                     new HmilyLoadBalance(new HmilyRoundRobinLoadBalance(config), config));
-
             ReflectionUtils.makeAccessible(field);
             ReflectionUtils.setField(field, bean, proxy);
         }

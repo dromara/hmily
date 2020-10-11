@@ -17,10 +17,10 @@
 [sql语句] (https://github.com/dromara/hmily/blob/master/hmily-demo/sql/hmily-demo.sql)
 
 # 建立tars节点
-根据[此文] (https://tarscloud.github.io/TarsDocs/dev/tarsjava/tars-quick-start.html)在当前tars平台建立       
+根据[此文](https://tarscloud.github.io/TarsDocs/dev/tarsjava/tars-quick-start.html)在当前tars平台建立       
 - 应用名:TestInventory,服务名称:InventoryApp,Obj名:InventoryObj,端口29740的节点。        
 - 应用名:HmilyAccount,服务名称:AccountApp,Obj名:AccountObj,端口10386的节点。         
-在完成节点的建立后，分别到hmily-demo-tars-springboot-account和hmily-demo-tars-springboot-inventory目录下执行mvn clean package命令打包并按照[此文] (https://tarscloud.github.io/TarsDocs/dev/tarsjava/tars-quick-start.html)在两个前面建立的节点上使用打包的成果物进行节点发布。     
+在完成节点的建立后，分别到hmily-demo-tars-springboot-account和hmily-demo-tars-springboot-inventory目录下执行mvn clean package命令打包并按照[此文](https://tarscloud.github.io/TarsDocs/dev/tarsjava/tars-quick-start.html)在两个前面建立的节点上使用打包的成果物进行节点发布。     
 
 # 使用你的工具 idea 打开项目，找到hmily-demo-tars-springboot项目。
 ## 修改项目配置（hmily-demo-tars-springboot-account为列子）

@@ -1,3 +1,20 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.dromara.hmily.tars.loadbalance;
 
 import com.qq.tars.client.ServantProxyConfig;
@@ -53,7 +70,6 @@ public class HmilyConsistentHashLoadBalance<T> implements LoadBalance<T> {
     public Invoker<T> select(final InvokeContext invocation) throws NoInvokerException {
         long consistentHash = Math.abs(StringUtils.convertLong(invocation.getAttachment(Constants.TARS_CONSISTENT_HASH), 0));
         consistentHash = consistentHash & 0xFFFFFFFFL;
-
         ConcurrentSkipListMap<Long, Invoker<T>> conHashInvokers = conHashInvokersCache;
         if (conHashInvokers != null && !conHashInvokers.isEmpty()) {
             if (!conHashInvokers.containsKey(consistentHash)) {
@@ -64,7 +80,6 @@ public class HmilyConsistentHashLoadBalance<T> implements LoadBalance<T> {
                     consistentHash = tailMap.firstKey();
                 }
             }
-
             Invoker<T> invoker = conHashInvokers.get(consistentHash);
             if (invoker.isAvailable()) {
                 return invoker;
@@ -77,16 +92,13 @@ public class HmilyConsistentHashLoadBalance<T> implements LoadBalance<T> {
                 return invoker;
             }
         }
-
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug(config.getSimpleObjectName() + " can't find active invoker using consistent hash loadbalance. try to use normal hash");
         }
-
         List<Invoker<T>> sortedInvokers = sortedInvokersCache;
         if (sortedInvokers == null || sortedInvokers.isEmpty()) {
             throw new NoInvokerException("no such active connection invoker");
         }
-
         List<Invoker<T>> list = new ArrayList<Invoker<T>>();
         for (Invoker<T> invoker : sortedInvokers) {
             if (!invoker.isAvailable()) {
@@ -103,14 +115,11 @@ public class HmilyConsistentHashLoadBalance<T> implements LoadBalance<T> {
         if (list.isEmpty()) {
             throw new NoInvokerException(config.getSimpleObjectName() + " try to select active invoker, size=" + sortedInvokers.size() + ", no such active connection invoker");
         }
-
         Invoker<T> invoker = list.get((int) (consistentHash % list.size()));
-
         if (!invoker.isAvailable()) {
             LOGGER.info("try to use inactive invoker|" + invoker.getUrl().toIdentityString());
             ServantInvokerAliveChecker.get(invoker.getUrl()).setLastRetryTime(System.currentTimeMillis());
         }
-
         return HmilyLoadBalanceUtils.doSelect(invoker, sortedInvokersCache);
     }
 
@@ -127,16 +136,12 @@ public class HmilyConsistentHashLoadBalance<T> implements LoadBalance<T> {
             conHashInvokersCache = null;
             return;
         }
-
         List<Invoker<T>> sortedInvokersTmp = new ArrayList<>(invokers);
         sortedInvokersTmp.sort(comparator);
-
         sortedInvokersCache = sortedInvokersTmp;
-
         ConcurrentSkipListMap<Long, Invoker<T>> concurrentSkipListMap = new ConcurrentSkipListMap<Long, Invoker<T>>();
         LoadBalanceHelper.buildConsistentHashCircle(sortedInvokersTmp, config).forEach(concurrentSkipListMap::put);
         conHashInvokersCache = concurrentSkipListMap;
-
         LOGGER.info(config.getSimpleObjectName() + " refresh ConsistentHashLoadBalance's invoker cache done, conHashInvokersCache size="
                 + (conHashInvokersCache == null || conHashInvokersCache.isEmpty() ? 0 : conHashInvokersCache.size())
                 + ", sortedInvokersCache size=" + (sortedInvokersCache == null || sortedInvokersCache.isEmpty() ? 0 : sortedInvokersCache.size()));

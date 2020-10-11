@@ -1,3 +1,20 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.dromara.hmily.tars.loadbalance;
 
 import com.qq.tars.client.ServantProxyConfig;
@@ -50,14 +67,12 @@ public class HmilyHashLoadBalance<T> implements LoadBalance<T> {
      */
     public Invoker<T> select(final InvokeContext invocation) throws NoInvokerException {
         long hash = Math.abs(StringUtils.convertLong(invocation.getAttachment(Constants.TARS_HASH), 0));
-
         List<Invoker<T>> staticWeightInvokers = staticWeightInvokersCache;
         if (staticWeightInvokers != null && !staticWeightInvokers.isEmpty()) {
             Invoker<T> invoker = staticWeightInvokers.get((int) (hash % staticWeightInvokers.size()));
             if (invoker.isAvailable()) {
                 return invoker;
             }
-
             ServantInvokerAliveStat stat = ServantInvokerAliveChecker.get(invoker.getUrl());
             if (stat.isAlive() || (stat.getLastRetryTime() + (config.getTryTimeInterval() * 1000)) < System.currentTimeMillis()) {
                 LOGGER.info("try to use inactive invoker|" + invoker.getUrl().toIdentityString());
@@ -65,12 +80,10 @@ public class HmilyHashLoadBalance<T> implements LoadBalance<T> {
                 return invoker;
             }
         }
-
         List<Invoker<T>> sortedInvokers = sortedInvokersCache;
         if (sortedInvokers == null || sortedInvokers.isEmpty()) {
             throw new NoInvokerException("no such active connection invoker");
         }
-
         List<Invoker<T>> list = new ArrayList<Invoker<T>>();
         for (Invoker<T> invoker : sortedInvokers) {
             if (!invoker.isAvailable()) {
@@ -86,14 +99,11 @@ public class HmilyHashLoadBalance<T> implements LoadBalance<T> {
         if (list.isEmpty()) {
             throw new NoInvokerException(config.getSimpleObjectName() + " try to select active invoker, size=" + sortedInvokers.size() + ", no such active connection invoker");
         }
-
         Invoker<T> invoker = list.get((int) (hash % list.size()));
-
         if (!invoker.isAvailable()) {
             LOGGER.info("try to use inactive invoker|" + invoker.getUrl().toIdentityString());
             ServantInvokerAliveChecker.get(invoker.getUrl()).setLastRetryTime(System.currentTimeMillis());
         }
-
         return HmilyLoadBalanceUtils.doSelect(invoker, sortedInvokersCache);
     }
 
@@ -110,13 +120,10 @@ public class HmilyHashLoadBalance<T> implements LoadBalance<T> {
             staticWeightInvokersCache = null;
             return;
         }
-
         List<Invoker<T>> sortedInvokersTmp = new ArrayList<Invoker<T>>(invokers);
         Collections.sort(sortedInvokersTmp, comparator);
-
         sortedInvokersCache = sortedInvokersTmp;
         staticWeightInvokersCache = LoadBalanceHelper.buildStaticWeightList(sortedInvokersTmp, config);
-
         LOGGER.info(config.getSimpleObjectName() + " refresh HashLoadBalance's invoker cache done, staticWeightInvokersCache size="
                 + (staticWeightInvokersCache == null || staticWeightInvokersCache.isEmpty() ? 0 : staticWeightInvokersCache.size())
                 + ", sortedInvokersCache size="
