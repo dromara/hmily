@@ -15,27 +15,25 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.demo.brpc.order;
+package org.dromara.hmily.brpc.loadbalance;
 
-import org.mybatis.spring.annotation.MapperScan;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import com.baidu.brpc.client.CommunicationClient;
+import com.baidu.brpc.loadbalance.FairStrategy;
+import com.baidu.brpc.protocol.Request;
+
+import java.util.List;
+import java.util.Set;
 
 /**
- * DubboTccOrderApplication.
+ * The hmily brpc fair strategy load balance.
  *
  * @author liu·yu
  */
-@SpringBootApplication
-@MapperScan("org.dromara.hmily.demo.common.order.mapper")
-public class BrpcHmilyOrderApplication {
+public class HmilyFairStrategy extends FairStrategy {
 
-    /**
-     * main.
-     *
-     * @param args args
-     */
-    public static void main(final String[] args) {
-        SpringApplication.run(BrpcHmilyOrderApplication.class, args);
+    @Override
+    public CommunicationClient selectInstance(final Request request, final List<CommunicationClient> instances, final Set<CommunicationClient> selectedInstances) {
+        CommunicationClient client = super.selectInstance(request, instances, selectedInstances);
+        return HmilyLoadBalanceUtils.doSelect(client, instances);
     }
 }

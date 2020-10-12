@@ -37,3 +37,4 @@ brpc:
       ioThreadNum: 1
       protocol-type: 30
       max-try-times: 1
+      interceptor-bean-names: hmilyInterceptor

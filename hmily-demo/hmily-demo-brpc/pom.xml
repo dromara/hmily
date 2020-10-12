@@ -17,25 +17,18 @@
     </modules>
 
     <properties>
-        <brpc.version>3.0.1</brpc.version>
-        <springfox.version>2.6.1</springfox.version>
+        <brpc.version>3.0.2</brpc.version>
     </properties>
 
-    <dependencies>
-        <dependency>
-            <groupId>org.dromara</groupId>
-            <artifactId>hmily-demo-common</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.baidu</groupId>
-            <artifactId>brpc-spring-boot-starter</artifactId>
-            <version>${brpc.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.baidu</groupId>
-            <artifactId>brpc-java-naming-zookeeper</artifactId>
-            <version>${brpc.version}</version>
-        </dependency>
-    </dependencies>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.baidu</groupId>
+                <artifactId>brpc-java-naming-zookeeper</artifactId>
+                <version>${brpc.version}</version>
+            </dependency>
+        </dependencies>
+
+    </dependencyManagement>
+
 </project>
