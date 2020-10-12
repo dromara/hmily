@@ -29,7 +29,7 @@ repository:
     driverClassName: com.mysql.jdbc.Driver
     url : jdbc:mysql://127.0.0.1:3306/hmily?useUnicode=true&characterEncoding=utf8
     username: root
-    password: 12345
+    password:
     maxActive: 20
     minIdle: 10
     connectionTimeout: 30000

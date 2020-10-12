@@ -17,14 +17,18 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <scope>provided</scope>
+            <groupId>org.dromara</groupId>
+            <artifactId>hmily-demo-common</artifactId>
         </dependency>
         <dependency>
             <groupId>org.dromara</groupId>
-            <artifactId>hmily-tac-p6spy</artifactId>
-            <version>2.1.2-SNAPSHOT</version>
+            <artifactId>hmily-spring-boot-starter-brpc</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.ctrip.framework.apollo</groupId>
+                    <artifactId>apollo-client</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>io.springfox</groupId>

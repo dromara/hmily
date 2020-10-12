@@ -3,8 +3,8 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>hmily-demo</artifactId>
         <groupId>org.dromara</groupId>
+        <artifactId>hmily-demo</artifactId>
         <version>1.0.0-SNAPSHOT</version>
     </parent>
     <artifactId>hmily-demo-brpc</artifactId>
@@ -17,21 +17,16 @@
     </modules>
 
     <properties>
-        <brpc.version>3.0.1</brpc.version>
-        <springfox.version>2.6.1</springfox.version>
+        <brpc.version>3.0.2</brpc.version>
     </properties>
 
     <dependencies>
-        <dependency>
-            <groupId>org.dromara</groupId>
-            <artifactId>hmily-demo-common</artifactId>
-            <version>${project.version}</version>
-        </dependency>
         <dependency>
             <groupId>com.baidu</groupId>
             <artifactId>brpc-spring-boot-starter</artifactId>
             <version>${brpc.version}</version>
         </dependency>
+
         <dependency>
             <groupId>com.baidu</groupId>
             <artifactId>brpc-java-naming-zookeeper</artifactId>

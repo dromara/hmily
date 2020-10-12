@@ -22,42 +22,26 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
+        <artifactId>hmily-spring-boot-starter</artifactId>
         <groupId>org.dromara</groupId>
-        <artifactId>hmily</artifactId>
         <version>2.1.2-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>hmily-spring-boot-starter</artifactId>
-    <packaging>pom</packaging>
-
-    <modules>
-        <module>hmily-spring-boot-starter-dubbo</module>
-        <module>hmily-spring-boot-starter-springcloud</module>
-        <module>hmily-spring-boot-starter-motan</module>
-        <module>hmily-spring-boot-starter-parent</module>
-        <module>hmily-spring-boot-starter-apache-dubbo</module>
-        <module>hmily-spring-boot-starter-sofa-rpc</module>
-        <module>hmily-spring-boot-starter-tars</module>
-        <module>hmily-spring-boot-starter-brpc</module>
-    </modules>
+    <artifactId>hmily-spring-boot-starter-brpc</artifactId>
 
     <dependencies>
+
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter</artifactId>
+            <groupId>org.dromara</groupId>
+            <artifactId>hmily-spring-boot-starter-parent</artifactId>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-        </dependency>
-
-        <!--自动配置-->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-configuration-processor</artifactId>
-            <optional>true</optional>
+            <groupId>org.dromara</groupId>
+            <artifactId>hmily-brpc</artifactId>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
 

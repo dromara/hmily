@@ -17,8 +17,13 @@
 
 package org.dromara.hmily.demo.brpc.order.configuration;
 
+import com.baidu.brpc.interceptor.Interceptor;
 import com.zaxxer.hikari.HikariDataSource;
+
 import javax.sql.DataSource;
+
+import org.dromara.hmily.brpc.interceptor.BrpcHmilyTransactionInterceptor;
+
 import org.dromara.hmily.tac.p6spy.HmilyP6Datasource;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.context.annotation.Bean;
@@ -32,9 +37,9 @@ import org.springframework.context.annotation.Primary;
  */
 @Configuration
 public class HmilyTacDatasourceConfig {
-    
+
     private final DataSourceProperties dataSourceProperties;
-    
+
     /**
      * Instantiates a new Hmily tac datasource config.
      *
@@ -43,7 +48,7 @@ public class HmilyTacDatasourceConfig {
     public HmilyTacDatasourceConfig(DataSourceProperties dataSourceProperties) {
         this.dataSourceProperties = dataSourceProperties;
     }
-    
+
     /**
      * Data source data source.
      *
@@ -64,4 +69,10 @@ public class HmilyTacDatasourceConfig {
         hikariDataSource.setMaxLifetime(1800000);
         return new HmilyP6Datasource(hikariDataSource);
     }
+
+    @Bean("hmilyInterceptor")
+    public Interceptor interceptor() {
+        return new BrpcHmilyTransactionInterceptor();
+    }
+
 }

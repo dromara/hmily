@@ -15,27 +15,25 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.demo.brpc.order;
+package org.dromara.hmily.brpc.field;
 
-import org.mybatis.spring.annotation.MapperScan;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import com.baidu.brpc.spring.annotation.RpcProxy;
+import org.dromara.hmily.core.field.AnnotationField;
+import org.dromara.hmily.spi.HmilySPI;
+
+import java.lang.reflect.Field;
 
 /**
- * DubboTccOrderApplication.
+ * The type brpc referer annotation field.
  *
  * @author liu·yu
  */
-@SpringBootApplication
-@MapperScan("org.dromara.hmily.demo.common.order.mapper")
-public class BrpcHmilyOrderApplication {
-
-    /**
-     * main.
-     *
-     * @param args args
-     */
-    public static void main(final String[] args) {
-        SpringApplication.run(BrpcHmilyOrderApplication.class, args);
+@HmilySPI(value = "brpc")
+public class BrpcRefererAnnotationField implements AnnotationField {
+    
+    @Override
+    public boolean check(final Field field) {
+        RpcProxy rpcProxy = field.getAnnotation(RpcProxy.class);
+        return rpcProxy != null;
     }
 }
