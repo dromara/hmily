@@ -30,6 +30,7 @@ import java.lang.reflect.Field;
  */
 @HmilySPI(value = "brpc")
 public class BrpcRefererAnnotationField implements AnnotationField {
+    
     @Override
     public boolean check(final Field field) {
         RpcProxy rpcProxy = field.getAnnotation(RpcProxy.class);

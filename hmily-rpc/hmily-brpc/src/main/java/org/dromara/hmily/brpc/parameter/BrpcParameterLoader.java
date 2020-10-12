@@ -34,13 +34,13 @@ import java.util.Optional;
  */
 @HmilySPI(value = "brpc")
 public class BrpcParameterLoader implements RpcParameterLoader {
+    
     @Override
     public HmilyTransactionContext load() {
-        return Optional.ofNullable(RpcMediator.getInstance().acquire(k -> {
-            Map<String, Object> attachment = RpcContext.getContext()
-                                                       .getRequestKvAttachment();
+        return Optional.ofNullable(RpcMediator.getInstance().acquire(key -> {
+            Map<String, Object> attachment = RpcContext.getContext().getRequestKvAttachment();
             if (attachment != null) {
-                return String.valueOf(attachment.get(k));
+                return String.valueOf(attachment.get(key));
             }
             return null;
         })).orElse(HmilyContextHolder.get());

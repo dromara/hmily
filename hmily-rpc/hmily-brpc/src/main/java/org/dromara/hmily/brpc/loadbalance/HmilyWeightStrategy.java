@@ -19,6 +19,7 @@ package org.dromara.hmily.brpc.loadbalance;
 
 import com.baidu.brpc.client.CommunicationClient;
 import com.baidu.brpc.loadbalance.FairStrategy;
+import com.baidu.brpc.loadbalance.WeightStrategy;
 import com.baidu.brpc.protocol.Request;
 
 import java.util.List;
@@ -29,7 +30,7 @@ import java.util.Set;
  *
  * @author liu·yu
  */
-public class HmilyWeightStrategy extends FairStrategy {
+public class HmilyWeightStrategy extends WeightStrategy {
 
     @Override
     public CommunicationClient selectInstance(final Request request, final List<CommunicationClient> instances, final Set<CommunicationClient> selectedInstances) {
