@@ -1,0 +1,7 @@
+module OrderApp
+{
+    interface Order
+    {
+        string orderPay(int count, double amount);
+    };
+};

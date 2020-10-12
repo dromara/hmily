@@ -24,6 +24,7 @@ package org.dromara.hmily.config.api.event;
  * @author sixh chenbin
  */
 public enum ChangeEvent {
+    
     /**
      * Add change event.
      */

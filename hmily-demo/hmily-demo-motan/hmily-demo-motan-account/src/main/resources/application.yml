@@ -46,7 +46,7 @@ spring:
         username: root
         password:
     application:
-        name: order-service
+        name: account-service
 
 mybatis:
     type-aliases-package: org.dromara.hmily.demo.common.account.entity

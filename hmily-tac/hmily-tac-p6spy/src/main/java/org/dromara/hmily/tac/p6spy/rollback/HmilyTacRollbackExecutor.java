@@ -17,16 +17,10 @@
 
 package org.dromara.hmily.tac.p6spy.rollback;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import javax.sql.DataSource;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.hmily.core.hook.UndoHook;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipantUndo;
-import org.dromara.hmily.repository.spi.entity.HmilyUndoInvocation;
-import org.dromara.hmily.tac.common.HmilyResourceManager;
-import org.dromara.hmily.tac.p6spy.HmilyP6Datasource;
+import org.dromara.hmily.tac.sqlrevert.spi.HmilySQLRevertEngineFactory;
 
 /**
  * The type Hmily tac rollback executor.
@@ -57,26 +51,10 @@ public final class HmilyTacRollbackExecutor {
     }
     
     private void registerRollback() {
-        UndoHook.INSTANCE.register(undo -> {
-            HmilyP6Datasource hmilyP6Datasource = (HmilyP6Datasource) HmilyResourceManager.get(undo.getResourceId());
-            return doRollback(hmilyP6Datasource, undo);
-        });
+        UndoHook.INSTANCE.register(this::doRollback);
     }
     
-    private boolean doRollback(final HmilyP6Datasource hmilyP6Datasource, final HmilyParticipantUndo undo) {
-        //1 . 根据undo生成 反向sql来执行
-        HmilyUndoInvocation undoInvocation = undo.getUndoInvocation();
-        String revertSql = undoInvocation.getRevertSql();
-        return executeUpdate(revertSql, hmilyP6Datasource) > 0;
-    }
-    
-    private int executeUpdate(final String sql, final DataSource dataSource) {
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement ps = connection.prepareStatement(sql)) {
-            return ps.executeUpdate();
-        } catch (SQLException e) {
-            log.error("hmily tac rollback exception -> ", e);
-            return 0;
-        }
+    private boolean doRollback(final HmilyParticipantUndo undo) {
+        return HmilySQLRevertEngineFactory.newInstance().revert(undo);
     }
 }

@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "org.dromara.hmily.demo.grpc.inventory.dto";
+option objc_class_prefix = "HLW";
+
+message InventoryRequest  {
+
+    string productId = 1;
+
+    int32 count = 2;
+}
+
+message InventoryResponse {
+
+    bool result = 1;
+
+    string content = 2;
+}
+
+message InventoryDO {
+
+    int32 id = 1;
+
+    string productId = 2;
+
+    int32 totalInventory = 3;
+
+    int32 lockInventory = 4;
+}
