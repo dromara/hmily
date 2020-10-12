@@ -36,7 +36,6 @@
         <module>hmily-motan</module>
         <module>hmily-springcloud</module>
         <module>hmily-sofa-rpc</module>
-        <module>hmily-brpc</module>
     </modules>
 
 </project>
