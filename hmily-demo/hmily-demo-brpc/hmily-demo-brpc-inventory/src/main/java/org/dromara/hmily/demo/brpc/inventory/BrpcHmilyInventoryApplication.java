@@ -21,6 +21,7 @@ import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.ImportResource;
 
 /**
  * DubboTccInventoryApplication.
@@ -28,6 +29,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * @author liu·yu
  */
 @SpringBootApplication
+@ImportResource({"classpath:applicationContext.xml"})
 @MapperScan("org.dromara.hmily.demo.common.inventory.mapper")
 public class BrpcHmilyInventoryApplication {
 

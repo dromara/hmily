@@ -15,6 +15,13 @@
         <dependency>
             <groupId>com.baidu</groupId>
             <artifactId>brpc-java</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.baidu</groupId>
+            <artifactId>brpc-spring</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.dromara</groupId>
@@ -33,24 +40,5 @@
             <artifactId>hmily-tac-p6spy</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>com.baidu</groupId>
-            <artifactId>brpc-spring</artifactId>
-        </dependency>
     </dependencies>
-
-    <build>
-        <finalName>hmily-brpc</finalName>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>${jdk.version}</source>
-                    <target>${jdk.version}</target>
-                    <encoding>${project.build.sourceEncoding}</encoding>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
 </project>
