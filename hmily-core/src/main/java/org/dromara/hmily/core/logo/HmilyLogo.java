@@ -36,7 +36,8 @@ public class HmilyLogo {
             + "  / /_/ / __ `__ \\/ / / / / /\n"
             + " / __  / / / / / / / / /_/ / \n"
             + "/_/ /_/_/ /_/ /_/_/_/\\__, /  \n"
-            + "                    /____/   \n";
+            + "                    /____/   \n"
+            + "---  https://dromara.org ---\n";
     
     private static final Logger LOGGER = LoggerFactory.getLogger(HmilyLogo.class);
     
@@ -57,7 +58,7 @@ public class HmilyLogo {
                 + CommonConstant.LINE_SEPARATOR
                 + HMILY_LOGO
                 + CommonConstant.LINE_SEPARATOR
-                + " :: Hmily :: (v" + VersionUtils.getVersion(getClass(), "2.0.2") + ")"
+                + " :: Hmily :: (v" + VersionUtils.getVersion(getClass(), "2.1.0") + ")"
                 + CommonConstant.LINE_SEPARATOR;
     }
 

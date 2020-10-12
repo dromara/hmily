@@ -40,7 +40,7 @@ public class BrpcHmilyAccountApplication {
         SpringApplication springApplication = new SpringApplication(BrpcHmilyAccountApplication.class);
         springApplication.setWebApplicationType(WebApplicationType.NONE);
         springApplication.run(args);
-        synchronized (BrpcHmilyAccountApplication.class) {
+        synchronized (BrpcHmilyAccountApplication.class){
             try {
                 BrpcHmilyAccountApplication.class.wait();
             } catch (InterruptedException e) {

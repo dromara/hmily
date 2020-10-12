@@ -27,6 +27,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
 
+import org.dromara.hmily.common.utils.FileUtils;
 import org.dromara.hmily.common.utils.StringUtils;
 import org.dromara.hmily.config.api.Config;
 import org.dromara.hmily.config.api.ConfigEnv;
@@ -109,6 +110,9 @@ public class ZookeeperConfigLoader implements ConfigLoader<ZookeeperConfig> {
             check(config);
             if (Objects.isNull(client)) {
                 client = CuratorZookeeperClient.getInstance(config);
+            }
+            if (config.isUpdate()) {
+                client.persist(config.getPath(), FileUtils.readYAML(config.getUpdateFileName()));
             }
             InputStream result = client.pull(config.getPath());
             String fileExtension = config.getFileExtension();

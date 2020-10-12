@@ -18,6 +18,7 @@
 package org.dromara.hmily.config.api;
 
 import org.apache.commons.lang3.StringUtils;
+import org.dromara.hmily.config.api.event.DefaultConsumer;
 import org.dromara.hmily.config.api.event.EventConsumer;
 import org.dromara.hmily.config.api.event.EventData;
 import org.dromara.hmily.config.api.exception.ConfigException;
@@ -45,6 +46,10 @@ public final class ConfigEnv {
      * Monitoring event change processing.
      */
     private static final Set<EventConsumer<EventData>> EVENTS = new HashSet<>();
+
+    static {
+        EVENTS.add(new DefaultConsumer());
+    }
 
     /**
      * Save some custom configuration information.

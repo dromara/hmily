@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>hmily-demo</artifactId>
     <groupId>org.dromara</groupId>
-    <version>2.0.2-RELEASE</version>
+    <version>1.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <parent>
@@ -20,12 +20,14 @@
         <module>hmily-demo-common</module>
         <module>hmily-demo-sofa</module>
         <module>hmily-demo-brpc</module>
+<!--        <module>hmily-demo-grpc</module>-->
+        <module>hmily-demo-tars</module>
+<!--        <module>hmily-demo-brpc</module>-->
     </modules>
-
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <jdk.version>1.8</jdk.version>
-        <hmily.version>2.1.0-SNAPSHOT</hmily.version>
+        <hmily.version>2.1.1</hmily.version>
         <spring-cloud.version>Dalston.SR1</spring-cloud.version>
         <springfox.version>2.6.1</springfox.version>
         <spring.data.mongodb.version>2.1.3.RELEASE</spring.data.mongodb.version>
@@ -36,7 +38,7 @@
             <dependency>
                 <groupId>org.dromara</groupId>
                 <artifactId>hmily-demo-common</artifactId>
-                <version>2.0.2-RELEASE</version>
+                <version>${project.version}</version>
             </dependency>
 
             <dependency>
@@ -66,6 +68,12 @@
             <dependency>
                 <groupId>org.dromara</groupId>
                 <artifactId>hmily-springcloud</artifactId>
+                <version>${hmily.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.dromara</groupId>
+                <artifactId>hmily-grpc</artifactId>
                 <version>${hmily.version}</version>
             </dependency>
 
@@ -130,6 +138,11 @@
                     <target>1.8</target>
                     <encoding>${project.build.sourceEncoding}</encoding>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>versions-maven-plugin</artifactId>
+                <version>2.5</version>
             </plugin>
         </plugins>
     </build>
