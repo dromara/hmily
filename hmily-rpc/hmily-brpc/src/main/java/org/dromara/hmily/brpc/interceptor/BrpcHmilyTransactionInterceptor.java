@@ -46,7 +46,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
- * The hmily brpc transaction interceptor
+ * The hmily brpc transaction interceptor.
  *
  * @author liu·yu
  */
@@ -97,7 +97,7 @@ public class BrpcHmilyTransactionInterceptor extends AbstractInterceptor {
         }
     }
 
-    private HmilyParticipant buildParticipant(HmilyTransactionContext context, Request request) {
+    private HmilyParticipant buildParticipant(final HmilyTransactionContext context, final Request request) {
         if (HmilyActionEnum.TRYING.getCode() != context.getAction()) {
             return null;
         }
@@ -119,7 +119,7 @@ public class BrpcHmilyTransactionInterceptor extends AbstractInterceptor {
         return hmilyParticipant;
     }
 
-    private Class[] converterParamsClass(Type[] types) {
+    private Class[] converterParamsClass(final Type[] types) {
         Class[] classes = new Class[types.length];
         for (int i = 0; i < types.length; i++) {
             classes[i] = (Class) types[i];

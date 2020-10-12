@@ -17,12 +17,6 @@
 
 package org.dromara.hmily.demo.brpc.account.config;
 
-import com.baidu.brpc.exceptions.RpcException;
-import com.baidu.brpc.interceptor.AbstractInterceptor;
-import com.baidu.brpc.interceptor.Interceptor;
-import com.baidu.brpc.interceptor.InterceptorChain;
-import com.baidu.brpc.protocol.Request;
-import com.baidu.brpc.protocol.Response;
 import com.zaxxer.hikari.HikariDataSource;
 
 import javax.sql.DataSource;
@@ -71,30 +65,6 @@ public class HmilyTacDatasourceConfig {
         hikariDataSource.setIdleTimeout(600000);
         hikariDataSource.setMaxLifetime(1800000);
         return new HmilyP6Datasource(hikariDataSource);
-    }
-
-    @Bean("hmilyInterceptor")
-    public Interceptor interceptor() {
-        return new AbstractInterceptor() {
-            @Override
-            public boolean handleRequest(Request request) {
-                System.out.println("handleRequest:" + request.getKvAttachment());
-                return super.handleRequest(request);
-            }
-
-            @Override
-            public void handleResponse(Response response) {
-                System.out.println("handleResponse:" + response.getKvAttachment());
-                super.handleResponse(response);
-            }
-
-            @Override
-            public void aroundProcess(Request request, Response response, InterceptorChain chain) throws RpcException {
-                System.out.println("aroundProcess req:" + request.getKvAttachment());
-                System.out.println("aroundProcess rsp:" + response.getKvAttachment());
-                super.aroundProcess(request, response, chain);
-            }
-        };
     }
 
 }

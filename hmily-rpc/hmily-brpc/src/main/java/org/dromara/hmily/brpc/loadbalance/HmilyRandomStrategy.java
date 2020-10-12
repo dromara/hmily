@@ -25,14 +25,14 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * The hmily brpc random strategy load balance
+ * The hmily brpc random strategy load balance.
  *
  * @author liu·yu
  */
 public class HmilyRandomStrategy extends RandomStrategy {
 
     @Override
-    public CommunicationClient selectInstance(Request request, List<CommunicationClient> instances, Set<CommunicationClient> selectedInstances) {
+    public CommunicationClient selectInstance(final Request request, final List<CommunicationClient> instances, final Set<CommunicationClient> selectedInstances) {
         CommunicationClient client = super.selectInstance(request, instances, selectedInstances);
         return HmilyLoadBalanceUtils.doSelect(client, instances);
     }

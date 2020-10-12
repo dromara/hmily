@@ -28,7 +28,7 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * The hmily brpc parameter loader
+ * The hmily brpc parameter loader.
  *
  * @author liu·yu
  */

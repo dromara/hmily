@@ -28,7 +28,7 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * The hmily brpc load balance utils referer annotation field.
+ * The hmily brpc load balance utils referer annotation field .
  *
  * @author liu·yu
  */
@@ -36,8 +36,15 @@ public class HmilyLoadBalanceUtils {
 
     private static final Map<String, String> URL_MAP = Maps.newConcurrentMap();
 
-    public static CommunicationClient doSelect(CommunicationClient defaultClient,
-                                               List<CommunicationClient> instances) {
+    /**
+     * do select client.
+     *
+     * @param defaultClient default client
+     * @param instances all client
+     * @return client
+     */
+    public static CommunicationClient doSelect(final CommunicationClient defaultClient,
+                                               final List<CommunicationClient> instances) {
         final HmilyTransactionContext hmilyTransactionContext = HmilyContextHolder.get();
         if (Objects.isNull(hmilyTransactionContext)) {
             return defaultClient;
