@@ -53,7 +53,6 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     @HmilyTCC(confirmMethod = "confirm", cancelMethod = "cancel")
-    @Hmily
     public void payment(AccountDTO accountDTO) {
         accountMapper.update(accountDTO);
     }

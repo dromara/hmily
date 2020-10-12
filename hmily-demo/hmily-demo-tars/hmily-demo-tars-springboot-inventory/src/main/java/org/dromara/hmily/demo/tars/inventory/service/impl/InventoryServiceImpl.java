@@ -48,7 +48,6 @@ public class InventoryServiceImpl implements InventoryService {
 
     @Override
     @HmilyTCC(confirmMethod = "confirmMethod", cancelMethod = "cancelMethod")
-    @Hmily
     public boolean decrease(InventoryDTO inventoryDTO) {
 //        throw new HmilyRuntimeException("库存扣减异常！");
         return inventoryMapper.decrease(inventoryDTO) > 0;

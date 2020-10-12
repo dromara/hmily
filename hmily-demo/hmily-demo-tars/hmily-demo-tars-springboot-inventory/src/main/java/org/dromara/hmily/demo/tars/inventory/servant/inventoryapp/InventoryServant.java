@@ -25,9 +25,11 @@ package org.dromara.hmily.demo.tars.inventory.servant.inventoryapp;
 import com.qq.tars.protocol.annotation.*;
 import com.qq.tars.protocol.tars.annotation.*;
 import com.qq.tars.common.support.Holder;
+import org.dromara.hmily.annotation.Hmily;
 
 @Servant
 public interface InventoryServant {
 
+	 @Hmily
 	 boolean decrease(@TarsMethodParameter(name="productId")String productId, @TarsMethodParameter(name="count")int count);
 }
