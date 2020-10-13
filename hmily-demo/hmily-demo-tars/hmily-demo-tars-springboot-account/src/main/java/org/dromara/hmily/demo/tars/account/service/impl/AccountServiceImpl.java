@@ -54,8 +54,8 @@ public class AccountServiceImpl implements AccountService {
     @Override
     @HmilyTCC(confirmMethod = "confirm", cancelMethod = "cancel")
     @Hmily
-    public void payment(AccountDTO accountDTO) {
-        accountMapper.update(accountDTO);
+    public boolean payment(AccountDTO accountDTO) {
+        return accountMapper.update(accountDTO) > 0;
     }
 
     @Transactional(rollbackFor = Exception.class)

@@ -133,5 +133,5 @@ public interface OrderService {
      *
      * @param order 订单实体类
      */
-    void updateOrderStatus(Order order);
+    boolean updateOrderStatus(Order order);
 }

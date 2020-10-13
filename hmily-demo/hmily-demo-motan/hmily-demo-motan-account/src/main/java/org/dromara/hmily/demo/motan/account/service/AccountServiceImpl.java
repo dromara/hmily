@@ -72,21 +72,21 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     @HmilyTCC(confirmMethod = "confirm", cancelMethod = "cancel")
-    public void payment(AccountDTO accountDTO) {
+    public boolean payment(AccountDTO accountDTO) {
         System.out.println(accountDTO+"<<<<<<<<<<<<<<<");
-        accountMapper.update(accountDTO);
+        return accountMapper.update(accountDTO) > 0;
     }
 
     @Override
     @HmilyTCC(confirmMethod = "confirm", cancelMethod = "cancel")
-    public void mockTryPaymentException(AccountDTO accountDTO) {
+    public boolean mockTryPaymentException(AccountDTO accountDTO) {
         throw new HmilyRuntimeException("账户扣减异常！");
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     @HmilyTCC(confirmMethod = "confirm", cancelMethod = "cancel")
-    public void mockTryPaymentTimeout(AccountDTO accountDTO) {
+    public boolean mockTryPaymentTimeout(AccountDTO accountDTO) {
         try {
             //模拟延迟 当前线程暂停10秒
             Thread.sleep(10000);
@@ -97,6 +97,7 @@ public class AccountServiceImpl implements AccountService {
         if (decrease != 1) {
             throw new HmilyRuntimeException("库存不足");
         }
+        return true;
     }
 
     @Override

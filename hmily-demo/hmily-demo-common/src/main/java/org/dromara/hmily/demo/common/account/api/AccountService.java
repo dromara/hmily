@@ -35,7 +35,7 @@ public interface AccountService {
      * @param accountDTO 参数dto
      */
     @Hmily
-    void payment(AccountDTO accountDTO);
+    boolean payment(AccountDTO accountDTO);
     
     /**
      * Mock try payment exception.
@@ -43,7 +43,7 @@ public interface AccountService {
      * @param accountDTO the account dto
      */
     @Hmily
-    void mockTryPaymentException(AccountDTO accountDTO);
+    boolean mockTryPaymentException(AccountDTO accountDTO);
     
     /**
      * Mock try payment timeout.
@@ -51,7 +51,7 @@ public interface AccountService {
      * @param accountDTO the account dto
      */
     @Hmily
-    void mockTryPaymentTimeout(AccountDTO accountDTO);
+    boolean mockTryPaymentTimeout(AccountDTO accountDTO);
     
     /**
      * Payment tac boolean.
