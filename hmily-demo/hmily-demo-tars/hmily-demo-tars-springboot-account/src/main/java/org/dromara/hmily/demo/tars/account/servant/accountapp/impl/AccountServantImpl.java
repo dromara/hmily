@@ -39,10 +39,10 @@ public class AccountServantImpl implements AccountServant {
     }
 
     @Override
-    public void payment(String userId, double amount) {
+    public boolean payment(String userId, double amount) {
         AccountDTO accountDTO = new AccountDTO();
         accountDTO.setUserId(userId);
         accountDTO.setAmount(new BigDecimal(amount));
-        accountService.payment(accountDTO);
+        return accountService.payment(accountDTO);
     }
 }

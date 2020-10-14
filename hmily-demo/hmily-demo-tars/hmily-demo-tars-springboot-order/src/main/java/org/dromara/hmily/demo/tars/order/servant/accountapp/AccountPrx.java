@@ -30,15 +30,15 @@ import java.util.concurrent.CompletableFuture;
 @Servant
 public interface AccountPrx {
 
-	 void payment(@TarsMethodParameter(name="userId")String userId, @TarsMethodParameter(name="amount")double amount);
+	 boolean payment(@TarsMethodParameter(name="userId")String userId, @TarsMethodParameter(name="amount")double amount);
 
-	 void payment(@TarsMethodParameter(name="userId")String userId, @TarsMethodParameter(name="amount")double amount, @TarsContext java.util.Map<String, String> ctx);
+	 boolean payment(@TarsMethodParameter(name="userId")String userId, @TarsMethodParameter(name="amount")double amount, @TarsContext java.util.Map<String, String> ctx);
 
-	 void async_payment(@TarsCallback AccountPrxCallback callback, @TarsMethodParameter(name="userId")String userId, @TarsMethodParameter(name="amount")double amount);
+	 boolean async_payment(@TarsCallback AccountPrxCallback callback, @TarsMethodParameter(name="userId")String userId, @TarsMethodParameter(name="amount")double amount);
 
-	 void async_payment(@TarsCallback AccountPrxCallback callback, @TarsMethodParameter(name="userId")String userId, @TarsMethodParameter(name="amount")double amount, @TarsContext java.util.Map<String, String> ctx);
+	 boolean async_payment(@TarsCallback AccountPrxCallback callback, @TarsMethodParameter(name="userId")String userId, @TarsMethodParameter(name="amount")double amount, @TarsContext java.util.Map<String, String> ctx);
 
-	 CompletableFuture<Void>  promise_payment(@TarsMethodParameter(name="userId")String userId, @TarsMethodParameter(name="amount")double amount);
+	 CompletableFuture<Boolean>  promise_payment(@TarsMethodParameter(name="userId")String userId, @TarsMethodParameter(name="amount")double amount);
 
-	 CompletableFuture<Void>  promise_payment(@TarsMethodParameter(name="userId")String userId, @TarsMethodParameter(name="amount")double amount, @TarsContext java.util.Map<String, String> ctx);
+	 CompletableFuture<Boolean>  promise_payment(@TarsMethodParameter(name="userId")String userId, @TarsMethodParameter(name="amount")double amount, @TarsContext java.util.Map<String, String> ctx);
 }

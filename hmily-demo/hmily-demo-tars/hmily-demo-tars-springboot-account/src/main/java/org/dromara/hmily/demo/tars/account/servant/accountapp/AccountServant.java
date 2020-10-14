@@ -29,5 +29,5 @@ import com.qq.tars.common.support.Holder;
 @Servant
 public interface AccountServant {
 
-	 void payment(@TarsMethodParameter(name="userId")String userId, @TarsMethodParameter(name="amount")double amount);
+	 boolean payment(@TarsMethodParameter(name="userId")String userId, @TarsMethodParameter(name="amount")double amount);
 }
