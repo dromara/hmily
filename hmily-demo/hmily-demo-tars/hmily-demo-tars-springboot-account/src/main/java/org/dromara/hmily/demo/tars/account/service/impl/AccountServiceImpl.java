@@ -17,7 +17,6 @@
 
 package org.dromara.hmily.demo.tars.account.service.impl;
 
-import org.dromara.hmily.annotation.Hmily;
 import org.dromara.hmily.annotation.HmilyTCC;
 import org.dromara.hmily.demo.common.account.dto.AccountDTO;
 import org.dromara.hmily.demo.common.account.entity.AccountDO;
@@ -53,7 +52,6 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     @HmilyTCC(confirmMethod = "confirm", cancelMethod = "cancel")
-    @Hmily
     public boolean payment(AccountDTO accountDTO) {
         return accountMapper.update(accountDTO) > 0;
     }
