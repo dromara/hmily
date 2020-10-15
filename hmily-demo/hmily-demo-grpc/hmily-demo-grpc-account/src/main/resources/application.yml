@@ -1,5 +1,5 @@
 server:
-  port: 8084
+  port: 28084
   servlet:
     context-path: /
   address: 0.0.0.0
@@ -8,9 +8,10 @@ spring:
         driver-class-name:  com.mysql.jdbc.Driver
         url: jdbc:mysql://127.0.0.1:3306/hmily_account?useUnicode=true&characterEncoding=utf8
         username: root
-        password: 746238836
-    grpc:
-      port: 8074
+        password:
+
+grpc:
+  port: 28074
 
 mybatis:
   type-aliases-package: org.dromara.hmily.demo.common.account.entity

@@ -25,11 +25,14 @@ package org.dromara.hmily.demo.tars.order.servant.accountapp;
 import com.qq.tars.protocol.annotation.*;
 import com.qq.tars.protocol.tars.annotation.*;
 import com.qq.tars.common.support.Holder;
+import org.dromara.hmily.annotation.Hmily;
+
 import java.util.concurrent.CompletableFuture;
 
 @Servant
 public interface AccountPrx {
 
+	 @Hmily
 	 boolean payment(@TarsMethodParameter(name="userId")String userId, @TarsMethodParameter(name="amount")double amount);
 
 	 boolean payment(@TarsMethodParameter(name="userId")String userId, @TarsMethodParameter(name="amount")double amount, @TarsContext java.util.Map<String, String> ctx);

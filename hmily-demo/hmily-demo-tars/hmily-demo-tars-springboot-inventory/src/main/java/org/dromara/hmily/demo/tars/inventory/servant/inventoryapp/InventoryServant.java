@@ -24,7 +24,6 @@ package org.dromara.hmily.demo.tars.inventory.servant.inventoryapp;
 
 import com.qq.tars.protocol.annotation.*;
 import com.qq.tars.protocol.tars.annotation.*;
-import com.qq.tars.common.support.Holder;
 
 @Servant
 public interface InventoryServant {
