@@ -25,11 +25,14 @@ package org.dromara.hmily.demo.tars.order.servant.inventoryapp;
 import com.qq.tars.protocol.annotation.*;
 import com.qq.tars.protocol.tars.annotation.*;
 import com.qq.tars.common.support.Holder;
+import org.dromara.hmily.annotation.Hmily;
+
 import java.util.concurrent.CompletableFuture;
 
 @Servant
 public interface InventoryPrx {
 
+	 @Hmily
 	 boolean decrease(@TarsMethodParameter(name="productId")String productId, @TarsMethodParameter(name="count")int count);
 
 	 boolean decrease(@TarsMethodParameter(name="productId")String productId, @TarsMethodParameter(name="count")int count, @TarsContext java.util.Map<String, String> ctx);

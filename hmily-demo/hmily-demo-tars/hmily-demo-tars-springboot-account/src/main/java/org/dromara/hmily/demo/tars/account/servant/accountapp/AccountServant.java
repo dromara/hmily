@@ -24,11 +24,8 @@ package org.dromara.hmily.demo.tars.account.servant.accountapp;
 
 import com.qq.tars.protocol.annotation.*;
 import com.qq.tars.protocol.tars.annotation.*;
-import com.qq.tars.common.support.Holder;
-import org.dromara.hmily.annotation.Hmily;
 
 @Servant
 public interface AccountServant {
-	 @Hmily
 	 boolean payment(@TarsMethodParameter(name="userId")String userId, @TarsMethodParameter(name="amount")double amount);
 }
