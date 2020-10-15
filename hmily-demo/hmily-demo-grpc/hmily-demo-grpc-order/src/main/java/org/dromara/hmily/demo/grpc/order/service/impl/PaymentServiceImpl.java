@@ -51,6 +51,7 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
+    @HmilyTCC(confirmMethod = "confirmOrderStatus", cancelMethod = "cancelOrderStatus")
     public void makePayment(Order order) {
         updateOrderStatus(order, OrderStatusEnum.PAYING);
         accountClient.payment(String.valueOf(order.getUserId()), String.valueOf(order.getTotalAmount().doubleValue()));

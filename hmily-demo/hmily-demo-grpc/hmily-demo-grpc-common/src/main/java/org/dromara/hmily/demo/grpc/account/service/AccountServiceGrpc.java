@@ -3,6 +3,7 @@ package org.dromara.hmily.demo.grpc.account.service;
 import io.grpc.MethodDescriptor;
 import io.grpc.stub.ClientCalls;
 import io.grpc.stub.ServerCalls;
+import org.dromara.hmily.annotation.Hmily;
 
 import static io.grpc.stub.ClientCalls.asyncUnaryCall;
 import static io.grpc.stub.ClientCalls.asyncServerStreamingCall;
@@ -28,7 +29,7 @@ public class AccountServiceGrpc {
 
   private AccountServiceGrpc() {}
 
-  public static final String SERVICE_NAME = "AccountService";
+  public static final String SERVICE_NAME = "org.dromara.hmily.demo.grpc.account.service.AccountServiceGrpc$AccountServiceBlockingStub";
 
   // Static method descriptors that strictly reflect the proto.
   @io.grpc.ExperimentalApi("https://github.com/grpc/grpc-java/issues/1901")
@@ -37,7 +38,7 @@ public class AccountServiceGrpc {
       io.grpc.MethodDescriptor.create(
           io.grpc.MethodDescriptor.MethodType.UNARY,
           MethodDescriptor.generateFullMethodName(
-              "AccountService", "payment"),
+              "org.dromara.hmily.demo.grpc.account.service.AccountServiceGrpc$AccountServiceBlockingStub", "payment"),
           io.grpc.protobuf.ProtoUtils.marshaller(org.dromara.hmily.demo.grpc.account.service.AccountRequest.getDefaultInstance()),
           io.grpc.protobuf.ProtoUtils.marshaller(org.dromara.hmily.demo.grpc.account.service.AccountResponse.getDefaultInstance()));
 
@@ -135,6 +136,7 @@ public class AccountServiceGrpc {
 
     /**
      */
+    @Hmily
     public org.dromara.hmily.demo.grpc.account.service.AccountResponse payment(org.dromara.hmily.demo.grpc.account.service.AccountRequest request) {
       return ClientCalls.blockingUnaryCall(
           getChannel(), METHOD_PAYMENT, getCallOptions(), request);

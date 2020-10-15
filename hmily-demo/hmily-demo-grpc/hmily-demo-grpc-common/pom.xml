@@ -32,6 +32,11 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <dependency>
+            <groupId>org.dromara</groupId>
+            <artifactId>hmily-spring-boot-starter-grpc</artifactId>
+            <version>2.1.2-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
     <build>

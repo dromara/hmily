@@ -40,6 +40,7 @@
         <module>hmily-spring-boot-starter-sofa-rpc</module>
         <module>hmily-spring-boot-starter-tars</module>
         <module>hmily-spring-boot-starter-brpc</module>
+        <module>hmily-spring-boot-starter-grpc</module>
     </modules>
 
     <dependencies>
