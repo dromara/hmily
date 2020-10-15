@@ -1,19 +1,13 @@
 package org.dromara.hmily.demo.grpc.inventory.service;
 
+import org.dromara.hmily.annotation.Hmily;
+
 import static io.grpc.stub.ClientCalls.asyncUnaryCall;
-import static io.grpc.stub.ClientCalls.asyncServerStreamingCall;
-import static io.grpc.stub.ClientCalls.asyncClientStreamingCall;
-import static io.grpc.stub.ClientCalls.asyncBidiStreamingCall;
 import static io.grpc.stub.ClientCalls.blockingUnaryCall;
-import static io.grpc.stub.ClientCalls.blockingServerStreamingCall;
 import static io.grpc.stub.ClientCalls.futureUnaryCall;
 import static io.grpc.MethodDescriptor.generateFullMethodName;
 import static io.grpc.stub.ServerCalls.asyncUnaryCall;
-import static io.grpc.stub.ServerCalls.asyncServerStreamingCall;
-import static io.grpc.stub.ServerCalls.asyncClientStreamingCall;
-import static io.grpc.stub.ServerCalls.asyncBidiStreamingCall;
 import static io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall;
-import static io.grpc.stub.ServerCalls.asyncUnimplementedStreamingCall;
 
 /**
  */
@@ -24,7 +18,7 @@ public class InventoryServiceGrpc {
 
   private InventoryServiceGrpc() {}
 
-  public static final String SERVICE_NAME = "InventoryService";
+  public static final String SERVICE_NAME = "org.dromara.hmily.demo.grpc.inventory.servic.InventoryServiceGrpc$InventoryServiceBlockingStub";
 
   // Static method descriptors that strictly reflect the proto.
   @io.grpc.ExperimentalApi("https://github.com/grpc/grpc-java/issues/1901")
@@ -33,7 +27,7 @@ public class InventoryServiceGrpc {
       io.grpc.MethodDescriptor.create(
           io.grpc.MethodDescriptor.MethodType.UNARY,
           generateFullMethodName(
-              "InventoryService", "decrease"),
+              "org.dromara.hmily.demo.grpc.inventory.servic.InventoryServiceGrpc$InventoryServiceBlockingStub", "decrease"),
           io.grpc.protobuf.ProtoUtils.marshaller(org.dromara.hmily.demo.grpc.inventory.service.InventoryRequest.getDefaultInstance()),
           io.grpc.protobuf.ProtoUtils.marshaller(org.dromara.hmily.demo.grpc.inventory.service.InventoryResponse.getDefaultInstance()));
 
@@ -131,6 +125,7 @@ public class InventoryServiceGrpc {
 
     /**
      */
+    @Hmily
     public org.dromara.hmily.demo.grpc.inventory.service.InventoryResponse decrease(org.dromara.hmily.demo.grpc.inventory.service.InventoryRequest request) {
       return blockingUnaryCall(
           getChannel(), METHOD_DECREASE, getCallOptions(), request);

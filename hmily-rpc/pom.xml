@@ -38,6 +38,7 @@
         <module>hmily-sofa-rpc</module>
         <module>hmily-brpc</module>
         <module>hmily-tars</module>
+        <module>hmily-grpc</module>
     </modules>
 
 </project>
