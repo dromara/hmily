@@ -1,5 +1,5 @@
 server:
-  port: 8087
+  port: 8077
   address: 0.0.0.0
   servlet:
     context-path: /
@@ -9,22 +9,12 @@ spring:
         driver-class-name:  com.mysql.jdbc.Driver
         url: jdbc:mysql://127.0.0.1:3306/hmily_order?useUnicode=true&characterEncoding=utf8&useSSL=false
         username: root
-        password: 12345
+        password:
 
 mybatis:
   type-aliases-package: org.dromara.hmily.demo.common.order.entity
   config-location: classpath:mybatis/mybatis-config.xml
 
-logging:
-    level:
-        root: error
-        org.springframework.web: info
-        org.apache.ibatis: debug
-        org.dromara.hmily.demo.bonuspoint: debug
-        org.dromara.hmily.demo.lottery: debug
-        org.dromara.hmily.demo: debug
-        io.netty: info
-    path: "./logs"
 brpc:
   global:
     naming:
@@ -37,3 +27,15 @@ brpc:
       ioThreadNum: 1
       protocol-type: 30
       max-try-times: 1
+      interceptor-bean-names: hmilyInterceptor
+
+logging:
+  level:
+    root: error
+    org.springframework.web: info
+    org.apache.ibatis: debug
+    org.dromara.hmily.demo.bonuspoint: debug
+    org.dromara.hmily.demo.lottery: debug
+    org.dromara.hmily.demo: debug
+    io.netty: info
+  path: "./logs"

@@ -17,12 +17,12 @@
 
 package org.dromara.hmily.repository.spi.entity;
 
-import java.io.Serializable;
-import java.util.Map;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import java.io.Serializable;
+import java.util.Collection;
+import java.util.LinkedList;
 
 
 /**
@@ -30,22 +30,11 @@ import lombok.NoArgsConstructor;
  *
  * @author xiaoyu
  */
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
+@RequiredArgsConstructor
+@Getter
 public class HmilyUndoInvocation implements Serializable {
     
     private static final long serialVersionUID = -4406133196112007765L;
     
-    private String revertSql;
-    
-    private String originSql;
-    
-    private String tableName;
-    
-    private String manipulationType;
-    
-    private Map<String, Object> beforeImage;
-    
-    private Map<String, Object> afterImage;
+    private final Collection<HmilySQLTuple> tuples = new LinkedList<>();
 }

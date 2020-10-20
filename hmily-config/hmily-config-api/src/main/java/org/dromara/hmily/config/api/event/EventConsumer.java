@@ -18,7 +18,7 @@
 package org.dromara.hmily.config.api.event;
 
 /**
- * ModifyEventConsumer .
+ * ModifyEventConsumer.
  * modify config event push .
  *
  * @param <T> the type parameter

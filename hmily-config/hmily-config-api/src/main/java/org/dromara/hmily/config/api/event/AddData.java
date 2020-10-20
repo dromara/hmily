@@ -18,14 +18,13 @@
 package org.dromara.hmily.config.api.event;
 
 /**
- * AddData .
+ * AddData.
  * Different processing of add data.
  *
  * @author sixh chenbin
  */
 public class AddData extends EventData {
-
-
+    
     /**
      * Instantiates a new Add data.
      *

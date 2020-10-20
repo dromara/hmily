@@ -17,13 +17,21 @@
 
 package org.dromara.hmily.tac.sqlcompute.impl;
 
+import com.google.common.base.Joiner;
 import lombok.RequiredArgsConstructor;
+import org.dromara.hmily.repository.spi.entity.HmilySQLTuple;
 import org.dromara.hmily.repository.spi.entity.HmilyUndoInvocation;
-import org.dromara.hmily.tac.sqlcompute.HmilySQLComputeEngine;
 import org.dromara.hmily.tac.sqlcompute.exception.SQLComputeException;
+import org.dromara.hmily.tac.sqlparser.model.segment.generic.table.HmilySimpleTableSegment;
 import org.dromara.hmily.tac.sqlparser.model.statement.dml.HmilyUpdateStatement;
 
 import java.sql.Connection;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Hmily update SQL compute engine.
@@ -31,26 +39,72 @@ import java.sql.Connection;
  * @author zhaojun
  */
 @RequiredArgsConstructor
-public final class HmilyUpdateSQLComputeEngine implements HmilySQLComputeEngine {
+public final class HmilyUpdateSQLComputeEngine extends AbstractHmilySQLComputeEngine {
     
-    private final HmilyUpdateStatement statement;
+    private final HmilyUpdateStatement sqlStatement;
     
     @Override
-    public HmilyUndoInvocation generateImage(final Connection connection, final String sql) throws SQLComputeException {
-        HmilyUndoInvocation undoInvocation = new HmilyUndoInvocation();
-        //这里是我的测试验证，写死了
-        String revertSql;
+    // FIXME fixture undoInvocation for poc test
+    public HmilyUndoInvocation generateImage(final String sql, final List<Object> parameters, final Connection connection) throws SQLComputeException {
+        Map<String, Object> beforeImage = new LinkedHashMap<>();
+        Map<String, Object> afterImage = new LinkedHashMap<>();
+        HmilyUndoInvocation result = new HmilyUndoInvocation();
         if (sql.contains("order")) {
-            String number = sql.substring(sql.indexOf("'") + 1, sql.length() - 1);
-            revertSql = "update `order` set status = 3 where number = " + number;
+            beforeImage.put("status", 3);
+            afterImage.put("number", sql.substring(sql.indexOf("'") + 1, sql.length() - 1));
+            result.getTuples().add(new HmilySQLTuple("order", "update", beforeImage, afterImage));
         } else if (sql.contains("account")) {
-            revertSql = "update account set balance = balance + 1  where user_id = 10000 ";
+            beforeImage.put("balance", 100);
+            afterImage.put("user_id", 10000);
+            result.getTuples().add(new HmilySQLTuple("account", "update", beforeImage, afterImage));
         } else {
-            revertSql = "update inventory set total_inventory = total_inventory + 1 where product_id = 1";
+            beforeImage.put("total_inventory", 100);
+            afterImage.put("product_id", 1);
+            result.getTuples().add(new HmilySQLTuple("inventory", "update", beforeImage, afterImage));
         }
-        undoInvocation.setRevertSql(revertSql);
-        undoInvocation.setOriginSql(sql);
-        //根据jdbcUrl获取 datasource
-        return undoInvocation;
+        return result;
+    }
+    
+    @Override
+    Collection<ImageSQLUnit> generateQueryImageSQLs(final String sql, final List<Object> parameters) {
+        Collection<ImageSQLUnit> result = new LinkedList<>();
+        String tables = getTables(sql);
+        String whereCondition = getWhereCondition(sql);
+        sqlStatement.getTables().forEach(segment -> {
+            String imageSQL = String.format("SELECT %s FROM %s %s", Joiner.on(",").join(getUndoItems(segment), getRedoItems(segment, parameters)), tables, whereCondition);
+            result.add(new ImageSQLUnit(imageSQL, new LinkedList<>(), "update", sql.substring(segment.getStartIndex(), segment.getStopIndex())));
+        });
+        return result;
+    }
+    
+    private String getUndoItems(final HmilySimpleTableSegment segment) {
+        String result;
+        if (segment.getAlias().isPresent()) {
+            result = String.format("%s.*", segment.getAlias().get());
+        } else if (segment.getOwner().isPresent()) {
+            result = String.format("%s.%s.*", segment.getOwner(), segment.getTableName().getIdentifier().getValue());
+        } else {
+            result = String.format("%s.*", segment.getTableName().getIdentifier().getValue());
+        }
+        return result;
+    }
+    
+    private List<String> getRedoItems(final HmilySimpleTableSegment tableSegment, final List<Object> parameters) {
+        List<String> result = new LinkedList<>();
+        // TODO filter the column which don't belong to current table
+        sqlStatement.getSetAssignment().getAssignments().forEach(assignment -> {
+            result.add(String.format("%s AS $after_image$%s", ExpressionHandler.getValue(parameters, assignment.getValue()), assignment.getColumn().getIdentifier().getValue()));
+        });
+        return result;
+    }
+    
+    private String getTables(final String sql) {
+        List<String> tables = sqlStatement.getTables().stream().map(segment -> sql.substring(segment.getStartIndex(), segment.getStopIndex())).collect(Collectors.toList());
+        return Joiner.on(",").join(tables);
+    }
+    
+    private String getWhereCondition(final String sql) {
+        return sqlStatement.getWhere().map(segment -> sql.substring(segment.getStartIndex(), segment.getStopIndex()))
+            .orElseThrow(() -> new SQLComputeException("DML SQL should contain where condition"));
     }
 }

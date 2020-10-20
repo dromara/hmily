@@ -21,10 +21,17 @@ import com.p6spy.engine.common.CallableStatementInformation;
 import com.p6spy.engine.common.ConnectionInformation;
 import com.p6spy.engine.common.PreparedStatementInformation;
 import com.p6spy.engine.common.StatementInformation;
+import com.p6spy.engine.common.Value;
 import com.p6spy.engine.event.JdbcEventListener;
-import java.sql.SQLException;
-import java.util.Objects;
+import java.lang.reflect.Method;
+import lombok.SneakyThrows;
 import org.dromara.hmily.tac.p6spy.executor.HmilyExecuteTemplate;
+
+import java.sql.SQLException;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * The type Hmily jdbc event listener.
@@ -44,25 +51,25 @@ public class HmilyJdbcEventListener extends JdbcEventListener {
     @Override
     public void onBeforeExecute(final PreparedStatementInformation statementInformation) {
         super.onBeforeExecute(statementInformation);
-        HmilyExecuteTemplate.INSTANCE.execute(statementInformation);
+        HmilyExecuteTemplate.INSTANCE.execute(statementInformation.getSql(), getParameters(statementInformation), statementInformation.getConnectionInformation());
     }
     
     @Override
     public void onBeforeExecute(final StatementInformation statementInformation, final String sql) {
         super.onBeforeExecute(statementInformation, sql);
-        HmilyExecuteTemplate.INSTANCE.execute(statementInformation);
+        HmilyExecuteTemplate.INSTANCE.execute(sql, new LinkedList<>(), statementInformation.getConnectionInformation());
     }
     
     @Override
     public void onBeforeExecuteUpdate(final PreparedStatementInformation statementInformation) {
         super.onBeforeExecuteUpdate(statementInformation);
-        HmilyExecuteTemplate.INSTANCE.execute(statementInformation);
+        HmilyExecuteTemplate.INSTANCE.execute(statementInformation.getSql(), getParameters(statementInformation), statementInformation.getConnectionInformation());
     }
     
     @Override
     public void onBeforeExecuteUpdate(final StatementInformation statementInformation, final String sql) {
         super.onBeforeExecuteUpdate(statementInformation, sql);
-        HmilyExecuteTemplate.INSTANCE.execute(statementInformation);
+        HmilyExecuteTemplate.INSTANCE.execute(sql, new LinkedList<>(), statementInformation.getConnectionInformation());
     }
     
     @Override
@@ -94,6 +101,19 @@ public class HmilyJdbcEventListener extends JdbcEventListener {
     @Override
     public void onAfterPreparedStatementSet(final PreparedStatementInformation statementInformation, final int parameterIndex, final Object value, final SQLException e) {
         statementInformation.setParameterValue(parameterIndex, value);
+    }
+    
+    @SneakyThrows
+    @SuppressWarnings("unchecked")
+    private List<Object> getParameters(final PreparedStatementInformation preparedStatementInformation) {
+        List<Object> result = new LinkedList<>();
+        Method method = preparedStatementInformation.getClass().getDeclaredMethod("getParameterValues");
+        method.setAccessible(true);
+        Map<Integer, Value> parameterValues = (Map<Integer, Value>) method.invoke(preparedStatementInformation);
+        for (int i = 0; i < parameterValues.size(); i++) {
+            result.add(parameterValues.get(i).toString());
+        }
+        return result;
     }
 }
 

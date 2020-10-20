@@ -3,9 +3,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>hmily-demo</artifactId>
         <groupId>org.dromara</groupId>
-        <version>2.0.2-RELEASE</version>
+        <artifactId>hmily-demo</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
     </parent>
     <artifactId>hmily-demo-brpc</artifactId>
     <modelVersion>4.0.0</modelVersion>
@@ -17,48 +17,20 @@
     </modules>
 
     <properties>
-        <brpc.version>3.0.1</brpc.version>
-        <springfox.version>2.6.1</springfox.version>
+        <brpc.version>3.0.2</brpc.version>
     </properties>
 
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.dromara</groupId>
-                <artifactId>hmily-demo-common</artifactId>
-                <version>2.0.2-RELEASE</version>
-            </dependency>
-            <dependency>
-                <groupId>org.dromara</groupId>
-                <artifactId>hmily-tcc</artifactId>
-                <version>2.1.0-SNAPSHOT</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.dromara</groupId>
-                        <artifactId>hmily-core</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>org.dromara</groupId>
-                <artifactId>hmily-tac-p6spy</artifactId>
-                <version>2.1.0-SNAPSHOT</version>
-            </dependency>
-            <dependency>
-                <groupId>com.baidu</groupId>
-                <artifactId>brpc-spring-boot-starter</artifactId>
-                <version>${brpc.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.baidu</groupId>
-                <artifactId>brpc-java-naming-zookeeper</artifactId>
-                <version>${brpc.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.dromara</groupId>
-                <artifactId>hmily-spring-boot-starter-parent</artifactId>
-                <version>2.1.0-SNAPSHOT</version>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
+    <dependencies>
+        <dependency>
+            <groupId>com.baidu</groupId>
+            <artifactId>brpc-spring-boot-starter</artifactId>
+            <version>${brpc.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.baidu</groupId>
+            <artifactId>brpc-java-naming-zookeeper</artifactId>
+            <version>${brpc.version}</version>
+        </dependency>
+    </dependencies>
 </project>

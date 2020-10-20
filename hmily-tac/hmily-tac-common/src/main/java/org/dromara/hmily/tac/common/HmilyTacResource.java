@@ -17,6 +17,8 @@
 
 package org.dromara.hmily.tac.common;
 
+import javax.sql.DataSource;
+
 /**
  * The interface Hmily tac resource.
  */
@@ -28,4 +30,11 @@ public interface HmilyTacResource {
      * @return the resource id
      */
     String getResourceId();
+    
+    /**
+     * Get target data source.
+     *
+     * @return data source
+     */
+    DataSource getTargetDataSource();
 }
