@@ -1,3 +1,20 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.dromara.hmily.grpc.filter;
 
 import java.lang.reflect.Method;
@@ -41,12 +58,13 @@ public class GrpcHmilyTransactionFilter implements ClientInterceptor {
     public <R, P> ClientCall<R, P> interceptCall(final MethodDescriptor<R, P> methodDescriptor,
                                                            final CallOptions callOptions, final Channel channel) {
         final HmilyTransactionContext context = HmilyContextHolder.get();
-        if (Objects.isNull(context)) {
+        if (Objects.isNull(context) || Objects.isNull(GrpcHmilyContext.getHmilyClass().get())
+            || Objects.isNull(GrpcHmilyContext.getHmilyParam().get())) {
             return channel.newCall(methodDescriptor, callOptions);
         }
         String[] clazzNameAndMethod = methodDescriptor.getFullMethodName().split("/");
         try {
-            Class<?> clazz = Class.forName(clazzNameAndMethod[0]);
+            Class<?> clazz = GrpcHmilyContext.getHmilyClass().get().getClass();
             String methodName = clazzNameAndMethod[1];
             Method method = null;
             for (Method tempMethod : clazz.getMethods()) {
@@ -83,7 +101,7 @@ public class GrpcHmilyTransactionFilter implements ClientInterceptor {
                                 } else {
                                     throw new HmilyRuntimeException("rpc invoke exception{}", status.getCause());
                                 }
-                                GrpcHmilyContext.getHmilyParam().remove();
+                                GrpcHmilyContext.removeAfterInvoke();
                                 super.onClose(status, trailers);
                             } }, headers);
                     }
