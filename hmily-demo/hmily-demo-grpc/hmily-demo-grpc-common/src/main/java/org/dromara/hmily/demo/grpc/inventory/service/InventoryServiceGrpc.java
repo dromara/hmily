@@ -1,7 +1,5 @@
 package org.dromara.hmily.demo.grpc.inventory.service;
 
-import org.dromara.hmily.annotation.Hmily;
-
 import static io.grpc.stub.ClientCalls.asyncUnaryCall;
 import static io.grpc.stub.ClientCalls.blockingUnaryCall;
 import static io.grpc.stub.ClientCalls.futureUnaryCall;
@@ -125,7 +123,6 @@ public class InventoryServiceGrpc {
 
     /**
      */
-    @Hmily
     public org.dromara.hmily.demo.grpc.inventory.service.InventoryResponse decrease(org.dromara.hmily.demo.grpc.inventory.service.InventoryRequest request) {
       return blockingUnaryCall(
           getChannel(), METHOD_DECREASE, getCallOptions(), request);
