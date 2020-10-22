@@ -30,7 +30,6 @@ import io.grpc.ForwardingClientCall;
 import io.grpc.Metadata;
 import io.grpc.Status;
 import io.grpc.ForwardingClientCallListener;
-import org.dromara.hmily.annotation.Hmily;
 import org.dromara.hmily.common.enums.HmilyActionEnum;
 import org.dromara.hmily.common.enums.HmilyRoleEnum;
 import org.dromara.hmily.common.exception.HmilyRuntimeException;
@@ -74,10 +73,6 @@ public class GrpcHmilyTransactionFilter implements ClientInterceptor {
                 }
             }
             if (method != null) {
-                Hmily hmily = method.getAnnotation(Hmily.class);
-                if (Objects.isNull(hmily)) {
-                    return channel.newCall(methodDescriptor, callOptions);
-                }
                 Class<?>[] arg = method.getParameterTypes();
                 Long participantId = context.getParticipantId();
                 HmilyParticipant hmilyParticipant = buildParticipant(context, methodName, clazz, arg);

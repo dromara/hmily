@@ -2,7 +2,6 @@ package org.dromara.hmily.demo.grpc.order.grpc;
 
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
-import org.dromara.hmily.core.holder.SingletonHolder;
 import org.dromara.hmily.demo.grpc.account.service.AccountRequest;
 import org.dromara.hmily.demo.grpc.account.service.AccountResponse;
 import org.dromara.hmily.demo.grpc.account.service.AccountServiceGrpc;
