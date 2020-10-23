@@ -36,7 +36,7 @@ repository:
     password: #改成你的密码
 ```
 
-- run TarsHmilyAccountApplication.java
+- run GrpcHmilyAccountApplication.java
 
 ## 启动hmily-demo-grpc-inventory 参考上述。
 
