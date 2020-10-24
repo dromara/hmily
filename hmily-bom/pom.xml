@@ -99,6 +99,7 @@
         <yml.version>1.23</yml.version>
         <apollo-client.version>1.6.0</apollo-client.version>
         <guice.version>4.2.3</guice.version>
+        <msgpack.version>0.6.12</msgpack.version>
     </properties>
 
     <dependencyManagement>
@@ -409,6 +410,11 @@
                 <groupId>com.google.inject</groupId>
                 <artifactId>guice</artifactId>
                 <version>${guice.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.msgpack</groupId>
+                <artifactId>msgpack</artifactId>
+                <version>${msgpack.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
