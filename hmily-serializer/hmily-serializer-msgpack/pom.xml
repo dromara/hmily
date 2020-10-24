@@ -21,22 +21,24 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <groupId>org.dromara</groupId>
-        <artifactId>hmily</artifactId>
+        <artifactId>hmily-serializer</artifactId>
         <version>2.1.2-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>hmily-serializer</artifactId>
-    <packaging>pom</packaging>
-    <modules>
-        <module>hmily-serializer-all</module>
-        <module>hmily-serializer-spi</module>
-        <module>hmily-serializer-jdk</module>
-        <module>hmily-serializer-hessian</module>
-        <module>hmily-serializer-kryo</module>
-        <module>hmily-serializer-protobuf</module>
-        <module>hmily-serializer-msgpack</module>
-    </modules>
+    <artifactId>hmily-serializer-msgpack</artifactId>
 
+    <dependencies>
+        <dependency>
+            <groupId>org.dromara</groupId>
+            <artifactId>hmily-serializer-spi</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.msgpack</groupId>
+            <artifactId>msgpack</artifactId>
+        </dependency>
+    </dependencies>
 
 </project>
