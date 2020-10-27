@@ -19,14 +19,17 @@
 
 package org.dromara.hmily.config.loader.yaml;
 
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import org.dromara.hmily.common.utils.StringUtils;
 import org.dromara.hmily.config.loader.PropertyLoader;
 import org.dromara.hmily.config.loader.property.MapPropertyKeySource;
 import org.dromara.hmily.config.loader.property.PropertyKeySource;
+
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 /**
  * The type Yaml property loader.
@@ -35,11 +38,14 @@ import org.dromara.hmily.config.loader.property.PropertyKeySource;
  */
 public class YamlPropertyLoader implements PropertyLoader {
 
+    private static final String[] SUPPORT_FILE_SUFFIX = {".yml", ".yaml"};
+
     @Override
     public boolean checkFile(final String fileName) {
-        String fileExtName = fileName.substring(fileName.lastIndexOf("."));
-        String extName = ".yml";
-        return extName.equals(fileExtName);
+        if (StringUtils.isBlank(fileName)) {
+            return false;
+        }
+        return Arrays.stream(SUPPORT_FILE_SUFFIX).anyMatch(fileName::endsWith);
     }
 
     @Override
