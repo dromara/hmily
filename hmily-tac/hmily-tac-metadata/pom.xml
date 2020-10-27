@@ -28,5 +28,12 @@
 
     <artifactId>hmily-tac-metadata</artifactId>
 
+    <dependencies>
+        <dependency>
+            <groupId>org.dromara</groupId>
+            <artifactId>hmily-tac-common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
 
 </project>
