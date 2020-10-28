@@ -31,16 +31,16 @@ import java.io.IOException;
  *
  * @author dongzl
  */
-@SuppressWarnings("unchecked")
 @HmilySPI("msgpack")
 public class MessagePackSerializer implements HmilySerializer {
+    
+    private static final MessagePack MESSAGE = new MessagePack();
     
     @Override
     public byte[] serialize(final Object obj) throws HmilySerializerException {
         byte[] result;
         try {
-            MessagePack msgpack = MessagePackFactory.getInstance();
-            result = msgpack.write(obj);
+            result = MESSAGE.write(obj);
         } catch (IOException e) {
             throw new HmilySerializerException("MessagePack serialize error " + e.getMessage());
         }
@@ -51,8 +51,7 @@ public class MessagePackSerializer implements HmilySerializer {
     public <T> T deSerialize(final byte[] param, final Class<T> clazz) throws HmilySerializerException {
         T obj;
         try {
-            MessagePack msgpack = MessagePackFactory.getInstance();
-            obj = msgpack.read(param, clazz);
+            obj = MESSAGE.read(param, clazz);
         } catch (IOException e) {
             throw new HmilySerializerException("MessagePack deSerialize error " + e.getMessage());
         }

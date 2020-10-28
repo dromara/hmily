@@ -51,7 +51,7 @@ public class MessagePackSerializerTest {
     
     @Test
     public void testDeSerialize() {
-        byte[] bytes = messagePackSerializer.serialize(Integer.valueOf(1));
+        byte[] bytes = messagePackSerializer.serialize(1);
         Assert.assertEquals(messagePackSerializer.deSerialize(bytes, Integer.class), Integer.valueOf(1));
     }
 }
