@@ -36,6 +36,7 @@ import org.apache.shardingsphere.sql.parser.sql.statement.dml.DeleteStatement;
 import org.apache.shardingsphere.sql.parser.sql.statement.dml.InsertStatement;
 import org.apache.shardingsphere.sql.parser.sql.statement.dml.UpdateStatement;
 import org.dromara.hmily.spi.HmilySPI;
+import org.dromara.hmily.tac.common.database.type.DatabaseType;
 import org.dromara.hmily.tac.sqlparser.model.constant.HmilyQuoteCharacter;
 import org.dromara.hmily.tac.sqlparser.model.segment.dml.assignment.HmilyAssignmentSegment;
 import org.dromara.hmily.tac.sqlparser.model.segment.dml.assignment.HmilySetAssignmentSegment;
@@ -73,8 +74,8 @@ import java.util.LinkedList;
 public class ShardingSphereSqlParserEngine implements HmilySqlParserEngine {
     
     @Override
-    public HmilyStatement parser(final String sql, final String databaseType) throws SqlParserException {
-        SQLStatement sqlStatement = SQLParserEngineFactory.getSQLParserEngine(databaseType).parse(sql, false);
+    public HmilyStatement parser(final String sql, final DatabaseType databaseType) throws SqlParserException {
+        SQLStatement sqlStatement = SQLParserEngineFactory.getSQLParserEngine(databaseType.getName()).parse(sql, false);
         if (sqlStatement instanceof UpdateStatement) {
             return generateHmilyUpdateStatement((UpdateStatement) sqlStatement);
         } else if (sqlStatement instanceof InsertStatement) {
