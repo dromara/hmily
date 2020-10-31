@@ -398,9 +398,9 @@ public abstract class AbstractHmilyDatabase implements HmilyRepository {
     
     @Override
     public int createHmilyParticipantUndo(final HmilyParticipantUndo undo) {
-        byte[] invocation = hmilySerializer.serialize(undo.getDataSnapshot());
+        byte[] dataSnapshot = hmilySerializer.serialize(undo.getDataSnapshot());
         return executeUpdate(INSERT_HMILY_PARTICIPANT_UNDO, undo.getUndoId(), undo.getParticipantId(), undo.getTransId(), undo.getResourceId(),
-                invocation, undo.getStatus(), undo.getCreateTime(), undo.getUpdateTime());
+                dataSnapshot, undo.getStatus(), undo.getCreateTime(), undo.getUpdateTime());
     }
     
     @Override
@@ -512,10 +512,10 @@ public abstract class AbstractHmilyDatabase implements HmilyRepository {
         undo.setParticipantId((Long) map.get("participant_id"));
         undo.setTransId((Long) map.get("trans_id"));
         undo.setResourceId((String) map.get("resource_id"));
-        byte[] undoInvocation = (byte[]) map.get("undo_invocation");
+        byte[] snapshotBytes = (byte[]) map.get("data_snapshot");
         try {
-            final HmilyDataSnapshot dataSnapshot = hmilySerializer.deSerialize(undoInvocation, HmilyDataSnapshot.class);
-            undo.setDataSnapshot(dataSnapshot);
+            HmilyDataSnapshot snapshot = hmilySerializer.deSerialize(snapshotBytes, HmilyDataSnapshot.class);
+            undo.setDataSnapshot(snapshot);
         } catch (HmilySerializerException e) {
             log.error("hmilySerializer deSerialize have exception:{} ", e.getMessage());
         }

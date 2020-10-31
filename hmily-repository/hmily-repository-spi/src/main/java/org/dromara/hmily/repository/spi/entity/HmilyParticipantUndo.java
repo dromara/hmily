@@ -32,6 +32,7 @@ import lombok.EqualsAndHashCode;
 public final class HmilyParticipantUndo implements Serializable {
     
     private static final long serialVersionUID = 6869663782220867407L;
+    
     /**
      * undo id.
      */
