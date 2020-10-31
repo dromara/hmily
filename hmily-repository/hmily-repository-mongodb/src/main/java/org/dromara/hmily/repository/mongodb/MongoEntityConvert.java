@@ -7,7 +7,7 @@ import org.dromara.hmily.repository.spi.entity.HmilyInvocation;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipant;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipantUndo;
 import org.dromara.hmily.repository.spi.entity.HmilyTransaction;
-import org.dromara.hmily.repository.spi.entity.HmilyUndoInvocation;
+import org.dromara.hmily.repository.spi.entity.HmilyDataSnapshot;
 import org.dromara.hmily.serializer.spi.HmilySerializer;
 import org.dromara.hmily.serializer.spi.exception.HmilySerializerException;
 import org.slf4j.Logger;
@@ -97,9 +97,9 @@ public class MongoEntityConvert {
         undo.setResourceId(entity.getResourceId());
         byte[] undoInvocation = entity.getUndoInvocation();
         try {
-            final HmilyUndoInvocation hmilyUndoInvocation =
-                    hmilySerializer.deSerialize(undoInvocation, HmilyUndoInvocation.class);
-            undo.setUndoInvocation(hmilyUndoInvocation);
+            final HmilyDataSnapshot dataSnapshot =
+                    hmilySerializer.deSerialize(undoInvocation, HmilyDataSnapshot.class);
+            undo.setDataSnapshot(dataSnapshot);
         } catch (HmilySerializerException e) {
             logger.error("mongo 存储序列化错误", e);
         }
@@ -175,7 +175,7 @@ public class MongoEntityConvert {
         entity.setStatus(undo.getStatus());
         entity.setTransId(undo.getTransId());
         entity.setUndoId(undo.getUndoId());
-        entity.setUndoInvocation(hmilySerializer.serialize(undo.getUndoInvocation()));
+        entity.setUndoInvocation(hmilySerializer.serialize(undo.getDataSnapshot()));
         entity.setUpdateTime(undo.getUpdateTime());
         return entity;
     }

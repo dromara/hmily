@@ -39,11 +39,11 @@ import org.dromara.hmily.config.api.ConfigEnv;
 import org.dromara.hmily.config.api.entity.HmilyConfig;
 import org.dromara.hmily.config.api.entity.HmilyDatabaseConfig;
 import org.dromara.hmily.repository.spi.HmilyRepository;
+import org.dromara.hmily.repository.spi.entity.HmilyDataSnapshot;
 import org.dromara.hmily.repository.spi.entity.HmilyInvocation;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipant;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipantUndo;
 import org.dromara.hmily.repository.spi.entity.HmilyTransaction;
-import org.dromara.hmily.repository.spi.entity.HmilyUndoInvocation;
 import org.dromara.hmily.repository.spi.exception.HmilyRepositoryException;
 import org.dromara.hmily.serializer.spi.HmilySerializer;
 import org.dromara.hmily.serializer.spi.exception.HmilySerializerException;
@@ -398,7 +398,7 @@ public abstract class AbstractHmilyDatabase implements HmilyRepository {
     
     @Override
     public int createHmilyParticipantUndo(final HmilyParticipantUndo undo) {
-        byte[] invocation = hmilySerializer.serialize(undo.getUndoInvocation());
+        byte[] invocation = hmilySerializer.serialize(undo.getDataSnapshot());
         return executeUpdate(INSERT_HMILY_PARTICIPANT_UNDO, undo.getUndoId(), undo.getParticipantId(), undo.getTransId(), undo.getResourceId(),
                 invocation, undo.getStatus(), undo.getCreateTime(), undo.getUpdateTime());
     }
@@ -514,8 +514,8 @@ public abstract class AbstractHmilyDatabase implements HmilyRepository {
         undo.setResourceId((String) map.get("resource_id"));
         byte[] undoInvocation = (byte[]) map.get("undo_invocation");
         try {
-            final HmilyUndoInvocation hmilyUndoInvocation = hmilySerializer.deSerialize(undoInvocation, HmilyUndoInvocation.class);
-            undo.setUndoInvocation(hmilyUndoInvocation);
+            final HmilyDataSnapshot dataSnapshot = hmilySerializer.deSerialize(undoInvocation, HmilyDataSnapshot.class);
+            undo.setDataSnapshot(dataSnapshot);
         } catch (HmilySerializerException e) {
             log.error("hmilySerializer deSerialize have exception:{} ", e.getMessage());
         }

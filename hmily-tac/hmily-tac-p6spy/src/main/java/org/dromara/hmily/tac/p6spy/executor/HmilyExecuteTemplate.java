@@ -27,7 +27,7 @@ import org.dromara.hmily.core.context.HmilyContextHolder;
 import org.dromara.hmily.core.context.HmilyTransactionContext;
 import org.dromara.hmily.core.repository.HmilyRepositoryStorage;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipantUndo;
-import org.dromara.hmily.repository.spi.entity.HmilyUndoInvocation;
+import org.dromara.hmily.repository.spi.entity.HmilyDataSnapshot;
 import org.dromara.hmily.tac.common.utils.DatabaseTypes;
 import org.dromara.hmily.tac.common.utils.ResourceIdUtils;
 import org.dromara.hmily.tac.core.cache.HmilyParticipantUndoCacheManager;
@@ -95,10 +95,10 @@ public enum HmilyExecuteTemplate {
             HmilyStatement statement = hmilySqlParserEngine.parser(sql, DatabaseTypes.INSTANCE.getDatabaseType());
             // TODO should generate lock-key to avoid dirty data modified by other global transaction.
             HmilySQLComputeEngine hmilySQLComputeEngine = HmilySQLComputeEngineFactory.newInstance(statement);
-            HmilyUndoInvocation hmilyUndoInvocation = hmilySQLComputeEngine.generateImage(sql, parameters, connectionInformation.getConnection());
+            HmilyDataSnapshot snapshot = hmilySQLComputeEngine.generateSnapshot(sql, parameters, connectionInformation.getConnection());
             //4.缓存sql日志记录 ? 存储到哪里呢 threadLocal？
             HmilyUndoContext context = new HmilyUndoContext();
-            context.setUndoInvocation(hmilyUndoInvocation);
+            context.setDataSnapshot(snapshot);
             context.setResourceId(ResourceIdUtils.INSTANCE.getResourceId(connectionInformation.getUrl()));
             HmilyTransactionContext transactionContext = HmilyContextHolder.get();
             context.setTransId(transactionContext.getTransId());
@@ -152,7 +152,7 @@ public enum HmilyExecuteTemplate {
             undo.setUndoId(IdWorkerUtils.getInstance().createUUID());
             undo.setParticipantId(context.getParticipantId());
             undo.setTransId(context.getTransId());
-            undo.setUndoInvocation(context.getUndoInvocation());
+            undo.setDataSnapshot(context.getDataSnapshot());
             undo.setStatus(HmilyActionEnum.TRYING.getCode());
             return undo;
         }).collect(Collectors.toList());

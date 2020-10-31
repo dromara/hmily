@@ -26,13 +26,13 @@ import java.util.LinkedList;
 
 
 /**
- * HmilyUndoInvocation.
+ * Hmily data dataSnapshot.
  *
  * @author xiaoyu
  */
 @RequiredArgsConstructor
 @Getter
-public class HmilyUndoInvocation implements Serializable {
+public class HmilyDataSnapshot implements Serializable {
     
     private static final long serialVersionUID = -4406133196112007765L;
     

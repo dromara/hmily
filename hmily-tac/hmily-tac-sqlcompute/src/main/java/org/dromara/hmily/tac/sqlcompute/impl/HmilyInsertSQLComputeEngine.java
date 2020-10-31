@@ -18,8 +18,8 @@
 package org.dromara.hmily.tac.sqlcompute.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.dromara.hmily.repository.spi.entity.HmilyDataSnapshot;
 import org.dromara.hmily.repository.spi.entity.HmilySQLTuple;
-import org.dromara.hmily.repository.spi.entity.HmilyUndoInvocation;
 import org.dromara.hmily.tac.sqlcompute.HmilySQLComputeEngine;
 import org.dromara.hmily.tac.sqlcompute.exception.SQLComputeException;
 import org.dromara.hmily.tac.sqlparser.model.segment.dml.assignment.HmilyAssignmentSegment;
@@ -48,8 +48,8 @@ public final class HmilyInsertSQLComputeEngine implements HmilySQLComputeEngine 
     private final HmilyInsertStatement sqlStatement;
     
     @Override
-    public HmilyUndoInvocation generateImage(final String sql, final List<Object> parameters, final Connection connection) throws SQLComputeException {
-        HmilyUndoInvocation result = new HmilyUndoInvocation();
+    public HmilyDataSnapshot generateSnapshot(final String sql, final List<Object> parameters, final Connection connection) throws SQLComputeException {
+        HmilyDataSnapshot result = new HmilyDataSnapshot();
         result.getTuples().addAll(generateSQLTuples(sql, parameters));
         return result;
     }

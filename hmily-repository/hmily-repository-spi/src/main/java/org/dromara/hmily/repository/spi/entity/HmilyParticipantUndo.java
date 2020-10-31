@@ -31,6 +31,7 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode
 public final class HmilyParticipantUndo implements Serializable {
     
+    private static final long serialVersionUID = 6869663782220867407L;
     /**
      * undo id.
      */
@@ -57,9 +58,9 @@ public final class HmilyParticipantUndo implements Serializable {
     private Integer status;
     
     /**
-     * undo invocation.
+     * data dataSnapshot.
      */
-    private HmilyUndoInvocation undoInvocation;
+    private HmilyDataSnapshot dataSnapshot;
     
     /**
      * createTime.
