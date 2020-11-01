@@ -95,10 +95,10 @@ public class MongoEntityConvert {
         undo.setParticipantId(entity.getParticipantId());
         undo.setTransId(entity.getTransId());
         undo.setResourceId(entity.getResourceId());
-        byte[] undoInvocation = entity.getUndoInvocation();
+        byte[] snapshotBytes = entity.getUndoDataSnapshot();
         try {
-            final HmilyDataSnapshot dataSnapshot =
-                    hmilySerializer.deSerialize(undoInvocation, HmilyDataSnapshot.class);
+            HmilyDataSnapshot dataSnapshot =
+                    hmilySerializer.deSerialize(snapshotBytes, HmilyDataSnapshot.class);
             undo.setDataSnapshot(dataSnapshot);
         } catch (HmilySerializerException e) {
             logger.error("mongo 存储序列化错误", e);
@@ -175,7 +175,7 @@ public class MongoEntityConvert {
         entity.setStatus(undo.getStatus());
         entity.setTransId(undo.getTransId());
         entity.setUndoId(undo.getUndoId());
-        entity.setUndoInvocation(hmilySerializer.serialize(undo.getDataSnapshot()));
+        entity.setUndoDataSnapshot(hmilySerializer.serialize(undo.getDataSnapshot()));
         entity.setUpdateTime(undo.getUpdateTime());
         return entity;
     }
