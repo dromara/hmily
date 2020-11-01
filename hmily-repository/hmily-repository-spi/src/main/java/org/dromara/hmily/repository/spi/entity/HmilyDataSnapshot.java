@@ -26,7 +26,7 @@ import java.util.LinkedList;
 
 
 /**
- * Hmily data dataSnapshot.
+ * Hmily data snapshot.
  *
  * @author xiaoyu
  */
