@@ -18,7 +18,7 @@
 package org.dromara.hmily.tac.sqlcompute.impl;
 
 import lombok.RequiredArgsConstructor;
-import org.dromara.hmily.repository.spi.entity.HmilyUndoInvocation;
+import org.dromara.hmily.repository.spi.entity.HmilyDataSnapshot;
 import org.dromara.hmily.tac.sqlcompute.HmilySQLComputeEngine;
 import org.dromara.hmily.tac.sqlcompute.exception.SQLComputeException;
 import org.dromara.hmily.tac.sqlparser.model.statement.dml.HmilyDeleteStatement;
@@ -27,7 +27,7 @@ import java.sql.Connection;
 import java.util.List;
 
 /**
- * Hmily Delete SQL compute engine.
+ * Hmily delete SQL compute engine.
  *
  * @author zhaojun
  */
@@ -37,7 +37,7 @@ public final class HmilyDeleteSQLComputeEngine implements HmilySQLComputeEngine 
     private final HmilyDeleteStatement statement;
     
     @Override
-    public HmilyUndoInvocation generateImage(final String sql, final List<Object> parameters, final Connection connection) throws SQLComputeException {
+    public HmilyDataSnapshot generateSnapshot(final String sql, final List<Object> parameters, final Connection connection) throws SQLComputeException {
         return null;
     }
 }

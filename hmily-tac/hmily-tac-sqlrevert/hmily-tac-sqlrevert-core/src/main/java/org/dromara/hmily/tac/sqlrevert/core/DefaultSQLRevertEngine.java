@@ -45,7 +45,7 @@ public class DefaultSQLRevertEngine implements HmilySQLRevertEngine {
     @Override
     public boolean revert(final HmilyParticipantUndo participantUndo) throws SQLRevertException {
         try (Connection connection = HmilyResourceManager.get(participantUndo.getResourceId()).getTargetDataSource().getConnection()) {
-            return doRevertInTransaction(connection, participantUndo.getUndoInvocation().getTuples());
+            return doRevertInTransaction(connection, participantUndo.getDataSnapshot().getTuples());
         } catch (final SQLException ex) {
             log.error("hmily tac rollback exception -> ", ex);
             return false;

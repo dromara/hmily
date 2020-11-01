@@ -20,7 +20,7 @@ package org.dromara.hmily.tac.sqlcompute.impl;
 import com.google.common.base.Joiner;
 import lombok.RequiredArgsConstructor;
 import org.dromara.hmily.repository.spi.entity.HmilySQLTuple;
-import org.dromara.hmily.repository.spi.entity.HmilyUndoInvocation;
+import org.dromara.hmily.repository.spi.entity.HmilyDataSnapshot;
 import org.dromara.hmily.tac.sqlcompute.exception.SQLComputeException;
 import org.dromara.hmily.tac.sqlparser.model.segment.generic.table.HmilySimpleTableSegment;
 import org.dromara.hmily.tac.sqlparser.model.statement.dml.HmilyUpdateStatement;
@@ -44,11 +44,11 @@ public final class HmilyUpdateSQLComputeEngine extends AbstractHmilySQLComputeEn
     private final HmilyUpdateStatement sqlStatement;
     
     @Override
-    // FIXME fixture undoInvocation for poc test
-    public HmilyUndoInvocation generateImage(final String sql, final List<Object> parameters, final Connection connection) throws SQLComputeException {
+    // FIXME fixture dataSnapshot for poc test
+    public HmilyDataSnapshot generateSnapshot(final String sql, final List<Object> parameters, final Connection connection) throws SQLComputeException {
         Map<String, Object> beforeImage = new LinkedHashMap<>();
         Map<String, Object> afterImage = new LinkedHashMap<>();
-        HmilyUndoInvocation result = new HmilyUndoInvocation();
+        HmilyDataSnapshot result = new HmilyDataSnapshot();
         if (sql.contains("order")) {
             beforeImage.put("status", 3);
             afterImage.put("number", sql.substring(sql.indexOf("'") + 1, sql.length() - 1));
