@@ -94,16 +94,10 @@ public enum HmilyExecuteTemplate {
             // TODO prepared sql will improve performance of parser engine
             HmilyStatement statement = hmilySqlParserEngine.parser(sql, DatabaseTypes.INSTANCE.getDatabaseType());
             // TODO should generate lock-key to avoid dirty data modified by other global transaction.
+            String resourceId = ResourceIdUtils.INSTANCE.getResourceId(connectionInformation.getUrl());
             HmilySQLComputeEngine hmilySQLComputeEngine = HmilySQLComputeEngineFactory.newInstance(statement);
             HmilyDataSnapshot snapshot = hmilySQLComputeEngine.generateSnapshot(sql, parameters, connectionInformation.getConnection());
-            //4.缓存sql日志记录 ? 存储到哪里呢 threadLocal？
-            HmilyUndoContext context = new HmilyUndoContext();
-            context.setDataSnapshot(snapshot);
-            context.setResourceId(ResourceIdUtils.INSTANCE.getResourceId(connectionInformation.getUrl()));
-            HmilyTransactionContext transactionContext = HmilyContextHolder.get();
-            context.setTransId(transactionContext.getTransId());
-            context.setParticipantId(transactionContext.getParticipantId());
-            HmilyUndoContextCacheManager.INSTANCE.set(context);
+            HmilyUndoContextCacheManager.INSTANCE.set(HmilyContextHolder.get(), snapshot, resourceId);
         } catch (Exception e) {
             log.error("execute hmily tac module have exception:", e);
         }
