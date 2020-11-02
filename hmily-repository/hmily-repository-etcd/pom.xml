@@ -21,23 +21,45 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <groupId>org.dromara</groupId>
-        <artifactId>hmily</artifactId>
+        <artifactId>hmily-repository</artifactId>
         <version>2.1.2-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>hmily-repository</artifactId>
-    <packaging>pom</packaging>
-    <modules>
-        <module>hmily-repository-all</module>
-        <module>hmily-repository-database</module>
-        <module>hmily-repository-mongodb</module>
-        <module>hmily-repository-redis</module>
-        <module>hmily-repository-file</module>
-        <module>hmily-repository-zookeeper</module>
-        <module>hmily-repository-etcd</module>
-        <module>hmily-repository-spi</module>
-    </modules>
+    <artifactId>hmily-repository-etcd</artifactId>
+    <properties>
+        <metrics.version>3.2.6</metrics.version>
+    </properties>
 
+    <dependencies>
+        <dependency>
+            <groupId>org.dromara</groupId>
+            <artifactId>hmily-repository-spi</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.dromara</groupId>
+            <artifactId>hmily-common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.dromara</groupId>
+            <artifactId>hmily-serializer-all</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.etcd</groupId>
+            <artifactId>jetcd-core</artifactId>
+            <version>0.5.0</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.google.guava</groupId>
+                    <artifactId>guava</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+    </dependencies>
 
 </project>
