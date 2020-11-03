@@ -59,7 +59,7 @@ public final class HmilyParticipantUndo implements Serializable {
     private Integer status;
     
     /**
-     * data dataSnapshot.
+     * data snapshot.
      */
     private HmilyDataSnapshot dataSnapshot;
     
