@@ -81,7 +81,7 @@ public class EtcdRepository implements HmilyRepository {
         try {
             client = Client.builder().endpoints(Util.toURIs(Splitter.on(",").trimResults()
                     .splitToList(etcdConfig.getHost()))).namespace(ByteSequence.from(etcdConfig.getRootPath(), Charsets.UTF_8)).build();
-            if (!exist(rootPathPrefix)) {
+            if (!isExist(rootPathPrefix)) {
                 client.getKVClient().put(ByteSequence.from(rootPathPrefix, StandardCharsets.UTF_8), ByteSequence.from(rootPathPrefix, StandardCharsets.UTF_8));
             }
         } catch (Exception e) {
@@ -99,17 +99,16 @@ public class EtcdRepository implements HmilyRepository {
     public int createHmilyTransaction(final HmilyTransaction hmilyTransaction) throws HmilyRepositoryException {
         String path = buildHmilyTransactionRootPath();
         try {
-            boolean exist = exist(path + "/" + hmilyTransaction.getTransId());
+            boolean exist = isExist(path + "/" + hmilyTransaction.getTransId());
             hmilyTransaction.setAppName(appName);
             if (!exist) {
                 hmilyTransaction.setRetry(0);
                 hmilyTransaction.setVersion(0);
                 hmilyTransaction.setCreateTime(new Date());
-                hmilyTransaction.setUpdateTime(new Date());
             } else {
                 hmilyTransaction.setVersion(hmilyTransaction.getVersion() + 1);
-                hmilyTransaction.setUpdateTime(new Date());
             }
+            hmilyTransaction.setUpdateTime(new Date());
             client.getKVClient().put(ByteSequence.from(path + "/" + hmilyTransaction.getTransId(), StandardCharsets.UTF_8),
                     ByteSequence.from(hmilySerializer.serialize(hmilyTransaction)));
             return HmilyRepository.ROWS;
@@ -148,9 +147,9 @@ public class EtcdRepository implements HmilyRepository {
         return keyValues.isEmpty() ? null : keyValues.iterator().next();
     }
     
-    private boolean exist(final String path) throws InterruptedException, ExecutionException {
-        long count = client.getKVClient().get(ByteSequence.from(path, StandardCharsets.UTF_8)).get().getCount();
-        return count > 0;
+    private boolean isExist(final String path) throws InterruptedException, ExecutionException {
+        return client.getKVClient().get(ByteSequence.from(path, StandardCharsets.UTF_8))
+                .get().getCount() > 0;
     }
 
     @Override
@@ -234,11 +233,10 @@ public class EtcdRepository implements HmilyRepository {
                 hmilyParticipant.setRetry(0);
                 hmilyParticipant.setVersion(0);
                 hmilyParticipant.setCreateTime(new Date());
-                hmilyParticipant.setUpdateTime(new Date());
             } else {
                 hmilyParticipant.setVersion(hmilyParticipant.getVersion() + 1);
-                hmilyParticipant.setUpdateTime(new Date());
             }
+            hmilyParticipant.setUpdateTime(new Date());
             client.getKVClient().put(ByteSequence.from(path + "/" + hmilyParticipant.getParticipantId(), StandardCharsets.UTF_8), 
                     ByteSequence.from(hmilySerializer.serialize(hmilyParticipant)));
             return HmilyRepository.ROWS;
@@ -361,10 +359,8 @@ public class EtcdRepository implements HmilyRepository {
             KeyValue keyValue = getKeyValue(path + "/" + hmilyParticipantUndo.getUndoId());
             if (null == keyValue) {
                 hmilyParticipantUndo.setCreateTime(new Date());
-                hmilyParticipantUndo.setUpdateTime(new Date());
-            } else {
-                hmilyParticipantUndo.setUpdateTime(new Date());
             }
+            hmilyParticipantUndo.setUpdateTime(new Date());
             client.getKVClient().put(ByteSequence.from(path + "/" + hmilyParticipantUndo.getUndoId(), StandardCharsets.UTF_8), ByteSequence.from(hmilySerializer.serialize(hmilyParticipantUndo)));
             return HmilyRepository.ROWS;
         } catch (ExecutionException | InterruptedException e) {
