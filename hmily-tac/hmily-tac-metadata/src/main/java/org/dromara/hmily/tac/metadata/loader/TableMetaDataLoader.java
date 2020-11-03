@@ -17,17 +17,17 @@
 
 package org.dromara.hmily.tac.metadata.loader;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.Optional;
-import javax.sql.DataSource;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.dromara.hmily.tac.common.database.dialect.DatabaseMetaDataDialectHandlerFactory;
 import org.dromara.hmily.tac.common.database.type.DatabaseType;
 import org.dromara.hmily.tac.metadata.connection.MetaDataConnectionAdapter;
 import org.dromara.hmily.tac.metadata.model.TableMetaData;
+
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Optional;
 
 
 /**
@@ -39,20 +39,18 @@ public final class TableMetaDataLoader {
     /**
      * Load table meta data.
      *
-     * @param dataSource data source
+     * @param connectionAdapter connection adapter
      * @param tableNamePattern table name pattern
      * @param databaseType database type
      * @return table meta data
      * @throws SQLException SQL exception
      */
-    public static Optional<TableMetaData> load(final DataSource dataSource, final String tableNamePattern, final DatabaseType databaseType) throws SQLException {
-        try (MetaDataConnectionAdapter connectionAdapter = new MetaDataConnectionAdapter(databaseType, dataSource.getConnection())) {
-            String formattedTableNamePattern = formatTableNamePattern(tableNamePattern, databaseType);
-            return isTableExist(connectionAdapter, formattedTableNamePattern)
-                    ? Optional.of(new TableMetaData(ColumnMetaDataLoader.load(
-                            connectionAdapter, formattedTableNamePattern, databaseType), IndexMetaDataLoader.load(connectionAdapter, formattedTableNamePattern)))
-                    : Optional.empty();
-        }
+    public static Optional<TableMetaData> load(final MetaDataConnectionAdapter connectionAdapter, final String tableNamePattern, final DatabaseType databaseType) throws SQLException {
+        String formattedTableNamePattern = formatTableNamePattern(tableNamePattern, databaseType);
+        return isTableExist(connectionAdapter, formattedTableNamePattern)
+                ? Optional.of(new TableMetaData(formattedTableNamePattern, ColumnMetaDataLoader.load(
+                        connectionAdapter, formattedTableNamePattern, databaseType), IndexMetaDataLoader.load(connectionAdapter, formattedTableNamePattern)))
+                : Optional.empty();
     }
     
     private static String formatTableNamePattern(final String tableNamePattern, final DatabaseType databaseType) {

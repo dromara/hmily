@@ -15,32 +15,20 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.tac.common.utils;
+package org.dromara.hmily.tac.metadata.model;
 
+import lombok.Getter;
+
+import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * The enum Resource id utils.
+ * Data source metadata.
  *
- * @author xiaoyu
+ * @author zhaojun
  */
-public enum ResourceIdUtils {
+@Getter
+public final class DataSourceMetaData {
     
-    /**
-     * Instance resource id utils.
-     */
-    INSTANCE;
-    
-    private final Map<String, String> resourceIds = new ConcurrentHashMap<>();
-    
-    /**
-     * Gets resource id.
-     *
-     * @param jdbcUrl the jdbc url
-     * @return the resource id
-     */
-    public String getResourceId(final String jdbcUrl) {
-        return resourceIds.computeIfAbsent(jdbcUrl, u -> u.contains("?") ? u.substring(0, u.indexOf('?')) : u);
-    }
+    private final Map<String, TableMetaData> tableMetaDataMap = new LinkedHashMap<>();
 }

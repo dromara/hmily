@@ -17,16 +17,17 @@
 
 package org.dromara.hmily.tac.metadata.model;
 
+import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import lombok.AccessLevel;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
 
 /**
  * Physical table meta data.
@@ -38,6 +39,8 @@ import lombok.ToString;
 @ToString
 public final class TableMetaData {
     
+    private final String tableName;
+    
     private final Map<String, ColumnMetaData> columns;
     
     private final Map<String, IndexMetaData> indexes;
@@ -47,11 +50,8 @@ public final class TableMetaData {
     
     private final List<String> primaryKeyColumns = new ArrayList<>();
     
-    public TableMetaData() {
-        this(Collections.emptyList(), Collections.emptyList());
-    }
-    
-    public TableMetaData(final Collection<ColumnMetaData> columnMetaDataList, final Collection<IndexMetaData> indexMetaDataList) {
+    public TableMetaData(final String tableName, final Collection<ColumnMetaData> columnMetaDataList, final Collection<IndexMetaData> indexMetaDataList) {
+        this.tableName = tableName;
         columns = getColumns(columnMetaDataList);
         indexes = getIndexes(indexMetaDataList);
     }

@@ -26,15 +26,14 @@ import org.dromara.hmily.common.utils.IdWorkerUtils;
 import org.dromara.hmily.core.context.HmilyContextHolder;
 import org.dromara.hmily.core.context.HmilyTransactionContext;
 import org.dromara.hmily.core.repository.HmilyRepositoryStorage;
-import org.dromara.hmily.repository.spi.entity.HmilyParticipantUndo;
 import org.dromara.hmily.repository.spi.entity.HmilyDataSnapshot;
+import org.dromara.hmily.repository.spi.entity.HmilyParticipantUndo;
 import org.dromara.hmily.tac.common.utils.DatabaseTypes;
 import org.dromara.hmily.tac.common.utils.ResourceIdUtils;
 import org.dromara.hmily.tac.core.cache.HmilyParticipantUndoCacheManager;
 import org.dromara.hmily.tac.core.cache.HmilyUndoContextCacheManager;
 import org.dromara.hmily.tac.core.context.HmilyUndoContext;
 import org.dromara.hmily.tac.p6spy.threadlocal.AutoCommitThreadLocal;
-import org.dromara.hmily.tac.sqlcompute.HmilySQLComputeEngine;
 import org.dromara.hmily.tac.sqlcompute.HmilySQLComputeEngineFactory;
 import org.dromara.hmily.tac.sqlparser.model.statement.HmilyStatement;
 import org.dromara.hmily.tac.sqlparser.spi.HmilySqlParserEngine;
@@ -94,10 +93,8 @@ public enum HmilyExecuteTemplate {
             // TODO prepared sql will improve performance of parser engine
             HmilyStatement statement = hmilySqlParserEngine.parser(sql, DatabaseTypes.INSTANCE.getDatabaseType());
             // TODO should generate lock-key to avoid dirty data modified by other global transaction.
-            String resourceId = ResourceIdUtils.INSTANCE.getResourceId(connectionInformation.getUrl());
-            HmilySQLComputeEngine hmilySQLComputeEngine = HmilySQLComputeEngineFactory.newInstance(statement);
-            HmilyDataSnapshot snapshot = hmilySQLComputeEngine.generateSnapshot(sql, parameters, connectionInformation.getConnection());
-            HmilyUndoContextCacheManager.INSTANCE.set(HmilyContextHolder.get(), snapshot, resourceId);
+            HmilyDataSnapshot snapshot = HmilySQLComputeEngineFactory.newInstance(statement).generateSnapshot(sql, parameters, connectionInformation.getConnection());
+            HmilyUndoContextCacheManager.INSTANCE.set(HmilyContextHolder.get(), snapshot, ResourceIdUtils.INSTANCE.getResourceId(connectionInformation.getUrl()));
         } catch (Exception e) {
             log.error("execute hmily tac module have exception:", e);
         }
