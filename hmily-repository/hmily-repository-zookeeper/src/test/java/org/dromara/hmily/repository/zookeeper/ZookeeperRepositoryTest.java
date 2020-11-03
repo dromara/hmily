@@ -183,7 +183,7 @@ public class ZookeeperRepositoryTest {
         int removeByIdResult = zookeeperRepository.removeHmilyTransaction(transactionId);
         assertEquals(1L, removeByIdResult);
         
-        int removeByDateResult = zookeeperRepository.removeHmilyTransactionByData(calendar.getTime());
+        int removeByDateResult = zookeeperRepository.removeHmilyTransactionByDate(calendar.getTime());
         assertEquals(3L, removeByDateResult);
     }
     
@@ -219,7 +219,7 @@ public class ZookeeperRepositoryTest {
         
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.HOUR_OF_DAY, 1);
-        int removeByDateResult = zookeeperRepository.removeHmilyParticipantUndoByData(calendar.getTime());
+        int removeByDateResult = zookeeperRepository.removeHmilyParticipantUndoByDate(calendar.getTime());
         assertEquals(3L, removeByDateResult);
     }
     
@@ -273,7 +273,7 @@ public class ZookeeperRepositoryTest {
         zookeeperRepository.updateHmilyParticipantStatus(id1, 4);
         zookeeperRepository.updateHmilyParticipantStatus(id2, 4);
         zookeeperRepository.updateHmilyParticipantStatus(id3, 4);
-        int removeByDateResult = zookeeperRepository.removeHmilyParticipantByData(calendar.getTime());
+        int removeByDateResult = zookeeperRepository.removeHmilyParticipantByDate(calendar.getTime());
         assertEquals(3L, removeByDateResult);
     }
     

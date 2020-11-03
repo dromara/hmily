@@ -191,7 +191,7 @@ public class EtcdRepositoryTest {
     }
     
     @Test
-    public void testRemoveHmilyTransactionByData() {
+    public void testRemoveHmilyTransactionByDate() {
         HmilyTransaction hmilyTransaction1 = buildHmilyTransaction((long) random.nextInt(1000));
         hmilyTransaction1.setStatus(1);
         io.etcd.jetcd.api.KeyValue keyValue1 = io.etcd.jetcd.api.KeyValue.newBuilder()
@@ -208,7 +208,7 @@ public class EtcdRepositoryTest {
 
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.HOUR_OF_DAY, 1);
-        int removeByDateResult = etcdRepository.removeHmilyTransactionByData(new Date());
+        int removeByDateResult = etcdRepository.removeHmilyTransactionByDate(new Date());
         assertEquals(1L, removeByDateResult);
     }
     
@@ -309,7 +309,7 @@ public class EtcdRepositoryTest {
     }
 
     @Test
-    public void testRemoveHmilyParticipantByData() {
+    public void testRemoveHmilyParticipantByDate() {
         HmilyParticipant hmilyParticipant1 = buildHmilyParticipant((long) random.nextInt(1000),
                 (long) random.nextInt(1000));
         hmilyParticipant1.setStatus(4);
@@ -327,7 +327,7 @@ public class EtcdRepositoryTest {
         when(getResponse.getKvs()).thenReturn(keyValues);
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.HOUR_OF_DAY, 1);
-        int removeByDateResult = etcdRepository.removeHmilyParticipantByData(calendar.getTime());
+        int removeByDateResult = etcdRepository.removeHmilyParticipantByDate(calendar.getTime());
         assertEquals(1L, removeByDateResult);
     }
 
@@ -375,7 +375,7 @@ public class EtcdRepositoryTest {
     }
 
     @Test
-    public void testRemoveHmilyParticipantUndoByData() {
+    public void testRemoveHmilyParticipantUndoByDate() {
         HmilyParticipantUndo hmilyParticipantUndo1 = buildHmilyParticipantUndo((long) random.nextInt(1000), 
                 (long) random.nextInt(1000), (long) random.nextInt(1000));
         hmilyParticipantUndo1.setStatus(1);
@@ -393,7 +393,7 @@ public class EtcdRepositoryTest {
         when(getResponse.getKvs()).thenReturn(keyValues);
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.HOUR_OF_DAY, 1);
-        int removeByDateResult = etcdRepository.removeHmilyParticipantUndoByData(calendar.getTime());
+        int removeByDateResult = etcdRepository.removeHmilyParticipantUndoByDate(calendar.getTime());
         assertEquals(1L, removeByDateResult);
     }
 
