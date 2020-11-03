@@ -27,9 +27,7 @@ import io.etcd.jetcd.options.GetOption;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.hmily.common.enums.HmilyActionEnum;
 import org.dromara.hmily.common.exception.HmilyException;
-import org.dromara.hmily.common.exception.HmilyRuntimeException;
 import org.dromara.hmily.common.utils.CollectionUtils;
-import org.dromara.hmily.common.utils.LogUtil;
 import org.dromara.hmily.config.api.ConfigEnv;
 import org.dromara.hmily.config.api.entity.HmilyEtcdConfig;
 import org.dromara.hmily.repository.spi.HmilyRepository;
@@ -78,16 +76,8 @@ public class EtcdRepository implements HmilyRepository {
     public void init(final String appName) {
         this.appName = appName;
         HmilyEtcdConfig etcdConfig = ConfigEnv.getInstance().getConfig(HmilyEtcdConfig.class);
-        try {
-            client = Client.builder().endpoints(Util.toURIs(Splitter.on(",").trimResults()
-                    .splitToList(etcdConfig.getHost()))).namespace(ByteSequence.from(etcdConfig.getRootPath(), Charsets.UTF_8)).build();
-            if (!isExist(rootPathPrefix)) {
-                client.getKVClient().put(ByteSequence.from(rootPathPrefix, StandardCharsets.UTF_8), ByteSequence.from(rootPathPrefix, StandardCharsets.UTF_8));
-            }
-        } catch (Exception e) {
-            LogUtil.error(LOGGER, "etcd init error please check you config:{}", e::getMessage);
-            throw new HmilyRuntimeException(e.getMessage());
-        }
+        client = Client.builder().endpoints(Util.toURIs(Splitter.on(",").trimResults()
+                .splitToList(etcdConfig.getHost()))).namespace(ByteSequence.from(etcdConfig.getRootPath(), Charsets.UTF_8)).build();
     }
 
     @Override
