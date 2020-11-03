@@ -83,9 +83,9 @@ public class HmilyTransactionSelfRecoveryScheduled implements AutoCloseable {
             phyDeletedExecutor
                     .scheduleWithFixedDelay(() -> {
                         try {
-                            hmilyRepository.removeHmilyTransactionByData(acquireDelayData(seconds));
-                            hmilyRepository.removeHmilyParticipantByData(acquireDelayData(seconds));
-                            hmilyRepository.removeHmilyParticipantUndoByData(acquireDelayData(seconds));
+                            hmilyRepository.removeHmilyTransactionByDate(acquireDelayData(seconds));
+                            hmilyRepository.removeHmilyParticipantByDate(acquireDelayData(seconds));
+                            hmilyRepository.removeHmilyParticipantUndoByDate(acquireDelayData(seconds));
                         } catch (Exception e) {
                             LOGGER.error(" scheduled hmily phyDeleted log is error:", e);
                         }

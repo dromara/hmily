@@ -418,17 +418,17 @@ public abstract class AbstractHmilyDatabase implements HmilyRepository {
     }
     
     @Override
-    public int removeHmilyTransactionByData(final Date date) {
+    public int removeHmilyTransactionByDate(final Date date) {
         return executeUpdate(DELETE_HMILY_TRANSACTION_WITH_DATA, date);
     }
     
     @Override
-    public int removeHmilyParticipantByData(final Date date) {
+    public int removeHmilyParticipantByDate(final Date date) {
         return executeUpdate(DELETE_HMILY_PARTICIPANT_WITH_DATA, date);
     }
     
     @Override
-    public int removeHmilyParticipantUndoByData(final Date date) {
+    public int removeHmilyParticipantUndoByDate(final Date date) {
         return executeUpdate(DELETE_HMILY_PARTICIPANT_UNDO_WITH_DATA, date);
     }
     
