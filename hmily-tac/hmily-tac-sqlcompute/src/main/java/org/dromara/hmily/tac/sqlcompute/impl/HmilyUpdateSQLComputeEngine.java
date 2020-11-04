@@ -19,8 +19,8 @@ package org.dromara.hmily.tac.sqlcompute.impl;
 
 import com.google.common.base.Joiner;
 import lombok.RequiredArgsConstructor;
-import org.dromara.hmily.repository.spi.entity.HmilySQLTuple;
 import org.dromara.hmily.repository.spi.entity.HmilyDataSnapshot;
+import org.dromara.hmily.repository.spi.entity.HmilySQLTuple;
 import org.dromara.hmily.tac.sqlcompute.exception.SQLComputeException;
 import org.dromara.hmily.tac.sqlparser.model.segment.generic.table.HmilySimpleTableSegment;
 import org.dromara.hmily.tac.sqlparser.model.statement.dml.HmilyUpdateStatement;
@@ -45,7 +45,7 @@ public final class HmilyUpdateSQLComputeEngine extends AbstractHmilySQLComputeEn
     
     @Override
     // FIXME fixture dataSnapshot for poc test
-    public HmilyDataSnapshot generateSnapshot(final String sql, final List<Object> parameters, final Connection connection) throws SQLComputeException {
+    public HmilyDataSnapshot generateSnapshot(final String sql, final List<Object> parameters, final Connection connection, final String resourceId) throws SQLComputeException {
         Map<String, Object> beforeImage = new LinkedHashMap<>();
         Map<String, Object> afterImage = new LinkedHashMap<>();
         HmilyDataSnapshot result = new HmilyDataSnapshot();
