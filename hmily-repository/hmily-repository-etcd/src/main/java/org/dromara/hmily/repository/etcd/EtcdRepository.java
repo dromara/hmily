@@ -38,8 +38,6 @@ import org.dromara.hmily.repository.spi.entity.HmilyTransaction;
 import org.dromara.hmily.repository.spi.exception.HmilyRepositoryException;
 import org.dromara.hmily.serializer.spi.HmilySerializer;
 import org.dromara.hmily.spi.HmilySPI;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -56,8 +54,6 @@ import java.util.concurrent.ExecutionException;
 @HmilySPI("etcd")
 @Slf4j
 public class EtcdRepository implements HmilyRepository {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(EtcdRepository.class);
     
     private Client client;
     
@@ -110,11 +106,11 @@ public class EtcdRepository implements HmilyRepository {
         try {
             KeyValue keyValue = getKeyValue(path);
             if (null == keyValue) {
-                LOGGER.warn("path {} is not exists.", path);
+                log.warn("path {} is not exists.", path);
                 return HmilyRepository.FAIL_ROWS;
             }
             if (currentVersion != keyValue.getVersion()) {
-                LOGGER.warn("current transaction data version different from etcd server. "
+                log.warn("current transaction data version different from etcd server. "
                         + "current version: {}, server data version:  {}", currentVersion, keyValue.getVersion());
             }
             hmilyTransaction.setVersion(currentVersion + 1);
@@ -123,7 +119,7 @@ public class EtcdRepository implements HmilyRepository {
             client.getKVClient().put(ByteSequence.from(path, StandardCharsets.UTF_8), ByteSequence.from(hmilySerializer.serialize(hmilyTransaction)));
             return HmilyRepository.ROWS;
         } catch (ExecutionException | InterruptedException e) {
-            LOGGER.error("updateRetryByLock occur a exception", e);
+            log.error("updateRetryByLock occur a exception", e);
         }
         return HmilyRepository.FAIL_ROWS;
     }
@@ -148,7 +144,7 @@ public class EtcdRepository implements HmilyRepository {
             }
             return hmilySerializer.deSerialize(keyValue.getValue().getBytes(), HmilyTransaction.class);
         } catch (ExecutionException | InterruptedException e) {
-            LOGGER.error("findByTransId occur a exception", e);
+            log.error("findByTransId occur a exception", e);
         }
         return null;
     }
@@ -183,7 +179,7 @@ public class EtcdRepository implements HmilyRepository {
             client.getKVClient().put(ByteSequence.from(path, StandardCharsets.UTF_8), ByteSequence.from(hmilySerializer.serialize(hmilyTransaction)));
             return HmilyRepository.ROWS;
         } catch (ExecutionException | InterruptedException e) {
-            LOGGER.error("updateHmilyTransactionStatus occur a exception", e);
+            log.error("updateHmilyTransactionStatus occur a exception", e);
             return HmilyRepository.FAIL_ROWS;
         }
     }
@@ -195,7 +191,7 @@ public class EtcdRepository implements HmilyRepository {
             client.getKVClient().delete(ByteSequence.from(path, StandardCharsets.UTF_8)).get();
             return HmilyRepository.ROWS;
         } catch (InterruptedException | ExecutionException e) {
-            LOGGER.error("removeHmilyTransaction occur a exception", e);
+            log.error("removeHmilyTransaction occur a exception", e);
         }
         return HmilyRepository.FAIL_ROWS;
     }
@@ -287,7 +283,7 @@ public class EtcdRepository implements HmilyRepository {
             client.getKVClient().put(ByteSequence.from(path, StandardCharsets.UTF_8), ByteSequence.from(hmilySerializer.serialize(hmilyParticipant)));
             return HmilyRepository.ROWS;
         } catch (ExecutionException | InterruptedException e) {
-            LOGGER.error("updateHmilyParticipantStatus occur a exception", e);
+            log.error("updateHmilyParticipantStatus occur a exception", e);
         }
         return HmilyRepository.FAIL_ROWS;
     }
@@ -299,7 +295,7 @@ public class EtcdRepository implements HmilyRepository {
             client.getKVClient().delete(ByteSequence.from(path, StandardCharsets.UTF_8)).get();
             return HmilyRepository.ROWS;
         } catch (InterruptedException | ExecutionException e) {
-            LOGGER.error("removeHmilyParticipant occur a exception", e);
+            log.error("removeHmilyParticipant occur a exception", e);
         }
         return HmilyRepository.FAIL_ROWS;
     }
@@ -320,11 +316,11 @@ public class EtcdRepository implements HmilyRepository {
         try {
             KeyValue keyValue = getKeyValue(path);
             if (null == keyValue) {
-                LOGGER.warn("path {} is not exists.", path);
+                log.warn("path {} is not exists.", path);
                 return false;
             }
             if (currentVersion != keyValue.getVersion()) {
-                LOGGER.warn("current transaction participant data version different from etcd server. "
+                log.warn("current transaction participant data version different from etcd server. "
                         + "current version: {}, server data version:  {}", currentVersion, keyValue.getVersion());
             }
             hmilyParticipant.setVersion(currentVersion + 1);
@@ -333,7 +329,7 @@ public class EtcdRepository implements HmilyRepository {
             client.getKVClient().put(ByteSequence.from(path, StandardCharsets.UTF_8), ByteSequence.from(hmilySerializer.serialize(hmilyParticipant)));
             return true;
         } catch (ExecutionException | InterruptedException e) {
-            LOGGER.error("updateRetryByLock occur a exception", e);
+            log.error("updateRetryByLock occur a exception", e);
         }
         return false;
     }
@@ -370,7 +366,7 @@ public class EtcdRepository implements HmilyRepository {
             client.getKVClient().delete(ByteSequence.from(path, StandardCharsets.UTF_8)).get();
             return HmilyRepository.ROWS;
         } catch (InterruptedException | ExecutionException e) {
-            LOGGER.error("removeHmilyParticipantUndo occur a exception", e);
+            log.error("removeHmilyParticipantUndo occur a exception", e);
         }
         return HmilyRepository.FAIL_ROWS;
     }
@@ -398,7 +394,7 @@ public class EtcdRepository implements HmilyRepository {
             client.getKVClient().put(ByteSequence.from(path, StandardCharsets.UTF_8), ByteSequence.from(hmilySerializer.serialize(hmilyParticipantUndo)));
             return HmilyRepository.ROWS;
         } catch (ExecutionException | InterruptedException e) {
-            LOGGER.error("updateHmilyParticipantStatus occur a exception", e);
+            log.error("updateHmilyParticipantStatus occur a exception", e);
         }
         return HmilyRepository.FAIL_ROWS;
     }
@@ -419,7 +415,7 @@ public class EtcdRepository implements HmilyRepository {
             }
             return result;
         } catch (ExecutionException | InterruptedException e) {
-            LOGGER.error("listByFilter occur a exception", e);
+            log.error("listByFilter occur a exception", e);
         }
         return Collections.emptyList();
     }
@@ -438,7 +434,7 @@ public class EtcdRepository implements HmilyRepository {
                 }
             }
         } catch (ExecutionException | InterruptedException e) {
-            LOGGER.error("existByFilter occur a exception", e);
+            log.error("existByFilter occur a exception", e);
         }
         return false;
     }
@@ -460,7 +456,7 @@ public class EtcdRepository implements HmilyRepository {
             }
             return count;
         } catch (ExecutionException | InterruptedException e) {
-            LOGGER.error("removeByFilter occur a exception", e);
+            log.error("removeByFilter occur a exception", e);
         }
         return HmilyRepository.FAIL_ROWS;
     }
