@@ -37,7 +37,7 @@ public final class HmilyDeleteSQLComputeEngine implements HmilySQLComputeEngine 
     private final HmilyDeleteStatement statement;
     
     @Override
-    public HmilyDataSnapshot generateSnapshot(final String sql, final List<Object> parameters, final Connection connection) throws SQLComputeException {
+    public HmilyDataSnapshot generateSnapshot(final String sql, final List<Object> parameters, final Connection connection, final String resourceId) throws SQLComputeException {
         return null;
     }
 }
