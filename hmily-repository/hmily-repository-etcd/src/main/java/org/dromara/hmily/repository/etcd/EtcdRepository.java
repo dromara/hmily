@@ -31,6 +31,7 @@ import org.dromara.hmily.common.utils.CollectionUtils;
 import org.dromara.hmily.config.api.ConfigEnv;
 import org.dromara.hmily.config.api.entity.HmilyEtcdConfig;
 import org.dromara.hmily.repository.spi.HmilyRepository;
+import org.dromara.hmily.repository.spi.HmilyRepositoryNode;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipant;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipantUndo;
 import org.dromara.hmily.repository.spi.entity.HmilyTransaction;
@@ -57,24 +58,19 @@ import java.util.concurrent.ExecutionException;
 public class EtcdRepository implements HmilyRepository {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EtcdRepository.class);
-
-    private static final String HMILY_TRANSACTION_GLOBAL = "hmily_transaction_global";
-
-    private static final String HMILY_TRANSACTION_PARTICIPANT = "hmily_transaction_participant";
-
-    private static final String HMILY_PARTICIPANT_UNDO = "hmily_participant_undo";
     
-    private static volatile Client client;
+    private Client client;
     
     private HmilySerializer hmilySerializer;
-
-    private String rootPathPrefix = "/hmily-repository";
+    
+    private HmilyRepositoryNode node;
 
     private String appName;
 
     @Override
     public void init(final String appName) {
         this.appName = appName;
+        this.node = new HmilyRepositoryNode(appName);
         HmilyEtcdConfig etcdConfig = ConfigEnv.getInstance().getConfig(HmilyEtcdConfig.class);
         client = Client.builder().endpoints(Util.toURIs(Splitter.on(",").trimResults()
                 .splitToList(etcdConfig.getHost()))).namespace(ByteSequence.from(etcdConfig.getRootPath(), Charsets.UTF_8)).build();
@@ -87,9 +83,9 @@ public class EtcdRepository implements HmilyRepository {
 
     @Override
     public int createHmilyTransaction(final HmilyTransaction hmilyTransaction) throws HmilyRepositoryException {
-        String path = buildHmilyTransactionRootPath();
+        String path = node.getHmilyTransactionRealPath(hmilyTransaction.getTransId());
         try {
-            boolean exist = isExist(path + "/" + hmilyTransaction.getTransId());
+            boolean exist = isExist(path);
             hmilyTransaction.setAppName(appName);
             if (!exist) {
                 hmilyTransaction.setRetry(0);
@@ -99,7 +95,7 @@ public class EtcdRepository implements HmilyRepository {
                 hmilyTransaction.setVersion(hmilyTransaction.getVersion() + 1);
             }
             hmilyTransaction.setUpdateTime(new Date());
-            client.getKVClient().put(ByteSequence.from(path + "/" + hmilyTransaction.getTransId(), StandardCharsets.UTF_8),
+            client.getKVClient().put(ByteSequence.from(path, StandardCharsets.UTF_8),
                     ByteSequence.from(hmilySerializer.serialize(hmilyTransaction)));
             return HmilyRepository.ROWS;
         } catch (ExecutionException | InterruptedException e) {
@@ -110,7 +106,7 @@ public class EtcdRepository implements HmilyRepository {
     @Override
     public int updateRetryByLock(final HmilyTransaction hmilyTransaction) {
         final int currentVersion = hmilyTransaction.getVersion();
-        String path = buildHmilyTransactionRealPath(hmilyTransaction.getTransId());
+        String path = node.getHmilyTransactionRealPath(hmilyTransaction.getTransId());
         try {
             KeyValue keyValue = getKeyValue(path);
             if (null == keyValue) {
@@ -144,7 +140,7 @@ public class EtcdRepository implements HmilyRepository {
 
     @Override
     public HmilyTransaction findByTransId(final Long transId) {
-        String path = buildHmilyTransactionRealPath(transId);
+        String path = node.getHmilyTransactionRealPath(transId);
         try {
             KeyValue keyValue = getKeyValue(path);
             if (keyValue == null) {
@@ -159,7 +155,7 @@ public class EtcdRepository implements HmilyRepository {
 
     @Override
     public List<HmilyTransaction> listLimitByDelay(final Date date, final int limit) {
-        String path = buildHmilyTransactionRootPath();
+        String path = node.getHmilyTransactionRootPath();
         return listByFilter(path, HmilyTransaction.class, (hmilyTransaction, params) -> {
             Date dateParam = (Date) params[0];
             int limitParam = (int) params[1];
@@ -174,7 +170,7 @@ public class EtcdRepository implements HmilyRepository {
 
     @Override
     public int updateHmilyTransactionStatus(final Long transId, final Integer status) throws HmilyRepositoryException {
-        String path = buildHmilyTransactionRealPath(transId);
+        String path = node.getHmilyTransactionRealPath(transId);
         try {
             KeyValue keyValue = getKeyValue(path);
             if (null == keyValue) {
@@ -194,7 +190,7 @@ public class EtcdRepository implements HmilyRepository {
 
     @Override
     public int removeHmilyTransaction(final Long transId) {
-        String path = buildHmilyTransactionRealPath(transId);
+        String path = node.getHmilyTransactionRealPath(transId);
         try {
             client.getKVClient().delete(ByteSequence.from(path, StandardCharsets.UTF_8)).get();
             return HmilyRepository.ROWS;
@@ -206,7 +202,7 @@ public class EtcdRepository implements HmilyRepository {
 
     @Override
     public int removeHmilyTransactionByDate(final Date date) {
-        String path = buildHmilyTransactionRootPath();
+        String path = node.getHmilyTransactionRootPath();
         return removeByFilter(path, HmilyTransaction.class, (hmilyTransaction, params) -> {
             Date dateParam = (Date) params[0];
             return dateParam.after(hmilyTransaction.getUpdateTime()) && hmilyTransaction.getStatus() == HmilyActionEnum.DELETE.getCode();
@@ -216,8 +212,8 @@ public class EtcdRepository implements HmilyRepository {
     @Override
     public int createHmilyParticipant(final HmilyParticipant hmilyParticipant) throws HmilyRepositoryException {
         try {
-            String path = buildHmilyParticipantRootPath();
-            KeyValue keyValue = getKeyValue(path + "/" + hmilyParticipant.getTransId());
+            String path = node.getHmilyParticipantRealPath(hmilyParticipant.getParticipantId());
+            KeyValue keyValue = getKeyValue(path);
             hmilyParticipant.setAppName(appName);
             if (null == keyValue) {
                 hmilyParticipant.setRetry(0);
@@ -227,7 +223,7 @@ public class EtcdRepository implements HmilyRepository {
                 hmilyParticipant.setVersion(hmilyParticipant.getVersion() + 1);
             }
             hmilyParticipant.setUpdateTime(new Date());
-            client.getKVClient().put(ByteSequence.from(path + "/" + hmilyParticipant.getParticipantId(), StandardCharsets.UTF_8), 
+            client.getKVClient().put(ByteSequence.from(path, StandardCharsets.UTF_8), 
                     ByteSequence.from(hmilySerializer.serialize(hmilyParticipant)));
             return HmilyRepository.ROWS;
         } catch (ExecutionException | InterruptedException e) {
@@ -237,7 +233,7 @@ public class EtcdRepository implements HmilyRepository {
 
     @Override
     public List<HmilyParticipant> findHmilyParticipant(final Long participantId) {
-        String path = buildHmilyParticipantRootPath();
+        String path = node.getHmilyParticipantRootPath();
         return listByFilter(path, HmilyParticipant.class, (hmilyParticipant, params) -> {
             Long participantIdParam = (Long) params[0];
             return participantIdParam.compareTo(hmilyParticipant.getParticipantId()) == 0
@@ -247,7 +243,7 @@ public class EtcdRepository implements HmilyRepository {
 
     @Override
     public List<HmilyParticipant> listHmilyParticipant(final Date date, final String transType, final int limit) {
-        String path = buildHmilyParticipantRootPath();
+        String path = node.getHmilyParticipantRootPath();
         return listByFilter(path, HmilyParticipant.class, (hmilyParticipant, params) -> {
             Date dateParam = (Date) params[0];
             String transTypeParam = (String) params[1];
@@ -263,13 +259,13 @@ public class EtcdRepository implements HmilyRepository {
 
     @Override
     public List<HmilyParticipant> listHmilyParticipantByTransId(final Long transId) {
-        String path = buildHmilyParticipantRootPath();
+        String path = node.getHmilyParticipantRootPath();
         return listByFilter(path, HmilyParticipant.class, (hmilyParticipant, params) -> transId.compareTo(hmilyParticipant.getTransId()) == 0, transId);
     }
 
     @Override
     public boolean existHmilyParticipantByTransId(final Long transId) {
-        String path = buildHmilyParticipantRootPath();
+        String path = node.getHmilyParticipantRootPath();
         return existByFilter(path, HmilyParticipant.class, (hmilyParticipant, params) -> {
             Long transIdParam = (Long) params[0];
             return transIdParam.compareTo(hmilyParticipant.getTransId()) == 0;
@@ -278,7 +274,7 @@ public class EtcdRepository implements HmilyRepository {
     
     @Override
     public int updateHmilyParticipantStatus(final Long participantId, final Integer status) throws HmilyRepositoryException {
-        String path = buildHmilyParticipantRealPath(participantId);
+        String path = node.getHmilyParticipantRealPath(participantId);
         try {
             KeyValue keyValue = getKeyValue(path);
             if (null == keyValue) {
@@ -298,7 +294,7 @@ public class EtcdRepository implements HmilyRepository {
 
     @Override
     public int removeHmilyParticipant(final Long participantId) {
-        String path = buildHmilyParticipantRealPath(participantId);
+        String path = node.getHmilyParticipantRealPath(participantId);
         try {
             client.getKVClient().delete(ByteSequence.from(path, StandardCharsets.UTF_8)).get();
             return HmilyRepository.ROWS;
@@ -310,7 +306,7 @@ public class EtcdRepository implements HmilyRepository {
 
     @Override
     public int removeHmilyParticipantByDate(final Date date) {
-        String path = buildHmilyParticipantRootPath();
+        String path = node.getHmilyParticipantRootPath();
         return removeByFilter(path, HmilyParticipant.class, (hmilyParticipant, params) -> {
             Date dateParam = (Date) params[0];
             return dateParam.after(hmilyParticipant.getUpdateTime()) && hmilyParticipant.getStatus().compareTo(HmilyActionEnum.DELETE.getCode()) == 0;
@@ -320,7 +316,7 @@ public class EtcdRepository implements HmilyRepository {
     @Override
     public boolean lockHmilyParticipant(final HmilyParticipant hmilyParticipant) {
         final int currentVersion = hmilyParticipant.getVersion();
-        String path = buildHmilyParticipantRealPath(hmilyParticipant.getParticipantId());
+        String path = node.getHmilyParticipantRealPath(hmilyParticipant.getParticipantId());
         try {
             KeyValue keyValue = getKeyValue(path);
             if (null == keyValue) {
@@ -344,14 +340,14 @@ public class EtcdRepository implements HmilyRepository {
 
     @Override
     public int createHmilyParticipantUndo(final HmilyParticipantUndo hmilyParticipantUndo) {
-        String path = buildHmilyParticipantUndoRootPath();
+        String path = node.getHmilyParticipantUndoRealPath(hmilyParticipantUndo.getUndoId());
         try {
-            KeyValue keyValue = getKeyValue(path + "/" + hmilyParticipantUndo.getUndoId());
+            KeyValue keyValue = getKeyValue(path);
             if (null == keyValue) {
                 hmilyParticipantUndo.setCreateTime(new Date());
             }
             hmilyParticipantUndo.setUpdateTime(new Date());
-            client.getKVClient().put(ByteSequence.from(path + "/" + hmilyParticipantUndo.getUndoId(), StandardCharsets.UTF_8), ByteSequence.from(hmilySerializer.serialize(hmilyParticipantUndo)));
+            client.getKVClient().put(ByteSequence.from(path, StandardCharsets.UTF_8), ByteSequence.from(hmilySerializer.serialize(hmilyParticipantUndo)));
             return HmilyRepository.ROWS;
         } catch (ExecutionException | InterruptedException e) {
             throw new HmilyException(e);
@@ -360,7 +356,7 @@ public class EtcdRepository implements HmilyRepository {
 
     @Override
     public List<HmilyParticipantUndo> findHmilyParticipantUndoByParticipantId(final Long participantId) {
-        String path = buildHmilyParticipantUndoRootPath();
+        String path = node.getHmilyParticipantUndoRootPath();
         return listByFilter(path, HmilyParticipantUndo.class, (undo, params) -> {
             Long participantIdParam = (Long) params[0];
             return participantIdParam.compareTo(undo.getParticipantId()) == 0;
@@ -369,7 +365,7 @@ public class EtcdRepository implements HmilyRepository {
 
     @Override
     public int removeHmilyParticipantUndo(final Long undoId) {
-        String path = buildHmilyParticipantUndoRealPath(undoId);
+        String path = node.getHmilyParticipantUndoRealPath(undoId);
         try {
             client.getKVClient().delete(ByteSequence.from(path, StandardCharsets.UTF_8)).get();
             return HmilyRepository.ROWS;
@@ -381,7 +377,7 @@ public class EtcdRepository implements HmilyRepository {
 
     @Override
     public int removeHmilyParticipantUndoByDate(final Date date) {
-        String path = buildHmilyParticipantUndoRootPath();
+        String path = node.getHmilyParticipantUndoRootPath();
         return removeByFilter(path, HmilyParticipantUndo.class, (undo, params) -> {
             Date dateParam = (Date) params[0];
             return dateParam.after(undo.getUpdateTime()) && undo.getStatus().compareTo(HmilyActionEnum.DELETE.getCode()) == 0;
@@ -390,7 +386,7 @@ public class EtcdRepository implements HmilyRepository {
 
     @Override
     public int updateHmilyParticipantUndoStatus(final Long undoId, final Integer status) {
-        String path = buildHmilyParticipantUndoRealPath(undoId);
+        String path = node.getHmilyParticipantUndoRealPath(undoId);
         try {
             KeyValue keyValue = getKeyValue(path);
             if (null == keyValue) {
@@ -405,30 +401,6 @@ public class EtcdRepository implements HmilyRepository {
             LOGGER.error("updateHmilyParticipantStatus occur a exception", e);
         }
         return HmilyRepository.FAIL_ROWS;
-    }
-    
-    private String buildHmilyTransactionRootPath() {
-        return rootPathPrefix + "/" + HMILY_TRANSACTION_GLOBAL;
-    }
-    
-    private String buildHmilyTransactionRealPath(final Long transId) {
-        return buildHmilyTransactionRootPath() + "/" + transId;
-    }
-    
-    private String buildHmilyParticipantRootPath() {
-        return rootPathPrefix + "/" + appName + "/" + HMILY_TRANSACTION_PARTICIPANT;
-    }
-    
-    private String buildHmilyParticipantRealPath(final Long participantId) {
-        return buildHmilyParticipantRootPath() + "/" + participantId;
-    }
-    
-    private String buildHmilyParticipantUndoRootPath() {
-        return rootPathPrefix + "/" + appName + "/" + HMILY_PARTICIPANT_UNDO;
-    }
-    
-    private String buildHmilyParticipantUndoRealPath(final Long undoId) {
-        return buildHmilyParticipantUndoRootPath() + "/" + undoId;
     }
 
     private <T> List<T> listByFilter(final String path, final Class<T> deserializeClass, final Filter<T> filter, final Object... params) {
