@@ -47,6 +47,5 @@ public abstract class AbstractHmilySQLComputeEngine implements HmilySQLComputeEn
         return result;
     }
     
-    
-    abstract Collection<HmilySQLTuple> createTuples(final String sql, final List<Object> parameters, final Connection connection, final String resourceId) throws SQLException;
+    abstract Collection<HmilySQLTuple> createTuples(String sql, List<Object> parameters, Connection connection, String resourceId) throws SQLException;
 }

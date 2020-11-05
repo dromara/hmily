@@ -50,10 +50,9 @@ public class HmilyJdbcEventListener extends SimpleJdbcEventListener {
     }
     
     @Override
-    public void onBeforeAnyExecute(StatementInformation statementInformation) {
+    public void onBeforeAnyExecute(final StatementInformation statementInformation) {
         super.onBeforeAnyExecute(statementInformation);
         HmilyExecuteTemplate.INSTANCE.execute(statementInformation.getSql(), getParameters(statementInformation), statementInformation.getConnectionInformation());
-        
     }
     
     @Override
@@ -91,7 +90,7 @@ public class HmilyJdbcEventListener extends SimpleJdbcEventListener {
     @SuppressWarnings("unchecked")
     private List<Object> getParameters(final StatementInformation statementInformation) {
         List<Object> result = new LinkedList<>();
-        if (!(statementInformation instanceof  PreparedStatementInformation)) {
+        if (!(statementInformation instanceof PreparedStatementInformation)) {
             return result;
         }
         Method method = statementInformation.getClass().getDeclaredMethod("getParameterValues");

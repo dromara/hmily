@@ -47,7 +47,7 @@ public final class HmilyInsertSQLComputeEngine extends AbstractHmilySQLComputeEn
     private final HmilyInsertStatement sqlStatement;
     
     @Override
-    Collection<HmilySQLTuple> createTuples(String sql, List<Object> parameters, Connection connection, String resourceId) {
+    Collection<HmilySQLTuple> createTuples(final String sql, final List<Object> parameters, final Connection connection, final String resourceId) {
         String tableName = sql.substring(sqlStatement.getTable().getStartIndex(), sqlStatement.getTable().getStopIndex());
         TableMetaData tableMetaData = HmilyMetaDataManager.get(resourceId).getTableMetaDataMap().get(tableName);
         return sqlStatement.getSetAssignment().isPresent()

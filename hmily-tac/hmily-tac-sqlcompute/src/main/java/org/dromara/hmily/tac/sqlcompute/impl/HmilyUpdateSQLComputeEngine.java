@@ -70,7 +70,7 @@ public final class HmilyUpdateSQLComputeEngine extends AbstractHmilySQLComputeEn
     }
     
     @Override
-    Collection<HmilySQLTuple> createTuples(String sql, List<Object> parameters, Connection connection, String resourceId) throws SQLException {
+    Collection<HmilySQLTuple> createTuples(final String sql, final List<Object> parameters, final Connection connection, final String resourceId) throws SQLException {
         Collection<HmilySQLTuple> result = new LinkedList<>();
         for (ImageSQLUnit each : getSnapshotSQL(sql, parameters)) {
             Collection<Map<String, Object>> data = doQueryImage(connection, each.getSql(), each.getParameters());
