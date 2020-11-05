@@ -81,6 +81,7 @@ public final class HmilyUpdateSQLComputeEngine extends AbstractHmilySQLComputeEn
     
     private Collection<ImageSQLUnit> getSnapshotSQL(final String sql, final List<Object> parameters) {
         Collection<ImageSQLUnit> result = new LinkedList<>();
+        // TODO do not support multiple tables currently
         String tables = getTables(sql);
         String whereCondition = getWhereCondition(sql);
         sqlStatement.getTables().forEach(segment -> {
