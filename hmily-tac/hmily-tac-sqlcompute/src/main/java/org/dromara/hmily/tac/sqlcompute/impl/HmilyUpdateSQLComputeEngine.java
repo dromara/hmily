@@ -26,6 +26,10 @@ import org.dromara.hmily.tac.sqlparser.model.segment.generic.table.HmilySimpleTa
 import org.dromara.hmily.tac.sqlparser.model.statement.dml.HmilyUpdateStatement;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -66,7 +70,16 @@ public final class HmilyUpdateSQLComputeEngine extends AbstractHmilySQLComputeEn
     }
     
     @Override
-    Collection<ImageSQLUnit> generateQueryImageSQLs(final String sql, final List<Object> parameters) {
+    Collection<HmilySQLTuple> createTuples(String sql, List<Object> parameters, Connection connection, String resourceId) throws SQLException {
+        Collection<HmilySQLTuple> result = new LinkedList<>();
+        for (ImageSQLUnit each : getSnapshotSQL(sql, parameters)) {
+            Collection<Map<String, Object>> data = doQueryImage(connection, each.getSql(), each.getParameters());
+            result.addAll(doGenerateSQLTuples(data, each.getTableName(), each.getManipulationType()));
+        }
+        return result;
+    }
+    
+    private Collection<ImageSQLUnit> getSnapshotSQL(final String sql, final List<Object> parameters) {
         Collection<ImageSQLUnit> result = new LinkedList<>();
         String tables = getTables(sql);
         String whereCondition = getWhereCondition(sql);
@@ -74,6 +87,46 @@ public final class HmilyUpdateSQLComputeEngine extends AbstractHmilySQLComputeEn
             String imageSQL = String.format("SELECT %s FROM %s %s", Joiner.on(",").join(getUndoItems(segment), getRedoItems(segment, parameters)), tables, whereCondition);
             result.add(new ImageSQLUnit(imageSQL, new LinkedList<>(), "update", sql.substring(segment.getStartIndex(), segment.getStopIndex())));
         });
+        return result;
+    }
+    
+    private Collection<Map<String, Object>> doQueryImage(final Connection connection, final String sql, final List<Object> parameters) throws SQLException {
+        Collection<Map<String, Object>> result = new LinkedList<>();
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            int parameterIndex = 1;
+            for (Object each : parameters) {
+                preparedStatement.setObject(parameterIndex, each);
+                parameterIndex++;
+            }
+            ResultSet resultSet = preparedStatement.executeQuery();
+            ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
+            while (resultSet.next()) {
+                Map<String, Object> record = new LinkedHashMap<>();
+                for (int columnIndex = 1; columnIndex <= resultSetMetaData.getColumnCount(); columnIndex++) {
+                    record.put(resultSetMetaData.getColumnLabel(columnIndex), resultSet.getObject(columnIndex));
+                    result.add(record);
+                }
+            }
+        }
+        return result;
+    }
+    
+    private Collection<HmilySQLTuple> doGenerateSQLTuples(final Collection<Map<String, Object>> data, final String tableName, final String manipulateType) {
+        Collection<HmilySQLTuple> result = new LinkedList<>();
+        for (Map<String, Object> each : data) {
+            Map<String, Object> beforeImage = new LinkedHashMap<>();
+            Map<String, Object> afterImage = new LinkedHashMap<>();
+            each.forEach((key, value) -> {
+                // FIXME $after_image$ is a marker for redo data item
+                if (key.contains("$after_image$")) {
+                    afterImage.put(key.replace("$after_image$", ""), value);
+                } else {
+                    beforeImage.put(key, value);
+                }
+            });
+            beforeImage.forEach(afterImage::putIfAbsent);
+            result.add(new HmilySQLTuple(tableName, manipulateType, beforeImage, afterImage));
+        }
         return result;
     }
     

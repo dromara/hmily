@@ -18,12 +18,9 @@
 package org.dromara.hmily.tac.sqlcompute.impl;
 
 import lombok.RequiredArgsConstructor;
-import org.dromara.hmily.repository.spi.entity.HmilyDataSnapshot;
 import org.dromara.hmily.repository.spi.entity.HmilySQLTuple;
 import org.dromara.hmily.tac.metadata.HmilyMetaDataManager;
 import org.dromara.hmily.tac.metadata.model.TableMetaData;
-import org.dromara.hmily.tac.sqlcompute.HmilySQLComputeEngine;
-import org.dromara.hmily.tac.sqlcompute.exception.SQLComputeException;
 import org.dromara.hmily.tac.sqlparser.model.segment.dml.assignment.HmilyAssignmentSegment;
 import org.dromara.hmily.tac.sqlparser.model.segment.dml.assignment.HmilyInsertValuesSegment;
 import org.dromara.hmily.tac.sqlparser.model.segment.dml.assignment.HmilySetAssignmentSegment;
@@ -45,18 +42,12 @@ import java.util.Map;
  * @author zhaojun
  */
 @RequiredArgsConstructor
-public final class HmilyInsertSQLComputeEngine implements HmilySQLComputeEngine {
+public final class HmilyInsertSQLComputeEngine extends AbstractHmilySQLComputeEngine {
     
     private final HmilyInsertStatement sqlStatement;
     
     @Override
-    public HmilyDataSnapshot generateSnapshot(final String sql, final List<Object> parameters, final Connection connection, final String resourceId) throws SQLComputeException {
-        HmilyDataSnapshot result = new HmilyDataSnapshot();
-        result.getTuples().addAll(createTuples(sql, parameters, resourceId));
-        return result;
-    }
-    
-    private Collection<HmilySQLTuple> createTuples(final String sql, final List<Object> parameters, final String resourceId) {
+    Collection<HmilySQLTuple> createTuples(String sql, List<Object> parameters, Connection connection, String resourceId) {
         String tableName = sql.substring(sqlStatement.getTable().getStartIndex(), sqlStatement.getTable().getStopIndex());
         TableMetaData tableMetaData = HmilyMetaDataManager.get(resourceId).getTableMetaDataMap().get(tableName);
         return sqlStatement.getSetAssignment().isPresent()
