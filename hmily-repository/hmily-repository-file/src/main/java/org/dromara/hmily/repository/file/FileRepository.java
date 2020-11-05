@@ -199,7 +199,7 @@ public class FileRepository implements HmilyRepository {
     @Override
     public int createHmilyParticipant(final HmilyParticipant hmilyParticipant) throws HmilyRepositoryException {
         try {
-            boolean exsist = isExsist(getParticipantPath(), hmilyParticipant.getTransId());
+            boolean exsist = isExsist(getParticipantPath(), hmilyParticipant.getParticipantId());
             if (!exsist) {
                 hmilyParticipant.setCreateTime(new Date());
                 hmilyParticipant.setUpdateTime(new Date());
