@@ -21,6 +21,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -37,6 +38,8 @@ public final class HmilySQLTuple implements Serializable {
     private final String tableName;
     
     private final String manipulationType;
+    
+    private final List<Object> primaryKeyValues;
     
     private final Map<String, Object> beforeImage;
     

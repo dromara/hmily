@@ -34,10 +34,12 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Hmily update SQL compute engine.
@@ -60,15 +62,15 @@ public final class HmilyUpdateSQLComputeEngine extends AbstractHmilySQLComputeEn
         if (sql.contains("order")) {
             beforeImage.put("status", 3);
             afterImage.put("number", sql.substring(sql.indexOf("'") + 1, sql.length() - 1));
-            result.getTuples().add(new HmilySQLTuple("order", "update", beforeImage, afterImage));
+            result.getTuples().add(new HmilySQLTuple("order", "update", Collections.singletonList(1), beforeImage, afterImage));
         } else if (sql.contains("account")) {
             beforeImage.put("balance", 100);
             afterImage.put("user_id", 10000);
-            result.getTuples().add(new HmilySQLTuple("account", "update", beforeImage, afterImage));
+            result.getTuples().add(new HmilySQLTuple("account", "update", Collections.singletonList(10000), beforeImage, afterImage));
         } else {
             beforeImage.put("total_inventory", 100);
             afterImage.put("product_id", 1);
-            result.getTuples().add(new HmilySQLTuple("inventory", "update", beforeImage, afterImage));
+            result.getTuples().add(new HmilySQLTuple("inventory", "update", Collections.singletonList(1), beforeImage, afterImage));
         }
         return result;
     }
@@ -80,8 +82,9 @@ public final class HmilyUpdateSQLComputeEngine extends AbstractHmilySQLComputeEn
         HmilySimpleTableSegment tableSegment = sqlStatement.getTables().iterator().next();
         String tableName = sql.substring(tableSegment.getStartIndex(), tableSegment.getStopIndex());
         String selectSQL = String.format("SELECT %s FROM %s %s", Joiner.on(",").join(getAllColumns(tableSegment), getUpdatedColumns(parameters)), tableName, getWhereCondition(sql));
+        // TODO revise where-condition parameters here
         Collection<Map<String, Object>> records = executeQuery(connection, selectSQL, parameters);
-        result.addAll(doConvert(records, tableName, resourceId));
+        result.addAll(doConvert(records, HmilyMetaDataManager.get(resourceId).getTableMetaDataMap().get(tableName)));
         return result;
     }
     
@@ -130,9 +133,8 @@ public final class HmilyUpdateSQLComputeEngine extends AbstractHmilySQLComputeEn
         return result;
     }
     
-    private Collection<HmilySQLTuple> doConvert(final Collection<Map<String, Object>> records, final String tableName, final String resourceId) {
+    private Collection<HmilySQLTuple> doConvert(final Collection<Map<String, Object>> records, final TableMetaData tableMetaData) {
         Collection<HmilySQLTuple> result = new LinkedList<>();
-        TableMetaData tableMetaData = HmilyMetaDataManager.get(resourceId).getTableMetaDataMap().get(tableName);
         for (Map<String, Object> record : records) {
             Map<String, Object> before = new LinkedHashMap<>();
             Map<String, Object> after = new LinkedHashMap<>();
@@ -144,7 +146,8 @@ public final class HmilyUpdateSQLComputeEngine extends AbstractHmilySQLComputeEn
                     after.put(key.replace(UPDATE_COLUMN_SUFFIX, ""), value);
                 }
             });
-            result.add(new HmilySQLTuple(tableName, "update", before, after));
+            List<Object> primaryKeyValues = tableMetaData.getPrimaryKeyColumns().stream().map(before::get).collect(Collectors.toList());
+            result.add(new HmilySQLTuple(tableMetaData.getTableName(), "update", primaryKeyValues, before, after));
         }
         return result;
     }
