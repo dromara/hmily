@@ -17,14 +17,23 @@
 
 package org.dromara.hmily.tac.sqlcompute.impl;
 
+import com.google.common.base.Preconditions;
 import lombok.RequiredArgsConstructor;
-import org.dromara.hmily.repository.spi.entity.HmilyDataSnapshot;
-import org.dromara.hmily.tac.sqlcompute.HmilySQLComputeEngine;
-import org.dromara.hmily.tac.sqlcompute.exception.SQLComputeException;
+import org.dromara.hmily.repository.spi.entity.tuple.HmilySQLManipulation;
+import org.dromara.hmily.repository.spi.entity.tuple.HmilySQLTuple;
+import org.dromara.hmily.tac.metadata.HmilyMetaDataManager;
+import org.dromara.hmily.tac.metadata.model.TableMetaData;
+import org.dromara.hmily.tac.sqlparser.model.segment.generic.table.HmilySimpleTableSegment;
 import org.dromara.hmily.tac.sqlparser.model.statement.dml.HmilyDeleteStatement;
 
 import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Hmily delete SQL compute engine.
@@ -32,12 +41,32 @@ import java.util.List;
  * @author zhaojun
  */
 @RequiredArgsConstructor
-public final class HmilyDeleteSQLComputeEngine implements HmilySQLComputeEngine {
+public final class HmilyDeleteSQLComputeEngine extends AbstractHmilySQLComputeEngine {
     
-    private final HmilyDeleteStatement statement;
+    private final HmilyDeleteStatement sqlStatement;
     
     @Override
-    public HmilyDataSnapshot execute(final String sql, final List<Object> parameters, final Connection connection, final String resourceId) throws SQLComputeException {
-        return null;
+    Collection<HmilySQLTuple> createTuples(String sql, List<Object> parameters, Connection connection, String resourceId) throws SQLException {
+        Collection<HmilySQLTuple> result = new LinkedList<>();
+        Preconditions.checkState(sqlStatement.getTables().size() == 1, "Do not support multiple tables in delete statement");
+        HmilySimpleTableSegment tableSegment = sqlStatement.getTables().iterator().next();
+        String tableName = sql.substring(tableSegment.getStartIndex(), tableSegment.getStopIndex());
+        String selectSQL = String.format("SELECT %s FROM %s %s", HmilySQLComputeUtils.getAllColumns(tableSegment), tableName, getWhereCondition(sql));
+        Collection<Map<String, Object>> records = HmilySQLComputeUtils.executeQuery(connection, selectSQL, parameters);
+        result.addAll(doConvert(records, HmilyMetaDataManager.get(resourceId).getTableMetaDataMap().get(tableName)));
+        return result;
+    }
+    
+    private String getWhereCondition(final String sql) {
+        return sqlStatement.getWhere().map(segment -> sql.substring(segment.getStartIndex(), segment.getStopIndex())).orElse("");
+    }
+    
+    private Collection<HmilySQLTuple> doConvert(final Collection<Map<String, Object>> records, final TableMetaData tableMetaData) {
+        Collection<HmilySQLTuple> result = new LinkedList<>();
+        for (Map<String, Object> record : records) {
+            List<Object> primaryKeyValues = tableMetaData.getPrimaryKeyColumns().stream().map(record::get).collect(Collectors.toList());
+            result.add(new HmilySQLTuple(tableMetaData.getTableName(), HmilySQLManipulation.DELETE, primaryKeyValues, record, new LinkedHashMap<>()));
+        }
+        return result;
     }
 }

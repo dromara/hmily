@@ -95,8 +95,7 @@ public final class HmilyUpdateSQLComputeEngine extends AbstractHmilySQLComputeEn
     }
     
     private String getWhereCondition(final String sql) {
-        return sqlStatement.getWhere().map(segment -> sql.substring(segment.getStartIndex(), segment.getStopIndex()))
-            .orElseThrow(() -> new SQLComputeException("DML SQL should contain where condition"));
+        return sqlStatement.getWhere().map(segment -> sql.substring(segment.getStartIndex(), segment.getStopIndex())).orElse("");
     }
     
     private Collection<HmilySQLTuple> doConvert(final Collection<Map<String, Object>> records, final TableMetaData tableMetaData) {
