@@ -18,7 +18,8 @@
 package org.dromara.hmily.tac.sqlcompute.impl;
 
 import lombok.RequiredArgsConstructor;
-import org.dromara.hmily.repository.spi.entity.HmilySQLTuple;
+import org.dromara.hmily.repository.spi.entity.tuple.HmilySQLManipulation;
+import org.dromara.hmily.repository.spi.entity.tuple.HmilySQLTuple;
 import org.dromara.hmily.tac.metadata.HmilyMetaDataManager;
 import org.dromara.hmily.tac.metadata.model.TableMetaData;
 import org.dromara.hmily.tac.sqlparser.model.segment.dml.assignment.HmilyAssignmentSegment;
@@ -56,19 +57,19 @@ public final class HmilyInsertSQLComputeEngine extends AbstractHmilySQLComputeEn
     }
     
     private Collection<HmilySQLTuple> createTuplesBySet(final List<Object> parameters, final HmilySetAssignmentSegment setAssignmentsSegment, final TableMetaData tableMetaData) {
-        return doConvert(Collections.singletonList(createTupleData(parameters, setAssignmentsSegment)), tableMetaData);
+        return doConvert(Collections.singletonList(getRecord(parameters, setAssignmentsSegment)), tableMetaData);
     }
     
     private Collection<HmilySQLTuple> createTuplesByValues(final List<Object> parameters, final TableMetaData tableMetaData) {
         Collection<Map<String, Object>> records = new LinkedList<>();
         for (HmilyInsertValuesSegment each : sqlStatement.getValues()) {
             List<String> columnNames = sqlStatement.getColumnNames().isEmpty() ? new LinkedList<>(tableMetaData.getColumns().keySet()) : sqlStatement.getColumnNames();
-            records.add(createTupleData(parameters, columnNames, each));
+            records.add(getRecord(parameters, columnNames, each));
         }
         return doConvert(records, tableMetaData);
     }
     
-    private Map<String, Object> createTupleData(final List<Object> parameters, final HmilySetAssignmentSegment setAssignments) {
+    private Map<String, Object> getRecord(final List<Object> parameters, final HmilySetAssignmentSegment setAssignments) {
         Map<String, Object> result = new LinkedHashMap<>(setAssignments.getAssignments().size(), 1);
         for (HmilyAssignmentSegment each : setAssignments.getAssignments()) {
             result.put(each.getColumn().getQualifiedName(), ExpressionHandler.getValue(parameters, each.getValue()));
@@ -76,7 +77,7 @@ public final class HmilyInsertSQLComputeEngine extends AbstractHmilySQLComputeEn
         return result;
     }
     
-    private Map<String, Object> createTupleData(final List<Object> parameters, final Collection<String> columnNames, final HmilyInsertValuesSegment insertValues) {
+    private Map<String, Object> getRecord(final List<Object> parameters, final Collection<String> columnNames, final HmilyInsertValuesSegment insertValues) {
         Map<String, Object> result = new LinkedHashMap<>(columnNames.size());
         Iterator<String> columnNameIterator = columnNames.iterator();
         for (HmilyExpressionSegment each : insertValues.getValues()) {
@@ -89,7 +90,7 @@ public final class HmilyInsertSQLComputeEngine extends AbstractHmilySQLComputeEn
         Collection<HmilySQLTuple> result = new LinkedList<>();
         for (Map<String, Object> record : records) {
             List<Object> primaryKeyValues = tableMetaData.getPrimaryKeyColumns().stream().map(record::get).collect(Collectors.toList());
-            result.add(new HmilySQLTuple(tableMetaData.getTableName(), "insert", primaryKeyValues, record, new LinkedHashMap<>()));
+            result.add(new HmilySQLTuple(tableMetaData.getTableName(), HmilySQLManipulation.INSERT, primaryKeyValues, new LinkedHashMap<>(), record));
         }
         return result;
     }

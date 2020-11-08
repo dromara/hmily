@@ -19,7 +19,7 @@ package org.dromara.hmily.tac.sqlrevert.core;
 
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipantUndo;
-import org.dromara.hmily.repository.spi.entity.HmilySQLTuple;
+import org.dromara.hmily.repository.spi.entity.tuple.HmilySQLTuple;
 import org.dromara.hmily.spi.HmilySPI;
 import org.dromara.hmily.tac.common.HmilyResourceManager;
 import org.dromara.hmily.tac.sqlrevert.core.image.RevertSQLUnit;

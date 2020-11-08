@@ -15,33 +15,14 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.repository.spi.entity;
-
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-
-import java.io.Serializable;
-import java.util.List;
-import java.util.Map;
+package org.dromara.hmily.repository.spi.entity.tuple;
 
 /**
- * Hmily SQL tuple.
+ * Hmily SQL manipulation enum.
  *
  * @author zhaojun
  */
-@RequiredArgsConstructor
-@Getter
-public final class HmilySQLTuple implements Serializable {
+public enum HmilySQLManipulation {
     
-    private static final long serialVersionUID = -5978500621198003611L;
-    
-    private final String tableName;
-    
-    private final String manipulationType;
-    
-    private final List<Object> primaryKeyValues;
-    
-    private final Map<String, Object> beforeImage;
-    
-    private final Map<String, Object> afterImage;
+    INSERT, DELETE, UPDATE
 }

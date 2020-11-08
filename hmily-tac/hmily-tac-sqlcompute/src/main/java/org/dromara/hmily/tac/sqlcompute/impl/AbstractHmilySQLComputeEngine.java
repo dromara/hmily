@@ -19,7 +19,7 @@ package org.dromara.hmily.tac.sqlcompute.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.dromara.hmily.repository.spi.entity.HmilyDataSnapshot;
-import org.dromara.hmily.repository.spi.entity.HmilySQLTuple;
+import org.dromara.hmily.repository.spi.entity.tuple.HmilySQLTuple;
 import org.dromara.hmily.tac.sqlcompute.HmilySQLComputeEngine;
 import org.dromara.hmily.tac.sqlcompute.exception.SQLComputeException;
 
@@ -37,7 +37,7 @@ import java.util.List;
 public abstract class AbstractHmilySQLComputeEngine implements HmilySQLComputeEngine {
     
     @Override
-    public HmilyDataSnapshot generateSnapshot(final String sql, final List<Object> parameters, final Connection connection, final String resourceId) throws SQLComputeException {
+    public HmilyDataSnapshot execute(final String sql, final List<Object> parameters, final Connection connection, final String resourceId) throws SQLComputeException {
         HmilyDataSnapshot result = new HmilyDataSnapshot();
         try {
             result.getTuples().addAll(createTuples(sql, parameters, connection, resourceId));

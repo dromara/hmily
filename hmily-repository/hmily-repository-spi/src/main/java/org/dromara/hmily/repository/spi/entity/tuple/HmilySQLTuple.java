@@ -15,29 +15,33 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.tac.sqlcompute.impl;
+package org.dromara.hmily.repository.spi.entity.tuple;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.dromara.hmily.repository.spi.entity.HmilyDataSnapshot;
-import org.dromara.hmily.tac.sqlcompute.HmilySQLComputeEngine;
-import org.dromara.hmily.tac.sqlcompute.exception.SQLComputeException;
-import org.dromara.hmily.tac.sqlparser.model.statement.dml.HmilyDeleteStatement;
 
-import java.sql.Connection;
+import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 
 /**
- * Hmily delete SQL compute engine.
+ * Hmily SQL tuple.
  *
  * @author zhaojun
  */
 @RequiredArgsConstructor
-public final class HmilyDeleteSQLComputeEngine implements HmilySQLComputeEngine {
+@Getter
+public final class HmilySQLTuple implements Serializable {
     
-    private final HmilyDeleteStatement statement;
+    private static final long serialVersionUID = -5978500621198003611L;
     
-    @Override
-    public HmilyDataSnapshot execute(final String sql, final List<Object> parameters, final Connection connection, final String resourceId) throws SQLComputeException {
-        return null;
-    }
+    private final String tableName;
+    
+    private final HmilySQLManipulation manipulationType;
+    
+    private final List<Object> primaryKeyValues;
+    
+    private final Map<String, Object> beforeImage;
+    
+    private final Map<String, Object> afterImage;
 }

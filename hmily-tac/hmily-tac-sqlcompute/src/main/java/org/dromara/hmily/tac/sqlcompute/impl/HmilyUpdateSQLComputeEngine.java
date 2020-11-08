@@ -21,7 +21,8 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import lombok.RequiredArgsConstructor;
 import org.dromara.hmily.repository.spi.entity.HmilyDataSnapshot;
-import org.dromara.hmily.repository.spi.entity.HmilySQLTuple;
+import org.dromara.hmily.repository.spi.entity.tuple.HmilySQLManipulation;
+import org.dromara.hmily.repository.spi.entity.tuple.HmilySQLTuple;
 import org.dromara.hmily.tac.metadata.HmilyMetaDataManager;
 import org.dromara.hmily.tac.metadata.model.TableMetaData;
 import org.dromara.hmily.tac.sqlcompute.exception.SQLComputeException;
@@ -55,22 +56,22 @@ public final class HmilyUpdateSQLComputeEngine extends AbstractHmilySQLComputeEn
     
     @Override
     // FIXME fixture dataSnapshot for poc test
-    public HmilyDataSnapshot generateSnapshot(final String sql, final List<Object> parameters, final Connection connection, final String resourceId) throws SQLComputeException {
+    public HmilyDataSnapshot execute(final String sql, final List<Object> parameters, final Connection connection, final String resourceId) throws SQLComputeException {
         Map<String, Object> beforeImage = new LinkedHashMap<>();
         Map<String, Object> afterImage = new LinkedHashMap<>();
         HmilyDataSnapshot result = new HmilyDataSnapshot();
         if (sql.contains("order")) {
             beforeImage.put("status", 3);
             afterImage.put("number", sql.substring(sql.indexOf("'") + 1, sql.length() - 1));
-            result.getTuples().add(new HmilySQLTuple("order", "update", Collections.singletonList(1), beforeImage, afterImage));
+            result.getTuples().add(new HmilySQLTuple("order", HmilySQLManipulation.UPDATE, Collections.singletonList(1), beforeImage, afterImage));
         } else if (sql.contains("account")) {
             beforeImage.put("balance", 100);
             afterImage.put("user_id", 10000);
-            result.getTuples().add(new HmilySQLTuple("account", "update", Collections.singletonList(10000), beforeImage, afterImage));
+            result.getTuples().add(new HmilySQLTuple("account", HmilySQLManipulation.UPDATE, Collections.singletonList(10000), beforeImage, afterImage));
         } else {
             beforeImage.put("total_inventory", 100);
             afterImage.put("product_id", 1);
-            result.getTuples().add(new HmilySQLTuple("inventory", "update", Collections.singletonList(1), beforeImage, afterImage));
+            result.getTuples().add(new HmilySQLTuple("inventory", HmilySQLManipulation.UPDATE, Collections.singletonList(1), beforeImage, afterImage));
         }
         return result;
     }
@@ -147,7 +148,7 @@ public final class HmilyUpdateSQLComputeEngine extends AbstractHmilySQLComputeEn
                 }
             });
             List<Object> primaryKeyValues = tableMetaData.getPrimaryKeyColumns().stream().map(before::get).collect(Collectors.toList());
-            result.add(new HmilySQLTuple(tableMetaData.getTableName(), "update", primaryKeyValues, before, after));
+            result.add(new HmilySQLTuple(tableMetaData.getTableName(), HmilySQLManipulation.UPDATE, primaryKeyValues, before, after));
         }
         return result;
     }
