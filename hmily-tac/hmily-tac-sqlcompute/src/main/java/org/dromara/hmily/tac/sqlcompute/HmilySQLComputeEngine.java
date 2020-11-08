@@ -40,5 +40,5 @@ public interface HmilySQLComputeEngine {
      * @return the hmily undo invocation
      * @throws SQLComputeException the SQL compute exception
      */
-    HmilyDataSnapshot generateSnapshot(String sql, List<Object> parameters, Connection connection, String resourceId) throws SQLComputeException;
+    HmilyDataSnapshot execute(String sql, List<Object> parameters, Connection connection, String resourceId) throws SQLComputeException;
 }
