@@ -15,27 +15,33 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.repository.spi.entity;
+package org.dromara.hmily.repository.spi.entity.tuple;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.dromara.hmily.repository.spi.entity.tuple.HmilySQLTuple;
 
 import java.io.Serializable;
-import java.util.Collection;
-import java.util.LinkedList;
-
+import java.util.List;
+import java.util.Map;
 
 /**
- * Hmily data snapshot.
+ * Hmily SQL tuple.
  *
- * @author xiaoyu
+ * @author zhaojun
  */
 @RequiredArgsConstructor
 @Getter
-public class HmilyDataSnapshot implements Serializable {
+public final class HmilySQLTuple implements Serializable {
     
-    private static final long serialVersionUID = -4406133196112007765L;
+    private static final long serialVersionUID = -5978500621198003611L;
     
-    private final Collection<HmilySQLTuple> tuples = new LinkedList<>();
+    private final String tableName;
+    
+    private final HmilySQLManipulation manipulationType;
+    
+    private final List<Object> primaryKeyValues;
+    
+    private final Map<String, Object> beforeImage;
+    
+    private final Map<String, Object> afterImage;
 }

@@ -92,7 +92,7 @@ public enum HmilyExecuteTemplate {
             HmilyStatement statement = HmilySqlParserEngineFactory.newInstance().parser(sql, DatabaseTypes.INSTANCE.getDatabaseType());
             // TODO should generate lock-key to avoid dirty data modified by other global transaction.
             String resourceId = ResourceIdUtils.INSTANCE.getResourceId(connectionInformation.getUrl());
-            HmilyDataSnapshot snapshot = HmilySQLComputeEngineFactory.newInstance(statement).generateSnapshot(sql, parameters, connectionInformation.getConnection(), resourceId);
+            HmilyDataSnapshot snapshot = HmilySQLComputeEngineFactory.newInstance(statement).execute(sql, parameters, connectionInformation.getConnection(), resourceId);
             HmilyUndoContextCacheManager.INSTANCE.set(HmilyContextHolder.get(), snapshot, resourceId);
         } catch (Exception e) {
             log.error("execute hmily tac module have exception:", e);
