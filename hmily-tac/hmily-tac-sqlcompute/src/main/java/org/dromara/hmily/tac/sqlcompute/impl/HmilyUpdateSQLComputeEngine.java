@@ -18,9 +18,12 @@
 package org.dromara.hmily.tac.sqlcompute.impl;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.Preconditions;
 import lombok.RequiredArgsConstructor;
 import org.dromara.hmily.repository.spi.entity.HmilyDataSnapshot;
 import org.dromara.hmily.repository.spi.entity.HmilySQLTuple;
+import org.dromara.hmily.tac.metadata.HmilyMetaDataManager;
+import org.dromara.hmily.tac.metadata.model.TableMetaData;
 import org.dromara.hmily.tac.sqlcompute.exception.SQLComputeException;
 import org.dromara.hmily.tac.sqlparser.model.segment.generic.table.HmilySimpleTableSegment;
 import org.dromara.hmily.tac.sqlparser.model.statement.dml.HmilyUpdateStatement;
@@ -31,6 +34,7 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -45,6 +49,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public final class HmilyUpdateSQLComputeEngine extends AbstractHmilySQLComputeEngine {
     
+    private static final String UPDATE_COLUMN_SUFFIX = "$UPDATED$";
+    
     private final HmilyUpdateStatement sqlStatement;
     
     @Override
@@ -56,15 +62,15 @@ public final class HmilyUpdateSQLComputeEngine extends AbstractHmilySQLComputeEn
         if (sql.contains("order")) {
             beforeImage.put("status", 3);
             afterImage.put("number", sql.substring(sql.indexOf("'") + 1, sql.length() - 1));
-            result.getTuples().add(new HmilySQLTuple("order", "update", beforeImage, afterImage));
+            result.getTuples().add(new HmilySQLTuple("order", "update", Collections.singletonList(1), beforeImage, afterImage));
         } else if (sql.contains("account")) {
             beforeImage.put("balance", 100);
             afterImage.put("user_id", 10000);
-            result.getTuples().add(new HmilySQLTuple("account", "update", beforeImage, afterImage));
+            result.getTuples().add(new HmilySQLTuple("account", "update", Collections.singletonList(10000), beforeImage, afterImage));
         } else {
             beforeImage.put("total_inventory", 100);
             afterImage.put("product_id", 1);
-            result.getTuples().add(new HmilySQLTuple("inventory", "update", beforeImage, afterImage));
+            result.getTuples().add(new HmilySQLTuple("inventory", "update", Collections.singletonList(1), beforeImage, afterImage));
         }
         return result;
     }
@@ -72,26 +78,41 @@ public final class HmilyUpdateSQLComputeEngine extends AbstractHmilySQLComputeEn
     @Override
     Collection<HmilySQLTuple> createTuples(final String sql, final List<Object> parameters, final Connection connection, final String resourceId) throws SQLException {
         Collection<HmilySQLTuple> result = new LinkedList<>();
-        for (ImageSQLUnit each : getSnapshotSQL(sql, parameters)) {
-            Collection<Map<String, Object>> data = doQueryImage(connection, each.getSql(), each.getParameters());
-            result.addAll(doGenerateSQLTuples(data, each.getTableName(), each.getManipulationType()));
+        Preconditions.checkState(sqlStatement.getTables().size() == 1, "Do not support multiple tables in update statement");
+        HmilySimpleTableSegment tableSegment = sqlStatement.getTables().iterator().next();
+        String tableName = sql.substring(tableSegment.getStartIndex(), tableSegment.getStopIndex());
+        String selectSQL = String.format("SELECT %s FROM %s %s", Joiner.on(",").join(getAllColumns(tableSegment), getUpdatedColumns(parameters)), tableName, getWhereCondition(sql));
+        // TODO revise where-condition parameters here
+        Collection<Map<String, Object>> records = executeQuery(connection, selectSQL, parameters);
+        result.addAll(doConvert(records, HmilyMetaDataManager.get(resourceId).getTableMetaDataMap().get(tableName)));
+        return result;
+    }
+    
+    private String getAllColumns(final HmilySimpleTableSegment segment) {
+        String result;
+        if (segment.getAlias().isPresent()) {
+            result = String.format("%s.*", segment.getAlias().get());
+        } else if (segment.getOwner().isPresent()) {
+            result = String.format("%s.%s.*", segment.getOwner(), segment.getTableName().getIdentifier().getValue());
+        } else {
+            result = String.format("%s.*", segment.getTableName().getIdentifier().getValue());
         }
         return result;
     }
     
-    private Collection<ImageSQLUnit> getSnapshotSQL(final String sql, final List<Object> parameters) {
-        Collection<ImageSQLUnit> result = new LinkedList<>();
-        // TODO do not support multiple tables currently
-        String tables = getTables(sql);
-        String whereCondition = getWhereCondition(sql);
-        sqlStatement.getTables().forEach(segment -> {
-            String imageSQL = String.format("SELECT %s FROM %s %s", Joiner.on(",").join(getUndoItems(segment), getRedoItems(segment, parameters)), tables, whereCondition);
-            result.add(new ImageSQLUnit(imageSQL, new LinkedList<>(), "update", sql.substring(segment.getStartIndex(), segment.getStopIndex())));
-        });
+    private List<String> getUpdatedColumns(final List<Object> parameters) {
+        List<String> result = new LinkedList<>();
+        sqlStatement.getSetAssignment().getAssignments().forEach(assignment -> result.add(
+            String.format("%s AS %s", ExpressionHandler.getValue(parameters, assignment.getValue()), assignment.getColumn().getIdentifier().getValue() + UPDATE_COLUMN_SUFFIX)));
         return result;
     }
     
-    private Collection<Map<String, Object>> doQueryImage(final Connection connection, final String sql, final List<Object> parameters) throws SQLException {
+    private String getWhereCondition(final String sql) {
+        return sqlStatement.getWhere().map(segment -> sql.substring(segment.getStartIndex(), segment.getStopIndex()))
+            .orElseThrow(() -> new SQLComputeException("DML SQL should contain where condition"));
+    }
+    
+    private Collection<Map<String, Object>> executeQuery(final Connection connection, final String sql, final List<Object> parameters) throws SQLException {
         Collection<Map<String, Object>> result = new LinkedList<>();
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             int parameterIndex = 1;
@@ -112,53 +133,22 @@ public final class HmilyUpdateSQLComputeEngine extends AbstractHmilySQLComputeEn
         return result;
     }
     
-    private Collection<HmilySQLTuple> doGenerateSQLTuples(final Collection<Map<String, Object>> data, final String tableName, final String manipulateType) {
+    private Collection<HmilySQLTuple> doConvert(final Collection<Map<String, Object>> records, final TableMetaData tableMetaData) {
         Collection<HmilySQLTuple> result = new LinkedList<>();
-        for (Map<String, Object> each : data) {
-            Map<String, Object> beforeImage = new LinkedHashMap<>();
-            Map<String, Object> afterImage = new LinkedHashMap<>();
-            each.forEach((key, value) -> {
-                // FIXME $after_image$ is a marker for redo data item
-                if (key.contains("$after_image$")) {
-                    afterImage.put(key.replace("$after_image$", ""), value);
+        for (Map<String, Object> record : records) {
+            Map<String, Object> before = new LinkedHashMap<>();
+            Map<String, Object> after = new LinkedHashMap<>();
+            record.forEach((key, value) -> {
+                if (!key.contains(UPDATE_COLUMN_SUFFIX)) {
+                    before.put(key, value);
                 } else {
-                    beforeImage.put(key, value);
+                    // TODO skip date column here
+                    after.put(key.replace(UPDATE_COLUMN_SUFFIX, ""), value);
                 }
             });
-            beforeImage.forEach(afterImage::putIfAbsent);
-            result.add(new HmilySQLTuple(tableName, manipulateType, beforeImage, afterImage));
+            List<Object> primaryKeyValues = tableMetaData.getPrimaryKeyColumns().stream().map(before::get).collect(Collectors.toList());
+            result.add(new HmilySQLTuple(tableMetaData.getTableName(), "update", primaryKeyValues, before, after));
         }
         return result;
-    }
-    
-    private String getUndoItems(final HmilySimpleTableSegment segment) {
-        String result;
-        if (segment.getAlias().isPresent()) {
-            result = String.format("%s.*", segment.getAlias().get());
-        } else if (segment.getOwner().isPresent()) {
-            result = String.format("%s.%s.*", segment.getOwner(), segment.getTableName().getIdentifier().getValue());
-        } else {
-            result = String.format("%s.*", segment.getTableName().getIdentifier().getValue());
-        }
-        return result;
-    }
-    
-    private List<String> getRedoItems(final HmilySimpleTableSegment tableSegment, final List<Object> parameters) {
-        List<String> result = new LinkedList<>();
-        // TODO filter the column which don't belong to current table
-        sqlStatement.getSetAssignment().getAssignments().forEach(assignment -> {
-            result.add(String.format("%s AS $after_image$%s", ExpressionHandler.getValue(parameters, assignment.getValue()), assignment.getColumn().getIdentifier().getValue()));
-        });
-        return result;
-    }
-    
-    private String getTables(final String sql) {
-        List<String> tables = sqlStatement.getTables().stream().map(segment -> sql.substring(segment.getStartIndex(), segment.getStopIndex())).collect(Collectors.toList());
-        return Joiner.on(",").join(tables);
-    }
-    
-    private String getWhereCondition(final String sql) {
-        return sqlStatement.getWhere().map(segment -> sql.substring(segment.getStartIndex(), segment.getStopIndex()))
-            .orElseThrow(() -> new SQLComputeException("DML SQL should contain where condition"));
     }
 }
