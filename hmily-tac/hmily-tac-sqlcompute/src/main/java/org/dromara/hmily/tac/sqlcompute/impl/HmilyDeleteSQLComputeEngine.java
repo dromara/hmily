@@ -46,7 +46,7 @@ public final class HmilyDeleteSQLComputeEngine extends AbstractHmilySQLComputeEn
     private final HmilyDeleteStatement sqlStatement;
     
     @Override
-    Collection<HmilySQLTuple> createTuples(String sql, List<Object> parameters, Connection connection, String resourceId) throws SQLException {
+    Collection<HmilySQLTuple> createTuples(final String sql, final List<Object> parameters, final Connection connection, final String resourceId) throws SQLException {
         Collection<HmilySQLTuple> result = new LinkedList<>();
         Preconditions.checkState(sqlStatement.getTables().size() == 1, "Do not support multiple tables in delete statement");
         HmilySimpleTableSegment tableSegment = sqlStatement.getTables().iterator().next();

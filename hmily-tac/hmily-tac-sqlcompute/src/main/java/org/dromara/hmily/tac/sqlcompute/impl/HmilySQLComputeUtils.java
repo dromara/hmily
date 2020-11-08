@@ -44,7 +44,7 @@ public class HmilySQLComputeUtils {
      * @param sql sql
      * @param parameters parameters
      * @return records
-     * @throws SQLException
+     * @throws SQLException SQL exception
      */
     public static Collection<Map<String, Object>> executeQuery(final Connection connection, final String sql, final List<Object> parameters) throws SQLException {
         Collection<Map<String, Object>> result = new LinkedList<>();
