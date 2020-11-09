@@ -20,18 +20,18 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>hmily</artifactId>
+        <artifactId>hmily-xa</artifactId>
         <groupId>org.dromara</groupId>
         <version>2.1.2-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>hmily-xa</artifactId>
-    <packaging>pom</packaging>
-    <modules>
-        <module>hmily-xa-p6spy</module>
-        <module>hmily-xa-core</module>
-    </modules>
+    <artifactId>hmily-xa-p6spy</artifactId>
 
-
+    <dependencies>
+        <dependency>
+            <groupId>p6spy</groupId>
+            <artifactId>p6spy</artifactId>
+        </dependency>
+    </dependencies>
 </project>
