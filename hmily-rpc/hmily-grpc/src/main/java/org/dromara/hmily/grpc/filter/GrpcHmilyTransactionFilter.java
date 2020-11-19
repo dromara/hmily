@@ -94,7 +94,7 @@ public class GrpcHmilyTransactionFilter implements ClientInterceptor {
                                         HmilyTransactionHolder.getInstance().registerStarterParticipant(hmilyParticipant);
                                     }
                                 } else {
-                                    throw new HmilyRuntimeException("rpc invoke exception{}", status.getCause());
+                                    onInvokeFail(status);
                                 }
                                 GrpcHmilyContext.removeAfterInvoke();
                                 super.onClose(status, trailers);
@@ -122,5 +122,10 @@ public class GrpcHmilyTransactionFilter implements ClientInterceptor {
         hmilyParticipant.setConfirmHmilyInvocation(hmilyInvocation);
         hmilyParticipant.setCancelHmilyInvocation(hmilyInvocation);
         return hmilyParticipant;
+    }
+
+    private void onInvokeFail(final Status status) {
+        GrpcHmilyContext.removeAfterInvoke();
+        throw new HmilyRuntimeException("rpc invoke exception{}", status.getCause());
     }
 }
