@@ -46,7 +46,7 @@
         </dependency>
         <dependency>
             <groupId>org.dromara</groupId>
-            <artifactId>hmily-metrics-promethues</artifactId>
+            <artifactId>hmily-metrics-prometheus</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>
