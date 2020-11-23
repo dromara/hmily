@@ -19,7 +19,7 @@ package org.dromara.hmily.tac.sqlrevert.core;
 
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipantUndo;
-import org.dromara.hmily.repository.spi.entity.HmilySQLTuple;
+import org.dromara.hmily.repository.spi.entity.tuple.HmilySQLTuple;
 import org.dromara.hmily.spi.HmilySPI;
 import org.dromara.hmily.tac.common.HmilyResourceManager;
 import org.dromara.hmily.tac.sqlrevert.core.image.RevertSQLUnit;
@@ -45,7 +45,7 @@ public class DefaultSQLRevertEngine implements HmilySQLRevertEngine {
     @Override
     public boolean revert(final HmilyParticipantUndo participantUndo) throws SQLRevertException {
         try (Connection connection = HmilyResourceManager.get(participantUndo.getResourceId()).getTargetDataSource().getConnection()) {
-            return doRevertInTransaction(connection, participantUndo.getUndoInvocation().getTuples());
+            return doRevertInTransaction(connection, participantUndo.getDataSnapshot().getTuples());
         } catch (final SQLException ex) {
             log.error("hmily tac rollback exception -> ", ex);
             return false;

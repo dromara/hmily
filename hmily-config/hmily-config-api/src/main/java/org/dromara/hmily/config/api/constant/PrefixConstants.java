@@ -60,6 +60,11 @@ public final class PrefixConstants {
      * The constant ZOOKEEPER_PREFIX.
      */
     public static final String ZOOKEEPER_PREFIX = "repository.zookeeper";
+
+    /**
+     * The constant ETCD_PREFIX.
+     */
+    public static final String ETCD_PREFIX = "repository.etcd";
     
     /**
      * The constant METRICS_PREFIX.
@@ -82,8 +87,13 @@ public final class PrefixConstants {
     public static final String REMOTE_ZOOKEEPER = "remote.zookeeper";
 
     /**
-     * The constant REMOTE_ZOOKEEPER.
+     * The constant REMOTE_ETCD.
      */
     public static final String REMOTE_ETCD = "remote.etcd";
+
+    /**
+     * The constant REMOTE_CONSUL.
+     */
+    public static final String REMOTE_CONSUL = "remote.consul";
     
 }

@@ -17,7 +17,7 @@
 
 package org.dromara.hmily.tac.sqlrevert.core.image;
 
-import org.dromara.hmily.repository.spi.entity.HmilySQLTuple;
+import org.dromara.hmily.repository.spi.entity.tuple.HmilySQLTuple;
 import org.dromara.hmily.tac.sqlrevert.core.image.impl.DeleteSQLImageMapper;
 import org.dromara.hmily.tac.sqlrevert.core.image.impl.InsertSQLImageMapper;
 import org.dromara.hmily.tac.sqlrevert.core.image.impl.UpdateSQLImageMapper;
@@ -38,11 +38,11 @@ public class SQLImageMapperFactory {
      */
     public static SQLImageMapper newInstance(final HmilySQLTuple sqlTuple) {
         switch (sqlTuple.getManipulationType()) {
-            case "insert":
+            case INSERT:
                 return new InsertSQLImageMapper(sqlTuple.getTableName(), sqlTuple.getAfterImage());
-            case "update":
+            case UPDATE:
                 return new UpdateSQLImageMapper(sqlTuple.getTableName(), sqlTuple.getBeforeImage(), sqlTuple.getAfterImage());
-            case "delete":
+            case DELETE:
                 return new DeleteSQLImageMapper(sqlTuple.getTableName(), sqlTuple.getBeforeImage());
             default:
                 throw new SQLRevertException(String.format("unsupported SQL manipulate type [%s]", sqlTuple.getManipulationType()));

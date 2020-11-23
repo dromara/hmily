@@ -19,8 +19,9 @@ public class InlineServiceImpl implements InlineService {
 
     @Override
     @HmilyTCC(confirmMethod = "inLineConfirm", cancelMethod = "inLineCancel")
-    public void testInline() {
+    public boolean testInline() {
         LOGGER.info("===========执行inline try 方法==============");
+        return true;
     }
 
     public void inLineConfirm() {

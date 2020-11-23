@@ -32,7 +32,6 @@
         <dependency>
             <groupId>p6spy</groupId>
             <artifactId>p6spy</artifactId>
-            <version>3.9.1</version>
         </dependency>
 
         <dependency>
@@ -40,7 +39,7 @@
             <artifactId>hmily-tac-common</artifactId>
             <version>${project.version}</version>
         </dependency>
-
+    
         <dependency>
             <groupId>org.dromara</groupId>
             <artifactId>hmily-tac-sqlparser-all</artifactId>

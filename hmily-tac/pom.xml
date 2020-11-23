@@ -36,5 +36,6 @@
         <module>hmily-tac-common</module>
         <module>hmily-tac-sqlcompute</module>
         <module>hmily-tac-sqlrevert</module>
+        <module>hmily-tac-metadata</module>
     </modules>
 </project>

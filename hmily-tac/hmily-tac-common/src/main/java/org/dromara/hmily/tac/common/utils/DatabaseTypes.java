@@ -19,6 +19,7 @@ package org.dromara.hmily.tac.common.utils;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.dromara.hmily.tac.common.database.type.DatabaseType;
 
 /**
  * The enum Database types.
@@ -34,5 +35,6 @@ public enum DatabaseTypes {
     
     @Setter
     @Getter
-    private String databaseType;
+    // TODO multiple database type will not be supported
+    private DatabaseType databaseType;
 }

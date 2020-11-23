@@ -35,6 +35,7 @@
         <module>hmily-serializer-hessian</module>
         <module>hmily-serializer-kryo</module>
         <module>hmily-serializer-protobuf</module>
+        <module>hmily-serializer-msgpack</module>
     </modules>
 
 

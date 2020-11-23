@@ -32,7 +32,7 @@ public class TarsHmilyFilterStartupBean implements ApplicationListener<ContextRe
 
     @Override
     public void onApplicationEvent(final ContextRefreshedEvent contextRefreshedEvent) {
-        AppContextManager.getInstance().getAppContext().addFilter(FilterKind.SERVER, new TarsHmilyTransactionFilter());
+        AppContextManager.getInstance().getAppContext().addFilter(FilterKind.CLIENT, new TarsHmilyTransactionFilter());
     }
 
 }

@@ -206,13 +206,13 @@ public class MongodbRepository implements HmilyRepository {
     }
 
     @Override
-    public int removeHmilyTransactionByData(final Date date) {
+    public int removeHmilyTransactionByDate(final Date date) {
         return service.delete(TransactionMongoEntity.class,
                 Criteria.where("update_time").lt(date).and("status").is(4));
     }
 
     @Override
-    public int removeHmilyParticipantByData(final Date date) {
+    public int removeHmilyParticipantByDate(final Date date) {
         return service.delete(ParticipantMongoEntity.class,
                 Criteria.where("update_time").lt(date).and("status").is(4));
     }
@@ -227,7 +227,7 @@ public class MongodbRepository implements HmilyRepository {
     }
 
     @Override
-    public int removeHmilyParticipantUndoByData(final Date date) {
+    public int removeHmilyParticipantUndoByDate(final Date date) {
         return service.delete(UndoMongoEntity.class,
                 Criteria.where("update_time").lt(date).and("status").is(4));
     }

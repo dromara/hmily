@@ -17,24 +17,20 @@
 
 package org.dromara.hmily.repository.file;
 
-import java.lang.reflect.Field;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 import org.dromara.hmily.annotation.TransTypeEnum;
-import org.dromara.hmily.config.api.Config;
 import org.dromara.hmily.config.api.ConfigEnv;
 import org.dromara.hmily.config.api.entity.HmilyConfig;
 import org.dromara.hmily.config.api.entity.HmilyFileConfig;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipant;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipantUndo;
 import org.dromara.hmily.repository.spi.entity.HmilyTransaction;
-import org.dromara.hmily.serializer.jdk.JDKSerializer;
 import org.dromara.hmily.serializer.kryo.KryoSerializer;
 import org.junit.Before;
 import org.junit.Test;
@@ -138,7 +134,7 @@ public class FileRepositoryTest {
 
         TimeUnit.SECONDS.sleep(2);
         recoveryDate = acquireDelayData(2);
-        int removeByDateResult = fileRepository.removeHmilyTransactionByData(recoveryDate);
+        int removeByDateResult = fileRepository.removeHmilyTransactionByDate(recoveryDate);
         assertEquals(3L, removeByDateResult);
     }
 
@@ -174,7 +170,7 @@ public class FileRepositoryTest {
 
         TimeUnit.SECONDS.sleep(2);
         Date recoveryDate = acquireDelayData(2);
-        int removeByDateResult = fileRepository.removeHmilyParticipantUndoByData(recoveryDate);
+        int removeByDateResult = fileRepository.removeHmilyParticipantUndoByDate(recoveryDate);
         assertEquals(3L, removeByDateResult);
     }
 
@@ -230,7 +226,7 @@ public class FileRepositoryTest {
         fileRepository.updateHmilyParticipantStatus(id3, 4);
         TimeUnit.SECONDS.sleep(2);
         recoveryDate = acquireDelayData(2);
-        int removeByDateResult = fileRepository.removeHmilyParticipantByData(recoveryDate);
+        int removeByDateResult = fileRepository.removeHmilyParticipantByDate(recoveryDate);
         assertEquals(3L, removeByDateResult);
     }
 

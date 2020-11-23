@@ -69,7 +69,7 @@ ELSE
     participant_id INT8  NOT NULL ,
     trans_id INT8  NOT NULL ,
     resource_id VARCHAR(256 )  NOT NULL ,
-    undo_invocation BYTEA  NOT NULL ,
+    undo_data_snapshot BYTEA  NOT NULL ,
     status INT2  NOT NULL ,
     create_time TIMESTAMP(6) NOT NULL default current_timestamp,
     update_time TIMESTAMP(6) NOT NULL default current_timestamp
@@ -79,7 +79,7 @@ ELSE
 	PERFORM public.dblink_exec('init_conn', ' COMMENT ON COLUMN hmily_participant_undo.participant_id IS ''' ||'参与者id' || '''');
 	PERFORM public.dblink_exec('init_conn',  ' COMMENT ON COLUMN hmily_participant_undo.trans_id IS ''' ||'全局事务id' || '''');
 	PERFORM public.dblink_exec('init_conn',  ' COMMENT ON COLUMN hmily_participant_undo.resource_id IS ''' ||'资源id，at模式下为jdbc url' || '''');
-	PERFORM public.dblink_exec('init_conn',  ' COMMENT ON COLUMN hmily_participant_undo.undo_invocation IS ''' ||'回滚调用点' || '''');
+	PERFORM public.dblink_exec('init_conn',  ' COMMENT ON COLUMN hmily_participant_undo.undo_data_snapshot IS ''' ||'回滚数据快照' || '''');
 	PERFORM public.dblink_exec('init_conn',  ' COMMENT ON COLUMN hmily_participant_undo.status IS ''' ||'状态' || '''');
 	PERFORM public.dblink_exec('init_conn',  ' COMMENT ON COLUMN hmily_participant_undo.create_time IS ''' ||'创建时间' || '''');
 	PERFORM public.dblink_exec('init_conn',  ' COMMENT ON COLUMN hmily_participant_undo.update_time IS ''' ||'更新时间' || '''');
