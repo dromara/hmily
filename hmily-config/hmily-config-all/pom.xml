@@ -69,5 +69,10 @@
             <artifactId>hmily-config-etcd</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.dromara</groupId>
+            <artifactId>hmily-config-consul</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 </project>

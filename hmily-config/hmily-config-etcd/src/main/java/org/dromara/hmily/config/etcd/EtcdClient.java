@@ -63,7 +63,9 @@ public final class EtcdClient {
      * @return the input stream
      */
     public InputStream pull(final EtcdConfig config) {
-        client = Client.builder().endpoints(config.getServer()).build();
+        if (client == null) {
+            client = Client.builder().endpoints(config.getServer()).build();
+        }
         try {
             CompletableFuture<GetResponse> future = client.getKVClient().get(ByteSequence.fromString(config.getKey()));
             List<KeyValue> kvs;

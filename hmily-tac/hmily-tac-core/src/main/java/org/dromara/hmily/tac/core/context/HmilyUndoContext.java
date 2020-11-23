@@ -18,7 +18,7 @@
 package org.dromara.hmily.tac.core.context;
 
 import lombok.Data;
-import org.dromara.hmily.repository.spi.entity.HmilyUndoInvocation;
+import org.dromara.hmily.repository.spi.entity.HmilyDataSnapshot;
 
 @Data
 public class HmilyUndoContext {
@@ -39,7 +39,7 @@ public class HmilyUndoContext {
     private String resourceId;
     
     /**
-     * undo invocation.
+     * data snapshot.
      */
-    private HmilyUndoInvocation undoInvocation;
+    private HmilyDataSnapshot dataSnapshot;
 }

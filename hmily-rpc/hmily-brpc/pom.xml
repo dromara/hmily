@@ -15,6 +15,13 @@
         <dependency>
             <groupId>com.baidu</groupId>
             <artifactId>brpc-java</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.baidu</groupId>
+            <artifactId>brpc-spring</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.dromara</groupId>

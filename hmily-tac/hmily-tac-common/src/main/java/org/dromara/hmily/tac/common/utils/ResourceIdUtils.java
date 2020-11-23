@@ -17,6 +17,9 @@
 
 package org.dromara.hmily.tac.common.utils;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 /**
  * The enum Resource id utils.
  *
@@ -29,6 +32,8 @@ public enum ResourceIdUtils {
      */
     INSTANCE;
     
+    private final Map<String, String> resourceIds = new ConcurrentHashMap<>();
+    
     /**
      * Gets resource id.
      *
@@ -36,10 +41,6 @@ public enum ResourceIdUtils {
      * @return the resource id
      */
     public String getResourceId(final String jdbcUrl) {
-        if (jdbcUrl.contains("?")) {
-            return jdbcUrl.substring(0, jdbcUrl.indexOf('?'));
-        } else {
-            return jdbcUrl;
-        }
+        return resourceIds.computeIfAbsent(jdbcUrl, u -> u.contains("?") ? u.substring(0, u.indexOf('?')) : u);
     }
 }

@@ -35,6 +35,7 @@
         <module>hmily-repository-redis</module>
         <module>hmily-repository-file</module>
         <module>hmily-repository-zookeeper</module>
+        <module>hmily-repository-etcd</module>
         <module>hmily-repository-spi</module>
     </modules>
 

@@ -189,7 +189,7 @@ public class FileRepository implements HmilyRepository {
     }
 
     @Override
-    public int removeHmilyTransactionByData(final Date date) {
+    public int removeHmilyTransactionByDate(final Date date) {
         return removeByFilter(getTransationPath(), HmilyTransaction.class, (hmilyTransaction, params) -> {
             Date dateParam = (Date) params[0];
             return dateParam.after(hmilyTransaction.getUpdateTime()) && hmilyTransaction.getStatus() == HmilyActionEnum.DELETE.getCode();
@@ -199,7 +199,7 @@ public class FileRepository implements HmilyRepository {
     @Override
     public int createHmilyParticipant(final HmilyParticipant hmilyParticipant) throws HmilyRepositoryException {
         try {
-            boolean exsist = isExsist(getParticipantPath(), hmilyParticipant.getTransId());
+            boolean exsist = isExsist(getParticipantPath(), hmilyParticipant.getParticipantId());
             if (!exsist) {
                 hmilyParticipant.setCreateTime(new Date());
                 hmilyParticipant.setUpdateTime(new Date());
@@ -282,7 +282,7 @@ public class FileRepository implements HmilyRepository {
     }
 
     @Override
-    public int removeHmilyParticipantByData(final Date date) {
+    public int removeHmilyParticipantByDate(final Date date) {
         return removeByFilter(getParticipantPath(), HmilyParticipant.class, (hmilyParticipant, params) -> {
             Date dateParam = (Date) params[0];
             return dateParam.after(hmilyParticipant.getUpdateTime()) && Objects.equals(HmilyActionEnum.DELETE.getCode(), hmilyParticipant.getStatus());
@@ -343,7 +343,7 @@ public class FileRepository implements HmilyRepository {
     }
 
     @Override
-    public int removeHmilyParticipantUndoByData(final Date date) {
+    public int removeHmilyParticipantUndoByDate(final Date date) {
         return removeByFilter(getParticipantUndoPath(), HmilyParticipantUndo.class, (undo, params) -> {
             Date dateParam = (Date) params[0];
             return dateParam.after(undo.getUpdateTime()) && Objects.equals(HmilyActionEnum.DELETE.getCode(), undo.getStatus());

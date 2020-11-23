@@ -24,6 +24,6 @@ import org.dromara.hmily.demo.common.account.dto.AccountDTO;
  */
 public interface AccountService {
 
-    void payment(AccountDTO accountDTO);
+    boolean payment(AccountDTO accountDTO);
 
 }

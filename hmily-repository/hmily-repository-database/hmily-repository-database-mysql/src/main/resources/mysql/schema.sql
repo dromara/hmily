@@ -24,7 +24,7 @@ create table if not exists `hmily_participant_undo`
     `participant_id`  bigint(20) not null comment '参与者id',
     `trans_id`        bigint(20) not null comment '全局事务id',
     `resource_id`     varchar(256) not null comment '资源id，tac模式下为jdbc url',
-    `undo_invocation` longblob     not null comment '回滚调用点',
+    undo_data_snapshot longblob     not null comment '回滚数据快照',
     `status`          tinyint      not null comment '状态',
     `create_time`     datetime     not null comment '创建时间',
     `update_time`     datetime     not null DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP comment '更新时间'

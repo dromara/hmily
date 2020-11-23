@@ -47,7 +47,7 @@ BEGIN
             participant_id NUMBER(20)  NOT NULL ,
             trans_id NUMBER(20)  NOT NULL ,
             resource_id VARCHAR2(256 )  NOT NULL ,
-            undo_invocation BLOB  NOT NULL ,
+            undo_data_snapshot BLOB  NOT NULL ,
             status INTEGER  NOT NULL ,
             create_time DATE  NOT NULL ,
             update_time DATE  NOT NULL)';
@@ -57,7 +57,7 @@ BEGIN
 	  EXECUTE IMMEDIATE ' COMMENT ON COLUMN hmily_participant_undo.participant_id IS ''' ||'参与者id' || '''';
 	  EXECUTE IMMEDIATE ' COMMENT ON COLUMN hmily_participant_undo.trans_id IS ''' ||'全局事务id' || '''';
 	  EXECUTE IMMEDIATE ' COMMENT ON COLUMN hmily_participant_undo.resource_id IS ''' ||'资源id，at模式下为jdbc url' || '''';
-	  EXECUTE IMMEDIATE ' COMMENT ON COLUMN hmily_participant_undo.undo_invocation IS ''' ||'回滚调用点' || '''';
+	  EXECUTE IMMEDIATE ' COMMENT ON COLUMN hmily_participant_undo.undo_data_snapshot IS ''' ||'回滚数据快照' || '''';
 	  EXECUTE IMMEDIATE ' COMMENT ON COLUMN hmily_participant_undo.status IS ''' ||'状态' || '''';
 	  EXECUTE IMMEDIATE ' COMMENT ON COLUMN hmily_participant_undo.create_time IS ''' ||'创建时间' || '''';
 	  EXECUTE IMMEDIATE ' COMMENT ON COLUMN hmily_participant_undo.update_time IS ''' ||'更新时间' || '''';

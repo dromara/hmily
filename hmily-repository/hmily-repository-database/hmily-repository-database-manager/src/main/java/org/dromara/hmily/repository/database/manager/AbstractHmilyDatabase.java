@@ -39,11 +39,11 @@ import org.dromara.hmily.config.api.ConfigEnv;
 import org.dromara.hmily.config.api.entity.HmilyConfig;
 import org.dromara.hmily.config.api.entity.HmilyDatabaseConfig;
 import org.dromara.hmily.repository.spi.HmilyRepository;
+import org.dromara.hmily.repository.spi.entity.HmilyDataSnapshot;
 import org.dromara.hmily.repository.spi.entity.HmilyInvocation;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipant;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipantUndo;
 import org.dromara.hmily.repository.spi.entity.HmilyTransaction;
-import org.dromara.hmily.repository.spi.entity.HmilyUndoInvocation;
 import org.dromara.hmily.repository.spi.exception.HmilyRepositoryException;
 import org.dromara.hmily.serializer.spi.HmilySerializer;
 import org.dromara.hmily.serializer.spi.exception.HmilySerializerException;
@@ -158,13 +158,13 @@ public abstract class AbstractHmilyDatabase implements HmilyRepository {
      * The constant INSERT_HMILY_PARTICIPANT_UNDO.
      */
     protected static final String INSERT_HMILY_PARTICIPANT_UNDO = "INSERT INTO hmily_participant_undo"
-            + "(undo_id, participant_id, trans_id, resource_id, undo_invocation, status, create_time, update_time) "
+            + "(undo_id, participant_id, trans_id, resource_id, undo_data_snapshot, status, create_time, update_time) "
             + " VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
     
     /**
      * The constant SELECTOR_HMILY_PARTICIPANT_UNDO_WITH_PARTICIPANT_ID.
      */
-    protected static final String SELECTOR_HMILY_PARTICIPANT_UNDO_WITH_PARTICIPANT_ID = " select undo_id, participant_id, trans_id, resource_id, undo_invocation, status "
+    protected static final String SELECTOR_HMILY_PARTICIPANT_UNDO_WITH_PARTICIPANT_ID = " select undo_id, participant_id, trans_id, resource_id, undo_data_snapshot, status "
             + "from hmily_participant_undo where participant_id =? ";
     
     /**
@@ -398,9 +398,9 @@ public abstract class AbstractHmilyDatabase implements HmilyRepository {
     
     @Override
     public int createHmilyParticipantUndo(final HmilyParticipantUndo undo) {
-        byte[] invocation = hmilySerializer.serialize(undo.getUndoInvocation());
+        byte[] dataSnapshot = hmilySerializer.serialize(undo.getDataSnapshot());
         return executeUpdate(INSERT_HMILY_PARTICIPANT_UNDO, undo.getUndoId(), undo.getParticipantId(), undo.getTransId(), undo.getResourceId(),
-                invocation, undo.getStatus(), undo.getCreateTime(), undo.getUpdateTime());
+                dataSnapshot, undo.getStatus(), undo.getCreateTime(), undo.getUpdateTime());
     }
     
     @Override
@@ -418,17 +418,17 @@ public abstract class AbstractHmilyDatabase implements HmilyRepository {
     }
     
     @Override
-    public int removeHmilyTransactionByData(final Date date) {
+    public int removeHmilyTransactionByDate(final Date date) {
         return executeUpdate(DELETE_HMILY_TRANSACTION_WITH_DATA, date);
     }
     
     @Override
-    public int removeHmilyParticipantByData(final Date date) {
+    public int removeHmilyParticipantByDate(final Date date) {
         return executeUpdate(DELETE_HMILY_PARTICIPANT_WITH_DATA, date);
     }
     
     @Override
-    public int removeHmilyParticipantUndoByData(final Date date) {
+    public int removeHmilyParticipantUndoByDate(final Date date) {
         return executeUpdate(DELETE_HMILY_PARTICIPANT_UNDO_WITH_DATA, date);
     }
     
@@ -512,10 +512,10 @@ public abstract class AbstractHmilyDatabase implements HmilyRepository {
         undo.setParticipantId((Long) map.get("participant_id"));
         undo.setTransId((Long) map.get("trans_id"));
         undo.setResourceId((String) map.get("resource_id"));
-        byte[] undoInvocation = (byte[]) map.get("undo_invocation");
+        byte[] snapshotBytes = (byte[]) map.get("data_snapshot");
         try {
-            final HmilyUndoInvocation hmilyUndoInvocation = hmilySerializer.deSerialize(undoInvocation, HmilyUndoInvocation.class);
-            undo.setUndoInvocation(hmilyUndoInvocation);
+            HmilyDataSnapshot snapshot = hmilySerializer.deSerialize(snapshotBytes, HmilyDataSnapshot.class);
+            undo.setDataSnapshot(snapshot);
         } catch (HmilySerializerException e) {
             log.error("hmilySerializer deSerialize have exception:{} ", e.getMessage());
         }

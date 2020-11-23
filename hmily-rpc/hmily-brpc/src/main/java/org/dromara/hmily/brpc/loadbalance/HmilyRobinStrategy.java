@@ -21,6 +21,8 @@ import com.baidu.brpc.client.CommunicationClient;
 import com.baidu.brpc.loadbalance.FairStrategy;
 import com.baidu.brpc.protocol.Request;
 
+import com.baidu.brpc.loadbalance.RoundRobinStrategy;
+import com.baidu.brpc.protocol.Request;
 import java.util.List;
 import java.util.Set;
 
@@ -29,7 +31,7 @@ import java.util.Set;
  *
  * @author liu·yu
  */
-public class HmilyRobinStrategy extends FairStrategy {
+public class HmilyRobinStrategy extends RoundRobinStrategy {
 
     @Override
     public CommunicationClient selectInstance(final Request request, final List<CommunicationClient> instances, final Set<CommunicationClient> selectedInstances) {

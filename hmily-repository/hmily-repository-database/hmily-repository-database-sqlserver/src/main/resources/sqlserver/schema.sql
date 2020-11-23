@@ -38,7 +38,7 @@ CREATE TABLE hmily_participant_undo (
     participant_id BIGINT  NOT NULL ,
     trans_id BIGINT  NOT NULL ,
     resource_id VARCHAR(256 )  NOT NULL ,
-    undo_invocation VARBINARY(MAX)  NOT NULL ,
+    undo_data_snapshot VARBINARY(MAX)  NOT NULL ,
     status INT  NOT NULL ,
     create_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     update_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -47,7 +47,7 @@ EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'主键id' , @l
 EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'参与者id' , @level0type=N'SCHEMA',@level0name=N'dbo', @level1type=N'TABLE',@level1name=N'hmily_participant_undo', @level2type=N'COLUMN',@level2name=N'participant_id';
 EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'全局事务id' , @level0type=N'SCHEMA',@level0name=N'dbo', @level1type=N'TABLE',@level1name=N'hmily_participant_undo', @level2type=N'COLUMN',@level2name=N'trans_id';
 EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'资源id，at模式下为jdbc url' , @level0type=N'SCHEMA',@level0name=N'dbo', @level1type=N'TABLE',@level1name=N'hmily_participant_undo', @level2type=N'COLUMN',@level2name=N'resource_id';
-EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'回滚调用点' , @level0type=N'SCHEMA',@level0name=N'dbo', @level1type=N'TABLE',@level1name=N'hmily_participant_undo', @level2type=N'COLUMN',@level2name=N'undo_invocation';
+EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'回滚数据快照' , @level0type=N'SCHEMA',@level0name=N'dbo', @level1type=N'TABLE',@level1name=N'hmily_participant_undo', @level2type=N'COLUMN', @level2name=N'undo_data_snapshot';
 EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'状态' , @level0type=N'SCHEMA',@level0name=N'dbo', @level1type=N'TABLE',@level1name=N'hmily_participant_undo', @level2type=N'COLUMN',@level2name=N'status';
 EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'创建时间' , @level0type=N'SCHEMA',@level0name=N'dbo', @level1type=N'TABLE',@level1name=N'hmily_participant_undo', @level2type=N'COLUMN',@level2name=N'create_time';
 EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'更新时间' , @level0type=N'SCHEMA',@level0name=N'dbo', @level1type=N'TABLE',@level1name=N'hmily_participant_undo', @level2type=N'COLUMN',@level2name=N'update_time';

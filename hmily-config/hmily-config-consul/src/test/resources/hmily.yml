@@ -1,0 +1,13 @@
+hmily:
+  server:
+    configMode: consul
+    appName: xiaoyu
+  #  如果server.configMode eq local 的时候才会读取到这里的配置信息.
+
+remote:
+  consul:
+    hostAndPort: 127.0.0.1:8500
+    key: test
+    blacklistTimeInMillis: 6000
+    fileExtension: yml
+    passive: true
