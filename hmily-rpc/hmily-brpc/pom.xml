@@ -40,10 +40,6 @@
             <artifactId>hmily-tac-p6spy</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>com.baidu</groupId>
-            <artifactId>brpc-spring</artifactId>
-        </dependency>
     </dependencies>
 
     <build>
