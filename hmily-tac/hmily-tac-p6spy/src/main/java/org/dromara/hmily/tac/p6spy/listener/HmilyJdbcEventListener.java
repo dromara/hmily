@@ -26,6 +26,7 @@ import com.p6spy.engine.event.JdbcEventListener;
 import lombok.SneakyThrows;
 import org.dromara.hmily.tac.p6spy.executor.HmilyExecuteTemplate;
 
+import java.lang.reflect.Method;
 import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
@@ -106,7 +107,9 @@ public class HmilyJdbcEventListener extends JdbcEventListener {
     @SuppressWarnings("unchecked")
     private List<Object> getParameters(final PreparedStatementInformation preparedStatementInformation) {
         List<Object> result = new LinkedList<>();
-        Map<Integer, Value> parameterValues = (Map<Integer, Value>) preparedStatementInformation.getClass().getDeclaredMethod("getParameterValues").invoke(preparedStatementInformation);
+        Method getParameterValues = preparedStatementInformation.getClass().getDeclaredMethod("getParameterValues");
+        getParameterValues.setAccessible(true);
+        Map<Integer, Value> parameterValues = (Map<Integer, Value>) getParameterValues.invoke(preparedStatementInformation);
         for (int i = 0; i < parameterValues.size(); i++) {
             result.add(parameterValues.get(i).toString());
         }
