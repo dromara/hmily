@@ -2,7 +2,7 @@
     <a href="https://dromara.org"><img src="https://yu199195.github.io/images/hmily/hmily-logo.png" width="45%"></a>
 </p>
 <p align="center">
-  <strong>Financial-level flexible distributed transaction solution</strong>
+  <strong>金融级柔性分布式事务解决方案</strong>
 </p>
 <p align="center">
   <a href="https://dromara.org">https://dromara.org/</a>
@@ -47,81 +47,80 @@
 
  -------------------------------------------------------------------------------
 
-# Panorama of distributed transaction solutions
+# 分布式事务解决方案全景图
  ![](https://yu199195.github.io/images/hmily/hmily.png) 
  
 -------------------------------------------------------------------------------
 
-#  Features
+#  功能
 
-   *  high reliability ：supports abnormal transaction rollback in distributed scenarios, and abnormal recovery over time to prevent transaction suspension
+   *  高可靠性 ：支持分布式场景下，事务异常回滚，超时异常恢复，防止事务悬挂
    
-   *  usability ：provide zero-invasive `Spring-Boot`, `Spring-Namespace` to quickly integrate with business systems
+   *  易用性 ：提供零侵入性式的 `Spring-Boot`, `Spring-Namespace` 快速与业务系统集成
    
-   *  high performance ：decentralized design, fully integrated with business systems, naturally supporting cluster deployment
+   *  高性能 ：去中心化设计，与业务系统完全融合，天然支持集群部署
    
-   *  observability ：metrics performance monitoring of multiple indicators, and admin management background UI display
+   *  可观测性 ：Metrics多项指标性能监控，以及admin管理后台UI展示
    
-   *  various RPC ： support `Dubbo`, `SpringCloud`, `Motan`, `Sofa-rpc`, `brpc`, `tars` and other well-known RPC frameworks
+   *  多种RPC ： 支持 `Dubbo`, `SpringCloud`,`Motan`, `Sofa-rpc`, `brpc`, `tars` 等知名RPC框架
    
-   *  log storage ： support `mysql`, `oracle`, `mongodb`, `redis`, `zookeeper` etc.
+   *  日志存储 ： 支持 `mysql`, `oracle`, `mongodb`, `redis`, `zookeeper` 等方式
    
-   *  complex scene ： support RPC nested call transaction
+   *  复杂场景 ： 支持RPC嵌套调用事务
    
 -------------------------------------------------------------------------------
 
-# Necessary premise 
+# 必要前提 
 
-  * must use `JDK8+` 
+  * 必须使用 `JDK8+` 
   
-  * TCC mode must use a `RPC` framework, such as: `Dubbo`, `SpringCloud`, `Montan`
+  * TCC模式必须要使用一款 `RPC` 框架, 比如 : `Dubbo`, `SpringCloud`,`Montan`
   
 -------------------------------------------------------------------------------
  
-# TCC mode
+# TCC模式
 
  ![](https://yu199195.github.io/images/hmily/hmily-tcc.png) 
  
-   when using the `TCC` mode, users provide three methods: `try`, `confirm`, and `cancel` according to their business needs.
-    And the `confirm` and `cancel` methods are implemented by themselves, and the framework is only responsible for calling them to achieve transaction consistency。
+   当使用`TCC`模式的时候,用户根据自身业务需求提供 `try`, `confirm`, `cancel` 等三个方法，
+   并且 `confirm`, `cancel` 方法由自身完成实现，框架只是负责来调用，来达到事务的一致性。
    
 -------------------------------------------------------------------------------
  
-# TAC mode  
+# TAC模式  
    ![](https://yu199195.github.io/images/hmily/hmily-tac.png) 
    
-   When the user uses the `TAC` mode, the user must use a relational database for business operations, and the framework will automatically generate a `rollback SQL`,
-    When the business is abnormal, the `rollback SQL` will be executed to achieve transaction consistency。
+   当用户使用`TAC`模式的时候，用户必须使用关系型数据库来进行业务操作，框架会自动生成`回滚SQL`,
+   当业务异常的时候，会执行`回滚SQL`来达到事务的一致性。
  
 -------------------------------------------------------------------------------   
 
-# Documentation
+# 文档
     
-    [![EN doc](https://img.shields.io/badge/document-English-blue.svg)](https://dromara.org/website/en-us/docs/hmily/index.html)
-    [![CN doc](https://img.shields.io/badge/文档-中文版-blue.svg)](https://dromara.org/website/zh-cn/docs/docs/index.html)
+   如果你想使用，你可以参考[Quick Start](http://dromara.org/website/zh-cn/docs/hmily/index.html)  
     
-  -------------------------------------------------------------------------------  
+-------------------------------------------------------------------------------  
 
-# About Hmily 
+# 关于Hmily 
     
-   Hmily is a flexible distributed transaction solution that provides `TCC` and `TAC` modes。
+   Hmily是柔性分布式事务解决方案，提供了`TCC` 与 `TAC` 模式。
    
-   It can be easily integrated by business with zero intrusion and rapid integration。
+   它以零侵入以及快速集成方式能够方便的被业务进行整合。
    
-   In terms of performance, log storage is asynchronous (optional) and asynchronous execution is used, without loss of business methods。
+   在性能上，日志存储异步（可选）以及使用异步执行的方式，不损耗业务方法方法。
    
-   It was previously developed by me personally. At present, I have restarted at JD Digital. The future will be a distributed transaction solution for financial scenarios.。
+   之前是由我个人开发，目前由我在京东数科已经重新启动，未来将会是金融场景的分布式事务解决方案。
 
 -------------------------------------------------------------------------------  
-# Follow the trend
+# 关注趋势
 
 [![Stargazers over time](https://starchart.cc/yu199195/hmily.svg)](https://starchart.cc/yu199195/hmily) 
  
 ------------------------------------------------------------------------------- 
-# User wall
+# 用户墙
 
  
-# Support
+# 支持
 
   ![](https://yu199195.github.io/images/qq.png)    ![](https://yu199195.github.io/images/public.jpg)
  
