@@ -45,11 +45,11 @@
 </p>
 <br/>
 
- -------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
 
 # Panorama of distributed transaction solutions
  ![](https://yu199195.github.io/images/hmily/hmily.png) 
- 
+
 -------------------------------------------------------------------------------
 
 #  Features
@@ -67,7 +67,7 @@
    *  log storage ： support `mysql`, `oracle`, `mongodb`, `redis`, `zookeeper` etc.
    
    *  complex scene ： support RPC nested call transaction
-   
+
 -------------------------------------------------------------------------------
 
 # Necessary premise 
@@ -75,56 +75,56 @@
   * must use `JDK8+` 
   
   * TCC mode must use a `RPC` framework, such as: `Dubbo`, `SpringCloud`, `Montan`
-  
+
 -------------------------------------------------------------------------------
- 
+
 # TCC mode
 
  ![](https://yu199195.github.io/images/hmily/hmily-tcc.png) 
- 
+
    when using the `TCC` mode, users provide three methods: `try`, `confirm`, and `cancel` according to their business needs.
     And the `confirm` and `cancel` methods are implemented by themselves, and the framework is only responsible for calling them to achieve transaction consistency。
-   
+
 -------------------------------------------------------------------------------
- 
+
 # TAC mode  
    ![](https://yu199195.github.io/images/hmily/hmily-tac.png) 
-   
+
    When the user uses the `TAC` mode, the user must use a relational database for business operations, and the framework will automatically generate a `rollback SQL`,
     When the business is abnormal, the `rollback SQL` will be executed to achieve transaction consistency。
- 
--------------------------------------------------------------------------------   
+
+-------------------------------------------------------------------------------
 
 # Documentation
-    
-    [![EN doc](https://img.shields.io/badge/document-English-blue.svg)](https://dromara.org/website/en-us/docs/hmily/index.html)
-    [![CN doc](https://img.shields.io/badge/文档-中文版-blue.svg)](https://dromara.org/website/zh-cn/docs/docs/index.html)
-    
-  -------------------------------------------------------------------------------  
+[![EN doc](https://img.shields.io/badge/document-English-blue.svg)](https://dromara.org/en-us/docs/hmily/index.html)
+
+[![CN doc](https://img.shields.io/badge/文档-中文版-blue.svg)](https://dromara.org/zh-cn/docs/hmily/index.html)
+
+If you want to use it, you can refer to [Quick Start](https://dromara.org/en-us/docs/hmily/index.html)
 
 # About Hmily 
-    
+
    Hmily is a flexible distributed transaction solution that provides `TCC` and `TAC` modes。
-   
+
    It can be easily integrated by business with zero intrusion and rapid integration。
-   
+
    In terms of performance, log storage is asynchronous (optional) and asynchronous execution is used, without loss of business methods。
-   
+
    It was previously developed by me personally. At present, I have restarted at JD Digital. The future will be a distributed transaction solution for financial scenarios.。
 
--------------------------------------------------------------------------------  
+-------------------------------------------------------------------------------
 # Follow the trend
 
 [![Stargazers over time](https://starchart.cc/yu199195/hmily.svg)](https://starchart.cc/yu199195/hmily) 
- 
-------------------------------------------------------------------------------- 
+
+-------------------------------------------------------------------------------
 # User wall
 
- 
+
 # Support
 
   ![](https://yu199195.github.io/images/qq.png)    ![](https://yu199195.github.io/images/public.jpg)
- 
+
 
 
 
