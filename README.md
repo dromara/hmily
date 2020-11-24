@@ -96,9 +96,9 @@
 -------------------------------------------------------------------------------
 
 # Documentation
-[![EN doc](https://img.shields.io/badge/document-English-blue.svg)](https://dromara.org/website/en-us/docs/hmily/index.html)
+[![EN doc](https://img.shields.io/badge/document-English-blue.svg)](https://dromara.org/en-us/docs/hmily/index.html)
 
-[![CN doc](https://img.shields.io/badge/文档-中文版-blue.svg)](https://dromara.org/website/zh-cn/docs/docs/index.html)
+[![CN doc](https://img.shields.io/badge/文档-中文版-blue.svg)](https://dromara.org/zh-cn/docs/hmily/index.html)
 
 If you want to use it, you can refer to [Quick Start](https://dromara.org/en-us/docs/hmily/index.html)
 
