@@ -29,7 +29,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 /**
- * The type Dubbo parameter loader.
+ * The type springCloud parameter loader.
  *
  * @author xiaoyu
  */
