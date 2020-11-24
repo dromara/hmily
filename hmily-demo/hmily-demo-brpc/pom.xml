@@ -20,17 +20,15 @@
         <brpc.version>3.0.2</brpc.version>
     </properties>
 
-    <dependencies>
-        <dependency>
-            <groupId>com.baidu</groupId>
-            <artifactId>brpc-spring-boot-starter</artifactId>
-            <version>${brpc.version}</version>
-        </dependency>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.baidu</groupId>
+                <artifactId>brpc-java-naming-zookeeper</artifactId>
+                <version>${brpc.version}</version>
+            </dependency>
+        </dependencies>
 
-        <dependency>
-            <groupId>com.baidu</groupId>
-            <artifactId>brpc-java-naming-zookeeper</artifactId>
-            <version>${brpc.version}</version>
-        </dependency>
-    </dependencies>
+    </dependencyManagement>
+
 </project>

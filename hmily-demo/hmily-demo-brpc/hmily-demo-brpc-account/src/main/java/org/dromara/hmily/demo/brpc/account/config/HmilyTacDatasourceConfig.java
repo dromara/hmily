@@ -17,10 +17,12 @@
 
 package org.dromara.hmily.demo.brpc.account.config;
 
+import com.baidu.brpc.interceptor.Interceptor;
 import com.zaxxer.hikari.HikariDataSource;
 
 import javax.sql.DataSource;
 
+import org.dromara.hmily.brpc.interceptor.BrpcHmilyTransactionInterceptor;
 import org.dromara.hmily.tac.p6spy.HmilyP6Datasource;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.context.annotation.Bean;
@@ -65,6 +67,11 @@ public class HmilyTacDatasourceConfig {
         hikariDataSource.setIdleTimeout(600000);
         hikariDataSource.setMaxLifetime(1800000);
         return new HmilyP6Datasource(hikariDataSource);
+    }
+
+    @Bean("hmilyInterceptor")
+    public Interceptor interceptor() {
+        return new BrpcHmilyTransactionInterceptor();
     }
 
 }

@@ -17,6 +17,15 @@
             <artifactId>hmily-demo-common</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.baidu</groupId>
+            <artifactId>brpc-java-naming-zookeeper</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>org.dromara</groupId>
             <artifactId>hmily-spring-boot-starter-brpc</artifactId>
             <exclusions>

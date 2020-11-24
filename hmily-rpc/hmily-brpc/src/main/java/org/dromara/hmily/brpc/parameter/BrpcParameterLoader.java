@@ -34,7 +34,6 @@ import java.util.Optional;
  */
 @HmilySPI(value = "brpc")
 public class BrpcParameterLoader implements RpcParameterLoader {
-    
     @Override
     public HmilyTransactionContext load() {
         return Optional.ofNullable(RpcMediator.getInstance().acquire(key -> {
