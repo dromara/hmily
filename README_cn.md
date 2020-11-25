@@ -21,8 +21,8 @@
     <a target="_blank" href="https://www.oracle.com/technetwork/java/javase/downloads/index.html">
         <img src="https://img.shields.io/badge/JDK-8+-green.svg" />
     </a>
-    <a target="_blank" href="https://travis-ci.org/github/dromara/hmily">
-        <img src="https://api.travis-ci.org/dromara/hmily.svg?branch=master&status=created" />
+    <a target="_blank" href="https://github.com/dromara/hmily">
+        <img src="https://github.com/dromara/hmily/workflows/build/badge.svg" />
     </a>
     <a href="https://codecov.io/gh/dromara/hmily">
         <img src="https://codecov.io/gh/dromara/hmily/branch/master/graph/badge.svg"/>
