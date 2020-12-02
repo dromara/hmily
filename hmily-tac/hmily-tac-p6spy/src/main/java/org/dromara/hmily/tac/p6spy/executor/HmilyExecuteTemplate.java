@@ -34,6 +34,7 @@ import org.dromara.hmily.tac.core.cache.HmilyParticipantUndoCacheManager;
 import org.dromara.hmily.tac.core.cache.HmilyUndoContextCacheManager;
 import org.dromara.hmily.tac.core.context.HmilyUndoContext;
 import org.dromara.hmily.tac.p6spy.threadlocal.AutoCommitThreadLocal;
+import org.dromara.hmily.tac.sqlcompute.HmilySQLComputeEngine;
 import org.dromara.hmily.tac.sqlcompute.HmilySQLComputeEngineFactory;
 import org.dromara.hmily.tac.sqlparser.model.statement.HmilyStatement;
 import org.dromara.hmily.tac.sqlparser.spi.HmilySqlParserEngineFactory;
@@ -87,15 +88,14 @@ public enum HmilyExecuteTemplate {
         if (check()) {
             return;
         }
-        try {
-            // TODO prepared sql will improve performance of parser engine
-            HmilyStatement statement = HmilySqlParserEngineFactory.newInstance().parser(sql, DatabaseTypes.INSTANCE.getDatabaseType());
+        // TODO prepared sql will improve performance of parser engine
+        HmilyStatement statement = HmilySqlParserEngineFactory.newInstance().parser(sql, DatabaseTypes.INSTANCE.getDatabaseType());
+        String resourceId = ResourceIdUtils.INSTANCE.getResourceId(connectionInformation.getUrl());
+        HmilySQLComputeEngine sqlComputeEngine = HmilySQLComputeEngineFactory.newInstance(statement);
+        if (null != sqlComputeEngine) {
+            HmilyDataSnapshot snapshot = sqlComputeEngine.execute(sql, parameters, connectionInformation.getConnection(), resourceId);
             // TODO should generate lock-key to avoid dirty data modified by other global transaction.
-            String resourceId = ResourceIdUtils.INSTANCE.getResourceId(connectionInformation.getUrl());
-            HmilyDataSnapshot snapshot = HmilySQLComputeEngineFactory.newInstance(statement).execute(sql, parameters, connectionInformation.getConnection(), resourceId);
             HmilyUndoContextCacheManager.INSTANCE.set(HmilyContextHolder.get(), snapshot, resourceId);
-        } catch (Exception e) {
-            log.error("execute hmily tac module have exception:", e);
         }
     }
     
