@@ -17,16 +17,19 @@
 
 package org.dromara.hmily.core.repository;
 
-import java.util.List;
 import lombok.Setter;
 import org.dromara.hmily.common.enums.HmilyActionEnum;
 import org.dromara.hmily.config.api.ConfigEnv;
 import org.dromara.hmily.config.api.entity.HmilyConfig;
 import org.dromara.hmily.repository.spi.HmilyRepository;
+import org.dromara.hmily.repository.spi.entity.HmilyLock;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipant;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipantUndo;
 import org.dromara.hmily.repository.spi.entity.HmilyTransaction;
 import org.dromara.hmily.repository.spi.exception.HmilyRepositoryException;
+
+import java.util.Collection;
+import java.util.List;
 
 /**
  * The type Hmily coordinator facade.
@@ -168,6 +171,24 @@ public final class HmilyRepositoryFacade {
      */
     public void updateHmilyParticipantUndoStatus(final Long undoId, final Integer status) {
         checkRows(hmilyRepository.updateHmilyParticipantUndoStatus(undoId, status));
+    }
+    
+    /**
+     * Write hmily locks.
+     *
+     * @param locks locks
+     */
+    public void writeHmilyLocks(final Collection<HmilyLock> locks) {
+        // TODO
+    }
+    
+    /**
+     * Release hmily locks.
+     *
+     * @param locks locks
+     */
+    public void releaseHmilyLocks(final Collection<HmilyLock> locks) {
+        // TODO
     }
     
     private void checkRows(final int rows) {

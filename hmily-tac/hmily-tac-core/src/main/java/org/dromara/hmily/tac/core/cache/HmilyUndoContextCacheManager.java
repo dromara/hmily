@@ -17,12 +17,10 @@
 
 package org.dromara.hmily.tac.core.cache;
 
+import org.dromara.hmily.tac.core.context.HmilyUndoContext;
+
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-
-import org.dromara.hmily.core.context.HmilyTransactionContext;
-import org.dromara.hmily.repository.spi.entity.HmilyDataSnapshot;
-import org.dromara.hmily.tac.core.context.HmilyUndoContext;
 
 /**
  * The enum Hmily undo context cache manager.
@@ -41,16 +39,9 @@ public enum HmilyUndoContextCacheManager {
     /**
      * Set undo context.
      *
-     * @param transactionContext transaction context
-     * @param dataSnapshot data snapshot
-     * @param resourceId resource id
+     * @param undoContext hmily undo context
      */
-    public void set(final HmilyTransactionContext transactionContext, final HmilyDataSnapshot dataSnapshot, final String resourceId) {
-        HmilyUndoContext undoContext = new HmilyUndoContext();
-        undoContext.setDataSnapshot(dataSnapshot);
-        undoContext.setResourceId(resourceId);
-        undoContext.setTransId(transactionContext.getTransId());
-        undoContext.setParticipantId(transactionContext.getParticipantId());
+    public void set(final HmilyUndoContext undoContext) {
         CURRENT_LOCAL.get().add(undoContext);
     }
     

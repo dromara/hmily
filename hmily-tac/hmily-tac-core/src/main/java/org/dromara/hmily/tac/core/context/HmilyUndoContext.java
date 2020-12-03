@@ -17,8 +17,13 @@
 
 package org.dromara.hmily.tac.core.context;
 
+import com.google.common.base.Joiner;
 import lombok.Data;
 import org.dromara.hmily.repository.spi.entity.HmilyDataSnapshot;
+import org.dromara.hmily.repository.spi.entity.HmilyLock;
+
+import java.util.Collection;
+import java.util.stream.Collectors;
 
 @Data
 public class HmilyUndoContext {
@@ -42,4 +47,15 @@ public class HmilyUndoContext {
      * data snapshot.
      */
     private HmilyDataSnapshot dataSnapshot;
+    
+    
+    /**
+     * Get hmily locks.
+     *
+     * @return hmily locks
+     */
+    public Collection<HmilyLock> getHmilyLocks() {
+        return dataSnapshot.getTuples().stream()
+            .map(tuple -> new HmilyLock(transId, participantId, resourceId, tuple.getTableName(), Joiner.on("_").join(tuple.getPrimaryKeyValues()))).collect(Collectors.toList());
+    }
 }

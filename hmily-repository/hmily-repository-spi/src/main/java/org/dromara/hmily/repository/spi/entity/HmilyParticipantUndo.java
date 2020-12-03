@@ -17,10 +17,14 @@
 
 package org.dromara.hmily.repository.spi.entity;
 
-import java.io.Serializable;
-import java.util.Date;
+import com.google.common.base.Joiner;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
+import java.io.Serializable;
+import java.util.Collection;
+import java.util.Date;
+import java.util.stream.Collectors;
 
 /**
  * The type Hmily participant undo.
@@ -76,5 +80,15 @@ public final class HmilyParticipantUndo implements Serializable {
     public HmilyParticipantUndo() {
         this.createTime = new Date();
         this.updateTime = new Date();
+    }
+    
+    /**
+     * Get hmily locks.
+     *
+     * @return hmily locks
+     */
+    public Collection<HmilyLock> getHmilyLocks() {
+        return dataSnapshot.getTuples().stream()
+            .map(tuple -> new HmilyLock(transId, participantId, resourceId, tuple.getTableName(), Joiner.on("_").join(tuple.getPrimaryKeyValues()))).collect(Collectors.toList());
     }
 }

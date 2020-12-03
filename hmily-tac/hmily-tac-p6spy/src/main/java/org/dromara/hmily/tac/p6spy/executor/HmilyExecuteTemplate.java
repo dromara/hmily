@@ -34,6 +34,7 @@ import org.dromara.hmily.tac.core.cache.HmilyParticipantUndoCacheManager;
 import org.dromara.hmily.tac.core.cache.HmilyUndoContextCacheManager;
 import org.dromara.hmily.tac.core.context.HmilyUndoContext;
 import org.dromara.hmily.tac.p6spy.threadlocal.AutoCommitThreadLocal;
+import org.dromara.hmily.tac.sqlcompute.HmilySQLComputeEngine;
 import org.dromara.hmily.tac.sqlcompute.HmilySQLComputeEngineFactory;
 import org.dromara.hmily.tac.sqlparser.model.statement.HmilyStatement;
 import org.dromara.hmily.tac.sqlparser.spi.HmilySqlParserEngineFactory;
@@ -87,16 +88,25 @@ public enum HmilyExecuteTemplate {
         if (check()) {
             return;
         }
-        try {
-            // TODO prepared sql will improve performance of parser engine
-            HmilyStatement statement = HmilySqlParserEngineFactory.newInstance().parser(sql, DatabaseTypes.INSTANCE.getDatabaseType());
-            // TODO should generate lock-key to avoid dirty data modified by other global transaction.
-            String resourceId = ResourceIdUtils.INSTANCE.getResourceId(connectionInformation.getUrl());
-            HmilyDataSnapshot snapshot = HmilySQLComputeEngineFactory.newInstance(statement).execute(sql, parameters, connectionInformation.getConnection(), resourceId);
-            HmilyUndoContextCacheManager.INSTANCE.set(HmilyContextHolder.get(), snapshot, resourceId);
-        } catch (Exception e) {
-            log.error("execute hmily tac module have exception:", e);
+        // TODO prepared sql will improve performance of parser engine
+        HmilyStatement statement = HmilySqlParserEngineFactory.newInstance().parser(sql, DatabaseTypes.INSTANCE.getDatabaseType());
+        String resourceId = ResourceIdUtils.INSTANCE.getResourceId(connectionInformation.getUrl());
+        HmilySQLComputeEngine sqlComputeEngine = HmilySQLComputeEngineFactory.newInstance(statement);
+        if (null != sqlComputeEngine) {
+            HmilyDataSnapshot snapshot = sqlComputeEngine.execute(sql, parameters, connectionInformation.getConnection(), resourceId);
+            HmilyUndoContext undoContext = buildUndoContext(HmilyContextHolder.get(), snapshot, resourceId);
+            HmilyRepositoryStorage.writeHmilyLocks(undoContext.getHmilyLocks());
+            HmilyUndoContextCacheManager.INSTANCE.set(undoContext);
         }
+    }
+    
+    private HmilyUndoContext buildUndoContext(final HmilyTransactionContext transactionContext, final HmilyDataSnapshot dataSnapshot, final String resourceId) {
+        HmilyUndoContext result = new HmilyUndoContext();
+        result.setDataSnapshot(dataSnapshot);
+        result.setResourceId(resourceId);
+        result.setTransId(transactionContext.getTransId());
+        result.setParticipantId(transactionContext.getParticipantId());
+        return result;
     }
     
     /**
