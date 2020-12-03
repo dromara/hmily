@@ -17,11 +17,14 @@
 
 package org.dromara.hmily.core.repository;
 
-import java.io.Serializable;
 import lombok.Data;
+import org.dromara.hmily.repository.spi.entity.HmilyLock;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipant;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipantUndo;
 import org.dromara.hmily.repository.spi.entity.HmilyTransaction;
+
+import java.io.Serializable;
+import java.util.Collection;
 
 /**
  * The HmilyTransactionEvent.
@@ -37,6 +40,8 @@ public class HmilyRepositoryEvent implements Serializable {
     
     private HmilyParticipantUndo hmilyParticipantUndo;
     
+    private Collection<HmilyLock> hmilyLocks;
+    
     private Long transId;
     
     private int type;
@@ -48,6 +53,7 @@ public class HmilyRepositoryEvent implements Serializable {
         hmilyTransaction = null;
         hmilyParticipant = null;
         hmilyParticipantUndo = null;
+        hmilyLocks = null;
         transId = null;
     }
 }

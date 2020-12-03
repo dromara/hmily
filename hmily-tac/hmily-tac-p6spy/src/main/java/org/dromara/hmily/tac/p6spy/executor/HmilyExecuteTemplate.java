@@ -94,9 +94,19 @@ public enum HmilyExecuteTemplate {
         HmilySQLComputeEngine sqlComputeEngine = HmilySQLComputeEngineFactory.newInstance(statement);
         if (null != sqlComputeEngine) {
             HmilyDataSnapshot snapshot = sqlComputeEngine.execute(sql, parameters, connectionInformation.getConnection(), resourceId);
-            // TODO should generate lock-key to avoid dirty data modified by other global transaction.
-            HmilyUndoContextCacheManager.INSTANCE.set(HmilyContextHolder.get(), snapshot, resourceId);
+            HmilyUndoContext undoContext = buildUndoContext(HmilyContextHolder.get(), snapshot, resourceId);
+            HmilyRepositoryStorage.writeHmilyLocks(undoContext.getHmilyLocks());
+            HmilyUndoContextCacheManager.INSTANCE.set(undoContext);
         }
+    }
+    
+    private HmilyUndoContext buildUndoContext(final HmilyTransactionContext transactionContext, final HmilyDataSnapshot dataSnapshot, final String resourceId) {
+        HmilyUndoContext result = new HmilyUndoContext();
+        result.setDataSnapshot(dataSnapshot);
+        result.setResourceId(resourceId);
+        result.setTransId(transactionContext.getTransId());
+        result.setParticipantId(transactionContext.getParticipantId());
+        return result;
     }
     
     /**

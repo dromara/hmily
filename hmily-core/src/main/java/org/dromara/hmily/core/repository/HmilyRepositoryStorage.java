@@ -17,12 +17,15 @@
 
 package org.dromara.hmily.core.repository;
 
-import java.util.Objects;
 import org.dromara.hmily.common.enums.EventTypeEnum;
 import org.dromara.hmily.core.disruptor.publisher.HmilyRepositoryEventPublisher;
+import org.dromara.hmily.repository.spi.entity.HmilyLock;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipant;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipantUndo;
 import org.dromara.hmily.repository.spi.entity.HmilyTransaction;
+
+import java.util.Collection;
+import java.util.Objects;
 
 /**
  * The type Hmily repository storage.
@@ -97,7 +100,6 @@ public class HmilyRepositoryStorage {
         }
     }
     
-    
     /**
      * Create hmily participant undo.
      *
@@ -120,4 +122,25 @@ public class HmilyRepositoryStorage {
         }
     }
     
+    /**
+     * Try to write locks.
+     *
+     * @param hmilyLocks hmily locks
+     */
+    public static void writeHmilyLocks(final Collection<HmilyLock> hmilyLocks) {
+        if (!hmilyLocks.isEmpty()) {
+            PUBLISHER.syncPublishEvent(hmilyLocks, EventTypeEnum.WRITE_HMILY_LOCKS.getCode());
+        }
+    }
+    
+    /**
+     * Release locks..
+     *
+     * @param hmilyLocks hmily locks
+     */
+    public static void releaseHmilyLocks(final Collection<HmilyLock> hmilyLocks) {
+        if (!hmilyLocks.isEmpty()) {
+            PUBLISHER.syncPublishEvent(hmilyLocks, EventTypeEnum.RELEASE_HMILY_LOCKS.getCode());
+        }
+    }
 }

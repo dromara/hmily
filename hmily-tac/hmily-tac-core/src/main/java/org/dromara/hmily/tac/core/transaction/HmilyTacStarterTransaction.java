@@ -18,8 +18,6 @@
 package org.dromara.hmily.tac.core.transaction;
 
 import com.google.common.collect.Lists;
-import java.util.List;
-import java.util.Objects;
 import org.dromara.hmily.annotation.TransTypeEnum;
 import org.dromara.hmily.common.enums.ExecutorTypeEnum;
 import org.dromara.hmily.common.enums.HmilyActionEnum;
@@ -32,6 +30,7 @@ import org.dromara.hmily.core.context.HmilyTransactionContext;
 import org.dromara.hmily.core.holder.HmilyTransactionHolder;
 import org.dromara.hmily.core.hook.UndoHook;
 import org.dromara.hmily.core.reflect.HmilyReflector;
+import org.dromara.hmily.core.repository.HmilyRepositoryFacade;
 import org.dromara.hmily.core.repository.HmilyRepositoryStorage;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipant;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipantUndo;
@@ -39,6 +38,9 @@ import org.dromara.hmily.repository.spi.entity.HmilyTransaction;
 import org.dromara.hmily.tac.core.cache.HmilyParticipantUndoCacheManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
+import java.util.Objects;
 
 /**
  * The type Hmily tac global transaction.
@@ -188,6 +190,7 @@ public class HmilyTacStarterTransaction {
         //clean undo
         HmilyRepositoryStorage.removeHmilyParticipantUndo(hmilyParticipantUndo);
         HmilyParticipantUndoCacheManager.getInstance().removeByKey(hmilyParticipantUndo.getParticipantId());
+        HmilyRepositoryFacade.getInstance().releaseHmilyLocks(hmilyParticipantUndo.getHmilyLocks());
     }
     
     private void cleanHmilyParticipant(final HmilyParticipant hmilyParticipant) {

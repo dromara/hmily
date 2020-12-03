@@ -76,6 +76,12 @@ public final class HmilyRepositoryDispatcher {
             case REMOVE_HMILY_PARTICIPANT_UNDO:
                 HmilyRepositoryFacade.getInstance().removeHmilyParticipantUndo(hmilyParticipantUndo.getUndoId());
                 break;
+            case WRITE_HMILY_LOCKS:
+                HmilyRepositoryFacade.getInstance().writeHmilyLocks(event.getHmilyLocks());
+                break;
+            case RELEASE_HMILY_LOCKS:
+                HmilyRepositoryFacade.getInstance().releaseHmilyLocks(event.getHmilyLocks());
+                break;
             default:
                 break;
         }
