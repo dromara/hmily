@@ -237,7 +237,6 @@ public interface HmilyRepository {
      */
     int updateHmilyParticipantUndoStatus(Long undoId, Integer status);
     
-    
     /**
      * Write hmily locks.
      *
@@ -254,4 +253,11 @@ public interface HmilyRepository {
      */
     int releaseHmilyLocks(Collection<HmilyLock> locks);
     
+    /**
+     * Find hmily lock by id.
+     *
+     * @param lockId lock id
+     * @return hmily lock
+     */
+    HmilyLock findHmilyLockById(String lockId);
 }
