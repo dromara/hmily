@@ -191,6 +191,11 @@ public final class HmilyRepositoryFacade {
         // TODO
     }
     
+    public HmilyLock findHmilyLockById(final String lockId) {
+        // TODO
+        return null;
+    }
+    
     private void checkRows(final int rows) {
         if (rows != 1) {
             throw new HmilyRepositoryException("hmily repository have exception");
