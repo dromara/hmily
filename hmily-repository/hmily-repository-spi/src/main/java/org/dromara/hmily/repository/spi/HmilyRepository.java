@@ -249,7 +249,7 @@ public interface HmilyRepository {
      * Release hmily locks.
      *
      * @param locks locks
-     * @return count of relesed locks
+     * @return count of release locks
      */
     int releaseHmilyLocks(Collection<HmilyLock> locks);
     

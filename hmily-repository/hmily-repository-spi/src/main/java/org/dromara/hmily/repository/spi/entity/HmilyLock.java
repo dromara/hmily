@@ -64,7 +64,7 @@ public class HmilyLock implements Serializable {
      */
     private final String targetTablePk;
     
-    public HmilyLock(Long transId, Long participantId, String resourceId, String targetTableName, String targetTablePk) {
+    public HmilyLock(final Long transId, final Long participantId, final String resourceId, final String targetTableName, final String targetTablePk) {
         this(Joiner.on(":").join(resourceId, targetTableName, targetTablePk), transId, participantId, resourceId, targetTableName, targetTablePk);
     }
 }
