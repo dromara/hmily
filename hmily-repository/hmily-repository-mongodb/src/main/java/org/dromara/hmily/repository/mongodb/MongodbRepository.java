@@ -210,16 +210,19 @@ public class MongodbRepository implements HmilyRepository {
     
     @Override
     public int writeHmilyLocks(final Collection<HmilyLock> locks) {
+        // TODO
         return 0;
     }
     
     @Override
     public int releaseHmilyLocks(final Collection<HmilyLock> locks) {
+        // TODO
         return 0;
     }
     
     @Override
     public HmilyLock findHmilyLockById(final String lockId) {
+        // TODO
         return null;
     }
     
