@@ -90,7 +90,7 @@ public final class ColumnMetaDataLoader {
     
     private static String generateEmptyResultSQL(final String table, final DatabaseType databaseType) {
         QuoteCharacter quoteCharacter = DatabaseMetaDataDialectHandlerFactory.findHandler(databaseType).map(DatabaseMetaDataDialectHandler::getQuoteCharacter).orElse(QuoteCharacter.NONE);
-        return String.format("SELECT * FROM %s WHERE 1 != 1", quoteCharacter.wrap(table));
+        return String.format("SELECT * FROM `%s` WHERE 1 != 1", quoteCharacter.wrap(table));
     }
     
     private static Collection<String> loadPrimaryKeys(final Connection connection, final String table) throws SQLException {
