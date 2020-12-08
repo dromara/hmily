@@ -201,9 +201,12 @@ public final class HmilyRepositoryFacade {
         return hmilyRepository.findHmilyLockById(lockId);
     }
     
-    private void checkRows(final int rows, final int... args) {
-        int expected = 0 == args.length ? 1 : args[0];
-        if (rows != expected) {
+    private void checkRows(final int rows) {
+        checkRows(rows, 1);
+    }
+    
+    private void checkRows(final int actual, final int expected) {
+        if (actual != expected) {
             throw new HmilyRepositoryException("hmily repository have exception");
         }
     }
