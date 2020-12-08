@@ -179,7 +179,7 @@ public final class HmilyRepositoryFacade {
      * @param locks locks
      */
     public void writeHmilyLocks(final Collection<HmilyLock> locks) {
-        // TODO
+        checkRows(hmilyRepository.writeHmilyLocks(locks), locks.size());
     }
     
     /**
@@ -188,11 +188,25 @@ public final class HmilyRepositoryFacade {
      * @param locks locks
      */
     public void releaseHmilyLocks(final Collection<HmilyLock> locks) {
-        // TODO
+        checkRows(hmilyRepository.releaseHmilyLocks(locks), locks.size());
+    }
+    
+    /**
+     * Find hmily lock by id.
+     *
+     * @param lockId lock id
+     * @return hmily lock
+     */
+    public HmilyLock findHmilyLockById(final String lockId) {
+        return hmilyRepository.findHmilyLockById(lockId);
     }
     
     private void checkRows(final int rows) {
-        if (rows != 1) {
+        checkRows(rows, 1);
+    }
+    
+    private void checkRows(final int actual, final int expected) {
+        if (actual != expected) {
             throw new HmilyRepositoryException("hmily repository have exception");
         }
     }

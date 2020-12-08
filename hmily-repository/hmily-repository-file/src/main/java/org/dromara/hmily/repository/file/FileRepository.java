@@ -17,6 +17,28 @@
 
 package org.dromara.hmily.repository.file;
 
+import lombok.SneakyThrows;
+import org.dromara.hmily.common.enums.HmilyActionEnum;
+import org.dromara.hmily.common.exception.HmilyException;
+import org.dromara.hmily.common.exception.HmilyRuntimeException;
+import org.dromara.hmily.common.utils.AssertUtils;
+import org.dromara.hmily.common.utils.CollectionUtils;
+import org.dromara.hmily.common.utils.LogUtil;
+import org.dromara.hmily.common.utils.StringUtils;
+import org.dromara.hmily.config.api.ConfigEnv;
+import org.dromara.hmily.config.api.entity.HmilyFileConfig;
+import org.dromara.hmily.repository.spi.HmilyRepository;
+import org.dromara.hmily.repository.spi.entity.HmilyLock;
+import org.dromara.hmily.repository.spi.entity.HmilyParticipant;
+import org.dromara.hmily.repository.spi.entity.HmilyParticipantUndo;
+import org.dromara.hmily.repository.spi.entity.HmilyTransaction;
+import org.dromara.hmily.repository.spi.exception.HmilyRepositoryException;
+import org.dromara.hmily.serializer.spi.HmilySerializer;
+import org.dromara.hmily.serializer.spi.exception.HmilySerializerException;
+import org.dromara.hmily.spi.HmilySPI;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -30,6 +52,7 @@ import java.nio.file.StandardOpenOption;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -38,26 +61,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
-import lombok.SneakyThrows;
-import org.dromara.hmily.common.enums.HmilyActionEnum;
-import org.dromara.hmily.common.exception.HmilyException;
-import org.dromara.hmily.common.exception.HmilyRuntimeException;
-import org.dromara.hmily.common.utils.AssertUtils;
-import org.dromara.hmily.common.utils.CollectionUtils;
-import org.dromara.hmily.common.utils.LogUtil;
-import org.dromara.hmily.common.utils.StringUtils;
-import org.dromara.hmily.config.api.ConfigEnv;
-import org.dromara.hmily.config.api.entity.HmilyFileConfig;
-import org.dromara.hmily.repository.spi.HmilyRepository;
-import org.dromara.hmily.repository.spi.entity.HmilyParticipant;
-import org.dromara.hmily.repository.spi.entity.HmilyParticipantUndo;
-import org.dromara.hmily.repository.spi.entity.HmilyTransaction;
-import org.dromara.hmily.repository.spi.exception.HmilyRepositoryException;
-import org.dromara.hmily.serializer.spi.HmilySerializer;
-import org.dromara.hmily.serializer.spi.exception.HmilySerializerException;
-import org.dromara.hmily.spi.HmilySPI;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * file impl.
@@ -359,7 +362,25 @@ public class FileRepository implements HmilyRepository {
         String filePath = concatPath(getParticipantUndoPath(), undoId);
         return writeParticipantUndoFile(filePath, HmilyParticipantUndo.class, undoId, status);
     }
-
+    
+    @Override
+    public int writeHmilyLocks(final Collection<HmilyLock> locks) {
+        // TODO
+        return 0;
+    }
+    
+    @Override
+    public int releaseHmilyLocks(final Collection<HmilyLock> locks) {
+        // TODO
+        return 0;
+    }
+    
+    @Override
+    public HmilyLock findHmilyLockById(final String lockId) {
+        // TODO
+        return null;
+    }
+    
     private String getTransationPath() {
         return filePath + File.separator + HMILY_ROOT_TRANSACTION;
     }
