@@ -45,7 +45,7 @@ public class HmilyLoadBalanceUtils {
      */
     public static CommunicationClient doSelect(final CommunicationClient defaultClient,
                                                final List<CommunicationClient> instances) {
-        HmilyTransactionContext hmilyTransactionContext = HmilyContextHolder.get();
+        final HmilyTransactionContext hmilyTransactionContext = HmilyContextHolder.get();
         if (Objects.isNull(hmilyTransactionContext)) {
             return defaultClient;
         }
@@ -55,7 +55,7 @@ public class HmilyLoadBalanceUtils {
             URL_MAP.put(key, defaultClient.getServiceInstance().getIp());
             return defaultClient;
         }
-        String ip = URL_MAP.get(key);
+        final String ip = URL_MAP.get(key);
         URL_MAP.remove(key);
         if (Objects.nonNull(ip)) {
             for (CommunicationClient client : instances) {

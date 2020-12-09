@@ -48,6 +48,10 @@ public enum EventTypeEnum {
     
     CREATE_HMILY_PARTICIPANT_UNDO(31, "创建undo日志"),
     
+    WRITE_HMILY_LOCKS(40, "写入全局事务锁"),
+    
+    RELEASE_HMILY_LOCKS(41, "释放全局事务锁"),
+    
   
     /**
      * Update coordinator action enum.

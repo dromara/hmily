@@ -15,50 +15,48 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.tac.core.cache;
-
-import org.dromara.hmily.tac.core.context.HmilyUndoContext;
-
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
+package org.dromara.hmily.repository.spi.exception;
 
 /**
- * The enum Hmily undo context cache manager.
+ * The type Hmily lock conflict exception.
  *
  * @author xiaoyu
  */
-public enum HmilyUndoContextCacheManager {
+public class HmilyLockConflictException extends RuntimeException {
+    
+    private static final long serialVersionUID = 54809856411203804L;
     
     /**
-     * Instance hmily undo context cache manager.
+     * Instantiates a new Hmily lock conflict exception.
      */
-    INSTANCE;
-    
-    private static final ThreadLocal<List<HmilyUndoContext>> CURRENT_LOCAL = ThreadLocal.withInitial(CopyOnWriteArrayList::new);
-    
-    /**
-     * Set undo context.
-     *
-     * @param undoContext hmily undo context
-     */
-    public void set(final HmilyUndoContext undoContext) {
-        CURRENT_LOCAL.get().add(undoContext);
-    }
-    
-    
-    /**
-     * Get hmily undo context.
-     *
-     * @return the hmily undo context list
-     */
-    public List<HmilyUndoContext> get() {
-        return CURRENT_LOCAL.get();
+    public HmilyLockConflictException() {
     }
     
     /**
-     * clean threadLocal for gc.
+     * Instantiates a new Hmily lock conflict exception.
+     *
+     * @param message the message
      */
-    public void remove() {
-        CURRENT_LOCAL.remove();
+    public HmilyLockConflictException(final String message) {
+        super(message);
+    }
+    
+    /**
+     * Instantiates a new Hmily lock conflict exception.
+     *
+     * @param message the message
+     * @param cause   the cause
+     */
+    public HmilyLockConflictException(final String message, final Throwable cause) {
+        super(message, cause);
+    }
+    
+    /**
+     * Instantiates a new Hmily lock conflict exception.
+     *
+     * @param cause the cause
+     */
+    public HmilyLockConflictException(final Throwable cause) {
+        super(cause);
     }
 }

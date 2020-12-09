@@ -85,7 +85,7 @@
         <jedis.version>3.1.0</jedis.version>
         <kryo.version>4.0.0</kryo.version>
         <gson.verions>2.8.0</gson.verions>
-        <lombok.version>1.16.14</lombok.version>
+        <lombok.version>1.18.12</lombok.version>
         <motan.version>1.0.0</motan.version>
         <disruptor.version>3.4.0</disruptor.version>
         <hikaricp.version>3.2.0</hikaricp.version>

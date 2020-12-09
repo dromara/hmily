@@ -6,7 +6,7 @@ server:
 spring:
     datasource:
         driver-class-name:  com.mysql.jdbc.Driver
-        url: jdbc:mysql://127.0.0.1:3306/hmily_account?useUnicode=true&characterEncoding=utf8
+        url: jdbc:mysql://127.0.0.1:3306/hmily_account?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai
         username: root
         password:
 
@@ -29,11 +29,11 @@ brpc:
       ioThreadNum: 1
       protocol-type: 30
       max-try-times: 1
+      interceptor-bean-names: hmilyInterceptor
     server:
       port: 8003
       workThreadNum: 1
       ioThreadNum: 1
-
 
 logging:
   level:

@@ -18,8 +18,9 @@
 package org.dromara.hmily.brpc.loadbalance;
 
 import com.baidu.brpc.client.CommunicationClient;
-import com.baidu.brpc.loadbalance.RoundRobinStrategy;
 import com.baidu.brpc.protocol.Request;
+
+import com.baidu.brpc.loadbalance.RoundRobinStrategy;
 import java.util.List;
 import java.util.Set;
 

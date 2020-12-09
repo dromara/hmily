@@ -17,16 +17,19 @@
 
 package org.dromara.hmily.core.repository;
 
-import java.util.List;
 import lombok.Setter;
 import org.dromara.hmily.common.enums.HmilyActionEnum;
 import org.dromara.hmily.config.api.ConfigEnv;
 import org.dromara.hmily.config.api.entity.HmilyConfig;
 import org.dromara.hmily.repository.spi.HmilyRepository;
+import org.dromara.hmily.repository.spi.entity.HmilyLock;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipant;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipantUndo;
 import org.dromara.hmily.repository.spi.entity.HmilyTransaction;
 import org.dromara.hmily.repository.spi.exception.HmilyRepositoryException;
+
+import java.util.Collection;
+import java.util.List;
 
 /**
  * The type Hmily coordinator facade.
@@ -170,8 +173,40 @@ public final class HmilyRepositoryFacade {
         checkRows(hmilyRepository.updateHmilyParticipantUndoStatus(undoId, status));
     }
     
+    /**
+     * Write hmily locks.
+     *
+     * @param locks locks
+     */
+    public void writeHmilyLocks(final Collection<HmilyLock> locks) {
+        checkRows(hmilyRepository.writeHmilyLocks(locks), locks.size());
+    }
+    
+    /**
+     * Release hmily locks.
+     *
+     * @param locks locks
+     */
+    public void releaseHmilyLocks(final Collection<HmilyLock> locks) {
+        checkRows(hmilyRepository.releaseHmilyLocks(locks), locks.size());
+    }
+    
+    /**
+     * Find hmily lock by id.
+     *
+     * @param lockId lock id
+     * @return hmily lock
+     */
+    public HmilyLock findHmilyLockById(final String lockId) {
+        return hmilyRepository.findHmilyLockById(lockId);
+    }
+    
     private void checkRows(final int rows) {
-        if (rows != 1) {
+        checkRows(rows, 1);
+    }
+    
+    private void checkRows(final int actual, final int expected) {
+        if (actual != expected) {
             throw new HmilyRepositoryException("hmily repository have exception");
         }
     }

@@ -19,16 +19,6 @@ package org.dromara.hmily.repository.redis;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
 import org.dromara.hmily.common.enums.HmilyActionEnum;
 import org.dromara.hmily.common.exception.HmilyException;
 import org.dromara.hmily.common.utils.LogUtil;
@@ -40,6 +30,7 @@ import org.dromara.hmily.repository.redis.jedis.JedisClientCluster;
 import org.dromara.hmily.repository.redis.jedis.JedisClientSentinel;
 import org.dromara.hmily.repository.redis.jedis.JedisClientSingle;
 import org.dromara.hmily.repository.spi.HmilyRepository;
+import org.dromara.hmily.repository.spi.entity.HmilyLock;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipant;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipantUndo;
 import org.dromara.hmily.repository.spi.entity.HmilyTransaction;
@@ -54,6 +45,18 @@ import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 import redis.clients.jedis.JedisSentinelPool;
 import redis.clients.jedis.exceptions.JedisException;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * redis impl.
@@ -423,6 +426,24 @@ public class RedisRepository implements HmilyRepository {
             LOGGER.error("updateHmilyParticipantStatus occur a exception", e);
         }
         return HmilyRepository.FAIL_ROWS;
+    }
+    
+    @Override
+    public int writeHmilyLocks(final Collection<HmilyLock> locks) {
+        // TODO
+        return 0;
+    }
+    
+    @Override
+    public int releaseHmilyLocks(final Collection<HmilyLock> locks) {
+        // TODO
+        return 0;
+    }
+    
+    @Override
+    public HmilyLock findHmilyLockById(final String lockId) {
+        // TODO
+        return null;
     }
     
     private <T> int removeByFilter(final String key, final Class<T> deserializeClass, final Filter<T> filter, final Object... params) {

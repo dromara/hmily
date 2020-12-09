@@ -19,19 +19,6 @@ package org.dromara.hmily.repository.database.manager;
 
 import com.google.common.collect.Maps;
 import com.zaxxer.hikari.HikariDataSource;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
-import javax.sql.DataSource;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.hmily.common.exception.HmilyRuntimeException;
 import org.dromara.hmily.common.utils.CollectionUtils;
@@ -41,12 +28,28 @@ import org.dromara.hmily.config.api.entity.HmilyDatabaseConfig;
 import org.dromara.hmily.repository.spi.HmilyRepository;
 import org.dromara.hmily.repository.spi.entity.HmilyDataSnapshot;
 import org.dromara.hmily.repository.spi.entity.HmilyInvocation;
+import org.dromara.hmily.repository.spi.entity.HmilyLock;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipant;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipantUndo;
 import org.dromara.hmily.repository.spi.entity.HmilyTransaction;
 import org.dromara.hmily.repository.spi.exception.HmilyRepositoryException;
 import org.dromara.hmily.serializer.spi.HmilySerializer;
 import org.dromara.hmily.serializer.spi.exception.HmilySerializerException;
+
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * The type Abstract hmily database.
@@ -445,6 +448,24 @@ public abstract class AbstractHmilyDatabase implements HmilyRepository {
     @Override
     public int removeHmilyParticipant(final Long participantId) {
         return executeUpdate(DELETE_HMILY_PARTICIPANT, participantId);
+    }
+    
+    @Override
+    public int writeHmilyLocks(final Collection<HmilyLock> locks) {
+        // TODO
+        return 0;
+    }
+    
+    @Override
+    public int releaseHmilyLocks(final Collection<HmilyLock> locks) {
+        // TODO
+        return 0;
+    }
+    
+    @Override
+    public HmilyLock findHmilyLockById(final String lockId) {
+        // TODO
+        return null;
     }
     
     /**

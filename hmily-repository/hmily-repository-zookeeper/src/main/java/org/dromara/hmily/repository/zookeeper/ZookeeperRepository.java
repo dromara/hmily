@@ -34,6 +34,7 @@ import org.dromara.hmily.config.api.ConfigEnv;
 import org.dromara.hmily.config.api.entity.HmilyZookeeperConfig;
 import org.dromara.hmily.repository.spi.HmilyRepository;
 import org.dromara.hmily.repository.spi.HmilyRepositoryNode;
+import org.dromara.hmily.repository.spi.entity.HmilyLock;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipant;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipantUndo;
 import org.dromara.hmily.repository.spi.entity.HmilyTransaction;
@@ -44,6 +45,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -437,6 +439,24 @@ public class ZookeeperRepository implements HmilyRepository {
             LOGGER.error("updateHmilyParticipantStatus occur a exception", e);
         }
         return HmilyRepository.FAIL_ROWS;
+    }
+    
+    @Override
+    public int writeHmilyLocks(final Collection<HmilyLock> locks) {
+        // TODO
+        return 0;
+    }
+    
+    @Override
+    public int releaseHmilyLocks(final Collection<HmilyLock> locks) {
+        // TODO
+        return 0;
+    }
+    
+    @Override
+    public HmilyLock findHmilyLockById(final String lockId) {
+        // TODO
+        return null;
     }
     
     private void connect(final HmilyZookeeperConfig config) {
