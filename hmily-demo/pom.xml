@@ -55,25 +55,25 @@
 
             <dependency>
                 <groupId>org.dromara</groupId>
-                <artifactId>hmily-dubbo</artifactId>
+                <artifactId>hmily-rpc-dubbo</artifactId>
                 <version>${hmily.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>org.dromara</groupId>
-                <artifactId>hmily-brpc</artifactId>
+                <artifactId>hmily-rpc-brpc</artifactId>
                 <version>${hmily.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>org.dromara</groupId>
-                <artifactId>hmily-springcloud</artifactId>
+                <artifactId>hmily-rpc-springcloud</artifactId>
                 <version>${hmily.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>org.dromara</groupId>
-                <artifactId>hmily-grpc</artifactId>
+                <artifactId>hmily-rpc-grpc</artifactId>
                 <version>${hmily.version}</version>
             </dependency>
 
