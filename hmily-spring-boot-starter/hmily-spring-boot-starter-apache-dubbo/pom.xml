@@ -21,7 +21,7 @@
 
         <dependency>
             <groupId>org.dromara</groupId>
-            <artifactId>hmily-apache-dubbo</artifactId>
+            <artifactId>hmily-rpc-apache-dubbo</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

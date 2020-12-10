@@ -39,7 +39,7 @@
 
         <dependency>
             <groupId>org.dromara</groupId>
-            <artifactId>hmily-springcloud</artifactId>
+            <artifactId>hmily-rpc-springcloud</artifactId>
             <version>${project.version}</version>
         </dependency>
 

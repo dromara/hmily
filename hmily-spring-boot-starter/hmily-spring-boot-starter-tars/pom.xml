@@ -54,7 +54,7 @@
 
         <dependency>
             <groupId>org.dromara</groupId>
-            <artifactId>hmily-tars</artifactId>
+            <artifactId>hmily-rpc-tars</artifactId>
             <version>${project.version}</version>
             <exclusions>
                 <exclusion>

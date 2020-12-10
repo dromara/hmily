@@ -40,7 +40,7 @@
 
         <dependency>
             <groupId>org.dromara</groupId>
-            <artifactId>hmily-motan</artifactId>
+            <artifactId>hmily-rpc-motan</artifactId>
             <version>${project.version}</version>
         </dependency>
 

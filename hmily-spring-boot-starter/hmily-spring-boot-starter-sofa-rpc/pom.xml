@@ -36,7 +36,7 @@
         </dependency>
         <dependency>
             <groupId>org.dromara</groupId>
-            <artifactId>hmily-sofa-rpc</artifactId>
+            <artifactId>hmily-rpc-sofa-rpc</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

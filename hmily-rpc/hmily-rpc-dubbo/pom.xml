@@ -8,17 +8,12 @@
         <version>2.1.2-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>hmily-apache-dubbo</artifactId>
+    <artifactId>hmily-rpc-dubbo</artifactId>
     <packaging>jar</packaging>
 
     <dependencies>
         <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.dubbo</groupId>
+            <groupId>com.alibaba</groupId>
             <artifactId>dubbo</artifactId>
             <scope>provided</scope>
         </dependency>
@@ -32,6 +27,12 @@
         <dependency>
             <groupId>org.dromara</groupId>
             <artifactId>hmily-tcc</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.dromara</groupId>
+            <artifactId>hmily-tac-p6spy</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

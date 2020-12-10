@@ -20,7 +20,7 @@
 
         <dependency>
             <groupId>org.dromara</groupId>
-            <artifactId>hmily-grpc</artifactId>
+            <artifactId>hmily-rpc-grpc</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

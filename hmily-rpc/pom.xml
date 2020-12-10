@@ -25,20 +25,18 @@
         <version>2.1.2-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-
     <artifactId>hmily-rpc</artifactId>
-
     <packaging>pom</packaging>
 
     <modules>
-        <module>hmily-apache-dubbo</module>
-        <module>hmily-dubbo</module>
-        <module>hmily-motan</module>
-        <module>hmily-springcloud</module>
-        <module>hmily-sofa-rpc</module>
-        <module>hmily-brpc</module>
-        <module>hmily-tars</module>
-        <module>hmily-grpc</module>
+        <module>hmily-rpc-apache-dubbo</module>
+        <module>hmily-rpc-dubbo</module>
+        <module>hmily-rpc-motan</module>
+        <module>hmily-rpc-springcloud</module>
+        <module>hmily-rpc-sofa-rpc</module>
+        <module>hmily-rpc-brpc</module>
+        <module>hmily-rpc-tars</module>
+        <module>hmily-rpc-grpc</module>
     </modules>
 
 </project>
