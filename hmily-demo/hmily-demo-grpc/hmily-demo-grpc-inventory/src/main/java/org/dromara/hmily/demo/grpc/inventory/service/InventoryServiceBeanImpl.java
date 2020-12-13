@@ -1,6 +1,7 @@
 package org.dromara.hmily.demo.grpc.inventory.service;
 
 import org.dromara.hmily.annotation.HmilyTCC;
+import org.dromara.hmily.common.exception.HmilyRuntimeException;
 import org.dromara.hmily.demo.common.inventory.dto.InventoryDTO;
 import org.dromara.hmily.demo.common.inventory.mapper.InventoryMapper;
 import org.dromara.hmily.demo.grpc.inventory.InventoryServiceBean;
