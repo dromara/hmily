@@ -1,6 +1,7 @@
 package org.dromara.hmily.demo.grpc.inventory.service;
 
 import io.grpc.stub.StreamObserver;
+import org.dromara.hmily.common.exception.HmilyRuntimeException;
 import org.dromara.hmily.demo.common.inventory.dto.InventoryDTO;
 import org.dromara.hmily.demo.grpc.inventory.InventoryServiceBean;
 import org.dromara.hmily.grpc.filter.GrpcHmilyServerFilter;
@@ -20,14 +21,17 @@ public class InventoryServiceImpl extends InventoryServiceGrpc.InventoryServiceI
     
     @Override
     public void decrease(InventoryRequest inventoryRequest, StreamObserver<InventoryResponse> streamObserver) {
-//        throw new HmilyRuntimeException("库存扣减异常！");
         InventoryDTO inventoryDTO = new InventoryDTO();
         inventoryDTO.setProductId(inventoryRequest.getProductId());
         inventoryDTO.setCount(inventoryRequest.getCount());
-        InventoryResponse response = InventoryResponse.newBuilder().setResult(inventoryServiceBean.decrease(inventoryDTO)).build();
+        try {
+            InventoryResponse response = InventoryResponse.newBuilder().setResult(inventoryServiceBean.decrease(inventoryDTO)).build();
 
-        streamObserver.onNext(response);
-        streamObserver.onCompleted();
+            streamObserver.onNext(response);
+            streamObserver.onCompleted();
+        } catch (Exception e) {
+            streamObserver.onError(new HmilyRuntimeException());
+        }
     }
 
 }
