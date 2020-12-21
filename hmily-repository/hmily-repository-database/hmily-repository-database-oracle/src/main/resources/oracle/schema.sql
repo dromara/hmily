@@ -13,17 +13,17 @@ BEGIN
       -- Table structure for hmily_lock-----
       -- -----------------------------------
       EXECUTE IMMEDIATE 'CREATE TABLE hmily_lock (
-            lock_id NUMBER(20)  NOT NULL PRIMARY KEY,
             trans_id NUMBER(20)  NOT NULL ,
             participant_id NUMBER(20)  NOT NULL ,
             resource_id VARCHAR2(256 )  NOT NULL ,
             target_table_name VARCHAR2(64 )  NOT NULL ,
             target_table_pk VARCHAR2(64 )  NOT NULL ,
             create_time DATE  NOT NULL ,
-            update_time DATE  NOT NULL)';
+            update_time DATE  NOT NULL,
+            CONSTRAINT lock_key PRIMARY KEY (resource_id, target_table_name, target_table_pk)
+            )';
 
 	  EXECUTE IMMEDIATE ' COMMENT ON TABLE hmily_lock IS ''' ||'hmily全局lock表' || '''';
-      EXECUTE IMMEDIATE ' COMMENT ON COLUMN hmily_lock.lock_id IS ''' ||'主键id' || '''';
 	  EXECUTE IMMEDIATE ' COMMENT ON COLUMN hmily_lock.trans_id  IS ''' ||'全局事务id' || '''';
       EXECUTE IMMEDIATE ' COMMENT ON COLUMN hmily_lock.participant_id IS ''' ||'hmily参与者id' || '''';
 	  EXECUTE IMMEDIATE ' COMMENT ON COLUMN hmily_lock.resource_id IS ''' ||'资源id'|| '''';
