@@ -42,7 +42,7 @@ public final class HmilyLockCacheManager {
     
     private final LoadingCache<String, Optional<HmilyLock>> loadingCache =
             CacheBuilder.newBuilder().maximumWeight(MAX_COUNT)
-                    .weigher((Weigher<String, Optional<HmilyLock>>) (String, HmilyLock) -> getSize())
+                    .weigher((Weigher<String, Optional<HmilyLock>>) (e1, e2) -> getSize())
                     .build(new CacheLoader<String, Optional<HmilyLock>>() {
                         @Override
                         public Optional<HmilyLock> load(final String key) {

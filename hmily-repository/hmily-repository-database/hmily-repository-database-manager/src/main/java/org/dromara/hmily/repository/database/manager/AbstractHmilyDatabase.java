@@ -204,8 +204,8 @@ public abstract class AbstractHmilyDatabase implements HmilyRepository {
     /**
      * The constant SELECT_HMILY_LOCK_BY_PK.
      */
-    protected static final String SELECT_HMILY_LOCK_BY_PK = " select trans_id, participant_id, resource_id, target_table_name, target_table_pk from hmily_lock where " +
-        "resource_id = ? and target_table_name = ? and target_table_pk = ?";
+    protected static final String SELECT_HMILY_LOCK_BY_PK = " select trans_id, participant_id, resource_id, target_table_name, target_table_pk from hmily_lock where "
+        + "resource_id = ? and target_table_name = ? and target_table_pk = ?";
     
     /**
      * The data source.
@@ -511,7 +511,7 @@ public abstract class AbstractHmilyDatabase implements HmilyRepository {
         return Optional.empty();
     }
     
-    private int batchExecuteUpdate(final String sql, List<List<Object>> params) {
+    private int batchExecuteUpdate(final String sql, final List<List<Object>> params) {
         try (Connection con = dataSource.getConnection()) {
             con.setAutoCommit(false);
             try (PreparedStatement ps = con.prepareStatement(sql)) {
