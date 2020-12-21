@@ -40,7 +40,7 @@ public class UndoMongoEntity {
     @Field("resource_id")
     private String resourceId;
 
-    @Field("undo_data_snapshot")
-    private byte[] undoDataSnapshot;
+    @Field("data_snapshot")
+    private byte[] dataSnapshot;
 
 }

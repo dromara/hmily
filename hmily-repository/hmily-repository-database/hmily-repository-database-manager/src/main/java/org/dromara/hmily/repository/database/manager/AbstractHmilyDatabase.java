@@ -165,13 +165,13 @@ public abstract class AbstractHmilyDatabase implements HmilyRepository {
      * The constant INSERT_HMILY_PARTICIPANT_UNDO.
      */
     protected static final String INSERT_HMILY_PARTICIPANT_UNDO = "INSERT INTO hmily_participant_undo"
-            + "(undo_id, participant_id, trans_id, resource_id, undo_data_snapshot, status, create_time, update_time) "
+            + "(undo_id, participant_id, trans_id, resource_id, data_snapshot, status, create_time, update_time) "
             + " VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
     
     /**
      * The constant SELECTOR_HMILY_PARTICIPANT_UNDO_WITH_PARTICIPANT_ID.
      */
-    protected static final String SELECTOR_HMILY_PARTICIPANT_UNDO_WITH_PARTICIPANT_ID = " select undo_id, participant_id, trans_id, resource_id, undo_data_snapshot, status "
+    protected static final String SELECTOR_HMILY_PARTICIPANT_UNDO_WITH_PARTICIPANT_ID = " select undo_id, participant_id, trans_id, resource_id, data_snapshot, status "
             + "from hmily_participant_undo where participant_id =? ";
     
     /**
