@@ -52,6 +52,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -203,8 +204,8 @@ public abstract class AbstractHmilyDatabase implements HmilyRepository {
     /**
      * The constant SELECT_HMILY_LOCK_BY_PK.
      */
-    protected static final String SELECT_HMILY_LOCK_BY_PK = " select trans_id, participant_id, resource_id, target_table_name, target_table_pk from hmily_lock" +
-        "where resource_id = ? and target_table_name = ? and target_table_pk = ?";
+    protected static final String SELECT_HMILY_LOCK_BY_PK = " select trans_id, participant_id, resource_id, target_table_name, target_table_pk from hmily_lock where " +
+        "resource_id = ? and target_table_name = ? and target_table_pk = ?";
     
     /**
      * The data source.
@@ -502,14 +503,12 @@ public abstract class AbstractHmilyDatabase implements HmilyRepository {
     }
     
     @Override
-    public HmilyLock findHmilyLockById(final String lockId) {
-        List<Map<String, Object>> list = executeQuery(SELECT_HMILY_LOCK_BY_PK, Splitter.on(":").splitToList(lockId));
+    public Optional<HmilyLock> findHmilyLockById(final String lockId) {
+        List<Map<String, Object>> list = executeQuery(SELECT_HMILY_LOCK_BY_PK, Splitter.on("##").splitToList(lockId).toArray());
         if (CollectionUtils.isNotEmpty(list)) {
-            return list.stream().filter(Objects::nonNull)
-                .map(this::buildHmilyLockByResultMap)
-                .findFirst().orElse(null);
+            return list.stream().filter(Objects::nonNull).map(this::buildHmilyLockByResultMap).findFirst();
         }
-        return null;
+        return Optional.empty();
     }
     
     private int batchExecuteUpdate(final String sql, List<List<Object>> params) {

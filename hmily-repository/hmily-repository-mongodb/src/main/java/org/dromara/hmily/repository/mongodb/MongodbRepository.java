@@ -46,6 +46,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -221,9 +222,9 @@ public class MongodbRepository implements HmilyRepository {
     }
     
     @Override
-    public HmilyLock findHmilyLockById(final String lockId) {
+    public Optional<HmilyLock> findHmilyLockById(final String lockId) {
         // TODO
-        return null;
+        return Optional.empty();
     }
     
     @Override
