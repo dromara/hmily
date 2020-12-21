@@ -100,6 +100,7 @@ public class HmilyTacStarterTransaction {
      *
      * @param currentTransaction the current transaction
      */
+    // TODO will refactor rollback & commit logic in future
     public void rollback(final HmilyTransaction currentTransaction) {
         if (Objects.isNull(currentTransaction)) {
             return;
@@ -108,6 +109,7 @@ public class HmilyTacStarterTransaction {
         if (CollectionUtils.isEmpty(hmilyParticipants)) {
             return;
         }
+        List<Boolean> successList = Lists.newArrayList();
         for (HmilyParticipant participant : hmilyParticipants) {
             try {
                 if (participant.getRole() == HmilyRoleEnum.START.getCode()) {
@@ -119,16 +121,22 @@ public class HmilyTacStarterTransaction {
                             cleanUndo(undo);
                         }
                     }
+                    cleanHmilyParticipant(participant);
                 } else {
                     HmilyReflector.executor(HmilyActionEnum.CANCELING, ExecutorTypeEnum.RPC, participant);
                 }
+                successList.add(true);
             } catch (Throwable e) {
+                successList.add(false);
                 LOGGER.error("HmilyParticipant rollback exception :{} ", participant.toString());
             } finally {
                 HmilyContextHolder.remove();
             }
         }
-        // maybe remove participant
+        if (successList.stream().allMatch(e -> e)) {
+            // remove global
+            HmilyRepositoryStorage.removeHmilyTransaction(currentTransaction);
+        }
     }
     
     /**

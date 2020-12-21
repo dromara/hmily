@@ -58,8 +58,8 @@ public final class HmilyUpdateSQLComputeEngine extends AbstractHmilySQLComputeEn
         Map<String, Object> afterImage = new LinkedHashMap<>();
         HmilyDataSnapshot result = new HmilyDataSnapshot();
         if (sql.contains("order")) {
-            beforeImage.put("status", 3);
-            afterImage.put("number", sql.substring(sql.indexOf("'") + 1, sql.length() - 1));
+            beforeImage.put("number", 3);
+            afterImage.put("status", 3);
             result.getTuples().add(new HmilySQLTuple("order", HmilySQLManipulation.UPDATE, Collections.singletonList(1), beforeImage, afterImage));
         } else if (sql.contains("account")) {
             beforeImage.put("balance", 100);

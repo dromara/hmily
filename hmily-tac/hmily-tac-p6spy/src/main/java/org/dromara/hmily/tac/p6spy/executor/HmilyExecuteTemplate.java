@@ -45,6 +45,7 @@ import org.dromara.hmily.tac.sqlparser.spi.HmilySqlParserEngineFactory;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -145,16 +146,28 @@ public enum HmilyExecuteTemplate {
         clean(connection);
     }
     
+    
     /**
-     * clean.
+     * Rollback.
      *
-     * @param connection the connection
+     * @param connection connection
      */
-    @SneakyThrows
-    public void clean(final Connection connection) {
+    public void rollback(final Connection connection) {
         if (check()) {
             return;
         }
+        List<HmilyUndoContext> contexts = HmilyUndoContextCacheManager.INSTANCE.get();
+        List<HmilyLock> locks = new LinkedList<>();
+        for (HmilyUndoContext context : contexts) {
+            locks.addAll(context.getHmilyLocks());
+        }
+        HmilyRepositoryStorage.releaseHmilyLocks(locks);
+        locks.forEach(lock -> HmilyLockCacheManager.getInstance().removeByKey(lock.getLockId()));
+        clean(connection);
+    }
+    
+    @SneakyThrows
+    private void clean(final Connection connection) {
         connection.setAutoCommit(AutoCommitThreadLocal.INSTANCE.get());
         HmilyUndoContextCacheManager.INSTANCE.remove();
         AutoCommitThreadLocal.INSTANCE.remove();
