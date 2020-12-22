@@ -65,6 +65,6 @@ public class HmilyLock implements Serializable {
      * @return lock id
      */
     public String getLockId() {
-        return Joiner.on("##").join(resourceId, targetTableName, targetTablePk);
+        return Joiner.on(";;").join(resourceId, targetTableName, targetTablePk);
     }
 }
