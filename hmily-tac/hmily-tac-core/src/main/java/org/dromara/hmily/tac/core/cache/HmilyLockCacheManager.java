@@ -40,13 +40,13 @@ public final class HmilyLockCacheManager {
     
     private static final int MAX_COUNT = 1000000;
     
-    private final LoadingCache<String, HmilyLock> loadingCache =
+    private final LoadingCache<String, Optional<HmilyLock>> loadingCache =
             CacheBuilder.newBuilder().maximumWeight(MAX_COUNT)
-                    .weigher((Weigher<String, HmilyLock>) (String, HmilyLock) -> getSize())
-                    .build(new CacheLoader<String, HmilyLock>() {
+                    .weigher((Weigher<String, Optional<HmilyLock>>) (e1, e2) -> getSize())
+                    .build(new CacheLoader<String, Optional<HmilyLock>>() {
                         @Override
-                        public HmilyLock load(final String key) {
-                            return cacheHmilyLock(key);
+                        public Optional<HmilyLock> load(final String key) {
+                            return HmilyRepositoryFacade.getInstance().findHmilyLockById(key);
                         }
                     });
     
@@ -69,13 +69,7 @@ public final class HmilyLockCacheManager {
      * @param hmilyLock the hmily lock
      */
     public void cacheHmilyLock(final String lockId, final HmilyLock hmilyLock) {
-        if (!get(lockId).isPresent()) {
-            loadingCache.put(lockId, hmilyLock);
-        }
-    }
-    
-    private HmilyLock cacheHmilyLock(final String lockId) {
-        return HmilyRepositoryFacade.getInstance().findHmilyLockById(lockId);
+        loadingCache.put(lockId, Optional.of(hmilyLock));
     }
     
     /**
@@ -86,7 +80,7 @@ public final class HmilyLockCacheManager {
      */
     public Optional<HmilyLock> get(final String lockId) {
         try {
-            return Optional.ofNullable(loadingCache.get(lockId));
+            return loadingCache.get(lockId);
         } catch (ExecutionException ex) {
             return Optional.empty();
         }

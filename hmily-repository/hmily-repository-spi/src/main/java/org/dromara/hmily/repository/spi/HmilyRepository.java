@@ -27,6 +27,7 @@ import org.dromara.hmily.serializer.spi.HmilySerializer;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * The interface Hmily repository.
@@ -259,5 +260,5 @@ public interface HmilyRepository {
      * @param lockId lock id
      * @return hmily lock
      */
-    HmilyLock findHmilyLockById(String lockId);
+    Optional<HmilyLock> findHmilyLockById(String lockId);
 }

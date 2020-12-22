@@ -30,6 +30,7 @@ import org.dromara.hmily.repository.spi.exception.HmilyRepositoryException;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * The type Hmily coordinator facade.
@@ -197,7 +198,7 @@ public final class HmilyRepositoryFacade {
      * @param lockId lock id
      * @return hmily lock
      */
-    public HmilyLock findHmilyLockById(final String lockId) {
+    public Optional<HmilyLock> findHmilyLockById(final String lockId) {
         return hmilyRepository.findHmilyLockById(lockId);
     }
     

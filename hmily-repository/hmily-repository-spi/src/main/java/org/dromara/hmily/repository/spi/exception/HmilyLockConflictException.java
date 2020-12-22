@@ -20,7 +20,7 @@ package org.dromara.hmily.repository.spi.exception;
 /**
  * The type Hmily lock conflict exception.
  *
- * @author xiaoyu
+ * @author zhaojun
  */
 public class HmilyLockConflictException extends RuntimeException {
     

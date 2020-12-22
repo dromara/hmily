@@ -55,6 +55,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -441,9 +442,9 @@ public class RedisRepository implements HmilyRepository {
     }
     
     @Override
-    public HmilyLock findHmilyLockById(final String lockId) {
+    public Optional<HmilyLock> findHmilyLockById(final String lockId) {
         // TODO
-        return null;
+        return Optional.empty();
     }
     
     private <T> int removeByFilter(final String key, final Class<T> deserializeClass, final Filter<T> filter, final Object... params) {

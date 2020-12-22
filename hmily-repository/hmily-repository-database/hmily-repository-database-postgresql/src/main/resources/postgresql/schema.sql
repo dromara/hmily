@@ -33,18 +33,17 @@ IF (SELECT * FROM dblink('host=localhost user=' || _user || ' password=' || _pas
 ELSE
     PERFORM public.dblink_exec('init_conn', 'BEGIN');
 		PERFORM public.dblink_exec('init_conn', 'CREATE TABLE  hmily_lock (
-    lock_id INT8 NOT NULL PRIMARY KEY ,
     trans_id INT8 NOT NULL,
     participant_id INT8 NOT NULL,
     resource_id VARCHAR(256) NOT NULL,
     target_table_name VARCHAR(64) NOT NULL,
     target_table_pk VARCHAR(64) NOT NULL,
     create_time TIMESTAMP(6) NOT NULL default current_timestamp,
-    update_time TIMESTAMP(6) NOT NULL default current_timestamp
+    update_time TIMESTAMP(6) NOT NULL default current_timestamp,
+    PRIMARY KEY (resource_id, target_table_name, target_table_pk)
     )');
 
 	PERFORM public.dblink_exec('init_conn','COMMENT ON TABLE hmily_lock IS ''' ||'hmily全局lock表' || '''');
-	PERFORM public.dblink_exec('init_conn','COMMENT ON COLUMN hmily_lock.lock_id IS ''' ||'主键id' || '''');
 	PERFORM public.dblink_exec('init_conn','COMMENT ON COLUMN hmily_lock.trans_id  IS ''' ||'全局事务id' || '''');
 	PERFORM public.dblink_exec('init_conn','COMMENT ON COLUMN hmily_lock.participant_id IS ''' ||'hmily参与者id' || '''');
 	PERFORM public.dblink_exec('init_conn','COMMENT ON COLUMN hmily_lock.resource_id IS ''' ||'资源id'|| '''');
@@ -69,7 +68,7 @@ ELSE
     participant_id INT8  NOT NULL ,
     trans_id INT8  NOT NULL ,
     resource_id VARCHAR(256 )  NOT NULL ,
-    undo_data_snapshot BYTEA  NOT NULL ,
+    data_snapshot BYTEA  NOT NULL ,
     status INT2  NOT NULL ,
     create_time TIMESTAMP(6) NOT NULL default current_timestamp,
     update_time TIMESTAMP(6) NOT NULL default current_timestamp
@@ -79,7 +78,7 @@ ELSE
 	PERFORM public.dblink_exec('init_conn', ' COMMENT ON COLUMN hmily_participant_undo.participant_id IS ''' ||'参与者id' || '''');
 	PERFORM public.dblink_exec('init_conn',  ' COMMENT ON COLUMN hmily_participant_undo.trans_id IS ''' ||'全局事务id' || '''');
 	PERFORM public.dblink_exec('init_conn',  ' COMMENT ON COLUMN hmily_participant_undo.resource_id IS ''' ||'资源id，at模式下为jdbc url' || '''');
-	PERFORM public.dblink_exec('init_conn',  ' COMMENT ON COLUMN hmily_participant_undo.undo_data_snapshot IS ''' ||'回滚数据快照' || '''');
+	PERFORM public.dblink_exec('init_conn',  ' COMMENT ON COLUMN hmily_participant_undo.data_snapshot IS ''' ||'回滚数据快照' || '''');
 	PERFORM public.dblink_exec('init_conn',  ' COMMENT ON COLUMN hmily_participant_undo.status IS ''' ||'状态' || '''');
 	PERFORM public.dblink_exec('init_conn',  ' COMMENT ON COLUMN hmily_participant_undo.create_time IS ''' ||'创建时间' || '''');
 	PERFORM public.dblink_exec('init_conn',  ' COMMENT ON COLUMN hmily_participant_undo.update_time IS ''' ||'更新时间' || '''');

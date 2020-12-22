@@ -49,6 +49,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 
 /**
@@ -454,9 +455,9 @@ public class ZookeeperRepository implements HmilyRepository {
     }
     
     @Override
-    public HmilyLock findHmilyLockById(final String lockId) {
+    public Optional<HmilyLock> findHmilyLockById(final String lockId) {
         // TODO
-        return null;
+        return Optional.empty();
     }
     
     private void connect(final HmilyZookeeperConfig config) {
