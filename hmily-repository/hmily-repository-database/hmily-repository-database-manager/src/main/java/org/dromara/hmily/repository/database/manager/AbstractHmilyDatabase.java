@@ -504,7 +504,7 @@ public abstract class AbstractHmilyDatabase implements HmilyRepository {
     
     @Override
     public Optional<HmilyLock> findHmilyLockById(final String lockId) {
-        List<Map<String, Object>> list = executeQuery(SELECT_HMILY_LOCK_BY_PK, Splitter.on("##").splitToList(lockId).toArray());
+        List<Map<String, Object>> list = executeQuery(SELECT_HMILY_LOCK_BY_PK, Splitter.on(";;").splitToList(lockId).toArray());
         if (CollectionUtils.isNotEmpty(list)) {
             return list.stream().filter(Objects::nonNull).map(this::buildHmilyLockByResultMap).findFirst();
         }

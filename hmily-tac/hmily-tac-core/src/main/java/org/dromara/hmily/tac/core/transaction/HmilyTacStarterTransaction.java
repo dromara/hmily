@@ -34,8 +34,8 @@ import org.dromara.hmily.core.repository.HmilyRepositoryStorage;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipant;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipantUndo;
 import org.dromara.hmily.repository.spi.entity.HmilyTransaction;
-import org.dromara.hmily.tac.core.cache.HmilyLockCacheManager;
 import org.dromara.hmily.tac.core.cache.HmilyParticipantUndoCacheManager;
+import org.dromara.hmily.tac.core.lock.HmilyLockManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -195,11 +195,9 @@ public class HmilyTacStarterTransaction {
     }
     
     private void cleanUndo(final HmilyParticipantUndo hmilyParticipantUndo) {
-        //clean undo
         HmilyRepositoryStorage.removeHmilyParticipantUndo(hmilyParticipantUndo);
         HmilyParticipantUndoCacheManager.getInstance().removeByKey(hmilyParticipantUndo.getParticipantId());
-        HmilyRepositoryStorage.releaseHmilyLocks(hmilyParticipantUndo.getHmilyLocks());
-        hmilyParticipantUndo.getHmilyLocks().forEach(lock -> HmilyLockCacheManager.getInstance().removeByKey(lock.getLockId()));
+        HmilyLockManager.INSTANCE.releaseLocks(hmilyParticipantUndo.getHmilyLocks());
     }
     
     private void cleanHmilyParticipant(final HmilyParticipant hmilyParticipant) {

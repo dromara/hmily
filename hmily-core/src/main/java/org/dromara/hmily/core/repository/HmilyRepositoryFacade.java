@@ -26,6 +26,7 @@ import org.dromara.hmily.repository.spi.entity.HmilyLock;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipant;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipantUndo;
 import org.dromara.hmily.repository.spi.entity.HmilyTransaction;
+import org.dromara.hmily.repository.spi.exception.HmilyLockConflictException;
 import org.dromara.hmily.repository.spi.exception.HmilyRepositoryException;
 
 import java.util.Collection;
@@ -180,7 +181,11 @@ public final class HmilyRepositoryFacade {
      * @param locks locks
      */
     public void writeHmilyLocks(final Collection<HmilyLock> locks) {
-        checkRows(hmilyRepository.writeHmilyLocks(locks), locks.size());
+        int count = hmilyRepository.writeHmilyLocks(locks);
+        if (count != locks.size()) {
+            HmilyLock lock = locks.iterator().next();
+            throw new HmilyLockConflictException(String.format("current record [%s] has locked by transaction:[%s]", lock.getLockId(), lock.getTransId()));
+        }
     }
     
     /**
