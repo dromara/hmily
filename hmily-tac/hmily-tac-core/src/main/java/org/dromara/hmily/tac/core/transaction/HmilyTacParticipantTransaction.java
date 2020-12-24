@@ -29,14 +29,10 @@ import org.dromara.hmily.common.utils.IdWorkerUtils;
 import org.dromara.hmily.core.cache.HmilyParticipantCacheManager;
 import org.dromara.hmily.core.context.HmilyContextHolder;
 import org.dromara.hmily.core.context.HmilyTransactionContext;
-import org.dromara.hmily.core.hook.UndoHook;
 import org.dromara.hmily.core.reflect.HmilyReflector;
 import org.dromara.hmily.core.repository.HmilyRepositoryStorage;
 import org.dromara.hmily.repository.spi.entity.HmilyInvocation;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipant;
-import org.dromara.hmily.repository.spi.entity.HmilyParticipantUndo;
-import org.dromara.hmily.tac.core.cache.HmilyParticipantUndoCacheManager;
-import org.dromara.hmily.tac.core.lock.HmilyLockManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -94,15 +90,7 @@ public class HmilyTacParticipantTransaction {
         for (HmilyParticipant participant : hmilyParticipantList) {
             try {
                 if (participant.getParticipantId().equals(selfParticipantId)) {
-                    //do local
-                    List<HmilyParticipantUndo> undoList = HmilyParticipantUndoCacheManager.getInstance().get(participant.getParticipantId());
-                    for (HmilyParticipantUndo undo : undoList) {
-                        boolean success = UndoHook.INSTANCE.run(undo);
-                        if (success) {
-                            cleanUndo(undo);
-                        }
-                    }
-                    cleanHmilyParticipant(participant);
+                    HmilyTacLocalParticipantExecutor.cancel(participant);
                 } else {
                     HmilyReflector.executor(HmilyActionEnum.CANCELING, ExecutorTypeEnum.RPC, participant);
                 }
@@ -126,20 +114,15 @@ public class HmilyTacParticipantTransaction {
         if (CollectionUtils.isEmpty(hmilyParticipantList)) {
             return;
         }
-        for (HmilyParticipant hmilyParticipant : hmilyParticipantList) {
+        for (HmilyParticipant participant : hmilyParticipantList) {
             try {
-                if (hmilyParticipant.getParticipantId().equals(selfParticipantId)) {
-                    //do local
-                    List<HmilyParticipantUndo> undoList = HmilyParticipantUndoCacheManager.getInstance().get(hmilyParticipant.getParticipantId());
-                    for (HmilyParticipantUndo undo : undoList) {
-                        cleanUndo(undo);
-                    }
-                    cleanHmilyParticipant(hmilyParticipant);
+                if (participant.getParticipantId().equals(selfParticipantId)) {
+                    HmilyTacLocalParticipantExecutor.confirm(participant);
                 } else {
-                    HmilyReflector.executor(HmilyActionEnum.CONFIRMING, ExecutorTypeEnum.RPC, hmilyParticipant);
+                    HmilyReflector.executor(HmilyActionEnum.CONFIRMING, ExecutorTypeEnum.RPC, participant);
                 }
             } catch (Throwable throwable) {
-                throw new HmilyRuntimeException(" hmilyParticipant execute confirm exception:" + hmilyParticipant.toString());
+                throw new HmilyRuntimeException(" hmilyParticipant execute confirm exception:" + participant.toString());
             } finally {
                 // FIXME why remove context after first participator handled
                 HmilyContextHolder.remove();
@@ -147,17 +130,7 @@ public class HmilyTacParticipantTransaction {
         }
     }
     
-    private void cleanUndo(final HmilyParticipantUndo hmilyParticipantUndo) {
-        HmilyRepositoryStorage.removeHmilyParticipantUndo(hmilyParticipantUndo);
-        HmilyParticipantUndoCacheManager.getInstance().removeByKey(hmilyParticipantUndo.getParticipantId());
-        HmilyLockManager.INSTANCE.releaseLocks(hmilyParticipantUndo.getHmilyLocks());
-    }
-    
-    private void cleanHmilyParticipant(final HmilyParticipant hmilyParticipant) {
-        HmilyParticipantCacheManager.getInstance().removeByKey(hmilyParticipant.getParticipantId());
-        HmilyRepositoryStorage.removeHmilyParticipant(hmilyParticipant);
-    }
-    
+    //TODO need review it with rpc.build-participant
     private HmilyParticipant buildHmilyParticipant(final ProceedingJoinPoint point, final Long participantId, final Long participantRefId, final Long transId) {
         HmilyParticipant hmilyParticipant = new HmilyParticipant();
         if (null == participantId) {
