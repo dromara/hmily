@@ -97,7 +97,7 @@ public class HmilyJdbcEventListener extends SimpleJdbcEventListener {
         method.setAccessible(true);
         Map<Integer, Value> parameterValues = (Map<Integer, Value>) method.invoke(statementInformation);
         for (int i = 0; i < parameterValues.size(); i++) {
-            result.add(parameterValues.get(i).toString());
+            result.add(parameterValues.get(i).getValue());
         }
         return result;
     }

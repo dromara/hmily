@@ -60,8 +60,8 @@ public class HmilySQLComputeUtils {
                 Map<String, Object> record = new LinkedHashMap<>();
                 for (int columnIndex = 1; columnIndex <= resultSetMetaData.getColumnCount(); columnIndex++) {
                     record.put(resultSetMetaData.getColumnLabel(columnIndex), resultSet.getObject(columnIndex));
-                    result.add(record);
                 }
+                result.add(record);
             }
         }
         return result;
@@ -78,9 +78,9 @@ public class HmilySQLComputeUtils {
         if (segment.getAlias().isPresent()) {
             result = String.format("%s.*", segment.getAlias().get());
         } else if (segment.getOwner().isPresent()) {
-            result = String.format("%s.%s.*", segment.getOwner(), segment.getTableName().getIdentifier().getValue());
+            result = String.format("%s.%s.*", segment.getOwner(), segment.getTableName().getIdentifier().toString());
         } else {
-            result = String.format("%s.*", segment.getTableName().getIdentifier().getValue());
+            result = String.format("%s.*", segment.getTableName().getIdentifier().toString());
         }
         return result;
     }
