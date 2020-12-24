@@ -133,7 +133,7 @@ public class HmilyConfig extends AbstractConfig {
     /**
      * tac sqlParserType.
      */
-    private String sqlParserType = "calcite";
+    private String sqlParserType = "shardingsphere";
     
     /**
      * tac sqlRevert.

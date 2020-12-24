@@ -23,6 +23,7 @@ import org.dromara.hmily.tac.sqlparser.model.segment.dml.expr.HmilyExpressionSeg
 import org.dromara.hmily.tac.sqlparser.model.segment.dml.expr.complex.HmilyCommonExpressionSegment;
 import org.dromara.hmily.tac.sqlparser.model.segment.dml.expr.simple.HmilyLiteralExpressionSegment;
 import org.dromara.hmily.tac.sqlparser.model.segment.dml.expr.simple.HmilyParameterMarkerExpressionSegment;
+import org.dromara.hmily.tac.sqlparser.model.segment.dml.item.HmilyExpressionProjectionSegment;
 
 import java.util.List;
 
@@ -44,13 +45,20 @@ public final class ExpressionHandler {
     public static Object getValue(final List<Object> parameters, final HmilyExpressionSegment expressionSegment) {
         if (expressionSegment instanceof HmilyCommonExpressionSegment) {
             String value = ((HmilyCommonExpressionSegment) expressionSegment).getText();
+            //FIXME shardingsphere has bug with set `set balance = balance - ?`
+            if (value.contains("?")) {
+                return value.replace("?", parameters.get(0).toString());
+            }
             return "null".equals(value) ? null : value;
         }
         if (expressionSegment instanceof HmilyParameterMarkerExpressionSegment) {
             return parameters.get(((HmilyParameterMarkerExpressionSegment) expressionSegment).getParameterMarkerIndex());
-        } else {
-            // TODO match result type with metadata
-            return ((HmilyLiteralExpressionSegment) expressionSegment).getLiterals();
         }
+        if (expressionSegment instanceof HmilyExpressionProjectionSegment) {
+            String value = ((HmilyExpressionProjectionSegment) expressionSegment).getText();
+            return "null".equals(value) ? null : value;
+        }
+        // TODO match result type with metadata
+        return ((HmilyLiteralExpressionSegment) expressionSegment).getLiterals();
     }
 }

@@ -19,7 +19,6 @@ package org.dromara.hmily.tac.sqlparser.shardingsphere;
 
 import org.apache.shardingsphere.sql.parser.SQLParserEngineFactory;
 import org.apache.shardingsphere.sql.parser.sql.segment.dml.assignment.AssignmentSegment;
-import org.apache.shardingsphere.sql.parser.sql.segment.dml.column.ColumnSegment;
 import org.apache.shardingsphere.sql.parser.sql.segment.dml.expr.ExpressionSegment;
 import org.apache.shardingsphere.sql.parser.sql.segment.dml.expr.complex.CommonExpressionSegment;
 import org.apache.shardingsphere.sql.parser.sql.segment.dml.expr.simple.LiteralExpressionSegment;
@@ -27,6 +26,7 @@ import org.apache.shardingsphere.sql.parser.sql.segment.dml.expr.simple.Paramete
 import org.apache.shardingsphere.sql.parser.sql.segment.dml.item.ExpressionProjectionSegment;
 import org.apache.shardingsphere.sql.parser.sql.segment.dml.predicate.AndPredicate;
 import org.apache.shardingsphere.sql.parser.sql.segment.dml.predicate.PredicateSegment;
+import org.apache.shardingsphere.sql.parser.sql.segment.dml.predicate.value.PredicateCompareRightValue;
 import org.apache.shardingsphere.sql.parser.sql.segment.dml.predicate.value.PredicateRightValue;
 import org.apache.shardingsphere.sql.parser.sql.segment.generic.OwnerSegment;
 import org.apache.shardingsphere.sql.parser.sql.segment.generic.table.SimpleTableSegment;
@@ -49,6 +49,7 @@ import org.dromara.hmily.tac.sqlparser.model.segment.dml.item.HmilyExpressionPro
 import org.dromara.hmily.tac.sqlparser.model.segment.dml.predicate.HmilyAndPredicate;
 import org.dromara.hmily.tac.sqlparser.model.segment.dml.predicate.HmilyPredicateSegment;
 import org.dromara.hmily.tac.sqlparser.model.segment.dml.predicate.HmilyWhereSegment;
+import org.dromara.hmily.tac.sqlparser.model.segment.dml.predicate.value.HmilyPredicateCompareRightValue;
 import org.dromara.hmily.tac.sqlparser.model.segment.dml.predicate.value.HmilyPredicateRightValue;
 import org.dromara.hmily.tac.sqlparser.model.segment.generic.HmilyAliasSegment;
 import org.dromara.hmily.tac.sqlparser.model.segment.generic.HmilyOwnerSegment;
@@ -70,7 +71,7 @@ import java.util.LinkedList;
  *
  * @author xiaoyu
  */
-@HmilySPI("shardingSphere")
+@HmilySPI("shardingsphere")
 public class ShardingSphereSqlParserEngine implements HmilySqlParserEngine {
     
     @Override
@@ -129,22 +130,7 @@ public class ShardingSphereSqlParserEngine implements HmilySqlParserEngine {
             HmilyQuoteCharacter quoteCharacter = HmilyQuoteCharacter.getQuoteCharacter(each.getColumn().getIdentifier().getQuoteCharacter().toString());
             HmilyIdentifierValue hmilyIdentifierValue = new HmilyIdentifierValue(each.getColumn().getIdentifier().getValue(), quoteCharacter);
             HmilyColumnSegment hmilyColumnSegment = new HmilyColumnSegment(each.getColumn().getStartIndex(), each.getColumn().getStopIndex(), hmilyIdentifierValue);
-            ExpressionSegment expressionSegment = each.getValue();
-            HmilyExpressionSegment hmilyExpressionSegment;
-            if (expressionSegment instanceof CommonExpressionSegment) {
-                hmilyExpressionSegment = new HmilyCommonExpressionSegment(expressionSegment.getStartIndex(),
-                        expressionSegment.getStopIndex(), ((CommonExpressionSegment) expressionSegment).getText());
-            } else if (expressionSegment instanceof ExpressionProjectionSegment) {
-                hmilyExpressionSegment = new HmilyExpressionProjectionSegment(expressionSegment.getStartIndex(),
-                        expressionSegment.getStopIndex(), ((ExpressionProjectionSegment) expressionSegment).getText());
-            } else if (expressionSegment instanceof LiteralExpressionSegment) {
-                hmilyExpressionSegment = new HmilyLiteralExpressionSegment(expressionSegment.getStartIndex(),
-                        expressionSegment.getStopIndex(), ((LiteralExpressionSegment) expressionSegment).getLiterals());
-            } else {
-                hmilyExpressionSegment = new HmilyParameterMarkerExpressionSegment(expressionSegment.getStartIndex(),
-                        expressionSegment.getStopIndex(), ((ParameterMarkerExpressionSegment) expressionSegment).getParameterMarkerIndex());
-            }
-            HmilyAssignmentSegment hmilyAssignmentSegment = new HmilyAssignmentSegment(each.getStartIndex(), each.getStopIndex(), hmilyColumnSegment, hmilyExpressionSegment);
+            HmilyAssignmentSegment hmilyAssignmentSegment = new HmilyAssignmentSegment(each.getStartIndex(), each.getStopIndex(), hmilyColumnSegment, assembleExpressionSegment(each.getValue()));
             assignments.add(hmilyAssignmentSegment);
         }
         HmilySetAssignmentSegment hmilySetAssignmentSegment = new HmilySetAssignmentSegment(updateStatement.getSetAssignment().getStartIndex(),
@@ -160,16 +146,22 @@ public class ShardingSphereSqlParserEngine implements HmilySqlParserEngine {
                 HmilyQuoteCharacter quoteCharacter = HmilyQuoteCharacter.getQuoteCharacter(predicateSegment.getColumn().getIdentifier().getQuoteCharacter().toString());
                 HmilyIdentifierValue hmilyIdentifierValue = new HmilyIdentifierValue(predicateSegment.getColumn().getIdentifier().getValue(), quoteCharacter);
                 PredicateRightValue predicateRightValue = predicateSegment.getRightValue();
-                HmilyPredicateRightValue hmilyRightValue;
+                HmilyPredicateRightValue hmilyRightValue = null;
+                if (predicateRightValue instanceof PredicateCompareRightValue) {
+                    PredicateCompareRightValue predicateCompareRightValue = (PredicateCompareRightValue) predicateRightValue;
+                    HmilyExpressionSegment expressionSegment = assembleExpressionSegment(predicateCompareRightValue.getExpression());
+                    hmilyRightValue = new HmilyPredicateCompareRightValue(predicateCompareRightValue.getOperator(), expressionSegment);
+                }
                 // TODO Support other segments except ColumnSegment
-                HmilyQuoteCharacter quoteCharacterCS = HmilyQuoteCharacter.getQuoteCharacter(((ColumnSegment) predicateRightValue).getIdentifier().getQuoteCharacter().toString());
-                HmilyIdentifierValue hmilyIdentifierValueCS = new HmilyIdentifierValue(((ColumnSegment) predicateRightValue).getIdentifier().getValue(), quoteCharacterCS);
-                HmilyQuoteCharacter quoteCharacterOS = HmilyQuoteCharacter.getQuoteCharacter(((ColumnSegment) predicateRightValue).getOwner().get().getIdentifier().getQuoteCharacter().toString());
-                HmilyIdentifierValue hmilyIdentifierValueOS = new HmilyIdentifierValue(((ColumnSegment) predicateRightValue).getOwner().get().getIdentifier().getValue(), quoteCharacterOS);
-                HmilyOwnerSegment owner = new HmilyOwnerSegment(((ColumnSegment) predicateRightValue).getOwner().get().getStartIndex(),
-                        ((ColumnSegment) predicateRightValue).getOwner().get().getStopIndex(), hmilyIdentifierValueOS);
-                hmilyRightValue = new HmilyColumnSegment(((ColumnSegment) predicateRightValue).getStartIndex(), ((ColumnSegment) predicateRightValue).getStopIndex(), hmilyIdentifierValueCS);
-                ((HmilyColumnSegment) hmilyRightValue).setOwner(owner);
+//                HmilyQuoteCharacter quoteCharacterCS = HmilyQuoteCharacter.getQuoteCharacter(((ColumnSegment) predicateRightValue).getIdentifier().getQuoteCharacter().toString());
+//                HmilyIdentifierValue hmilyIdentifierValueCS = new HmilyIdentifierValue(((ColumnSegment) predicateRightValue).getIdentifier().getValue(), quoteCharacterCS);
+//                HmilyQuoteCharacter quoteCharacterOS = HmilyQuoteCharacter.getQuoteCharacter(((ColumnSegment) predicateRightValue).getOwner().get().getIdentifier().getQuoteCharacter().toString());
+//                HmilyIdentifierValue hmilyIdentifierValueOS = new HmilyIdentifierValue(((ColumnSegment) predicateRightValue).getOwner().get().getIdentifier().getValue(), quoteCharacterOS);
+//                HmilyOwnerSegment owner = new HmilyOwnerSegment(((ColumnSegment) predicateRightValue).getOwner().get().getStartIndex(),
+//                        ((ColumnSegment) predicateRightValue).getOwner().get().getStopIndex(), hmilyIdentifierValueOS);
+
+//                hmilyRightValue = new HmilyColumnSegment(((ColumnSegment) predicateRightValue).getStartIndex(), ((ColumnSegment) predicateRightValue).getStopIndex(), hmilyIdentifierValueCS);
+//                ((HmilyColumnSegment) hmilyRightValue).setOwner(owner);
                 HmilyColumnSegment hmilyColumnSegment = new HmilyColumnSegment(predicateSegment.getColumn().getStartIndex(), predicateSegment.getColumn().getStopIndex(), hmilyIdentifierValue);
                 HmilyPredicateSegment hmilyPredicateSegment = new HmilyPredicateSegment(predicateSegment.getStartIndex(), predicateSegment.getStopIndex(), hmilyColumnSegment, hmilyRightValue);
                 hmilyAndPredicate.getPredicates().add(hmilyPredicateSegment);
@@ -177,6 +169,24 @@ public class ShardingSphereSqlParserEngine implements HmilySqlParserEngine {
             hmilyWhereSegment.getHmilyAndPredicates().add(hmilyAndPredicate);
         }
         result.setWhere(hmilyWhereSegment);
+    }
+    
+    private HmilyExpressionSegment assembleExpressionSegment(final ExpressionSegment expressionSegment) {
+        HmilyExpressionSegment result;
+        if (expressionSegment instanceof CommonExpressionSegment) {
+            result = new HmilyCommonExpressionSegment(expressionSegment.getStartIndex(),
+                expressionSegment.getStopIndex(), ((CommonExpressionSegment) expressionSegment).getText());
+        } else if (expressionSegment instanceof ExpressionProjectionSegment) {
+            result = new HmilyExpressionProjectionSegment(expressionSegment.getStartIndex(),
+                expressionSegment.getStopIndex(), ((ExpressionProjectionSegment) expressionSegment).getText());
+        } else if (expressionSegment instanceof LiteralExpressionSegment) {
+            result = new HmilyLiteralExpressionSegment(expressionSegment.getStartIndex(),
+                expressionSegment.getStopIndex(), ((LiteralExpressionSegment) expressionSegment).getLiterals());
+        } else {
+            result = new HmilyParameterMarkerExpressionSegment(expressionSegment.getStartIndex(),
+                expressionSegment.getStopIndex(), ((ParameterMarkerExpressionSegment) expressionSegment).getParameterMarkerIndex());
+        }
+        return result;
     }
     
     private HmilyInsertStatement generateHmilyInsertStatement(final InsertStatement insertStatement) {
