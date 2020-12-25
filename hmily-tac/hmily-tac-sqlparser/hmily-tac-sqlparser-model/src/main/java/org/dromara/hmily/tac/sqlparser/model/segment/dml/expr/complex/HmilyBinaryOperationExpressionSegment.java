@@ -15,48 +15,32 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.tac.sqlparser.model.segment.dml.column;
+package org.dromara.hmily.tac.sqlparser.model.segment.dml.expr.complex;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import lombok.ToString;
 import org.dromara.hmily.tac.sqlparser.model.segment.dml.expr.HmilyExpressionSegment;
-import org.dromara.hmily.tac.sqlparser.model.segment.dml.predicate.value.HmilyPredicateRightValue;
-import org.dromara.hmily.tac.sqlparser.model.segment.generic.HmilyOwnerAvailable;
-import org.dromara.hmily.tac.sqlparser.model.segment.generic.HmilyOwnerSegment;
-import org.dromara.hmily.tac.sqlparser.model.value.identifier.HmilyIdentifierValue;
-
-import java.util.Optional;
 
 /**
- * Column segment.
+ * Hmily binary operation expression segment.
+ *
+ * @author zhaojun
  */
 @RequiredArgsConstructor
 @Getter
-@Setter
 @ToString
-public final class HmilyColumnSegment implements HmilyExpressionSegment, HmilyPredicateRightValue, HmilyOwnerAvailable {
+public final class HmilyBinaryOperationExpressionSegment implements HmilyComplexExpressionSegment {
     
     private final int startIndex;
     
     private final int stopIndex;
     
-    private final HmilyIdentifierValue identifier;
+    private final HmilyExpressionSegment left;
     
-    private HmilyOwnerSegment owner;
+    private final HmilyExpressionSegment right;
     
-    /**
-     * Get qualified name.
-     *
-     * @return qualified name
-     */
-    public String getQualifiedName() {
-        return null == owner ? identifier.getValue() : owner.getIdentifier().getValue() + "." + identifier.getValue();
-    }
-
-    @Override
-    public Optional<HmilyOwnerSegment> getOwner() {
-        return Optional.ofNullable(owner);
-    }
+    private final String operator;
+    
+    private final String text;
 }
