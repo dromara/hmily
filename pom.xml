@@ -76,7 +76,7 @@
         <mockito.version>2.7.21</mockito.version>
         <logback.version>1.2.0</logback.version>
         <powermock.version>2.0.7</powermock.version>
-        <shardingsphere.version>4.1.1</shardingsphere.version>
+        <shardingsphere.version>5.0.0-alpha</shardingsphere.version>
     </properties>
 
     <dependencyManagement>
@@ -91,6 +91,11 @@
             <dependency>
                 <groupId>org.apache.shardingsphere</groupId>
                 <artifactId>shardingsphere-sql-parser-mysql</artifactId>
+                <version>${shardingsphere.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.shardingsphere</groupId>
+                <artifactId>shardingsphere-infra-parser</artifactId>
                 <version>${shardingsphere.version}</version>
             </dependency>
         </dependencies>
