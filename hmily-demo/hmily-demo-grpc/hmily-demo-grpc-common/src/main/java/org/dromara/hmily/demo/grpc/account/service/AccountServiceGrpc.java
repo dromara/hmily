@@ -3,7 +3,6 @@ package org.dromara.hmily.demo.grpc.account.service;
 import io.grpc.MethodDescriptor;
 import io.grpc.stub.ClientCalls;
 import io.grpc.stub.ServerCalls;
-import org.dromara.hmily.annotation.Hmily;
 
 import static io.grpc.stub.ClientCalls.asyncUnaryCall;
 import static io.grpc.stub.ClientCalls.asyncServerStreamingCall;
@@ -136,7 +135,6 @@ public class AccountServiceGrpc {
 
     /**
      */
-    @Hmily
     public org.dromara.hmily.demo.grpc.account.service.AccountResponse payment(org.dromara.hmily.demo.grpc.account.service.AccountRequest request) {
       return ClientCalls.blockingUnaryCall(
           getChannel(), METHOD_PAYMENT, getCallOptions(), request);

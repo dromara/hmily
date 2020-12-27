@@ -18,19 +18,31 @@
 package org.dromara.hmily.tac.sqlcompute.impl;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.Preconditions;
 import lombok.RequiredArgsConstructor;
-import org.dromara.hmily.repository.spi.entity.HmilySQLTuple;
-import org.dromara.hmily.repository.spi.entity.HmilyUndoInvocation;
-import org.dromara.hmily.tac.sqlcompute.exception.SQLComputeException;
+import org.dromara.hmily.repository.spi.entity.tuple.HmilySQLManipulation;
+import org.dromara.hmily.repository.spi.entity.tuple.HmilySQLTuple;
+import org.dromara.hmily.tac.metadata.HmilyMetaDataManager;
+import org.dromara.hmily.tac.metadata.model.TableMetaData;
+import org.dromara.hmily.tac.sqlparser.model.segment.dml.expr.HmilyExpressionSegment;
+import org.dromara.hmily.tac.sqlparser.model.segment.dml.expr.simple.HmilyParameterMarkerExpressionSegment;
+import org.dromara.hmily.tac.sqlparser.model.segment.dml.predicate.HmilyAndPredicate;
+import org.dromara.hmily.tac.sqlparser.model.segment.dml.predicate.HmilyPredicateSegment;
+import org.dromara.hmily.tac.sqlparser.model.segment.dml.predicate.value.HmilyPredicateBetweenRightValue;
+import org.dromara.hmily.tac.sqlparser.model.segment.dml.predicate.value.HmilyPredicateCompareRightValue;
+import org.dromara.hmily.tac.sqlparser.model.segment.dml.predicate.value.HmilyPredicateInRightValue;
+import org.dromara.hmily.tac.sqlparser.model.segment.dml.predicate.value.HmilyPredicateRightValue;
 import org.dromara.hmily.tac.sqlparser.model.segment.generic.table.HmilySimpleTableSegment;
 import org.dromara.hmily.tac.sqlparser.model.statement.dml.HmilyUpdateStatement;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -41,70 +53,101 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public final class HmilyUpdateSQLComputeEngine extends AbstractHmilySQLComputeEngine {
     
+    private static final String AFTER_IMAGE_COLUMN_SUFFIX = "_v2";
+    
     private final HmilyUpdateStatement sqlStatement;
     
     @Override
-    // FIXME fixture undoInvocation for poc test
-    public HmilyUndoInvocation generateImage(final String sql, final List<Object> parameters, final Connection connection) throws SQLComputeException {
-        Map<String, Object> beforeImage = new LinkedHashMap<>();
-        Map<String, Object> afterImage = new LinkedHashMap<>();
-        HmilyUndoInvocation result = new HmilyUndoInvocation();
-        if (sql.contains("order")) {
-            beforeImage.put("status", 3);
-            afterImage.put("number", sql.substring(sql.indexOf("'") + 1, sql.length() - 1));
-            result.getTuples().add(new HmilySQLTuple("order", "update", beforeImage, afterImage));
-        } else if (sql.contains("account")) {
-            beforeImage.put("balance", 100);
-            afterImage.put("user_id", 10000);
-            result.getTuples().add(new HmilySQLTuple("account", "update", beforeImage, afterImage));
-        } else {
-            beforeImage.put("total_inventory", 100);
-            afterImage.put("product_id", 1);
-            result.getTuples().add(new HmilySQLTuple("inventory", "update", beforeImage, afterImage));
-        }
+    Collection<HmilySQLTuple> createTuples(final String sql, final List<Object> parameters, final Connection connection, final String resourceId) throws SQLException {
+        Collection<HmilySQLTuple> result = new LinkedList<>();
+        Preconditions.checkState(sqlStatement.getTables().size() == 1, "Do not support multiple tables in update statement");
+        HmilySimpleTableSegment tableSegment = sqlStatement.getTables().iterator().next();
+        String tableName = sql.substring(tableSegment.getStartIndex(), tableSegment.getStopIndex() + 1);
+        String selectSQL = String.format("SELECT %s FROM %s %s", Joiner.on(", ").join(getSelectItems(parameters, tableSegment)), tableName, getWhereCondition(sql));
+        Collection<Map<String, Object>> records = HmilySQLComputeUtils.executeQuery(connection, selectSQL, getWhereParameters(parameters));
+        result.addAll(doConvert(records, HmilyMetaDataManager.get(resourceId).getTableMetaDataMap().get(tableSegment.getTableName().getIdentifier().getValue())));
         return result;
     }
     
-    @Override
-    Collection<ImageSQLUnit> generateQueryImageSQLs(final String sql, final List<Object> parameters) {
-        Collection<ImageSQLUnit> result = new LinkedList<>();
-        String tables = getTables(sql);
-        String whereCondition = getWhereCondition(sql);
-        sqlStatement.getTables().forEach(segment -> {
-            String imageSQL = String.format("SELECT %s FROM %s %s", Joiner.on(",").join(getUndoItems(segment), getRedoItems(segment, parameters)), tables, whereCondition);
-            result.add(new ImageSQLUnit(imageSQL, new LinkedList<>(), "update", sql.substring(segment.getStartIndex(), segment.getStopIndex())));
-        });
-        return result;
-    }
-    
-    private String getUndoItems(final HmilySimpleTableSegment segment) {
-        String result;
-        if (segment.getAlias().isPresent()) {
-            result = String.format("%s.*", segment.getAlias().get());
-        } else if (segment.getOwner().isPresent()) {
-            result = String.format("%s.%s.*", segment.getOwner(), segment.getTableName().getIdentifier().getValue());
-        } else {
-            result = String.format("%s.*", segment.getTableName().getIdentifier().getValue());
-        }
-        return result;
-    }
-    
-    private List<String> getRedoItems(final HmilySimpleTableSegment tableSegment, final List<Object> parameters) {
+    private List<String> getSelectItems(final List<Object> parameters, final HmilySimpleTableSegment tableSegment) {
         List<String> result = new LinkedList<>();
-        // TODO filter the column which don't belong to current table
-        sqlStatement.getSetAssignment().getAssignments().forEach(assignment -> {
-            result.add(String.format("%s AS $after_image$%s", ExpressionHandler.getValue(parameters, assignment.getValue()), assignment.getColumn().getIdentifier().getValue()));
-        });
+        result.add(HmilySQLComputeUtils.getAllColumns(tableSegment));
+        sqlStatement.getSetAssignment().getAssignments().forEach(assignment -> result.add(
+            String.format("%s AS %s", ExpressionHandler.getValue(parameters, assignment.getValue()), assignment.getColumn().getIdentifier().getValue() + AFTER_IMAGE_COLUMN_SUFFIX)));
         return result;
-    }
-    
-    private String getTables(final String sql) {
-        List<String> tables = sqlStatement.getTables().stream().map(segment -> sql.substring(segment.getStartIndex(), segment.getStopIndex())).collect(Collectors.toList());
-        return Joiner.on(",").join(tables);
     }
     
     private String getWhereCondition(final String sql) {
-        return sqlStatement.getWhere().map(segment -> sql.substring(segment.getStartIndex(), segment.getStopIndex()))
-            .orElseThrow(() -> new SQLComputeException("DML SQL should contain where condition"));
+        return sqlStatement.getWhere().map(segment -> sql.substring(segment.getStartIndex(), segment.getStopIndex() + 1)).orElse("");
+    }
+    
+    private List<Object> getWhereParameters(final List<Object> parameters) {
+        List<Object> result = new LinkedList<>();
+        sqlStatement.getWhere().ifPresent(whereSegment -> {
+            for (HmilyAndPredicate predicate : whereSegment.getHmilyAndPredicates()) {
+                result.addAll(getPredicateSegmentParameters(parameters, predicate));
+            }
+        });
+        return result;
+    }
+    
+    private List<Object> getPredicateSegmentParameters(final List<Object> parameters, final HmilyAndPredicate predicate) {
+        List<Object> result = new LinkedList<>();
+        for (HmilyPredicateSegment segment : predicate.getPredicates()) {
+            HmilyPredicateRightValue rightValue = segment.getRightValue();
+            if (rightValue instanceof HmilyPredicateBetweenRightValue) {
+                result.addAll(getPredicateBetweenRightValueParameters(parameters, (HmilyPredicateBetweenRightValue) rightValue));
+            } else if (rightValue instanceof HmilyPredicateCompareRightValue) {
+                Optional<Object> parameter = getExpressionParameter(parameters, ((HmilyPredicateCompareRightValue) rightValue).getExpression());
+                parameter.ifPresent(result::add);
+            } else if (rightValue instanceof HmilyPredicateInRightValue) {
+                result.addAll(getPredicateInRightValue(parameters, (HmilyPredicateInRightValue) rightValue));
+            }
+        }
+        return result;
+    }
+    
+    private List<Object> getPredicateBetweenRightValueParameters(final List<Object> parameters, final HmilyPredicateBetweenRightValue predicateRightValue) {
+        List<Object> result = new LinkedList<>();
+        Optional<Object> andParameter = getExpressionParameter(parameters, predicateRightValue.getAndExpression());
+        Optional<Object> betweenParameter = getExpressionParameter(parameters, predicateRightValue.getBetweenExpression());
+        andParameter.ifPresent(result::add);
+        betweenParameter.ifPresent(result::add);
+        return result;
+    }
+    
+    private List<Object> getPredicateInRightValue(final List<Object> parameters, final HmilyPredicateInRightValue predicateInRightValue) {
+        List<Object> result = new LinkedList<>();
+        for (HmilyExpressionSegment expressionSegment : predicateInRightValue.getSqlExpressions()) {
+            Optional<Object> parameter = getExpressionParameter(parameters, expressionSegment);
+            parameter.ifPresent(result::add);
+        }
+        return result;
+    }
+    
+    private Optional<Object> getExpressionParameter(final List<Object> parameters, final HmilyExpressionSegment expressionSegment) {
+        if (expressionSegment instanceof HmilyParameterMarkerExpressionSegment) {
+            return Optional.of(parameters.get(((HmilyParameterMarkerExpressionSegment) expressionSegment).getParameterMarkerIndex()));
+        }
+        return Optional.empty();
+    }
+    
+    private Collection<HmilySQLTuple> doConvert(final Collection<Map<String, Object>> records, final TableMetaData tableMetaData) {
+        Collection<HmilySQLTuple> result = new LinkedList<>();
+        for (Map<String, Object> record : records) {
+            Map<String, Object> before = new LinkedHashMap<>();
+            Map<String, Object> after = new LinkedHashMap<>();
+            record.forEach((key, value) -> {
+                if (!key.contains(AFTER_IMAGE_COLUMN_SUFFIX)) {
+                    before.put(key, value);
+                } else {
+                    // TODO skip date column here
+                    after.put(key.replace(AFTER_IMAGE_COLUMN_SUFFIX, ""), value);
+                }
+            });
+            List<Object> primaryKeyValues = tableMetaData.getPrimaryKeyColumns().stream().map(before::get).collect(Collectors.toList());
+            result.add(new HmilySQLTuple(tableMetaData.getTableName(), HmilySQLManipulation.UPDATE, primaryKeyValues, before, after));
+        }
+        return result;
     }
 }

@@ -17,9 +17,6 @@
 
 package org.dromara.hmily.core.disruptor.publisher;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 import org.dromara.hmily.common.enums.EventTypeEnum;
 import org.dromara.hmily.config.api.ConfigEnv;
 import org.dromara.hmily.config.api.entity.HmilyConfig;
@@ -29,9 +26,15 @@ import org.dromara.hmily.core.disruptor.DisruptorProviderManage;
 import org.dromara.hmily.core.disruptor.handler.HmilyRepositoryDataHandler;
 import org.dromara.hmily.core.repository.HmilyRepositoryDispatcher;
 import org.dromara.hmily.core.repository.HmilyRepositoryEvent;
+import org.dromara.hmily.repository.spi.entity.HmilyLock;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipant;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipantUndo;
 import org.dromara.hmily.repository.spi.entity.HmilyTransaction;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * event publisher.
@@ -111,6 +114,20 @@ public final class HmilyRepositoryEventPublisher implements AutoCloseable {
         event.setTransId(hmilyParticipant.getTransId());
         event.setHmilyParticipant(hmilyParticipant);
         push(event);
+    }
+    
+    /**
+     * Sync publish event.
+     *
+     * @param hmilyLocks the hmily locks
+     * @param type type
+     */
+    public void syncPublishEvent(final Collection<HmilyLock> hmilyLocks, final int type) {
+        HmilyRepositoryEvent event = new HmilyRepositoryEvent();
+        event.setType(type);
+        event.setTransId(hmilyLocks.iterator().next().getTransId());
+        event.setHmilyLocks(hmilyLocks);
+        HmilyRepositoryDispatcher.getInstance().doDispatcher(event);
     }
     
     /**

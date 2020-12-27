@@ -58,6 +58,12 @@
             <artifactId>hmily-serializer-protobuf</artifactId>
             <version>${project.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.dromara</groupId>
+            <artifactId>hmily-serializer-msgpack</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 
 </project>

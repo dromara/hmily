@@ -1,0 +1,8 @@
+org.dromara.hmily.tac.common.database.type.H2DatabaseType
+org.dromara.hmily.tac.common.database.type.MariaDBDatabaseType
+org.dromara.hmily.tac.common.database.type.MySQLDatabaseType
+org.dromara.hmily.tac.common.database.type.OracleDatabaseType
+org.dromara.hmily.tac.common.database.type.PostgreSQLDatabaseType
+org.dromara.hmily.tac.common.database.type.SQL92DatabaseType
+org.dromara.hmily.tac.common.database.type.SQLServerDatabaseType
+

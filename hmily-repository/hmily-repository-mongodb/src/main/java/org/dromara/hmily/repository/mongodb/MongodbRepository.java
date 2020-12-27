@@ -21,12 +21,6 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.mongodb.MongoCredential;
 import com.mongodb.ServerAddress;
-import java.net.InetSocketAddress;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 import org.apache.commons.lang3.tuple.Pair;
 import org.dromara.hmily.config.api.ConfigEnv;
 import org.dromara.hmily.config.api.entity.HmilyMongoConfig;
@@ -34,6 +28,7 @@ import org.dromara.hmily.repository.mongodb.entity.ParticipantMongoEntity;
 import org.dromara.hmily.repository.mongodb.entity.TransactionMongoEntity;
 import org.dromara.hmily.repository.mongodb.entity.UndoMongoEntity;
 import org.dromara.hmily.repository.spi.HmilyRepository;
+import org.dromara.hmily.repository.spi.entity.HmilyLock;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipant;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipantUndo;
 import org.dromara.hmily.repository.spi.entity.HmilyTransaction;
@@ -44,6 +39,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.MongoClientFactoryBean;
 import org.springframework.data.mongodb.core.query.Criteria;
+
+import java.net.InetSocketAddress;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * mongo impl.
@@ -204,15 +208,33 @@ public class MongodbRepository implements HmilyRepository {
     public int updateHmilyParticipantUndoStatus(final Long undoId, final Integer status) {
         return service.update(UndoMongoEntity.class, Criteria.where("undo_id").is(undoId), set("status", status));
     }
-
+    
     @Override
-    public int removeHmilyTransactionByData(final Date date) {
+    public int writeHmilyLocks(final Collection<HmilyLock> locks) {
+        // TODO
+        return 0;
+    }
+    
+    @Override
+    public int releaseHmilyLocks(final Collection<HmilyLock> locks) {
+        // TODO
+        return 0;
+    }
+    
+    @Override
+    public Optional<HmilyLock> findHmilyLockById(final String lockId) {
+        // TODO
+        return Optional.empty();
+    }
+    
+    @Override
+    public int removeHmilyTransactionByDate(final Date date) {
         return service.delete(TransactionMongoEntity.class,
                 Criteria.where("update_time").lt(date).and("status").is(4));
     }
 
     @Override
-    public int removeHmilyParticipantByData(final Date date) {
+    public int removeHmilyParticipantByDate(final Date date) {
         return service.delete(ParticipantMongoEntity.class,
                 Criteria.where("update_time").lt(date).and("status").is(4));
     }
@@ -227,7 +249,7 @@ public class MongodbRepository implements HmilyRepository {
     }
 
     @Override
-    public int removeHmilyParticipantUndoByData(final Date date) {
+    public int removeHmilyParticipantUndoByDate(final Date date) {
         return service.delete(UndoMongoEntity.class,
                 Criteria.where("update_time").lt(date).and("status").is(4));
     }

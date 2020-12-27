@@ -30,7 +30,7 @@ import io.grpc.ForwardingClientCall;
 import io.grpc.Metadata;
 import io.grpc.Status;
 import io.grpc.ForwardingClientCallListener;
-import org.dromara.hmily.annotation.Hmily;
+import io.grpc.stub.AbstractStub;
 import org.dromara.hmily.common.enums.HmilyActionEnum;
 import org.dromara.hmily.common.enums.HmilyRoleEnum;
 import org.dromara.hmily.common.exception.HmilyRuntimeException;
@@ -39,6 +39,7 @@ import org.dromara.hmily.core.context.HmilyContextHolder;
 import org.dromara.hmily.core.context.HmilyTransactionContext;
 import org.dromara.hmily.core.holder.HmilyTransactionHolder;
 import org.dromara.hmily.core.mediator.RpcMediator;
+import org.dromara.hmily.grpc.client.GrpcHmilyClient;
 import org.dromara.hmily.grpc.parameter.GrpcHmilyContext;
 import org.dromara.hmily.repository.spi.entity.HmilyInvocation;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipant;
@@ -58,13 +59,12 @@ public class GrpcHmilyTransactionFilter implements ClientInterceptor {
     public <R, P> ClientCall<R, P> interceptCall(final MethodDescriptor<R, P> methodDescriptor,
                                                            final CallOptions callOptions, final Channel channel) {
         final HmilyTransactionContext context = HmilyContextHolder.get();
-        if (Objects.isNull(context) || Objects.isNull(GrpcHmilyContext.getHmilyClass().get())
-            || Objects.isNull(GrpcHmilyContext.getHmilyParam().get())) {
+        if (Objects.isNull(context) || Objects.isNull(GrpcHmilyContext.getHmilyClass().get())) {
             return channel.newCall(methodDescriptor, callOptions);
         }
         String[] clazzNameAndMethod = methodDescriptor.getFullMethodName().split("/");
         try {
-            Class<?> clazz = GrpcHmilyContext.getHmilyClass().get().getClass();
+            Class<?> clazz = GrpcHmilyContext.getHmilyClass().get().getArgs()[0].getClass();
             String methodName = clazzNameAndMethod[1];
             Method method = null;
             for (Method tempMethod : clazz.getMethods()) {
@@ -74,13 +74,8 @@ public class GrpcHmilyTransactionFilter implements ClientInterceptor {
                 }
             }
             if (method != null) {
-                Hmily hmily = method.getAnnotation(Hmily.class);
-                if (Objects.isNull(hmily)) {
-                    return channel.newCall(methodDescriptor, callOptions);
-                }
-                Class<?>[] arg = method.getParameterTypes();
                 Long participantId = context.getParticipantId();
-                HmilyParticipant hmilyParticipant = buildParticipant(context, methodName, clazz, arg);
+                HmilyParticipant hmilyParticipant = buildParticipant(context);
                 Optional.ofNullable(hmilyParticipant)
                     .ifPresent(participant -> context.setParticipantId(participant.getParticipantId()));
                 if (context.getRole() == HmilyRoleEnum.PARTICIPANT.getCode()) {
@@ -99,7 +94,7 @@ public class GrpcHmilyTransactionFilter implements ClientInterceptor {
                                         HmilyTransactionHolder.getInstance().registerStarterParticipant(hmilyParticipant);
                                     }
                                 } else {
-                                    throw new HmilyRuntimeException("rpc invoke exception{}", status.getCause());
+                                    GrpcHmilyContext.getHmilyFailContext().set(true);
                                 }
                                 GrpcHmilyContext.removeAfterInvoke();
                                 super.onClose(status, trailers);
@@ -113,8 +108,7 @@ public class GrpcHmilyTransactionFilter implements ClientInterceptor {
         return channel.newCall(methodDescriptor, callOptions);
     }
 
-    private HmilyParticipant buildParticipant(final HmilyTransactionContext context, final String methodName,
-        final Class<?> clazz, final Class<?>[] args) throws HmilyRuntimeException {
+    private HmilyParticipant buildParticipant(final HmilyTransactionContext context) throws HmilyRuntimeException {
         if (HmilyActionEnum.TRYING.getCode() != context.getAction()) {
             return null;
         }
@@ -122,8 +116,8 @@ public class GrpcHmilyTransactionFilter implements ClientInterceptor {
         hmilyParticipant.setParticipantId(IdWorkerUtils.getInstance().createUUID());
         hmilyParticipant.setTransId(context.getTransId());
         hmilyParticipant.setTransType(context.getTransType());
-        final Object[] arguments = new Object[] {GrpcHmilyContext.getHmilyParam().get()};
-        HmilyInvocation hmilyInvocation = new HmilyInvocation(clazz, methodName, args, arguments);
+        HmilyInvocation hmilyInvocation = new HmilyInvocation(GrpcHmilyClient.class, "syncInvoke",
+                new Class[] {AbstractStub.class, String.class, Object.class, Class.class}, GrpcHmilyContext.getHmilyClass().get().getArgs());
         hmilyParticipant.setConfirmHmilyInvocation(hmilyInvocation);
         hmilyParticipant.setCancelHmilyInvocation(hmilyInvocation);
         return hmilyParticipant;

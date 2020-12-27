@@ -41,4 +41,9 @@ public final class HmilyIdentifierValue implements HmilyValueASTNode<String> {
         this.value = value;
         this.hmilyQuoteCharacter = hmilyQuoteCharacter;
     }
+    
+    @Override
+    public String toString() {
+        return hmilyQuoteCharacter.getStartDelimiter() + value + hmilyQuoteCharacter.getEndDelimiter();
+    }
 }

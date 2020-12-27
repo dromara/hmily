@@ -17,13 +17,17 @@
 
 package org.dromara.hmily.repository.spi;
 
-import java.util.Date;
-import java.util.List;
+import org.dromara.hmily.repository.spi.entity.HmilyLock;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipant;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipantUndo;
 import org.dromara.hmily.repository.spi.entity.HmilyTransaction;
 import org.dromara.hmily.repository.spi.exception.HmilyRepositoryException;
 import org.dromara.hmily.serializer.spi.HmilySerializer;
+
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * The interface Hmily repository.
@@ -109,12 +113,12 @@ public interface HmilyRepository {
     int removeHmilyTransaction(Long transId);
     
     /**
-     * Remove hmily transaction by data int.
+     * Remove hmily transaction by date.
      *
      * @param date the date
      * @return the int
      */
-    int removeHmilyTransactionByData(Date date);
+    int removeHmilyTransactionByDate(Date date);
     
     /**
      * Create hmily participant int.
@@ -178,12 +182,12 @@ public interface HmilyRepository {
     int removeHmilyParticipant(Long participantId);
     
     /**
-     * Remove hmily participant by data int.
+     * Remove hmily participant by date.
      *
      * @param date the date
      * @return the int
      */
-    int removeHmilyParticipantByData(Date date);
+    int removeHmilyParticipantByDate(Date date);
     
     /**
      * Lock hmily participant boolean.
@@ -218,12 +222,12 @@ public interface HmilyRepository {
     int removeHmilyParticipantUndo(Long undoId);
     
     /**
-     * Remove hmily participant undo by data int.
+     * Remove hmily participant undo by date.
      *
      * @param date the date
      * @return the int
      */
-    int removeHmilyParticipantUndoByData(Date date);
+    int removeHmilyParticipantUndoByDate(Date date);
     
     /**
      * Update hmily participant undo status int.
@@ -234,4 +238,27 @@ public interface HmilyRepository {
      */
     int updateHmilyParticipantUndoStatus(Long undoId, Integer status);
     
+    /**
+     * Write hmily locks.
+     *
+     * @param locks locks
+     * @return count of writable locks
+     */
+    int writeHmilyLocks(Collection<HmilyLock> locks);
+    
+    /**
+     * Release hmily locks.
+     *
+     * @param locks locks
+     * @return count of release locks
+     */
+    int releaseHmilyLocks(Collection<HmilyLock> locks);
+    
+    /**
+     * Find hmily lock by id.
+     *
+     * @param lockId lock id
+     * @return hmily lock
+     */
+    Optional<HmilyLock> findHmilyLockById(String lockId);
 }

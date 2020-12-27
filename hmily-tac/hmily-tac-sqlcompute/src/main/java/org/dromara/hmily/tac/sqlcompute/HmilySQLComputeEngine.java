@@ -17,7 +17,7 @@
 
 package org.dromara.hmily.tac.sqlcompute;
 
-import org.dromara.hmily.repository.spi.entity.HmilyUndoInvocation;
+import org.dromara.hmily.repository.spi.entity.HmilyDataSnapshot;
 import org.dromara.hmily.tac.sqlcompute.exception.SQLComputeException;
 
 import java.sql.Connection;
@@ -31,13 +31,14 @@ import java.util.List;
 public interface HmilySQLComputeEngine {
     
     /**
-     * Revert hmily undo invocation.
+     * Generate snapshot images.
      *
      * @param sql the sql
      * @param parameters parameters
      * @param connection connection
+     * @param resourceId resource id
      * @return the hmily undo invocation
      * @throws SQLComputeException the SQL compute exception
      */
-    HmilyUndoInvocation generateImage(String sql, List<Object> parameters, Connection connection) throws SQLComputeException;
+    HmilyDataSnapshot execute(String sql, List<Object> parameters, Connection connection, String resourceId) throws SQLComputeException;
 }

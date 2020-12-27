@@ -17,6 +17,28 @@
 
 package org.dromara.hmily.repository.file;
 
+import lombok.SneakyThrows;
+import org.dromara.hmily.common.enums.HmilyActionEnum;
+import org.dromara.hmily.common.exception.HmilyException;
+import org.dromara.hmily.common.exception.HmilyRuntimeException;
+import org.dromara.hmily.common.utils.AssertUtils;
+import org.dromara.hmily.common.utils.CollectionUtils;
+import org.dromara.hmily.common.utils.LogUtil;
+import org.dromara.hmily.common.utils.StringUtils;
+import org.dromara.hmily.config.api.ConfigEnv;
+import org.dromara.hmily.config.api.entity.HmilyFileConfig;
+import org.dromara.hmily.repository.spi.HmilyRepository;
+import org.dromara.hmily.repository.spi.entity.HmilyLock;
+import org.dromara.hmily.repository.spi.entity.HmilyParticipant;
+import org.dromara.hmily.repository.spi.entity.HmilyParticipantUndo;
+import org.dromara.hmily.repository.spi.entity.HmilyTransaction;
+import org.dromara.hmily.repository.spi.exception.HmilyRepositoryException;
+import org.dromara.hmily.serializer.spi.HmilySerializer;
+import org.dromara.hmily.serializer.spi.exception.HmilySerializerException;
+import org.dromara.hmily.spi.HmilySPI;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -30,34 +52,16 @@ import java.nio.file.StandardOpenOption;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
-import lombok.SneakyThrows;
-import org.dromara.hmily.common.enums.HmilyActionEnum;
-import org.dromara.hmily.common.exception.HmilyException;
-import org.dromara.hmily.common.exception.HmilyRuntimeException;
-import org.dromara.hmily.common.utils.AssertUtils;
-import org.dromara.hmily.common.utils.CollectionUtils;
-import org.dromara.hmily.common.utils.LogUtil;
-import org.dromara.hmily.common.utils.StringUtils;
-import org.dromara.hmily.config.api.ConfigEnv;
-import org.dromara.hmily.config.api.entity.HmilyFileConfig;
-import org.dromara.hmily.repository.spi.HmilyRepository;
-import org.dromara.hmily.repository.spi.entity.HmilyParticipant;
-import org.dromara.hmily.repository.spi.entity.HmilyParticipantUndo;
-import org.dromara.hmily.repository.spi.entity.HmilyTransaction;
-import org.dromara.hmily.repository.spi.exception.HmilyRepositoryException;
-import org.dromara.hmily.serializer.spi.HmilySerializer;
-import org.dromara.hmily.serializer.spi.exception.HmilySerializerException;
-import org.dromara.hmily.spi.HmilySPI;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * file impl.
@@ -189,7 +193,7 @@ public class FileRepository implements HmilyRepository {
     }
 
     @Override
-    public int removeHmilyTransactionByData(final Date date) {
+    public int removeHmilyTransactionByDate(final Date date) {
         return removeByFilter(getTransationPath(), HmilyTransaction.class, (hmilyTransaction, params) -> {
             Date dateParam = (Date) params[0];
             return dateParam.after(hmilyTransaction.getUpdateTime()) && hmilyTransaction.getStatus() == HmilyActionEnum.DELETE.getCode();
@@ -199,7 +203,7 @@ public class FileRepository implements HmilyRepository {
     @Override
     public int createHmilyParticipant(final HmilyParticipant hmilyParticipant) throws HmilyRepositoryException {
         try {
-            boolean exsist = isExsist(getParticipantPath(), hmilyParticipant.getTransId());
+            boolean exsist = isExsist(getParticipantPath(), hmilyParticipant.getParticipantId());
             if (!exsist) {
                 hmilyParticipant.setCreateTime(new Date());
                 hmilyParticipant.setUpdateTime(new Date());
@@ -282,7 +286,7 @@ public class FileRepository implements HmilyRepository {
     }
 
     @Override
-    public int removeHmilyParticipantByData(final Date date) {
+    public int removeHmilyParticipantByDate(final Date date) {
         return removeByFilter(getParticipantPath(), HmilyParticipant.class, (hmilyParticipant, params) -> {
             Date dateParam = (Date) params[0];
             return dateParam.after(hmilyParticipant.getUpdateTime()) && Objects.equals(HmilyActionEnum.DELETE.getCode(), hmilyParticipant.getStatus());
@@ -343,7 +347,7 @@ public class FileRepository implements HmilyRepository {
     }
 
     @Override
-    public int removeHmilyParticipantUndoByData(final Date date) {
+    public int removeHmilyParticipantUndoByDate(final Date date) {
         return removeByFilter(getParticipantUndoPath(), HmilyParticipantUndo.class, (undo, params) -> {
             Date dateParam = (Date) params[0];
             return dateParam.after(undo.getUpdateTime()) && Objects.equals(HmilyActionEnum.DELETE.getCode(), undo.getStatus());
@@ -359,7 +363,25 @@ public class FileRepository implements HmilyRepository {
         String filePath = concatPath(getParticipantUndoPath(), undoId);
         return writeParticipantUndoFile(filePath, HmilyParticipantUndo.class, undoId, status);
     }
-
+    
+    @Override
+    public int writeHmilyLocks(final Collection<HmilyLock> locks) {
+        // TODO
+        return 0;
+    }
+    
+    @Override
+    public int releaseHmilyLocks(final Collection<HmilyLock> locks) {
+        // TODO
+        return 0;
+    }
+    
+    @Override
+    public Optional<HmilyLock> findHmilyLockById(final String lockId) {
+        // TODO
+        return Optional.empty();
+    }
+    
     private String getTransationPath() {
         return filePath + File.separator + HMILY_ROOT_TRANSACTION;
     }

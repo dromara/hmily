@@ -33,6 +33,12 @@
             <artifactId>hmily-tac-sqlparser-model</artifactId>
             <version>${project.version}</version>
         </dependency>
+    
+        <dependency>
+            <groupId>org.dromara</groupId>
+            <artifactId>hmily-tac-metadata</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         
         <dependency>
             <groupId>org.dromara</groupId>
@@ -46,5 +52,4 @@
             <version>${project.version}</version>
         </dependency>
     </dependencies>
-
 </project>

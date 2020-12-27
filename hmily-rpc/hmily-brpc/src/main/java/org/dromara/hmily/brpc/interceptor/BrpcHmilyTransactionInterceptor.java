@@ -31,13 +31,17 @@ import org.dromara.hmily.annotation.Hmily;
 import org.dromara.hmily.common.enums.HmilyActionEnum;
 import org.dromara.hmily.common.enums.HmilyRoleEnum;
 import org.dromara.hmily.common.exception.HmilyRuntimeException;
+import org.dromara.hmily.common.utils.LogUtil;
 import org.dromara.hmily.common.utils.IdWorkerUtils;
 import org.dromara.hmily.core.context.HmilyContextHolder;
 import org.dromara.hmily.core.context.HmilyTransactionContext;
 import org.dromara.hmily.core.holder.HmilyTransactionHolder;
 import org.dromara.hmily.core.mediator.RpcMediator;
-import org.dromara.hmily.repository.spi.entity.HmilyInvocation;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipant;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import org.dromara.hmily.repository.spi.entity.HmilyInvocation;
 
 /**
  * The hmily brpc transaction interceptor.
@@ -45,10 +49,12 @@ import org.dromara.hmily.repository.spi.entity.HmilyParticipant;
  * @author liu·yu
  */
 public class BrpcHmilyTransactionInterceptor extends AbstractInterceptor {
-    
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(BrpcHmilyTransactionInterceptor.class);
+
     @Override
     public void aroundProcess(final Request request, final Response response, final InterceptorChain chain) throws RpcException {
-        HmilyTransactionContext context = HmilyContextHolder.get();
+        final HmilyTransactionContext context = HmilyContextHolder.get();
         if (Objects.isNull(context)) {
             chain.intercept(request, response);
             return;
@@ -61,6 +67,7 @@ public class BrpcHmilyTransactionInterceptor extends AbstractInterceptor {
                 return;
             }
         } catch (Exception ex) {
+            LogUtil.error(LOGGER, "hmily find method error {} ", ex::getMessage);
             chain.intercept(request, response);
             return;
         }
@@ -98,18 +105,21 @@ public class BrpcHmilyTransactionInterceptor extends AbstractInterceptor {
         hmilyParticipant.setTransType(context.getTransType());
         Class<?> clazz = request.getRpcMethodInfo().getMethod().getDeclaringClass();
         String methodName = request.getRpcMethodInfo().getMethodName();
-        Class<?>[] converter = converterParamsClass(request.getRpcMethodInfo().getInputClasses());
+        Class[] converter = converterParamsClass(request.getRpcMethodInfo().getInputClasses());
         Object[] args = request.getArgs();
+
         HmilyInvocation invocation = new HmilyInvocation(clazz, methodName, converter, args);
+
         hmilyParticipant.setConfirmHmilyInvocation(invocation);
         hmilyParticipant.setCancelHmilyInvocation(invocation);
+
         return hmilyParticipant;
     }
 
-    private Class<?>[] converterParamsClass(final Type[] types) {
-        Class<?>[] classes = new Class[types.length];
+    private Class[] converterParamsClass(final Type[] types) {
+        Class[] classes = new Class[types.length];
         for (int i = 0; i < types.length; i++) {
-            classes[i] = (Class<?>) types[i];
+            classes[i] = (Class) types[i];
         }
         return classes;
     }

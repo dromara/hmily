@@ -17,9 +17,10 @@
 
 package org.dromara.hmily.tac.core.cache;
 
+import org.dromara.hmily.tac.core.context.HmilyUndoContext;
+
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import org.dromara.hmily.tac.core.context.HmilyUndoContext;
 
 /**
  * The enum Hmily undo context cache manager.
@@ -36,12 +37,12 @@ public enum HmilyUndoContextCacheManager {
     private static final ThreadLocal<List<HmilyUndoContext>> CURRENT_LOCAL = ThreadLocal.withInitial(CopyOnWriteArrayList::new);
     
     /**
-     * Set.
+     * Set undo context.
      *
-     * @param context the context
+     * @param undoContext hmily undo context
      */
-    public void set(final HmilyUndoContext context) {
-        CURRENT_LOCAL.get().add(context);
+    public void set(final HmilyUndoContext undoContext) {
+        CURRENT_LOCAL.get().add(undoContext);
     }
     
     

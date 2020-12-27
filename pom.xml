@@ -26,6 +26,7 @@
         <module>hmily-metrics</module>
         <module>hmily-bom</module>
         <module>hmily-all</module>
+        <module>hmily-xa</module>
     </modules>
 
     <organization>
@@ -68,14 +69,14 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <jdk.version>1.8</jdk.version>
         <cobertura-maven-plugin.version>2.7</cobertura-maven-plugin.version>
-        <lombok.version>1.16.20</lombok.version>
+        <lombok.version>1.18.12</lombok.version>
         <slf4j.version>1.7.7</slf4j.version>
         <junit.version>4.12</junit.version>
         <hamcrest.version>1.3</hamcrest.version>
         <mockito.version>2.7.21</mockito.version>
         <logback.version>1.2.0</logback.version>
         <powermock.version>2.0.7</powermock.version>
-        <shardingsphere.version>4.1.1</shardingsphere.version>
+        <shardingsphere.version>5.0.0-alpha</shardingsphere.version>
     </properties>
 
     <dependencyManagement>
@@ -90,6 +91,11 @@
             <dependency>
                 <groupId>org.apache.shardingsphere</groupId>
                 <artifactId>shardingsphere-sql-parser-mysql</artifactId>
+                <version>${shardingsphere.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.shardingsphere</groupId>
+                <artifactId>shardingsphere-infra-parser</artifactId>
                 <version>${shardingsphere.version}</version>
             </dependency>
         </dependencies>

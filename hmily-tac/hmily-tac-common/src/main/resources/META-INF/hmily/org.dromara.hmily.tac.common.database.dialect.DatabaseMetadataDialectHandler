@@ -1,0 +1,8 @@
+org.dromara.hmily.tac.common.database.dialect.H2DatabaseMetaDataDialectHandler
+org.dromara.hmily.tac.common.database.dialect.MariaDBDatabaseMetaDataDialectHandler
+org.dromara.hmily.tac.common.database.dialect.MySQLDatabaseMetaDataDialectHandler
+org.dromara.hmily.tac.common.database.dialect.OracleDatabaseMetaDataDialectHandler
+org.dromara.hmily.tac.common.database.dialect.PostgreSQLDatabaseMetaDataDialectHandler
+org.dromara.hmily.tac.common.database.dialect.SQL92DatabaseMetaDataDialectHandler
+org.dromara.hmily.tac.common.database.dialect.SQLServerDatabaseMetaDataDialectHandler
+

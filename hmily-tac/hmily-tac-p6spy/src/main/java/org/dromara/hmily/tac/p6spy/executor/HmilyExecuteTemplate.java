@@ -26,22 +26,24 @@ import org.dromara.hmily.common.utils.IdWorkerUtils;
 import org.dromara.hmily.core.context.HmilyContextHolder;
 import org.dromara.hmily.core.context.HmilyTransactionContext;
 import org.dromara.hmily.core.repository.HmilyRepositoryStorage;
+import org.dromara.hmily.repository.spi.entity.HmilyDataSnapshot;
+import org.dromara.hmily.repository.spi.entity.HmilyLock;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipantUndo;
-import org.dromara.hmily.repository.spi.entity.HmilyUndoInvocation;
 import org.dromara.hmily.tac.common.utils.DatabaseTypes;
 import org.dromara.hmily.tac.common.utils.ResourceIdUtils;
 import org.dromara.hmily.tac.core.cache.HmilyParticipantUndoCacheManager;
 import org.dromara.hmily.tac.core.cache.HmilyUndoContextCacheManager;
 import org.dromara.hmily.tac.core.context.HmilyUndoContext;
+import org.dromara.hmily.tac.core.lock.HmilyLockManager;
 import org.dromara.hmily.tac.p6spy.threadlocal.AutoCommitThreadLocal;
 import org.dromara.hmily.tac.sqlcompute.HmilySQLComputeEngine;
 import org.dromara.hmily.tac.sqlcompute.HmilySQLComputeEngineFactory;
 import org.dromara.hmily.tac.sqlparser.model.statement.HmilyStatement;
-import org.dromara.hmily.tac.sqlparser.spi.HmilySqlParserEngine;
 import org.dromara.hmily.tac.sqlparser.spi.HmilySqlParserEngineFactory;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -89,24 +91,25 @@ public enum HmilyExecuteTemplate {
         if (check()) {
             return;
         }
-        try {
-            HmilySqlParserEngine hmilySqlParserEngine = HmilySqlParserEngineFactory.newInstance();
-            // TODO prepared sql will improve performance of parser engine
-            HmilyStatement statement = hmilySqlParserEngine.parser(sql, DatabaseTypes.INSTANCE.getDatabaseType());
-            // TODO should generate lock-key to avoid dirty data modified by other global transaction.
-            HmilySQLComputeEngine hmilySQLComputeEngine = HmilySQLComputeEngineFactory.newInstance(statement);
-            HmilyUndoInvocation hmilyUndoInvocation = hmilySQLComputeEngine.generateImage(sql, parameters, connectionInformation.getConnection());
-            //4.缓存sql日志记录 ? 存储到哪里呢 threadLocal？
-            HmilyUndoContext context = new HmilyUndoContext();
-            context.setUndoInvocation(hmilyUndoInvocation);
-            context.setResourceId(ResourceIdUtils.INSTANCE.getResourceId(connectionInformation.getUrl()));
-            HmilyTransactionContext transactionContext = HmilyContextHolder.get();
-            context.setTransId(transactionContext.getTransId());
-            context.setParticipantId(transactionContext.getParticipantId());
-            HmilyUndoContextCacheManager.INSTANCE.set(context);
-        } catch (Exception e) {
-            log.error("execute hmily tac module have exception:", e);
+        // TODO prepared sql will improve performance of parser engine
+        HmilyStatement statement = HmilySqlParserEngineFactory.newInstance().parser(sql, DatabaseTypes.INSTANCE.getDatabaseType());
+        String resourceId = ResourceIdUtils.INSTANCE.getResourceId(connectionInformation.getUrl());
+        HmilySQLComputeEngine sqlComputeEngine = HmilySQLComputeEngineFactory.newInstance(statement);
+        if (null != sqlComputeEngine) {
+            HmilyDataSnapshot snapshot = sqlComputeEngine.execute(sql, parameters, connectionInformation.getConnection(), resourceId);
+            HmilyUndoContext undoContext = buildUndoContext(HmilyContextHolder.get(), snapshot, resourceId);
+            HmilyLockManager.INSTANCE.tryAcquireLocks(undoContext.getHmilyLocks());
+            HmilyUndoContextCacheManager.INSTANCE.set(undoContext);
         }
+    }
+    
+    private HmilyUndoContext buildUndoContext(final HmilyTransactionContext transactionContext, final HmilyDataSnapshot dataSnapshot, final String resourceId) {
+        HmilyUndoContext result = new HmilyUndoContext();
+        result.setDataSnapshot(dataSnapshot);
+        result.setResourceId(resourceId);
+        result.setTransId(transactionContext.getTransId());
+        result.setParticipantId(transactionContext.getParticipantId());
+        return result;
     }
     
     /**
@@ -129,16 +132,27 @@ public enum HmilyExecuteTemplate {
         clean(connection);
     }
     
+    
     /**
-     * clean.
+     * Rollback.
      *
-     * @param connection the connection
+     * @param connection connection
      */
-    @SneakyThrows
-    public void clean(final Connection connection) {
+    public void rollback(final Connection connection) {
         if (check()) {
             return;
         }
+        List<HmilyUndoContext> contexts = HmilyUndoContextCacheManager.INSTANCE.get();
+        List<HmilyLock> locks = new LinkedList<>();
+        for (HmilyUndoContext context : contexts) {
+            locks.addAll(context.getHmilyLocks());
+        }
+        HmilyLockManager.INSTANCE.releaseLocks(locks);
+        clean(connection);
+    }
+    
+    @SneakyThrows
+    private void clean(final Connection connection) {
         connection.setAutoCommit(AutoCommitThreadLocal.INSTANCE.get());
         HmilyUndoContextCacheManager.INSTANCE.remove();
         AutoCommitThreadLocal.INSTANCE.remove();
@@ -152,7 +166,7 @@ public enum HmilyExecuteTemplate {
             undo.setUndoId(IdWorkerUtils.getInstance().createUUID());
             undo.setParticipantId(context.getParticipantId());
             undo.setTransId(context.getTransId());
-            undo.setUndoInvocation(context.getUndoInvocation());
+            undo.setDataSnapshot(context.getDataSnapshot());
             undo.setStatus(HmilyActionEnum.TRYING.getCode());
             return undo;
         }).collect(Collectors.toList());
