@@ -29,13 +29,12 @@ import org.dromara.hmily.core.repository.HmilyRepositoryStorage;
 import org.dromara.hmily.repository.spi.entity.HmilyDataSnapshot;
 import org.dromara.hmily.repository.spi.entity.HmilyLock;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipantUndo;
-import org.dromara.hmily.repository.spi.exception.HmilyLockConflictException;
 import org.dromara.hmily.tac.common.utils.DatabaseTypes;
 import org.dromara.hmily.tac.common.utils.ResourceIdUtils;
-import org.dromara.hmily.tac.core.cache.HmilyLockCacheManager;
 import org.dromara.hmily.tac.core.cache.HmilyParticipantUndoCacheManager;
 import org.dromara.hmily.tac.core.cache.HmilyUndoContextCacheManager;
 import org.dromara.hmily.tac.core.context.HmilyUndoContext;
+import org.dromara.hmily.tac.core.lock.HmilyLockManager;
 import org.dromara.hmily.tac.p6spy.threadlocal.AutoCommitThreadLocal;
 import org.dromara.hmily.tac.sqlcompute.HmilySQLComputeEngine;
 import org.dromara.hmily.tac.sqlcompute.HmilySQLComputeEngineFactory;
@@ -44,10 +43,9 @@ import org.dromara.hmily.tac.sqlparser.spi.HmilySqlParserEngineFactory;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -100,7 +98,7 @@ public enum HmilyExecuteTemplate {
         if (null != sqlComputeEngine) {
             HmilyDataSnapshot snapshot = sqlComputeEngine.execute(sql, parameters, connectionInformation.getConnection(), resourceId);
             HmilyUndoContext undoContext = buildUndoContext(HmilyContextHolder.get(), snapshot, resourceId);
-            tryAcquireLocks(undoContext.getHmilyLocks());
+            HmilyLockManager.INSTANCE.tryAcquireLocks(undoContext.getHmilyLocks());
             HmilyUndoContextCacheManager.INSTANCE.set(undoContext);
         }
     }
@@ -112,17 +110,6 @@ public enum HmilyExecuteTemplate {
         result.setTransId(transactionContext.getTransId());
         result.setParticipantId(transactionContext.getParticipantId());
         return result;
-    }
-    
-    private void tryAcquireLocks(final Collection<HmilyLock> hmilyLocks) {
-        for (HmilyLock each : hmilyLocks) {
-            Optional<HmilyLock> hmilyLock = HmilyLockCacheManager.getInstance().get(each.getLockId());
-            if (hmilyLock.isPresent()) {
-                throw new HmilyLockConflictException(String.format("current record [%s] has locked by transaction:[%s]", each.getLockId(), hmilyLock.get().getTransId()));
-            }
-        }
-        HmilyRepositoryStorage.writeHmilyLocks(hmilyLocks);
-        hmilyLocks.forEach(lock -> HmilyLockCacheManager.getInstance().cacheHmilyLock(lock.getLockId(), lock));
     }
     
     /**
@@ -145,16 +132,27 @@ public enum HmilyExecuteTemplate {
         clean(connection);
     }
     
+    
     /**
-     * clean.
+     * Rollback.
      *
-     * @param connection the connection
+     * @param connection connection
      */
-    @SneakyThrows
-    public void clean(final Connection connection) {
+    public void rollback(final Connection connection) {
         if (check()) {
             return;
         }
+        List<HmilyUndoContext> contexts = HmilyUndoContextCacheManager.INSTANCE.get();
+        List<HmilyLock> locks = new LinkedList<>();
+        for (HmilyUndoContext context : contexts) {
+            locks.addAll(context.getHmilyLocks());
+        }
+        HmilyLockManager.INSTANCE.releaseLocks(locks);
+        clean(connection);
+    }
+    
+    @SneakyThrows
+    private void clean(final Connection connection) {
         connection.setAutoCommit(AutoCommitThreadLocal.INSTANCE.get());
         HmilyUndoContextCacheManager.INSTANCE.remove();
         AutoCommitThreadLocal.INSTANCE.remove();

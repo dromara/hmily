@@ -35,11 +35,6 @@ public class HmilyLock implements Serializable {
     private static final long serialVersionUID = -6910542871629586617L;
     
     /**
-     * lock id.
-     */
-    private final String lockId;
-    
-    /**
      * transaction id.
      */
     private final Long transId;
@@ -64,7 +59,12 @@ public class HmilyLock implements Serializable {
      */
     private final String targetTablePk;
     
-    public HmilyLock(final Long transId, final Long participantId, final String resourceId, final String targetTableName, final String targetTablePk) {
-        this(Joiner.on(":").join(resourceId, targetTableName, targetTablePk), transId, participantId, resourceId, targetTableName, targetTablePk);
+    /**
+     * Get lock id.
+     *
+     * @return lock id
+     */
+    public String getLockId() {
+        return Joiner.on(";;").join(resourceId, targetTableName, targetTablePk);
     }
 }

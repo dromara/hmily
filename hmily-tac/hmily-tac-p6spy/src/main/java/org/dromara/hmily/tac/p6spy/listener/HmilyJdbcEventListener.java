@@ -61,14 +61,14 @@ public class HmilyJdbcEventListener extends SimpleJdbcEventListener {
         if (Objects.isNull(e)) {
             HmilyExecuteTemplate.INSTANCE.commit(connectionInformation.getConnection());
         } else {
-            HmilyExecuteTemplate.INSTANCE.clean(connectionInformation.getConnection());
+            HmilyExecuteTemplate.INSTANCE.rollback(connectionInformation.getConnection());
         }
     }
     
     @Override
     public void onAfterRollback(final ConnectionInformation connectionInformation, final long timeElapsedNanos, final SQLException e) {
         super.onAfterRollback(connectionInformation, timeElapsedNanos, e);
-        HmilyExecuteTemplate.INSTANCE.clean(connectionInformation.getConnection());
+        HmilyExecuteTemplate.INSTANCE.rollback(connectionInformation.getConnection());
     }
     
     @Override
@@ -97,7 +97,7 @@ public class HmilyJdbcEventListener extends SimpleJdbcEventListener {
         method.setAccessible(true);
         Map<Integer, Value> parameterValues = (Map<Integer, Value>) method.invoke(statementInformation);
         for (int i = 0; i < parameterValues.size(); i++) {
-            result.add(parameterValues.get(i).toString());
+            result.add(parameterValues.get(i).getValue());
         }
         return result;
     }

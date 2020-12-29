@@ -18,8 +18,10 @@
 package org.dromara.hmily.grpc.client;
 
 import io.grpc.stub.AbstractStub;
+import org.dromara.hmily.common.exception.HmilyRuntimeException;
 import org.dromara.hmily.core.holder.SingletonHolder;
 import org.dromara.hmily.grpc.parameter.GrpcHmilyContext;
+import org.dromara.hmily.grpc.parameter.GrpcInvokeContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,26 +40,31 @@ public class GrpcHmilyClient {
      * grpc sync.
      *
      * @param <T> T
+     * @param clazz clazz
      * @param abstractStub AbstractStub
      * @param method String
      * @param param Object
-     * @param clazz Class
      * @return t T
      */
-    public static <T> T syncInvoke(final AbstractStub abstractStub, final String method, final Object param, final Class<T> clazz) {
-        GrpcHmilyContext.getHmilyParam().set(param);
-        GrpcHmilyContext.getHmilyClass().set(abstractStub);
+    public <T> T syncInvoke(final AbstractStub abstractStub, final String method, final Object param, final Class<T> clazz) {
+        GrpcHmilyContext.getHmilyFailContext().remove();
+        GrpcHmilyContext.getHmilyClass().set(new GrpcInvokeContext(new Object[]{abstractStub, method, param, clazz}));
 
-        if (SingletonHolder.INST.get(abstractStub.getClass()) == null) {
-            SingletonHolder.INST.register(abstractStub.getClass(), abstractStub);
+        if (SingletonHolder.INST.get(GrpcHmilyClient.class) == null) {
+            SingletonHolder.INST.register(GrpcHmilyClient.class, this);
         }
 
         for (Method m : abstractStub.getClass().getMethods()) {
             if (m.getName().equals(method)) {
                 try {
-                    return (T) m.invoke(abstractStub, m.getParameterTypes()[0].cast(param));
+                    T res = (T) m.invoke(abstractStub, m.getParameterTypes()[0].cast(param));
+                    if (GrpcHmilyContext.getHmilyFailContext().get() != null) {
+                        throw new HmilyRuntimeException();
+                    }
+                    return res;
                 } catch (Exception e) {
-                    LOGGER.error("failed to find the method invoke, exception is {}", e.getMessage());
+                    LOGGER.error("failed to invoke grpc server");
+                    throw new HmilyRuntimeException();
                 }
             }
         }

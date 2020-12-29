@@ -46,6 +46,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -414,9 +415,9 @@ public class EtcdRepository implements HmilyRepository {
     }
     
     @Override
-    public HmilyLock findHmilyLockById(final String lockId) {
+    public Optional<HmilyLock> findHmilyLockById(final String lockId) {
         // TODO
-        return null;
+        return Optional.empty();
     }
     
     private <T> List<T> listByFilter(final String path, final Class<T> deserializeClass, final Filter<T> filter, final Object... params) {

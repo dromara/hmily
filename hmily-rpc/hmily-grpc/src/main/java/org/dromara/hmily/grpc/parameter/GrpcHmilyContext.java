@@ -31,9 +31,9 @@ public class GrpcHmilyContext {
 
     private static ThreadLocal<String> hmilyContext = new ThreadLocal<>();
 
-    private static ThreadLocal<Object> hmilyParam = new ThreadLocal<>();
+    private static ThreadLocal<GrpcInvokeContext> hmilyClass = new ThreadLocal<>();
 
-    private static ThreadLocal<Object> hmilyClass = new ThreadLocal<>();
+    private static ThreadLocal<Boolean> hmilyFailContext = new ThreadLocal<>();
 
     /**
      * get hmilyContext conext.
@@ -45,29 +45,29 @@ public class GrpcHmilyContext {
     }
 
     /**
-     * get hmilyParam conext.
-     *
-     * @return ThreadLocal
-     */
-    public static ThreadLocal<Object> getHmilyParam() {
-        return hmilyParam;
-    }
-
-    /**
      * get hmilyClass conext.
      *
      * @return ThreadLocal
      */
-    public static ThreadLocal<Object> getHmilyClass() {
+    public static ThreadLocal<GrpcInvokeContext> getHmilyClass() {
         return hmilyClass;
     }
+
+    /**
+     * get hmilyFailContext conext.
+     *
+     * @return ThreadLocal
+     */
+    public static ThreadLocal<Boolean> getHmilyFailContext() {
+        return hmilyFailContext;
+    }
+
 
     /**
      * remove hmily conext after invoke.
      *
      */
     public static void removeAfterInvoke() {
-        GrpcHmilyContext.getHmilyParam().remove();
         GrpcHmilyContext.getHmilyClass().remove();
     }
 }

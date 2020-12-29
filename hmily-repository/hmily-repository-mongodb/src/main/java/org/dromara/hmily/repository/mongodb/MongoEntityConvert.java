@@ -3,11 +3,11 @@ package org.dromara.hmily.repository.mongodb;
 import org.dromara.hmily.repository.mongodb.entity.ParticipantMongoEntity;
 import org.dromara.hmily.repository.mongodb.entity.TransactionMongoEntity;
 import org.dromara.hmily.repository.mongodb.entity.UndoMongoEntity;
+import org.dromara.hmily.repository.spi.entity.HmilyDataSnapshot;
 import org.dromara.hmily.repository.spi.entity.HmilyInvocation;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipant;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipantUndo;
 import org.dromara.hmily.repository.spi.entity.HmilyTransaction;
-import org.dromara.hmily.repository.spi.entity.HmilyDataSnapshot;
 import org.dromara.hmily.serializer.spi.HmilySerializer;
 import org.dromara.hmily.serializer.spi.exception.HmilySerializerException;
 import org.slf4j.Logger;
@@ -95,7 +95,7 @@ public class MongoEntityConvert {
         undo.setParticipantId(entity.getParticipantId());
         undo.setTransId(entity.getTransId());
         undo.setResourceId(entity.getResourceId());
-        byte[] snapshotBytes = entity.getUndoDataSnapshot();
+        byte[] snapshotBytes = entity.getDataSnapshot();
         try {
             HmilyDataSnapshot dataSnapshot =
                     hmilySerializer.deSerialize(snapshotBytes, HmilyDataSnapshot.class);
@@ -175,7 +175,7 @@ public class MongoEntityConvert {
         entity.setStatus(undo.getStatus());
         entity.setTransId(undo.getTransId());
         entity.setUndoId(undo.getUndoId());
-        entity.setUndoDataSnapshot(hmilySerializer.serialize(undo.getDataSnapshot()));
+        entity.setDataSnapshot(hmilySerializer.serialize(undo.getDataSnapshot()));
         entity.setUpdateTime(undo.getUpdateTime());
         return entity;
     }

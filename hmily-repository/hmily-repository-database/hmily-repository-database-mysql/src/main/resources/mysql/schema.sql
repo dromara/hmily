@@ -5,18 +5,17 @@ USE `hmily`;
 
 CREATE TABLE IF NOT EXISTS `hmily_lock`
 (
-    `lock_id`           bigint(20) not null comment '主键id' primary key,
     `trans_id`          bigint(20) not null comment '全局事务id',
     `participant_id`    bigint(20) not null comment 'hmily参与者id',
     `resource_id`       varchar(256) not null comment '资源id',
     `target_table_name` varchar(64)  not null comment '锁定目标表名',
     `target_table_pk`   varchar(64)  not null comment '锁定表主键',
     `create_time`       datetime     not null comment '创建时间',
-    `update_time`       datetime     not null DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP comment '更新时间'
+    `update_time`       datetime     not null DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP comment '更新时间',
+    PRIMARY KEY (`resource_id`, `target_table_name`, `target_table_pk`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci comment 'hmily全局lock表';
-
 
 create table if not exists `hmily_participant_undo`
 (
@@ -24,7 +23,7 @@ create table if not exists `hmily_participant_undo`
     `participant_id`  bigint(20) not null comment '参与者id',
     `trans_id`        bigint(20) not null comment '全局事务id',
     `resource_id`     varchar(256) not null comment '资源id，tac模式下为jdbc url',
-    undo_data_snapshot longblob     not null comment '回滚数据快照',
+    `data_snapshot`   longblob     not null comment '回滚数据快照',
     `status`          tinyint      not null comment '状态',
     `create_time`     datetime     not null comment '创建时间',
     `update_time`     datetime     not null DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP comment '更新时间'
