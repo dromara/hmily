@@ -30,7 +30,6 @@
     <packaging>pom</packaging>
     <modules>
         <module>hmily-tac-core</module>
-        <module>hmily-tac-datasource</module>
         <module>hmily-tac-sqlparser</module>
         <module>hmily-tac-p6spy</module>
         <module>hmily-tac-common</module>
