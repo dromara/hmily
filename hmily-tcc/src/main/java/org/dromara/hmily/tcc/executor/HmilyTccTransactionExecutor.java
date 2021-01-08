@@ -19,9 +19,8 @@ package org.dromara.hmily.tcc.executor;
 
 import com.google.common.collect.Lists;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.dromara.hmily.annotation.HmilyTCC;
@@ -36,11 +35,15 @@ import org.dromara.hmily.common.utils.LogUtil;
 import org.dromara.hmily.common.utils.StringUtils;
 import org.dromara.hmily.core.cache.HmilyParticipantCacheManager;
 import org.dromara.hmily.core.context.HmilyContextHolder;
+import org.dromara.hmily.core.context.HmilyInvocationContextParamLookUp;
 import org.dromara.hmily.core.context.HmilyTransactionContext;
 import org.dromara.hmily.core.holder.HmilyTransactionHolder;
+import org.dromara.hmily.core.holder.SingletonHolder;
+import org.dromara.hmily.core.provide.ObjectProvide;
 import org.dromara.hmily.core.reflect.HmilyReflector;
 import org.dromara.hmily.core.repository.HmilyRepositoryStorage;
 import org.dromara.hmily.repository.spi.entity.HmilyInvocation;
+import org.dromara.hmily.repository.spi.entity.HmilyInvocationWithContext;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipant;
 import org.dromara.hmily.repository.spi.entity.HmilyTransaction;
 import org.slf4j.Logger;
@@ -330,16 +333,36 @@ public final class HmilyTccTransactionExecutor {
         hmilyParticipant.setRole(role);
         hmilyParticipant.setTargetClass(clazz.getName());
         hmilyParticipant.setTargetMethod(method.getName());
+
+        //传递上下文参数
+        Map<String, Object> contextParams = getContextParams();
+
         if (StringUtils.isNoneBlank(confirmMethodName)) {
             hmilyParticipant.setConfirmMethod(confirmMethodName);
-            HmilyInvocation confirmInvocation = new HmilyInvocation(clazz.getInterfaces()[0], method.getName(), method.getParameterTypes(), args);
+            HmilyInvocation confirmInvocation =
+                    new HmilyInvocationWithContext(clazz.getInterfaces()[0], method.getName(), method.getParameterTypes(), args,contextParams);
+
             hmilyParticipant.setConfirmHmilyInvocation(confirmInvocation);
         }
         if (StringUtils.isNoneBlank(cancelMethodName)) {
             hmilyParticipant.setCancelMethod(cancelMethodName);
-            HmilyInvocation cancelInvocation = new HmilyInvocation(clazz.getInterfaces()[0], method.getName(), method.getParameterTypes(), args);
+            HmilyInvocation cancelInvocation =
+                    new HmilyInvocationWithContext(clazz.getInterfaces()[0], method.getName(), method.getParameterTypes(), args,contextParams);
+
             hmilyParticipant.setCancelHmilyInvocation(cancelInvocation);
         }
         return hmilyParticipant;
+    }
+
+    private Map<String, Object> getContextParams(){
+        Map<String, Object> contextParams;
+        HmilyInvocationContextParamLookUp hmilyInvocationContextParamLookUp = (HmilyInvocationContextParamLookUp) SingletonHolder.INST
+                .get(ObjectProvide.class).provide(HmilyInvocationContextParamLookUp.class);
+        if(hmilyInvocationContextParamLookUp != null){
+            contextParams = hmilyInvocationContextParamLookUp.getContextParams();
+        }else{
+            contextParams = new HashMap<>();
+        }
+        return contextParams;
     }
 }

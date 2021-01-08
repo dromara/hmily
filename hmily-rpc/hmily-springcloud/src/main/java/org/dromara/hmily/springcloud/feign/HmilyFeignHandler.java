@@ -19,6 +19,8 @@ package org.dromara.hmily.springcloud.feign;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import org.dromara.hmily.annotation.Hmily;
@@ -26,9 +28,14 @@ import org.dromara.hmily.common.enums.HmilyActionEnum;
 import org.dromara.hmily.common.enums.HmilyRoleEnum;
 import org.dromara.hmily.common.utils.IdWorkerUtils;
 import org.dromara.hmily.core.context.HmilyContextHolder;
+import org.dromara.hmily.core.context.HmilyInvocationContextParamClear;
+import org.dromara.hmily.core.context.HmilyInvocationContextParamLookUp;
 import org.dromara.hmily.core.context.HmilyTransactionContext;
 import org.dromara.hmily.core.holder.HmilyTransactionHolder;
+import org.dromara.hmily.core.holder.SingletonHolder;
+import org.dromara.hmily.core.provide.ObjectProvide;
 import org.dromara.hmily.repository.spi.entity.HmilyInvocation;
+import org.dromara.hmily.repository.spi.entity.HmilyInvocationWithContext;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -87,7 +94,8 @@ public class HmilyFeignHandler implements InvocationHandler {
         hmilyParticipant.setTransId(context.getTransId());
         hmilyParticipant.setTransType(context.getTransType());
         final Class<?> declaringClass = method.getDeclaringClass();
-        HmilyInvocation hmilyInvocation = new HmilyInvocation(declaringClass, method.getName(), method.getParameterTypes(), args);
+        Map<String, Object> contextParams = getContextParams();
+        HmilyInvocation hmilyInvocation = new HmilyInvocationWithContext(declaringClass, method.getName(), method.getParameterTypes(), args,contextParams);
         hmilyParticipant.setConfirmHmilyInvocation(hmilyInvocation);
         hmilyParticipant.setCancelHmilyInvocation(hmilyInvocation);
         return hmilyParticipant;
@@ -95,5 +103,18 @@ public class HmilyFeignHandler implements InvocationHandler {
     
     void setDelegate(final InvocationHandler delegate) {
         this.delegate = delegate;
+    }
+
+    private Map<String, Object> getContextParams(){
+        Map<String, Object> contextParams;
+        final HmilyInvocationContextParamLookUp hmilyInvocationContextParamLookUp =
+                (HmilyInvocationContextParamLookUp) SingletonHolder.INST.get(ObjectProvide.class)
+                        .provide(HmilyInvocationContextParamLookUp.class);
+        if(hmilyInvocationContextParamLookUp != null){
+            contextParams = hmilyInvocationContextParamLookUp.getContextParams();
+        }else{
+            contextParams = new HashMap<>();
+        }
+        return contextParams;
     }
 }

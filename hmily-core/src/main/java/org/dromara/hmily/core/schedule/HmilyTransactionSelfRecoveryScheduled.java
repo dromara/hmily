@@ -216,6 +216,11 @@ public class HmilyTransactionSelfRecoveryScheduled implements AutoCloseable {
     private Date acquireDelayData(final int delayTime) {
         return new Date(LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli() - (delayTime * 1000));
     }
+
+    public static  void main(String args[]){
+        System.out.println(ZoneId.systemDefault());
+        System.out.println(new Date(LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli() - (180 * 1000)));
+    }
     
     @Override
     public void close() {

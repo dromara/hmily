@@ -27,12 +27,7 @@ import org.dromara.hmily.config.api.ConfigEnv;
 import org.dromara.hmily.config.api.entity.HmilyConfig;
 import org.dromara.hmily.config.api.entity.HmilyDatabaseConfig;
 import org.dromara.hmily.repository.spi.HmilyRepository;
-import org.dromara.hmily.repository.spi.entity.HmilyDataSnapshot;
-import org.dromara.hmily.repository.spi.entity.HmilyInvocation;
-import org.dromara.hmily.repository.spi.entity.HmilyLock;
-import org.dromara.hmily.repository.spi.entity.HmilyParticipant;
-import org.dromara.hmily.repository.spi.entity.HmilyParticipantUndo;
-import org.dromara.hmily.repository.spi.entity.HmilyTransaction;
+import org.dromara.hmily.repository.spi.entity.*;
 import org.dromara.hmily.repository.spi.exception.HmilyRepositoryException;
 import org.dromara.hmily.serializer.spi.HmilySerializer;
 import org.dromara.hmily.serializer.spi.exception.HmilySerializerException;
@@ -633,12 +628,12 @@ public abstract class AbstractHmilyDatabase implements HmilyRepository {
         try {
             if (Objects.nonNull(map.get("confirm_invocation"))) {
                 byte[] confirmInvocation = (byte[]) map.get("confirm_invocation");
-                final HmilyInvocation confirmHmilyInvocation = hmilySerializer.deSerialize(confirmInvocation, HmilyInvocation.class);
+                final HmilyInvocation confirmHmilyInvocation = hmilySerializer.deSerialize(confirmInvocation, HmilyInvocationWithContext.class);
                 hmilyParticipant.setConfirmHmilyInvocation(confirmHmilyInvocation);
             }
             if (Objects.nonNull(map.get("cancel_invocation"))) {
                 byte[] cancelInvocation = (byte[]) map.get("cancel_invocation");
-                final HmilyInvocation cancelHmilyInvocation = hmilySerializer.deSerialize(cancelInvocation, HmilyInvocation.class);
+                final HmilyInvocation cancelHmilyInvocation = hmilySerializer.deSerialize(cancelInvocation, HmilyInvocationWithContext.class);
                 hmilyParticipant.setCancelHmilyInvocation(cancelHmilyInvocation);
             }
         } catch (HmilySerializerException e) {

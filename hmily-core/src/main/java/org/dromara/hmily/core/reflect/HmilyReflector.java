@@ -18,16 +18,17 @@
 
 package org.dromara.hmily.core.reflect;
 
+import java.util.Map;
 import java.util.Objects;
 import org.apache.commons.lang3.reflect.MethodUtils;
 import org.dromara.hmily.common.enums.ExecutorTypeEnum;
 import org.dromara.hmily.common.enums.HmilyActionEnum;
 import org.dromara.hmily.common.enums.HmilyRoleEnum;
-import org.dromara.hmily.core.context.HmilyContextHolder;
-import org.dromara.hmily.core.context.HmilyTransactionContext;
+import org.dromara.hmily.core.context.*;
 import org.dromara.hmily.core.holder.SingletonHolder;
 import org.dromara.hmily.core.provide.ObjectProvide;
 import org.dromara.hmily.repository.spi.entity.HmilyInvocation;
+import org.dromara.hmily.repository.spi.entity.HmilyInvocationWithContext;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipant;
 
 /**
@@ -36,7 +37,48 @@ import org.dromara.hmily.repository.spi.entity.HmilyParticipant;
  * @author xiaoyu(Myth)
  */
 public class HmilyReflector {
-    
+
+    /**
+     * 获取上下文参数并设置
+     */
+    private static boolean setContextParams(final HmilyParticipant hmilyParticipant){
+        boolean result = false;
+
+        final HmilyInvocationContextParamSet hmilyInvocationContextParamSet =
+                (HmilyInvocationContextParamSet)SingletonHolder.INST.get(ObjectProvide.class)
+                        .provide(HmilyInvocationContextParamSet.class);
+        if(null == hmilyInvocationContextParamSet){
+            return false;
+        }
+
+        HmilyInvocationWithContext hmilyInvocationWithContext =
+                (HmilyInvocationWithContext)hmilyParticipant.getConfirmHmilyInvocation();
+        if(null == hmilyInvocationWithContext){
+            hmilyInvocationWithContext = (HmilyInvocationWithContext)hmilyParticipant.getCancelHmilyInvocation();
+        }
+
+        Map<String, Object> contextParams = hmilyInvocationWithContext.getContextParams();
+
+        result = hmilyInvocationContextParamSet.setContextParam(contextParams);
+
+        return result;
+    }
+
+    /**
+     * 清理上下文参数
+     * 
+     */
+    private static void clearContextParams(Boolean flag){
+        if(flag){
+            final HmilyInvocationContextParamClear hmilyInvocationContextParamClear =
+                    (HmilyInvocationContextParamClear)SingletonHolder.INST.get(ObjectProvide.class)
+                            .provide(HmilyInvocationContextParamClear.class);
+            if(hmilyInvocationContextParamClear != null) {
+                hmilyInvocationContextParamClear.clearContextParam();
+            }
+        }
+    }
+
     /**
      * Executor object.
      *
@@ -47,22 +89,31 @@ public class HmilyReflector {
      * @throws Exception the exception
      */
     public static Object executor(final HmilyActionEnum action, final ExecutorTypeEnum executorType, final HmilyParticipant hmilyParticipant) throws Exception {
-        if (executorType == ExecutorTypeEnum.RPC && hmilyParticipant.getRole() != HmilyRoleEnum.START.getCode()) {
+        Boolean isFillContextParam = false;
+        try {
             setContext(action, hmilyParticipant);
-            if (action == HmilyActionEnum.CONFIRMING) {
-                return executeRpc(hmilyParticipant.getConfirmHmilyInvocation());
+
+            isFillContextParam = setContextParams(hmilyParticipant);
+
+            if (executorType == ExecutorTypeEnum.RPC && hmilyParticipant.getRole() != HmilyRoleEnum.START.getCode()) {
+//            setContext(action, hmilyParticipant);
+                if (action == HmilyActionEnum.CONFIRMING) {
+                    return executeRpc(hmilyParticipant.getConfirmHmilyInvocation());
+                } else {
+                    return executeRpc(hmilyParticipant.getCancelHmilyInvocation());
+                }
             } else {
-                return executeRpc(hmilyParticipant.getCancelHmilyInvocation());
+                if (action == HmilyActionEnum.CONFIRMING) {
+                    return executeLocal(hmilyParticipant.getConfirmHmilyInvocation(), hmilyParticipant.getTargetClass(), hmilyParticipant.getConfirmMethod());
+                } else {
+                    return executeLocal(hmilyParticipant.getCancelHmilyInvocation(), hmilyParticipant.getTargetClass(), hmilyParticipant.getCancelMethod());
+                }
             }
-        } else {
-            if (action == HmilyActionEnum.CONFIRMING) {
-                return executeLocal(hmilyParticipant.getConfirmHmilyInvocation(), hmilyParticipant.getTargetClass(), hmilyParticipant.getConfirmMethod());
-            } else {
-                return executeLocal(hmilyParticipant.getConfirmHmilyInvocation(), hmilyParticipant.getTargetClass(), hmilyParticipant.getCancelMethod());
-            }
+        }finally {
+            clearContextParams(isFillContextParam);
         }
     }
-    
+
     private static void setContext(final HmilyActionEnum action, final HmilyParticipant hmilyParticipant) {
         HmilyTransactionContext context = new HmilyTransactionContext();
         context.setAction(action.getCode());
@@ -72,7 +123,7 @@ public class HmilyReflector {
         context.setTransType(hmilyParticipant.getTransType());
         HmilyContextHolder.set(context);
     }
-    
+
     private static Object executeLocal(final HmilyInvocation hmilyInvocation, final String className, final String methodName) throws Exception {
         if (Objects.isNull(hmilyInvocation)) {
             return null;
@@ -83,7 +134,7 @@ public class HmilyReflector {
         final Object bean = SingletonHolder.INST.get(ObjectProvide.class).provide(clazz);
         return MethodUtils.invokeMethod(bean, methodName, args, parameterTypes);
     }
-    
+
     private static Object executeRpc(final HmilyInvocation hmilyInvocation) throws Exception {
         if (Objects.isNull(hmilyInvocation)) {
             return null;
