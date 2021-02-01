@@ -47,8 +47,8 @@ public class HmilyReflector {
      * @throws Exception the exception
      */
     public static Object executor(final HmilyActionEnum action, final ExecutorTypeEnum executorType, final HmilyParticipant hmilyParticipant) throws Exception {
+        setContext(action, hmilyParticipant);
         if (executorType == ExecutorTypeEnum.RPC && hmilyParticipant.getRole() != HmilyRoleEnum.START.getCode()) {
-            setContext(action, hmilyParticipant);
             if (action == HmilyActionEnum.CONFIRMING) {
                 return executeRpc(hmilyParticipant.getConfirmHmilyInvocation());
             } else {
@@ -58,7 +58,7 @@ public class HmilyReflector {
             if (action == HmilyActionEnum.CONFIRMING) {
                 return executeLocal(hmilyParticipant.getConfirmHmilyInvocation(), hmilyParticipant.getTargetClass(), hmilyParticipant.getConfirmMethod());
             } else {
-                return executeLocal(hmilyParticipant.getConfirmHmilyInvocation(), hmilyParticipant.getTargetClass(), hmilyParticipant.getCancelMethod());
+                return executeLocal(hmilyParticipant.getCancelHmilyInvocation(), hmilyParticipant.getTargetClass(), hmilyParticipant.getCancelMethod());
             }
         }
     }
