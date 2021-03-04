@@ -6,7 +6,7 @@ labels: 'type: enhancement'
 
 ## Feature Request
 
-<!-- First of all: Have you checked the docs https://dromara.org/en-us/docs/hmily/index.html, GitHub issues whether someone else has already reported your issue? Maybe the feature already exists?-->
+<!-- First of all: Have you checked the docs https://dromara.org/projects/hmily/, GitHub issues whether someone else has already reported your issue? Maybe the feature already exists?-->
 
 #### Is your feature request related to a problem? Please describe
 
