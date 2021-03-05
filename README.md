@@ -9,6 +9,10 @@
 </p>
 
 <p align="center">
+  English | <a href="https://github.com/dromara/hmily/blob/master/README_CN.md">简体中文</a>
+</p>
+
+<p align="center">
     <a target="_blank" href="https://search.maven.org/search?q=g:org.dromara%20AND%20hmily">
         <img src="https://img.shields.io/maven-central/v/org.dromara/hmily.svg?label=maven%20central" />
     </a>
@@ -27,8 +31,8 @@
     <a href="https://codecov.io/gh/dromara/hmily">
         <img src="https://codecov.io/gh/dromara/hmily/branch/master/graph/badge.svg"/>
     </a>
-    <a target="_blank" href='https://gitee.com/shuaiqiyu/hmily/stargazers'>
-        <img src='https://gitee.com/shuaiqiyu/hmily/badge/star.svg?theme=gvp' alt='gitee stars'/>
+    <a target="_blank" href='https://gitee.com/dromara/hmily/stargazers'>
+        <img src='https://gitee.com/dromara/hmily/badge/star.svg?theme=gvp' alt='gitee stars'/>
     </a>
     <a target="_blank" href='https://github.com/dromara/hmily'>
         <img src="https://img.shields.io/github/forks/dromara/hmily.svg" alt="github forks"/>
