@@ -51,7 +51,6 @@ public class ServerConfigLoader implements ConfigLoader<HmilyServer> {
             configFile = new File(dirPath);
             if (configFile.exists()) {
                 filePath = dirPath;
-                throw new ConfigException("ConfigLoader:loader config error,error file path:" + filePath);
             } else {
                 //Mainly used for development environment。
                 ClassLoader loader = ConfigLoader.class.getClassLoader();
