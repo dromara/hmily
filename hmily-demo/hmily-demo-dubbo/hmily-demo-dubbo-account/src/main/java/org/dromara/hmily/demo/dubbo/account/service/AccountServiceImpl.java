@@ -82,7 +82,12 @@ public class AccountServiceImpl implements AccountService {
     @Override
     @HmilyTCC(confirmMethod = "confirm", cancelMethod = "cancel")
     public boolean payment(AccountDTO accountDTO) {
-        return accountMapper.update(accountDTO) > 0;
+        int count =  accountMapper.update(accountDTO);
+        if (count > 0) {
+            return true;
+        } else {
+            throw new HmilyRuntimeException("账户扣减异常！");
+        }
     }
     
     @Override
