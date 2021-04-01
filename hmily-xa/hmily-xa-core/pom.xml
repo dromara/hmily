@@ -27,6 +27,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>hmily-xa-core</artifactId>
+    <dependencies>
+        <dependency>
+            <groupId>javax.transaction</groupId>
+            <artifactId>javax.transaction-api</artifactId>
+        </dependency>
+    </dependencies>
 
 
 </project>

@@ -18,7 +18,9 @@
 package org.dromara.hmily.xa.p6spy;
 
 import com.p6spy.engine.spy.P6DataSource;
+
 import javax.sql.DataSource;
+
 import lombok.Getter;
 
 /**
@@ -27,10 +29,10 @@ import lombok.Getter;
  * @author xiaoyu
  */
 public class HmilyXAP6Datasource extends P6DataSource {
-    
+
     @Getter
     private final DataSource targetDataSource;
-    
+
     /**
      * Instantiates a new Hmily p 6 datasource.
      *
@@ -41,9 +43,10 @@ public class HmilyXAP6Datasource extends P6DataSource {
         targetDataSource = delegate;
         init();
     }
-    
+
     private void init() {
-    
+        if (this.targetDataSource == null) {
+            throw new NullPointerException("targetDataSource is null");
+        }
     }
-    
 }
