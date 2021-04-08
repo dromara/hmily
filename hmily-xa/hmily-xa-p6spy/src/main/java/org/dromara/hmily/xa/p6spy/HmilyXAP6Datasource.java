@@ -18,10 +18,11 @@
 package org.dromara.hmily.xa.p6spy;
 
 import com.p6spy.engine.spy.P6DataSource;
+import lombok.Getter;
+import org.dromara.hmily.xa.core.TransactionManagerImpl;
 
 import javax.sql.DataSource;
-
-import lombok.Getter;
+import javax.sql.XADataSource;
 
 /**
  * The type Hmily p 6 datasource xa.
@@ -48,5 +49,9 @@ public class HmilyXAP6Datasource extends P6DataSource {
         if (this.targetDataSource == null) {
             throw new NullPointerException("targetDataSource is null");
         }
+        if (!(this.targetDataSource instanceof XADataSource)) {
+            throw new RuntimeException("targetDataSource have not instanceof XADataSource");
+        }
+        TransactionManagerImpl.INST.initialized(this);
     }
 }

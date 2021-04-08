@@ -17,66 +17,94 @@
 
 package org.dromara.hmily.xa.core;
 
-import javax.transaction.HeuristicMixedException;
-import javax.transaction.HeuristicRollbackException;
-import javax.transaction.InvalidTransactionException;
-import javax.transaction.NotSupportedException;
-import javax.transaction.RollbackException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.sql.DataSource;
+import javax.sql.XAConnection;
 import javax.transaction.SystemException;
 import javax.transaction.Transaction;
-import javax.transaction.TransactionManager;
+import java.sql.SQLException;
+import java.util.Map;
+import java.util.Stack;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * HmilyXaTransactionManager .
  *
  * @author sixh chenbin
  */
-public class HmilyXaTransactionManager implements TransactionManager {
+public class HmilyXaTransactionManager {
 
-    private TransactionManager tm;
+    private Logger logger = LoggerFactory.getLogger(HmilyXaTransactionManager.class);
 
-    @Override
-    public void begin() throws NotSupportedException, SystemException {
+    private final Map<Thread, Stack<Transaction>> threadStackMap;
 
+    private final DataSource dataSource;
+
+    public HmilyXaTransactionManager(DataSource dataSource) {
+        this.dataSource = dataSource;
+        threadStackMap = new ConcurrentHashMap<>(16);
     }
 
-    @Override
-    public void commit() throws RollbackException, HeuristicMixedException, HeuristicRollbackException, SecurityException, IllegalStateException, SystemException {
-
+    public static HmilyXaTransactionManager initialized(DataSource dataSource) {
+        return new HmilyXaTransactionManager(dataSource);
     }
 
-    @Override
-    public int getStatus() throws SystemException {
-        return 0;
+    public DataSource getDataSource() {
+        return dataSource;
     }
 
-    @Override
-    public Transaction getTransaction() throws SystemException {
-        return null;
+    public Transaction createTransaction() {
+        Transaction threadTransaction = getThreadTransaction();
+        Transaction rct = threadTransaction;
+        if (threadTransaction == null) {
+            XAConnection connection = null;
+            try {
+                connection = (XAConnection) dataSource.getConnection();
+            } catch (SQLException throwables) {
+                throw new RuntimeException(throwables);
+            }
+            rct = new TransactionImpl(connection, new HmliyTransactionImpl());
+        } else {
+
+        }
+        addToMap(rct);
+        return rct;
     }
 
-    @Override
-    public void resume(Transaction transaction) throws InvalidTransactionException, IllegalStateException, SystemException {
-
+    private void addToMap(Transaction rct) {
+        Thread thread = Thread.currentThread();
+        synchronized (threadStackMap) {
+            Stack<Transaction> stack = threadStackMap.get(thread);
+            if (stack == null) {
+                stack = new Stack<>();
+            }
+            try {
+                if (rct.getStatus() == XaState.STATUS_ACTIVE.getState()) {
+                    stack.push(rct);
+                }
+            } catch (SystemException e) {
+            }
+        }
     }
 
-    @Override
-    public void rollback() throws IllegalStateException, SecurityException, SystemException {
-
+    public Transaction getTransaction() {
+        Transaction transaction = getThreadTransaction();
+        if (transaction == null) {
+            logger.warn("transaction is null");
+        }
+        return transaction;
     }
 
-    @Override
-    public void setRollbackOnly() throws IllegalStateException, SystemException {
-
-    }
-
-    @Override
-    public void setTransactionTimeout(int i) throws SystemException {
-
-    }
-
-    @Override
-    public Transaction suspend() throws SystemException {
-        return null;
+    public Transaction getThreadTransaction() {
+        Thread thread = Thread.currentThread();
+        synchronized (threadStackMap) {
+            Stack<Transaction> stack = threadStackMap.get(thread);
+            if (stack == null) {
+                return null;
+            }
+            return stack.peek();
+        }
     }
 }

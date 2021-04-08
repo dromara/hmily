@@ -17,7 +17,6 @@
 
 package org.dromara.hmily.xa.core;
 
-import javax.sql.XAConnection;
 import javax.transaction.HeuristicMixedException;
 import javax.transaction.HeuristicRollbackException;
 import javax.transaction.NotSupportedException;
@@ -25,7 +24,6 @@ import javax.transaction.RollbackException;
 import javax.transaction.SystemException;
 import javax.transaction.TransactionManager;
 import javax.transaction.UserTransaction;
-import javax.transaction.xa.XAResource;
 
 /**
  * UserTransactionImpl .
@@ -36,23 +34,28 @@ public class UserTransactionImpl implements UserTransaction {
 
     private TransactionManager tm;
 
-    public UserTransactionImpl(TransactionManager tm) {
-        this.tm = tm;
+    private TransactionManager getTm() {
+        if (tm == null) {
+            synchronized (TransactionManagerImpl.INST) {
+                tm = TransactionManagerImpl.INST;
+            }
+        }
+        return tm;
     }
 
     @Override
     public void begin() throws NotSupportedException, SystemException {
-
+        getTm().begin();
     }
 
     @Override
     public void commit() throws RollbackException, HeuristicMixedException, HeuristicRollbackException, SecurityException, IllegalStateException, SystemException {
-
+        getTm().commit();
     }
 
     @Override
     public void rollback() throws IllegalStateException, SecurityException, SystemException {
-
+        getTm().rollback();
     }
 
     @Override

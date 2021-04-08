@@ -17,6 +17,9 @@
 
 package org.dromara.hmily.xa.core;
 
+import lombok.SneakyThrows;
+
+import javax.sql.XAConnection;
 import javax.transaction.HeuristicMixedException;
 import javax.transaction.HeuristicRollbackException;
 import javax.transaction.RollbackException;
@@ -24,7 +27,6 @@ import javax.transaction.Synchronization;
 import javax.transaction.SystemException;
 import javax.transaction.Transaction;
 import javax.transaction.xa.XAResource;
-import javax.transaction.xa.Xid;
 
 /**
  * TransactionImpl .
@@ -33,13 +35,25 @@ import javax.transaction.xa.Xid;
  */
 public class TransactionImpl implements Transaction {
 
-    private Xid xid;
+    private XaId xid;
 
     private XAResource xaResource;
+    /**
+     * connection;
+     */
+    private XAConnection connection;
 
+    private HmliyTransactionImpl hmliyTransaction;
+
+    public TransactionImpl(XAConnection connection, HmliyTransactionImpl hmliyTransaction) {
+        this.connection = connection;
+        this.hmliyTransaction = hmliyTransaction;
+    }
+
+    @SneakyThrows
     @Override
     public void commit() throws RollbackException, HeuristicMixedException, HeuristicRollbackException, SecurityException, IllegalStateException, SystemException {
-
+//        connection.getXAResource().commit(xid);
     }
 
     @Override
@@ -54,7 +68,8 @@ public class TransactionImpl implements Transaction {
 
     @Override
     public int getStatus() throws SystemException {
-        return 0;
+        XaState state = hmliyTransaction.getState();
+        return state.getState();
     }
 
     @Override

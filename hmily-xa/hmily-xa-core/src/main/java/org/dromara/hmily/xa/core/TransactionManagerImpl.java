@@ -17,6 +17,7 @@
 
 package org.dromara.hmily.xa.core;
 
+import javax.sql.DataSource;
 import javax.transaction.HeuristicMixedException;
 import javax.transaction.HeuristicRollbackException;
 import javax.transaction.InvalidTransactionException;
@@ -25,30 +26,45 @@ import javax.transaction.RollbackException;
 import javax.transaction.SystemException;
 import javax.transaction.Transaction;
 import javax.transaction.TransactionManager;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * TransactionManagerImpl .
  *
  * @author sixh chenbin
  */
-public class TransactionManagerImpl implements TransactionManager {
+public enum TransactionManagerImpl implements TransactionManager {
 
     /**
-     * Save current transaction object information.
+     * Singleton.
      */
-    private Map<String, Transaction> currentTransactions = new ConcurrentHashMap<>();
+    INST;
+
+    HmilyXaTransactionManager hmilyXaTransactionManager = null;
+
+    TransactionManagerImpl() {
+    }
+
+    public void initialized(DataSource dataSource) {
+        //初始化一下 @see HmilyXaTransactionManager;
+        hmilyXaTransactionManager = HmilyXaTransactionManager.initialized(dataSource);
+    }
 
     @Override
     public void begin() throws NotSupportedException, SystemException {
         //开始一个事务.
-
+        Transaction transaction = hmilyXaTransactionManager.getTransaction();
+        if (transaction == null) {
+            transaction = hmilyXaTransactionManager.createTransaction();
+        }
     }
 
     @Override
     public void commit() throws RollbackException, HeuristicMixedException, HeuristicRollbackException, SecurityException, IllegalStateException, SystemException {
-
+        Transaction transaction = hmilyXaTransactionManager
+                .getTransaction();
+        if (transaction != null) {
+            transaction.commit();
+        }
     }
 
     @Override
@@ -68,7 +84,11 @@ public class TransactionManagerImpl implements TransactionManager {
 
     @Override
     public void rollback() throws IllegalStateException, SecurityException, SystemException {
-
+        Transaction transaction = hmilyXaTransactionManager
+                .getTransaction();
+        if (transaction != null) {
+            transaction.rollback();
+        }
     }
 
     @Override

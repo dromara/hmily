@@ -60,7 +60,7 @@ public class AtomikosTest {
             userTransaction.begin();
             AtomikosDataSourceBean dataSource = getDataSource();
             connection = dataSource.getConnection();
-            String sql = "insert into (name) values ('chenbin')";
+            String sql = "insert into xa_data (name) values ('chenbin')";
             preparedStatement = connection.prepareStatement(sql);
             preparedStatement.executeUpdate();
             userTransaction.commit();
