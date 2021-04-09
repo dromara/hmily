@@ -17,24 +17,47 @@
 
 package org.dromara.hmily.xa.core;
 
+import javax.transaction.xa.Xid;
+import java.util.concurrent.atomic.AtomicLong;
+
 /**
- * HmliyTransactionImpl .
+ * XaId .
  *
  * @author sixh chenbin
  */
-public class HmliyTransactionImpl {
+public class XIdImpl implements Xid {
 
-    private String tid;
+    private final Long id;
 
-    public String getTid() {
-        return tid;
+    private static final Integer DEF_ID = 8808;
+
+    private static final AtomicLong XID = new AtomicLong(1);
+
+    public XIdImpl(Long id) {
+        this.id = id;
     }
 
-    public void isRoot() {
-
+    public XIdImpl() {
+        id = XID.getAndIncrement();
     }
 
-    public XaState getState() {
-        return XaState.STATUS_ACTIVE;
+    public Long getId() {
+        return id;
+    }
+
+    @Override
+    public int getFormatId() {
+        return DEF_ID;
+    }
+
+    @Override
+    public byte[] getGlobalTransactionId() {
+        return new byte[0];
+    }
+
+    @Override
+    public byte[] getBranchQualifier() {
+        return new byte[0];
     }
 }
+

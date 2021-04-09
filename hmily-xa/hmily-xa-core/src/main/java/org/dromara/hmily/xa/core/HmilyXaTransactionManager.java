@@ -21,13 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.sql.DataSource;
-import javax.sql.XAConnection;
-import javax.transaction.SystemException;
 import javax.transaction.Transaction;
-import java.sql.SQLException;
-import java.util.Map;
-import java.util.Stack;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * HmilyXaTransactionManager .
@@ -36,59 +30,48 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class HmilyXaTransactionManager {
 
-    private Logger logger = LoggerFactory.getLogger(HmilyXaTransactionManager.class);
+    private final Logger logger = LoggerFactory.getLogger(HmilyXaTransactionManager.class);
 
-    private final Map<Thread, Stack<Transaction>> threadStackMap;
-
-    private final DataSource dataSource;
-
-    public HmilyXaTransactionManager(DataSource dataSource) {
-        this.dataSource = dataSource;
-        threadStackMap = new ConcurrentHashMap<>(16);
+    private final ThreadLocal<Transaction> tms = new ThreadLocal<>();
+    /**
+     * Initialized hmily xa transaction manager.
+     *
+     * @param dataSource the data source
+     * @return the hmily xa transaction manager
+     */
+    public static HmilyXaTransactionManager initialized() {
+        return new HmilyXaTransactionManager();
     }
-
-    public static HmilyXaTransactionManager initialized(DataSource dataSource) {
-        return new HmilyXaTransactionManager(dataSource);
-    }
-
-    public DataSource getDataSource() {
-        return dataSource;
-    }
-
+    /**
+     * Create transaction transaction.
+     *
+     * @return the transaction
+     */
     public Transaction createTransaction() {
         Transaction threadTransaction = getThreadTransaction();
         Transaction rct = threadTransaction;
+        XIdImpl xId = new XIdImpl();
         if (threadTransaction == null) {
-            XAConnection connection = null;
-            try {
-                connection = (XAConnection) dataSource.getConnection();
-            } catch (SQLException throwables) {
-                throw new RuntimeException(throwables);
-            }
-            rct = new TransactionImpl(connection, new HmliyTransactionImpl());
+            rct = new TransactionImpl(xId);
         } else {
 
         }
-        addToMap(rct);
+        setTxTotr(rct);
         return rct;
     }
 
-    private void addToMap(Transaction rct) {
-        Thread thread = Thread.currentThread();
-        synchronized (threadStackMap) {
-            Stack<Transaction> stack = threadStackMap.get(thread);
-            if (stack == null) {
-                stack = new Stack<>();
-            }
-            try {
-                if (rct.getStatus() == XaState.STATUS_ACTIVE.getState()) {
-                    stack.push(rct);
-                }
-            } catch (SystemException e) {
-            }
-        }
+    /**
+     * tx  to threadLocal;
+     */
+    private void setTxTotr(Transaction transaction) {
+        tms.set(transaction);
     }
 
+    /**
+     * Gets transaction.
+     *
+     * @return the transaction
+     */
     public Transaction getTransaction() {
         Transaction transaction = getThreadTransaction();
         if (transaction == null) {
@@ -97,14 +80,39 @@ public class HmilyXaTransactionManager {
         return transaction;
     }
 
+    /**
+     * Gets thread transaction.
+     *
+     * @return the thread transaction
+     */
     public Transaction getThreadTransaction() {
-        Thread thread = Thread.currentThread();
-        synchronized (threadStackMap) {
-            Stack<Transaction> stack = threadStackMap.get(thread);
-            if (stack == null) {
-                return null;
-            }
-            return stack.peek();
+        return tms.get();
+    }
+
+    /**
+     * Rollback transaction.
+     *
+     * @return the transaction
+     */
+    public Transaction rollback() {
+        Transaction threadTransaction = getThreadTransaction();
+        if (threadTransaction != null) {
+            tms.set(null);
         }
+        return threadTransaction;
+    }
+
+    /**
+     * Commit transaction.
+     *
+     * @return the transaction
+     */
+    public Transaction commit() {
+        Transaction threadTransaction = getThreadTransaction();
+        if (threadTransaction == null) {
+            throw new IllegalStateException("Transaction is null,can not commit");
+        }
+        tms.set(null);
+        return threadTransaction;
     }
 }

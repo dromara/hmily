@@ -23,6 +23,8 @@ import org.dromara.hmily.xa.core.TransactionManagerImpl;
 
 import javax.sql.DataSource;
 import javax.sql.XADataSource;
+import java.sql.Connection;
+import java.sql.SQLException;
 
 /**
  * The type Hmily p 6 datasource xa.
@@ -45,6 +47,28 @@ public class HmilyXAP6Datasource extends P6DataSource {
         init();
     }
 
+    @Override
+    public Connection getConnection() throws SQLException {
+        Connection connection = super.getConnection();
+        return getHmilyConnection(connection);
+    }
+
+    @Override
+    public Connection getConnection(String username, String password) throws SQLException {
+        Connection connection = super.getConnection(username, password);
+        return getHmilyConnection(connection);
+    }
+
+    /**
+     * Gets hmily connection.
+     *
+     * @param connection the connection
+     * @return the hmily connection
+     */
+    public Connection getHmilyConnection(Connection connection) {
+        return new HmilyXaConnection(connection);
+    }
+
     private void init() {
         if (this.targetDataSource == null) {
             throw new NullPointerException("targetDataSource is null");
@@ -52,6 +76,6 @@ public class HmilyXAP6Datasource extends P6DataSource {
         if (!(this.targetDataSource instanceof XADataSource)) {
             throw new RuntimeException("targetDataSource have not instanceof XADataSource");
         }
-        TransactionManagerImpl.INST.initialized(this);
+        TransactionManagerImpl.INST.initialized();
     }
 }

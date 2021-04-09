@@ -17,7 +17,6 @@
 
 package org.dromara.hmily.xa.core;
 
-import javax.sql.DataSource;
 import javax.transaction.HeuristicMixedException;
 import javax.transaction.HeuristicRollbackException;
 import javax.transaction.InvalidTransactionException;
@@ -42,11 +41,12 @@ public enum TransactionManagerImpl implements TransactionManager {
     HmilyXaTransactionManager hmilyXaTransactionManager = null;
 
     TransactionManagerImpl() {
+
     }
 
-    public void initialized(DataSource dataSource) {
+    public void initialized() {
         //初始化一下 @see HmilyXaTransactionManager;
-        hmilyXaTransactionManager = HmilyXaTransactionManager.initialized(dataSource);
+        hmilyXaTransactionManager = HmilyXaTransactionManager.initialized();
     }
 
     @Override
@@ -73,7 +73,7 @@ public enum TransactionManagerImpl implements TransactionManager {
     }
 
     @Override
-    public Transaction getTransaction() throws SystemException {
+    public Transaction getTransaction() {
         return null;
     }
 

@@ -27,6 +27,9 @@ import javax.transaction.Synchronization;
 import javax.transaction.SystemException;
 import javax.transaction.Transaction;
 import javax.transaction.xa.XAResource;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * TransactionImpl .
@@ -35,7 +38,7 @@ import javax.transaction.xa.XAResource;
  */
 public class TransactionImpl implements Transaction {
 
-    private XaId xid;
+    private XIdImpl xid;
 
     private XAResource xaResource;
     /**
@@ -43,17 +46,19 @@ public class TransactionImpl implements Transaction {
      */
     private XAConnection connection;
 
-    private HmliyTransactionImpl hmliyTransaction;
+    private SubCoordinator subCoordinator = null;
 
-    public TransactionImpl(XAConnection connection, HmliyTransactionImpl hmliyTransaction) {
-        this.connection = connection;
-        this.hmliyTransaction = hmliyTransaction;
+    private List<XAResource> enlistResource = Collections.synchronizedList(new ArrayList<>());
+
+    private List<XAResource> delistResource = Collections.synchronizedList(new ArrayList<>());
+
+    public TransactionImpl(XIdImpl xid) {
+        this.xid = xid;
     }
 
     @SneakyThrows
     @Override
     public void commit() throws RollbackException, HeuristicMixedException, HeuristicRollbackException, SecurityException, IllegalStateException, SystemException {
-//        connection.getXAResource().commit(xid);
     }
 
     @Override
@@ -68,8 +73,7 @@ public class TransactionImpl implements Transaction {
 
     @Override
     public int getStatus() throws SystemException {
-        XaState state = hmliyTransaction.getState();
-        return state.getState();
+        return 0;
     }
 
     @Override
