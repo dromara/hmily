@@ -15,52 +15,32 @@
  *  limitations under the License.
  */
 
-package org.dromara.hmily.xa.core;
+package org.dromara.hmily.common.utils;
 
-import javax.transaction.xa.Xid;
-import java.util.Vector;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 /**
- * Coordinator .
+ * NetUtils .
  *
  * @author sixh chenbin
  */
-public class Coordinator implements Mock {
+public class NetUtils {
 
-    /**
-     * all SubCoordinator.
-     */
-    private Vector<SubCoordinator> coordinators = new Vector<>();
+    private static String localAddress;
 
-    private XIdImpl xid;
-
-    public Coordinator(XIdImpl xid) {
-        this.xid = xid;
-    }
-
-    @Override
-    public int prepare() {
-        return 0;
-    }
-
-    @Override
-    public void rollback() {
-
-    }
-
-    @Override
-    public void commit() {
-
-    }
-
-    public synchronized boolean addCoordinators(SubCoordinator subCoordinator) {
-        if (coordinators.contains(subCoordinator)) {
-            return true;
+    public static String getLocalIp() {
+        if (localAddress == null) {
+            synchronized (NetUtils.class) {
+                if (localAddress == null) {
+                    try {
+                        localAddress = InetAddress.getLocalHost().getHostAddress();
+                    } catch (UnknownHostException e) {
+                        localAddress = "0.0.0.0";
+                    }
+                }
+            }
         }
-        return this.coordinators.add(subCoordinator);
-    }
-
-    public XIdImpl getSubXid() {
-        return this.xid.newBranchId();
+        return localAddress;
     }
 }

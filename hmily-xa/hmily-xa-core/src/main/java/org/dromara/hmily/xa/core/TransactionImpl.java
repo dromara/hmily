@@ -17,7 +17,8 @@
 
 package org.dromara.hmily.xa.core;
 
-import lombok.SneakyThrows;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.sql.XAConnection;
 import javax.transaction.HeuristicMixedException;
@@ -26,7 +27,9 @@ import javax.transaction.RollbackException;
 import javax.transaction.Synchronization;
 import javax.transaction.SystemException;
 import javax.transaction.Transaction;
+import javax.transaction.xa.XAException;
 import javax.transaction.xa.XAResource;
+import javax.transaction.xa.Xid;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -38,9 +41,9 @@ import java.util.List;
  */
 public class TransactionImpl implements Transaction {
 
-    private XIdImpl xid;
+    private Logger logger = LoggerFactory.getLogger(TransactionImpl.class);
 
-    private XAResource xaResource;
+    private Xid xid;
     /**
      * connection;
      */
@@ -48,27 +51,66 @@ public class TransactionImpl implements Transaction {
 
     private SubCoordinator subCoordinator = null;
 
-    private List<XAResource> enlistResource = Collections.synchronizedList(new ArrayList<>());
+    private List<XAResource> enlistResourceList = Collections.synchronizedList(new ArrayList<>());
 
-    private List<XAResource> delistResource = Collections.synchronizedList(new ArrayList<>());
+    private List<XAResource> delistResourceList;
 
     public TransactionImpl(XIdImpl xid) {
         this.xid = xid;
+        buildCoord();
     }
 
-    @SneakyThrows
     @Override
     public void commit() throws RollbackException, HeuristicMixedException, HeuristicRollbackException, SecurityException, IllegalStateException, SystemException {
     }
 
+    public void doEnList(XAResource xaResource, int flag) throws SystemException, RollbackException {
+        if (flag == XAResource.TMRESUME) {
+
+        } else if (flag == XAResource.TMJOIN) {
+            enlistResource(xaResource);
+        }
+        delistResourceList = null;
+    }
+
+    public void doDeList(int flag) throws SystemException {
+        delistResourceList = new ArrayList<>(enlistResourceList);
+        for (XAResource resource : delistResourceList) {
+            delistResource(resource, flag);
+        }
+    }
+
     @Override
-    public boolean delistResource(XAResource xaResource, int i) throws IllegalStateException, SystemException {
+    public boolean delistResource(XAResource xaResource, int flag) throws IllegalStateException, SystemException {
+        if (!enlistResourceList.contains(xaResource)) {
+            return false;
+        }
+        Xid xid = new XIdImpl();
+        try {
+            xaResource.end(xid, flag);
+        } catch (XAException e) {
+        }
         return false;
+
     }
 
     @Override
     public boolean enlistResource(XAResource xaResource) throws RollbackException, IllegalStateException, SystemException {
-        return false;
+        //is null .
+        if (subCoordinator == null) {
+            buildCoord();
+            if (subCoordinator == null) {
+                throw new SystemException("not create subCoordinator");
+            }
+        }
+        boolean found = subCoordinator.addXaResource(xaResource);
+        int flag = found ? XAResource.TMJOIN : XAResource.TMNOFLAGS;
+        try {
+            xaResource.start(xid, flag);
+        } catch (XAException e) {
+            logger.error("", e);
+        }
+        return true;
     }
 
     @Override
@@ -89,5 +131,12 @@ public class TransactionImpl implements Transaction {
     @Override
     public void setRollbackOnly() throws IllegalStateException, SystemException {
 
+    }
+
+    void buildCoord() {
+        try {
+            subCoordinator = new SubCoordinator(xid, this);
+        } catch (Exception ex) {
+        }
     }
 }

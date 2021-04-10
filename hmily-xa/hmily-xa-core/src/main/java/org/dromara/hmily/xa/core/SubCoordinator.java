@@ -17,12 +17,39 @@
 
 package org.dromara.hmily.xa.core;
 
+import javax.transaction.xa.XAResource;
+import javax.transaction.xa.Xid;
+import java.util.Vector;
+
 /**
  * SubCoordinator .
  *
  * @author sixh chenbin
  */
-public class SubCoordinator implements Mock{
+public class SubCoordinator implements Mock {
+
+    private Xid xid;
+
+    private TransactionImpl transaction;
+
+    private XaState state = XaState.STATUS_ACTIVE;
+
+    private boolean isRoot;
+    /**
+     * all xaResources.
+     */
+    private Vector<XAResource> resources = new Vector<>();
+
+    /**
+     * Instantiates a new Sub coordinator.
+     *
+     * @param xid the xid
+     */
+    public SubCoordinator(Xid xid, TransactionImpl transaction) {
+        this.xid = xid;
+        this.transaction = transaction;
+    }
+
     @Override
     public int prepare() {
         return 0;
@@ -36,5 +63,17 @@ public class SubCoordinator implements Mock{
     @Override
     public void commit() {
 
+    }
+
+    /**
+     * Add a xa Resource.
+     *
+     * @return boolean
+     */
+    public synchronized boolean addXaResource(XAResource xaResource) {
+        if (resources.contains(xaResource)) {
+            return true;
+        }
+        return resources.add(xaResource);
     }
 }

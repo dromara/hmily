@@ -74,7 +74,7 @@ public enum TransactionManagerImpl implements TransactionManager {
 
     @Override
     public Transaction getTransaction() {
-        return null;
+        return hmilyXaTransactionManager.getTransaction();
     }
 
     @Override

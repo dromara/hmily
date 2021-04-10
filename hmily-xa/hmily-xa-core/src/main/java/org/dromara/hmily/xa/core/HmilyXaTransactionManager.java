@@ -20,7 +20,6 @@ package org.dromara.hmily.xa.core;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.sql.DataSource;
 import javax.transaction.Transaction;
 
 /**
@@ -33,15 +32,24 @@ public class HmilyXaTransactionManager {
     private final Logger logger = LoggerFactory.getLogger(HmilyXaTransactionManager.class);
 
     private final ThreadLocal<Transaction> tms = new ThreadLocal<>();
+
+    private Coordinator coordinator;
+
     /**
      * Initialized hmily xa transaction manager.
      *
-     * @param dataSource the data source
      * @return the hmily xa transaction manager
      */
     public static HmilyXaTransactionManager initialized() {
         return new HmilyXaTransactionManager();
     }
+
+    public HmilyXaTransactionManager() {
+        XIdImpl xId = new XIdImpl();
+        //Main business coordinator
+        coordinator = new Coordinator(xId);
+    }
+
     /**
      * Create transaction transaction.
      *
@@ -50,9 +58,9 @@ public class HmilyXaTransactionManager {
     public Transaction createTransaction() {
         Transaction threadTransaction = getThreadTransaction();
         Transaction rct = threadTransaction;
-        XIdImpl xId = new XIdImpl();
+        //xa;
         if (threadTransaction == null) {
-            rct = new TransactionImpl(xId);
+            rct = new TransactionImpl(this.coordinator.getSubXid());
         } else {
 
         }

@@ -46,7 +46,7 @@ import java.util.Calendar;
  */
 public class HmilyXaPreparedStatement extends HmilyXaStatement implements PreparedStatement {
 
-    private PreparedStatement preparedStatement;
+    private final PreparedStatement preparedStatement;
 
     public HmilyXaPreparedStatement(Connection connection, PreparedStatement statement) {
         super(connection, statement);

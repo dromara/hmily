@@ -17,7 +17,11 @@
 
 package org.dromara.hmily.xa.core;
 
+import com.google.common.base.Splitter;
+import org.dromara.hmily.common.utils.NetUtils;
+
 import javax.transaction.xa.Xid;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -27,22 +31,53 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class XIdImpl implements Xid {
 
-    private final Long id;
-
     private static final Integer DEF_ID = 8808;
 
-    private static final AtomicLong XID = new AtomicLong(1);
+    private static final AtomicLong XID = new AtomicLong(10000);
 
-    public XIdImpl(Long id) {
-        this.id = id;
-    }
+    /**
+     * Process branch Id;
+     */
+    private static final AtomicLong BXID = new AtomicLong(1);
+
+    private final String globalId;
+
+    private final String branchId;
+
+    private final byte[] globalIdByte;
+
+    private final byte[] branchIdByte;
 
     public XIdImpl() {
-        id = XID.getAndIncrement();
+        Long id = XID.getAndIncrement();
+        String bid = "0";
+        String newId = id + "-" + bid + "-" + NetUtils.getLocalIp();
+        this.globalId = newId;
+        this.branchId = newId;
+        this.branchIdByte = newId.getBytes();
+        this.globalIdByte = newId.getBytes();
     }
 
-    public Long getId() {
-        return id;
+    public XIdImpl(XIdImpl xId) {
+        String bid;
+        String gid;
+        List<String> xxIdx = Splitter.on("-").splitToList(xId.getGlobalId());
+        gid = xxIdx.get(0);
+        bid = String.valueOf(BXID.getAndIncrement());
+        String newId = gid + "-" + bid + "-" + NetUtils.getLocalIp();
+        this.branchId = newId;
+        this.branchIdByte = newId.getBytes();
+        this.globalId = xId.getGlobalId();
+        this.globalIdByte = xId.globalIdByte;
+    }
+
+
+    public String getGlobalId() {
+        return globalId;
+    }
+
+    public String getBranchId() {
+        return branchId;
     }
 
     @Override
@@ -52,12 +87,16 @@ public class XIdImpl implements Xid {
 
     @Override
     public byte[] getGlobalTransactionId() {
-        return new byte[0];
+        return this.globalIdByte;
     }
 
     @Override
     public byte[] getBranchQualifier() {
-        return new byte[0];
+        return this.branchIdByte;
+    }
+
+    public XIdImpl newBranchId() {
+        return new XIdImpl(this);
     }
 }
 

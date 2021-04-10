@@ -17,12 +17,14 @@
 
 package org.dromara.hmily.xa.p6spy;
 
+import org.dromara.hmily.xa.core.TransactionImpl;
 import org.dromara.hmily.xa.core.TransactionManagerImpl;
 
 import javax.sql.XAConnection;
 import javax.transaction.RollbackException;
 import javax.transaction.SystemException;
 import javax.transaction.Transaction;
+import javax.transaction.xa.XAResource;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -39,9 +41,9 @@ public class HmilyXaStatement implements Statement {
     /**
      * The Statement.
      */
-    Statement statement;
+    private final Statement statement;
 
-    private Connection connection;
+    private final Connection connection;
 
     /**
      * Instantiates a new Hmily xa statement.
@@ -51,6 +53,7 @@ public class HmilyXaStatement implements Statement {
      */
     public HmilyXaStatement(Connection connection, Statement statement) {
         this.statement = statement;
+        this.connection = connection;
     }
 
     @Override
@@ -286,7 +289,9 @@ public class HmilyXaStatement implements Statement {
         if (tx != null) {
             XAConnection xaConnection = getXaConnection();
             try {
-                tx.enlistResource(xaConnection.getXAResource());
+                if (tx instanceof TransactionImpl) {
+                    ((TransactionImpl) tx).doEnList(xaConnection.getXAResource(), XAResource.TMJOIN);
+                }
             } catch (RollbackException e) {
                 e.printStackTrace();
             } catch (SystemException e) {

@@ -32,6 +32,11 @@
             <groupId>javax.transaction</groupId>
             <artifactId>javax.transaction-api</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.dromara</groupId>
+            <artifactId>hmily-common</artifactId>
+            <version>2.1.2-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
 
