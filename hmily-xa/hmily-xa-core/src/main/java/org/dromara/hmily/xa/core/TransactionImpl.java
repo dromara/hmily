@@ -20,7 +20,6 @@ package org.dromara.hmily.xa.core;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.sql.XAConnection;
 import javax.transaction.HeuristicMixedException;
 import javax.transaction.HeuristicRollbackException;
 import javax.transaction.RollbackException;
@@ -43,15 +42,11 @@ public class TransactionImpl implements Transaction {
 
     private Logger logger = LoggerFactory.getLogger(TransactionImpl.class);
 
-    private Xid xid;
-    /**
-     * connection;
-     */
-    private XAConnection connection;
+    private XIdImpl xid;
 
     private SubCoordinator subCoordinator = null;
 
-    private List<XAResource> enlistResourceList = Collections.synchronizedList(new ArrayList<>());
+    private final List<XAResource> enlistResourceList = Collections.synchronizedList(new ArrayList<>());
 
     private List<XAResource> delistResourceList;
 
@@ -62,9 +57,15 @@ public class TransactionImpl implements Transaction {
 
     @Override
     public void commit() throws RollbackException, HeuristicMixedException, HeuristicRollbackException, SecurityException, IllegalStateException, SystemException {
+        if (subCoordinator != null) {
+            subCoordinator.commit();
+        } else {
+
+        }
     }
 
     public void doEnList(XAResource xaResource, int flag) throws SystemException, RollbackException {
+        //xaResource;
         if (flag == XAResource.TMRESUME) {
 
         } else if (flag == XAResource.TMJOIN) {
@@ -103,10 +104,13 @@ public class TransactionImpl implements Transaction {
                 throw new SystemException("not create subCoordinator");
             }
         }
-        boolean found = subCoordinator.addXaResource(xaResource);
+
+        XIdImpl resId = this.subCoordinator.nextXid(this.xid);
+        HmilyXaResource hmilyXaResource = new HmilyXaResource(resId, xaResource);
+        boolean found = subCoordinator.addXaResource(hmilyXaResource);
         int flag = found ? XAResource.TMJOIN : XAResource.TMNOFLAGS;
         try {
-            xaResource.start(xid, flag);
+            hmilyXaResource.start(flag);
         } catch (XAException e) {
             logger.error("", e);
         }
@@ -135,7 +139,8 @@ public class TransactionImpl implements Transaction {
 
     void buildCoord() {
         try {
-            subCoordinator = new SubCoordinator(xid, this);
+            subCoordinator = new SubCoordinator(this);
+
         } catch (Exception ex) {
         }
     }

@@ -17,7 +17,6 @@
 
 package org.dromara.hmily.xa.core;
 
-import javax.transaction.xa.Xid;
 import java.util.Vector;
 
 /**
@@ -30,12 +29,18 @@ public class Coordinator implements Mock {
     /**
      * all SubCoordinator.
      */
-    private Vector<SubCoordinator> coordinators = new Vector<>();
+    private Vector<Mock> coordinators = new Vector<>();
 
     private XIdImpl xid;
 
-    public Coordinator(XIdImpl xid) {
+    private XaState state = XaState.STATUS_ACTIVE;
+
+    private Coordinator superCoord;
+
+    public Coordinator(XIdImpl xid, Coordinator superCoord) {
         this.xid = xid;
+        this.superCoord = superCoord;
+        coordinators.add(this);
     }
 
     @Override
@@ -45,7 +50,14 @@ public class Coordinator implements Mock {
 
     @Override
     public void rollback() {
-
+        switch (state) {
+            case STATUS_ACTIVE:
+            case STATUS_MARKED_ROLLBACK:
+                break;
+            case STATUS_ROLLEDBACK:
+                return;
+        }
+        doRollback();
     }
 
     @Override
@@ -53,14 +65,32 @@ public class Coordinator implements Mock {
 
     }
 
-    public synchronized boolean addCoordinators(SubCoordinator subCoordinator) {
-        if (coordinators.contains(subCoordinator)) {
+    public XaState getState() {
+        return state;
+    }
+
+    public synchronized boolean addCoordinators(Mock mock) {
+        if (coordinators.contains(mock)) {
             return true;
         }
-        return this.coordinators.add(subCoordinator);
+        return this.coordinators.add(mock);
     }
 
     public XIdImpl getSubXid() {
         return this.xid.newBranchId();
+    }
+
+    private void doRollback() {
+        state = XaState.STATUS_ROLLEDBACK;
+        for (int i = 0; i < this.coordinators.size(); i++) {
+            Mock mock = this.coordinators.get(i);
+            if (mock != null) {
+                mock.rollback();
+            }
+        }
+    }
+
+    private void doCommit() {
+        state = XaState.STATUS_COMMITTED;
     }
 }

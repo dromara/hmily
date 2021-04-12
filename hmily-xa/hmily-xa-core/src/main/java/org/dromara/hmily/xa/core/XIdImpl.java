@@ -71,6 +71,19 @@ public class XIdImpl implements Xid {
         this.globalIdByte = xId.globalIdByte;
     }
 
+    public XIdImpl(XIdImpl xId, Integer index) {
+        String bid;
+        String gid;
+        List<String> xxIdx = Splitter.on("-").splitToList(xId.getGlobalId());
+        gid = xxIdx.get(0);
+        bid = String.valueOf(BXID.getAndIncrement());
+        String newId = gid + "-" + bid + "-" + NetUtils.getLocalIp() + "-" + index;
+        this.branchId = newId;
+        this.branchIdByte = newId.getBytes();
+        this.globalId = xId.getGlobalId();
+        this.globalIdByte = xId.globalIdByte;
+    }
+
 
     public String getGlobalId() {
         return globalId;
@@ -97,6 +110,20 @@ public class XIdImpl implements Xid {
 
     public XIdImpl newBranchId() {
         return new XIdImpl(this);
+    }
+
+    public XIdImpl newResId(int index) {
+        return new XIdImpl(this, index);
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return super.equals(obj);
     }
 }
 

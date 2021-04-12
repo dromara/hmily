@@ -36,9 +36,7 @@ public class UserTransactionImpl implements UserTransaction {
 
     private TransactionManager getTm() {
         if (tm == null) {
-            synchronized (TransactionManagerImpl.INST) {
-                tm = TransactionManagerImpl.INST;
-            }
+            tm = TransactionManagerImpl.INST;
         }
         return tm;
     }

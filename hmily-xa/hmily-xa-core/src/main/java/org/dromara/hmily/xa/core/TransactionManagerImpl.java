@@ -52,16 +52,15 @@ public enum TransactionManagerImpl implements TransactionManager {
     @Override
     public void begin() throws NotSupportedException, SystemException {
         //开始一个事务.
-        Transaction transaction = hmilyXaTransactionManager.getTransaction();
+        Transaction transaction = hmilyXaTransactionManager.createTransaction();
         if (transaction == null) {
-            transaction = hmilyXaTransactionManager.createTransaction();
+            throw new NullPointerException("begin Transaction error");
         }
     }
 
     @Override
     public void commit() throws RollbackException, HeuristicMixedException, HeuristicRollbackException, SecurityException, IllegalStateException, SystemException {
-        Transaction transaction = hmilyXaTransactionManager
-                .getTransaction();
+        Transaction transaction = hmilyXaTransactionManager.commit();
         if (transaction != null) {
             transaction.commit();
         }
@@ -69,7 +68,7 @@ public enum TransactionManagerImpl implements TransactionManager {
 
     @Override
     public int getStatus() throws SystemException {
-        return 0;
+        return hmilyXaTransactionManager.getCoordinator().getState().getState();
     }
 
     @Override
@@ -84,8 +83,8 @@ public enum TransactionManagerImpl implements TransactionManager {
 
     @Override
     public void rollback() throws IllegalStateException, SecurityException, SystemException {
-        Transaction transaction = hmilyXaTransactionManager
-                .getTransaction();
+        Transaction transaction = hmilyXaTransactionManager.rollback();
+
         if (transaction != null) {
             transaction.rollback();
         }
