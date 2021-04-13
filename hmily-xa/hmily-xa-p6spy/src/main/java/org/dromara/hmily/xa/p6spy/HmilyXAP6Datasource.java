@@ -65,7 +65,7 @@ public class HmilyXAP6Datasource extends P6DataSource {
      * @param connection the connection
      * @return the hmily connection
      */
-    public Connection getHmilyConnection(Connection connection) {
+    private Connection getHmilyConnection(Connection connection) {
         return new HmilyXaConnection(connection);
     }
 

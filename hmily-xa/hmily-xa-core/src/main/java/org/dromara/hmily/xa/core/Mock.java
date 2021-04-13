@@ -27,9 +27,9 @@ public interface Mock {
     /**
      * 2pc phase 1;
      *
-     * @return int
+     * @return int int
      */
-    int prepare();
+    Result prepare();
 
     /**
      * Rollback.
@@ -40,4 +40,41 @@ public interface Mock {
      * Commit.
      */
     void commit();
+
+    /**
+     * The enum Result.
+     */
+    enum Result {
+        /**
+         * Commit result.
+         */
+        COMMIT,
+        /**
+         * Rollback result.
+         */
+        ROLLBACK,
+        /**
+         * Readonly result.
+         */
+        READONLY,
+        ;
+
+        public static Result getResult(int r) {
+            Result rs = READONLY;
+            switch (r) {
+                case 0:
+                    rs = COMMIT;
+                    break;
+                case 1:
+                    rs = ROLLBACK;
+                    break;
+                case 2:
+                    rs = READONLY;
+                    break;
+                default:
+                    break;
+            }
+            return rs;
+        }
+    }
 }

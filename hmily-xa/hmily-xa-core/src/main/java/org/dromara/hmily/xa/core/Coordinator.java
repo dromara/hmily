@@ -17,6 +17,9 @@
 
 package org.dromara.hmily.xa.core;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.Vector;
 
 /**
@@ -26,12 +29,13 @@ import java.util.Vector;
  */
 public class Coordinator implements Mock {
 
+    private final Logger logger = LoggerFactory.getLogger(Coordinator.class);
     /**
      * all SubCoordinator.
      */
-    private Vector<Mock> coordinators = new Vector<>();
+    private final Vector<Mock> coordinators = new Vector<>();
 
-    private XIdImpl xid;
+    private final XIdImpl xid;
 
     private XaState state = XaState.STATUS_ACTIVE;
 
@@ -44,8 +48,8 @@ public class Coordinator implements Mock {
     }
 
     @Override
-    public int prepare() {
-        return 0;
+    public Result prepare() {
+        return Result.READONLY;
     }
 
     @Override
@@ -53,15 +57,39 @@ public class Coordinator implements Mock {
         switch (state) {
             case STATUS_ACTIVE:
             case STATUS_MARKED_ROLLBACK:
+                logger.warn("statue == STATUS_ACTIVE OR STATUS_MARKED_ROLLBACK");
                 break;
             case STATUS_ROLLEDBACK:
+                logger.warn("statue == STATUS_ROLLED_BACK");
                 return;
+            default:
+                break;
         }
         doRollback();
     }
 
     @Override
     public void commit() {
+        switch (state) {
+            case STATUS_ACTIVE:
+                break;
+            case STATUS_COMMITTED:
+                logger.warn("commit done");
+                return;
+            case STATUS_ROLLEDBACK:
+                logger.warn("commit state == STATUS_ROLLEDBACK");
+                return;
+            case STATUS_MARKED_ROLLBACK:
+                doRollback();
+                return;
+        }
+        //Start 1 pc.
+        doPrepare();
+        //Start 2 pc.
+        doCommit();
+    }
+
+    private void doPrepare() {
 
     }
 
@@ -82,8 +110,7 @@ public class Coordinator implements Mock {
 
     private void doRollback() {
         state = XaState.STATUS_ROLLEDBACK;
-        for (int i = 0; i < this.coordinators.size(); i++) {
-            Mock mock = this.coordinators.get(i);
+        for (Mock mock : this.coordinators) {
             if (mock != null) {
                 mock.rollback();
             }

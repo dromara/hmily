@@ -17,6 +17,9 @@
 
 package org.dromara.hmily.xa.core;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.transaction.SystemException;
 import javax.transaction.xa.XAException;
 import javax.transaction.xa.XAResource;
@@ -29,11 +32,11 @@ import java.util.Vector;
  */
 public class SubCoordinator implements Mock {
 
+    private final Logger logger = LoggerFactory.getLogger(SubCoordinator.class);
+
     private TransactionImpl transaction;
 
     private XaState state = XaState.STATUS_ACTIVE;
-
-    private boolean isRoot;
     /**
      * all xaResources.
      */
@@ -49,8 +52,54 @@ public class SubCoordinator implements Mock {
     }
 
     @Override
-    public int prepare() {
-        return 0;
+    public Result prepare() {
+        Result result = Result.READONLY;
+        if (resources.size() == 0) {
+            state = XaState.STATUS_COMMITTED;
+            return result;
+        }
+        state = XaState.STATUS_PREPARING;
+        boolean isError = false;
+        for (int i = 0; i < resources.size(); i++) {
+            HmilyXaResource xaResource = (HmilyXaResource) resources.elementAt(i);
+            //If there is an error.
+            if (isError) {
+                try {
+                    xaResource.rollback();
+                } catch (XAException e) {
+                    logger.error("call xa.rollback error ", e);
+                }
+            } else {
+                try {
+                    int prepare = xaResource.prepare();
+                    switch (prepare) {
+                        case XAResource.XA_OK:
+                            result = Result.COMMIT;
+                            break;
+                        case XAResource.XA_RDONLY:
+                            result = Result.ROLLBACK;
+                            break;
+                        default:
+                            break;
+                    }
+                } catch (XAException e) {
+                    result = Result.ROLLBACK;
+                    isError = true;
+                }
+            }
+        }
+        switch (result) {
+            case ROLLBACK:
+                state = XaState.STATUS_ROLLING_BACK;
+                break;
+            case COMMIT:
+                state = XaState.STATUS_PREPARED;
+                break;
+            case READONLY:
+                state = XaState.STATUS_COMMITTED;
+                break;
+        }
+        return result;
     }
 
     @Override
@@ -59,6 +108,8 @@ public class SubCoordinator implements Mock {
         try {
             this.transaction.doDeList(XAResource.TMSUCCESS);
         } catch (SystemException e) {
+            logger.error("rollback error", e);
+            return;
         }
         switch (state) {
             case STATUS_ACTIVE:
@@ -82,13 +133,19 @@ public class SubCoordinator implements Mock {
             try {
                 xaResource.rollback();
             } catch (XAException e) {
-
+                logger.error("rollback  error");
             }
         }
     }
 
+    private synchronized void doCommit() {
+
+    }
+
+
     @Override
     public void commit() {
+
     }
 
     public synchronized XIdImpl nextXid(XIdImpl xId) {
