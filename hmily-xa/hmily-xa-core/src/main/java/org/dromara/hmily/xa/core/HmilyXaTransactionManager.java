@@ -37,9 +37,13 @@ public class HmilyXaTransactionManager {
 
     private final ThreadLocal<Transaction> tms = new ThreadLocal<>();
 
-    private final Coordinator coordinator;
-
     private final Map<XIdImpl, Transaction> xidTransactionMap = new ConcurrentHashMap<>();
+
+    /**
+     * Instantiates a new Hmily xa transaction manager.
+     */
+    public HmilyXaTransactionManager() {
+    }
 
     /**
      * Initialized hmily xa transaction manager.
@@ -50,20 +54,11 @@ public class HmilyXaTransactionManager {
         return new HmilyXaTransactionManager();
     }
 
-    public HmilyXaTransactionManager() {
-        XIdImpl xId = new XIdImpl();
-        //Main business coordinator
-        coordinator = new Coordinator(xId,null);
-    }
-
-    public Coordinator getCoordinator() {
-        return coordinator;
-    }
-
     /**
      * Create transaction transaction.
      *
      * @return the transaction
+     * @throws SystemException the system exception
      */
     public Transaction createTransaction() throws SystemException {
         Transaction threadTransaction = getThreadTransaction();
@@ -78,17 +73,18 @@ public class HmilyXaTransactionManager {
                 }
             }
         }
-        XIdImpl subXid = this.coordinator.getSubXid();
-        rct = new TransactionImpl(subXid);
+        XIdImpl xId = new XIdImpl();
+        //Main business coordinator
+        rct = new TransactionImpl(xId);
         setTxTotr(rct);
-        xidTransactionMap.put(subXid, rct);
+        xidTransactionMap.put(xId, rct);
         return rct;
     }
 
     /**
-     * tx  to threadLocal;
+     * tx  to threadLocal.
      */
-    private void setTxTotr(Transaction transaction) {
+    private void setTxTotr(final Transaction transaction) {
         tms.set(transaction);
     }
 
@@ -141,12 +137,26 @@ public class HmilyXaTransactionManager {
         return threadTransaction;
     }
 
-    private boolean txCanRollback(Transaction transaction) throws SystemException {
+    private boolean txCanRollback(final Transaction transaction) throws SystemException {
         if (transaction.getStatus() == Status
                 .STATUS_MARKED_ROLLBACK) {
             transaction.rollback();
             return true;
         }
         return false;
+    }
+
+    /**
+     * Gets state.
+     *
+     * @return the state
+     * @throws SystemException the system exception
+     */
+    public Integer getState() throws SystemException {
+        Transaction transaction = getTransaction();
+        if (transaction == null) {
+            return XaState.STATUS_NO_TRANSACTION.getState();
+        }
+        return transaction.getStatus();
     }
 }

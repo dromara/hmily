@@ -20,35 +20,51 @@ package org.dromara.hmily.xa.core;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.transaction.RollbackException;
+import javax.transaction.Synchronization;
 import javax.transaction.SystemException;
 import javax.transaction.xa.XAException;
 import javax.transaction.xa.XAResource;
+import java.util.Optional;
 import java.util.Vector;
+
+import static org.dromara.hmily.xa.core.XaState.STATUS_PREPARED;
 
 /**
  * SubCoordinator .
  *
  * @author sixh chenbin
  */
-public class SubCoordinator implements Mock {
+public class SubCoordinator implements Remote {
 
     private final Logger logger = LoggerFactory.getLogger(SubCoordinator.class);
 
-    private TransactionImpl transaction;
+    private final TransactionImpl transaction;
 
     private XaState state = XaState.STATUS_ACTIVE;
+
     /**
      * all xaResources.
      */
-    private Vector<XAResource> resources = new Vector<>();
+    private final Vector<XAResource> resources = new Vector<>();
+
+    /**
+     * all Synchronization.
+     *
+     * @see SynchronizationImpl
+     */
+    private final Vector<Synchronization> synchronizations = new Vector<>();
+
+    private final XIdImpl xId;
 
     /**
      * Instantiates a new Sub coordinator.
      *
      * @param transaction the transaction
      */
-    public SubCoordinator(TransactionImpl transaction) {
+    public SubCoordinator(final TransactionImpl transaction) {
         this.transaction = transaction;
+        xId = transaction.getXid().newBranchId();
     }
 
     @Override
@@ -93,10 +109,12 @@ public class SubCoordinator implements Mock {
                 state = XaState.STATUS_ROLLING_BACK;
                 break;
             case COMMIT:
-                state = XaState.STATUS_PREPARED;
+                state = STATUS_PREPARED;
                 break;
             case READONLY:
                 state = XaState.STATUS_COMMITTED;
+                break;
+            default:
                 break;
         }
         return result;
@@ -138,17 +156,44 @@ public class SubCoordinator implements Mock {
         }
     }
 
+    //2pc.
     private synchronized void doCommit() {
+        state = XaState.STATUS_COMMITTING;
 
+        for (int i = 0; i < resources.size(); i++) {
+            HmilyXaResource xaResource = (HmilyXaResource) resources.elementAt(i);
+            try {
+                // false is 2pc.
+                xaResource.commit(false);
+            } catch (XAException e) {
+                logger.error("rollback  error");
+            }
+        }
     }
-
 
     @Override
     public void commit() {
+        switch (state) {
+            case STATUS_PREPARED:
+                break;
+            default:
+                return;
+        }
+        doCommit();
+    }
+
+    @Override
+    public void onePhaseCommit() {
 
     }
 
-    public synchronized XIdImpl nextXid(XIdImpl xId) {
+    /**
+     * Next xid x id.
+     *
+     * @param xId the x id
+     * @return the x id
+     */
+    public synchronized XIdImpl nextXid(final XIdImpl xId) {
         return xId.newResId(this.resources.size() + 1);
     }
 
@@ -158,7 +203,7 @@ public class SubCoordinator implements Mock {
      * @param xaResource the xa resource
      * @return boolean boolean
      */
-    public synchronized boolean addXaResource(XAResource xaResource) {
+    public synchronized boolean addXaResource(final XAResource xaResource) {
         switch (state) {
             case STATUS_MARKED_ROLLBACK:
                 break;
@@ -167,13 +212,44 @@ public class SubCoordinator implements Mock {
             default:
                 throw new RuntimeException("status == " + state);
         }
-        resources.stream().filter(e -> {
+        Optional<XAResource> isSameRM = resources.stream().filter(e -> {
             try {
                 return !e.isSameRM(xaResource);
             } catch (XAException xaException) {
-                return true;
+                logger.error("xa isSameRM", xaException);
+                return false;
             }
-        }).findFirst().ifPresent(xaResource1 -> resources.add(xaResource));
+        }).findFirst();
+        if (!isSameRM.isPresent()) {
+            this.resources.add(xaResource);
+            return false;
+        }
         return true;
+    }
+
+    /**
+     * Add synchronization boolean.
+     *
+     * @param synchronization the synchronization
+     * @throws RollbackException the rollback exception
+     */
+    public synchronized void addSynchronization(final Synchronization synchronization) throws RollbackException {
+        if (state == XaState.STATUS_ACTIVE) {
+            synchronizations.add(synchronization);
+            return;
+        }
+        if (state == XaState.STATUS_MARKED_ROLLBACK || state == XaState.STATUS_ROLLEDBACK) {
+            synchronizations.add(synchronization);
+            throw new RollbackException();
+        }
+    }
+
+    /**
+     * Gets state.
+     *
+     * @return the state
+     */
+    public XaState getState() {
+        return state;
     }
 }

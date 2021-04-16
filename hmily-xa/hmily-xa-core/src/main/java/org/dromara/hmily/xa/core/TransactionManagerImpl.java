@@ -38,14 +38,17 @@ public enum TransactionManagerImpl implements TransactionManager {
      */
     INST;
 
-    HmilyXaTransactionManager hmilyXaTransactionManager = null;
+    private HmilyXaTransactionManager hmilyXaTransactionManager;
 
     TransactionManagerImpl() {
-
+        this.initialized();
     }
 
+    /**
+     * Initialized.
+     */
     public void initialized() {
-        //初始化一下 @see HmilyXaTransactionManager;
+        //initialize_it @see HmilyXaTransactionManager;
         hmilyXaTransactionManager = HmilyXaTransactionManager.initialized();
     }
 
@@ -68,7 +71,7 @@ public enum TransactionManagerImpl implements TransactionManager {
 
     @Override
     public int getStatus() throws SystemException {
-        return hmilyXaTransactionManager.getCoordinator().getState().getState();
+        return hmilyXaTransactionManager.getState();
     }
 
     @Override
@@ -77,14 +80,13 @@ public enum TransactionManagerImpl implements TransactionManager {
     }
 
     @Override
-    public void resume(Transaction transaction) throws InvalidTransactionException, IllegalStateException, SystemException {
+    public void resume(final Transaction transaction) throws InvalidTransactionException, IllegalStateException, SystemException {
 
     }
 
     @Override
     public void rollback() throws IllegalStateException, SecurityException, SystemException {
         Transaction transaction = hmilyXaTransactionManager.rollback();
-
         if (transaction != null) {
             transaction.rollback();
         }
@@ -96,7 +98,7 @@ public enum TransactionManagerImpl implements TransactionManager {
     }
 
     @Override
-    public void setTransactionTimeout(int i) throws SystemException {
+    public void setTransactionTimeout(final int i) throws SystemException {
 
     }
 

@@ -28,53 +28,76 @@ import javax.transaction.SystemException;
 import javax.transaction.Transaction;
 import javax.transaction.xa.XAException;
 import javax.transaction.xa.XAResource;
-import javax.transaction.xa.Xid;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 /**
  * TransactionImpl .
+ * a thread only .
  *
  * @author sixh chenbin
  */
 public class TransactionImpl implements Transaction {
 
-    private Logger logger = LoggerFactory.getLogger(TransactionImpl.class);
+    private final Logger logger = LoggerFactory.getLogger(TransactionImpl.class);
 
-    private XIdImpl xid;
+    private final XIdImpl xid;
 
-    private SubCoordinator subCoordinator = null;
+    private SubCoordinator subCoordinator;
 
     private final List<XAResource> enlistResourceList = Collections.synchronizedList(new ArrayList<>());
 
     private List<XAResource> delistResourceList;
 
-    public TransactionImpl(XIdImpl xid) {
-        this.xid = xid;
-        buildCoord();
+    private final TransactionContext context;
+
+    /**
+     * Instantiates a new Transaction.
+     *
+     * @param xId the x id
+     */
+    public TransactionImpl(final XIdImpl xId) {
+        this.xid = xId;
+        context = new TransactionContext(null, xId);
+        subCoordinator(true, true);
     }
 
     @Override
     public void commit() throws RollbackException, HeuristicMixedException, HeuristicRollbackException, SecurityException, IllegalStateException, SystemException {
+        Coordinator coordinator = context.getCoordinator();
+        if (coordinator != null) {
+            coordinator.commit();
+        }
         if (subCoordinator != null) {
             subCoordinator.commit();
-        } else {
-
         }
     }
 
-    public void doEnList(XAResource xaResource, int flag) throws SystemException, RollbackException {
+    /**
+     * Do en list.
+     *
+     * @param xaResource the xa resource
+     * @param flag       the flag
+     * @throws SystemException   the system exception
+     * @throws RollbackException the rollback exception
+     */
+    public void doEnList(final XAResource xaResource, final int flag) throws SystemException, RollbackException {
         //xaResource;
-        if (flag == XAResource.TMRESUME) {
-
-        } else if (flag == XAResource.TMJOIN) {
+        if (flag == XAResource.TMJOIN) {
             enlistResource(xaResource);
         }
         delistResourceList = null;
+
     }
 
-    public void doDeList(int flag) throws SystemException {
+    /**
+     * Do de list.
+     *
+     * @param flag the flag
+     * @throws SystemException the system exception
+     */
+    public void doDeList(final int flag) throws SystemException {
         delistResourceList = new ArrayList<>(enlistResourceList);
         for (XAResource resource : delistResourceList) {
             delistResource(resource, flag);
@@ -82,29 +105,30 @@ public class TransactionImpl implements Transaction {
     }
 
     @Override
-    public boolean delistResource(XAResource xaResource, int flag) throws IllegalStateException, SystemException {
+    public boolean delistResource(final XAResource xaResource, final int flag) throws IllegalStateException, SystemException {
         if (!enlistResourceList.contains(xaResource)) {
             return false;
         }
-        Xid xid = new XIdImpl();
+        HmilyXaResource myResoure = (HmilyXaResource) xaResource;
         try {
-            xaResource.end(xid, flag);
+            xaResource.end(myResoure.getXid(), flag);
+            enlistResourceList.remove(xaResource);
+            return true;
         } catch (XAException e) {
+            logger.info("xa resource end ", e);
         }
         return false;
-
     }
 
     @Override
-    public boolean enlistResource(XAResource xaResource) throws RollbackException, IllegalStateException, SystemException {
+    public boolean enlistResource(final XAResource xaResource) throws RollbackException, IllegalStateException, SystemException {
         //is null .
         if (subCoordinator == null) {
-            buildCoord();
+            subCoordinator(false, false);
             if (subCoordinator == null) {
                 throw new SystemException("not create subCoordinator");
             }
         }
-
         XIdImpl resId = this.subCoordinator.nextXid(this.xid);
         HmilyXaResource hmilyXaResource = new HmilyXaResource(resId, xaResource);
         boolean found = subCoordinator.addXaResource(hmilyXaResource);
@@ -113,35 +137,66 @@ public class TransactionImpl implements Transaction {
             hmilyXaResource.start(flag);
         } catch (XAException e) {
             logger.error("", e);
+            throw new IllegalStateException(e);
         }
         return true;
     }
 
     @Override
     public int getStatus() throws SystemException {
-        return 0;
+        if (context.getCoordinator() != null) {
+            return context.getCoordinator().getState().getState();
+        }
+        return subCoordinator.getState().getState();
     }
 
     @Override
-    public void registerSynchronization(Synchronization synchronization) throws RollbackException, IllegalStateException, SystemException {
-
+    public void registerSynchronization(final Synchronization synchronization) throws RollbackException, IllegalStateException, SystemException {
+        if (synchronization == null) {
+            return;
+        }
+        if (subCoordinator == null) {
+            subCoordinator(false, true);
+        }
+        subCoordinator.addSynchronization(synchronization);
     }
 
     @Override
     public void rollback() throws IllegalStateException, SystemException {
 
+        if (subCoordinator != null) {
+            subCoordinator.rollback();
+        }
     }
 
     @Override
     public void setRollbackOnly() throws IllegalStateException, SystemException {
-
+        subCoordinator(false, false);
     }
 
-    void buildCoord() {
+    private void subCoordinator(final boolean newCoordinator, final boolean stateActive) {
         try {
             subCoordinator = new SubCoordinator(this);
-
+            if (!stateActive) {
+                return;
+            }
+            Coordinator coordinator = context.getCoordinator();
+            if (newCoordinator && coordinator == null) {
+                coordinator = new Coordinator(xid);
+            }
+            context.setCoordinator(coordinator);
+            coordinator.addCoordinators(subCoordinator);
         } catch (Exception ex) {
+            logger.error("build SubCoordinator error");
         }
+    }
+
+    /**
+     * Gets xid.
+     *
+     * @return the xid
+     */
+    public XIdImpl getXid() {
+        return xid;
     }
 }

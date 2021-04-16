@@ -36,7 +36,7 @@ public class XIdImpl implements Xid {
     private static final AtomicLong XID = new AtomicLong(10000);
 
     /**
-     * Process branch Id;
+     * Process branch Id.
      */
     private static final AtomicLong BXID = new AtomicLong(1);
 
@@ -48,6 +48,9 @@ public class XIdImpl implements Xid {
 
     private final byte[] branchIdByte;
 
+    /**
+     * Instantiates a new X id.
+     */
     public XIdImpl() {
         Long id = XID.getAndIncrement();
         String bid = "0";
@@ -58,7 +61,12 @@ public class XIdImpl implements Xid {
         this.globalIdByte = newId.getBytes();
     }
 
-    public XIdImpl(XIdImpl xId) {
+    /**
+     * Instantiates a new X id.
+     *
+     * @param xId the x id
+     */
+    public XIdImpl(final XIdImpl xId) {
         String bid;
         String gid;
         List<String> xxIdx = Splitter.on("-").splitToList(xId.getGlobalId());
@@ -71,7 +79,13 @@ public class XIdImpl implements Xid {
         this.globalIdByte = xId.globalIdByte;
     }
 
-    public XIdImpl(XIdImpl xId, Integer index) {
+    /**
+     * Instantiates a new X id.
+     *
+     * @param xId   the x id
+     * @param index the index
+     */
+    public XIdImpl(final XIdImpl xId, final Integer index) {
         String bid;
         String gid;
         List<String> xxIdx = Splitter.on("-").splitToList(xId.getGlobalId());
@@ -85,10 +99,20 @@ public class XIdImpl implements Xid {
     }
 
 
+    /**
+     * Gets global id.
+     *
+     * @return the global id
+     */
     public String getGlobalId() {
         return globalId;
     }
 
+    /**
+     * Gets branch id.
+     *
+     * @return the branch id
+     */
     public String getBranchId() {
         return branchId;
     }
@@ -108,11 +132,22 @@ public class XIdImpl implements Xid {
         return this.branchIdByte;
     }
 
+    /**
+     * New branch id x id.
+     *
+     * @return the x id
+     */
     public XIdImpl newBranchId() {
         return new XIdImpl(this);
     }
 
-    public XIdImpl newResId(int index) {
+    /**
+     * New res id x id.
+     *
+     * @param index the index
+     * @return the x id
+     */
+    public XIdImpl newResId(final int index) {
         return new XIdImpl(this, index);
     }
 
@@ -122,7 +157,7 @@ public class XIdImpl implements Xid {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         return super.equals(obj);
     }
 }

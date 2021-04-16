@@ -27,28 +27,32 @@ import java.util.Vector;
  *
  * @author sixh chenbin
  */
-public class Coordinator implements Mock {
+public class Coordinator implements Remote {
 
     private final Logger logger = LoggerFactory.getLogger(Coordinator.class);
+
     /**
      * all SubCoordinator.
      */
-    private final Vector<Mock> coordinators = new Vector<>();
+    private final Vector<Remote> coordinators = new Vector<>();
 
     private final XIdImpl xid;
 
     private XaState state = XaState.STATUS_ACTIVE;
 
-    private Coordinator superCoord;
-
-    public Coordinator(XIdImpl xid, Coordinator superCoord) {
+    /**
+     * Instantiates a new Coordinator.
+     *
+     * @param xid the xid
+     */
+    public Coordinator(final XIdImpl xid) {
         this.xid = xid;
-        this.superCoord = superCoord;
         coordinators.add(this);
     }
 
     @Override
     public Result prepare() {
+        doPrepare();
         return Result.READONLY;
     }
 
@@ -82,37 +86,61 @@ public class Coordinator implements Mock {
             case STATUS_MARKED_ROLLBACK:
                 doRollback();
                 return;
+            default:
+                break;
         }
         //Start 1 pc.
-        doPrepare();
+        onePhaseCommit();
+
         //Start 2 pc.
         doCommit();
+    }
+
+    @Override
+    public void onePhaseCommit() {
+
     }
 
     private void doPrepare() {
 
     }
 
+    /**
+     * Gets state.
+     *
+     * @return the state
+     */
     public XaState getState() {
         return state;
     }
 
-    public synchronized boolean addCoordinators(Mock mock) {
-        if (coordinators.contains(mock)) {
+    /**
+     * Add coordinators boolean.
+     *
+     * @param remote the remote
+     * @return the boolean
+     */
+    public synchronized boolean addCoordinators(final Remote remote) {
+        if (coordinators.contains(remote)) {
             return true;
         }
-        return this.coordinators.add(mock);
+        return this.coordinators.add(remote);
     }
 
+    /**
+     * Gets sub xid.
+     *
+     * @return the sub xid
+     */
     public XIdImpl getSubXid() {
         return this.xid.newBranchId();
     }
 
     private void doRollback() {
         state = XaState.STATUS_ROLLEDBACK;
-        for (Mock mock : this.coordinators) {
-            if (mock != null) {
-                mock.rollback();
+        for (Remote remote : this.coordinators) {
+            if (remote != null) {
+                remote.rollback();
             }
         }
     }

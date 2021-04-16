@@ -28,50 +28,88 @@ import javax.transaction.xa.Xid;
  */
 public class HmilyXaResource implements XAResource {
 
-    private XAResource xaResource;
+    private final XAResource xaResource;
 
     private Xid xid;
 
-    public void setXid(Xid xid) {
+    /**
+     * Instantiates a new Hmily xa resource.
+     *
+     * @param xaResource the xa resource
+     */
+    public HmilyXaResource(final XAResource xaResource) {
+        this.xaResource = xaResource;
+    }
+
+    /**
+     * Instantiates a new Hmily xa resource.
+     *
+     * @param xid        the xid
+     * @param xaResource the xa resource
+     */
+    public HmilyXaResource(final Xid xid, final XAResource xaResource) {
+        this.xaResource = xaResource;
         this.xid = xid;
     }
 
+    /**
+     * Sets xid.
+     *
+     * @param xid the xid
+     */
+    public void setXid(final Xid xid) {
+        this.xid = xid;
+    }
+
+    /**
+     * Gets xid.
+     *
+     * @return the xid
+     */
     public Xid getXid() {
         return xid;
     }
 
-    public HmilyXaResource(XAResource xaResource) {
-        this.xaResource = xaResource;
-    }
-
-    public HmilyXaResource(Xid xid, XAResource xaResource) {
-        this.xaResource = xaResource;
-        this.xid = xid;
-    }
-
     @Override
-    public void commit(Xid xid, boolean b) throws XAException {
+    public void commit(final Xid xid, final boolean b) throws XAException {
         this.xaResource.commit(xid, b);
     }
 
-    public void commit(boolean b) throws XAException {
+    /**
+     * Commit.
+     *
+     * @param b the b
+     * @throws XAException the xa exception
+     */
+    public void commit(final boolean b) throws XAException {
         this.commit(this.xid, b);
     }
 
     @Override
-    public void end(Xid xid, int i) throws XAException {
+    public void end(final Xid xid, final int i) throws XAException {
         this.xaResource.end(xid, i);
     }
 
-    public void end(int i) throws XAException {
+    /**
+     * End.
+     *
+     * @param i the
+     * @throws XAException the xa exception
+     */
+    public void end(final int i) throws XAException {
         this.end(this.xid, i);
     }
 
     @Override
-    public void forget(Xid xid) throws XAException {
+    public void forget(final Xid xid) throws XAException {
         this.xaResource.forget(xid);
     }
 
+    /**
+     * Forget.
+     *
+     * @throws XAException the xa exception
+     */
     public void forget() throws XAException {
         this.forget(this.xid);
     }
@@ -82,44 +120,61 @@ public class HmilyXaResource implements XAResource {
     }
 
     @Override
-    public boolean isSameRM(XAResource xaResource) throws XAException {
+    public boolean isSameRM(final XAResource xaResource) throws XAException {
         return this.xaResource.isSameRM(xaResource);
     }
 
     @Override
-    public int prepare(Xid xid) throws XAException {
+    public int prepare(final Xid xid) throws XAException {
         return this.xaResource.prepare(xid);
     }
 
+    /**
+     * Prepare int.
+     *
+     * @return the int
+     * @throws XAException the xa exception
+     */
     public int prepare() throws XAException {
         return this.prepare(this.xid);
     }
 
     @Override
-    public Xid[] recover(int i) throws XAException {
+    public Xid[] recover(final int i) throws XAException {
         return this.xaResource.recover(i);
     }
 
     @Override
-    public void rollback(Xid xid) throws XAException {
+    public void rollback(final Xid xid) throws XAException {
         this.xaResource.rollback(xid);
     }
 
+    /**
+     * Rollback.
+     *
+     * @throws XAException the xa exception
+     */
     public void rollback() throws XAException {
         this.rollback(this.xid);
     }
 
     @Override
-    public boolean setTransactionTimeout(int i) throws XAException {
+    public boolean setTransactionTimeout(final int i) throws XAException {
         return this.xaResource.setTransactionTimeout(i);
     }
 
     @Override
-    public void start(Xid xid, int i) throws XAException {
+    public void start(final Xid xid, final int i) throws XAException {
         this.xaResource.start(xid, i);
     }
 
-    public void start(int i) throws XAException {
+    /**
+     * Start.
+     *
+     * @param i the
+     * @throws XAException the xa exception
+     */
+    public void start(final int i) throws XAException {
         this.start(this.xid, i);
     }
 }

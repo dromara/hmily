@@ -63,11 +63,11 @@ public class UserTransactionImpl implements UserTransaction {
 
     @Override
     public int getStatus() throws SystemException {
-        return 0;
+        return tm.getStatus();
     }
 
     @Override
-    public void setTransactionTimeout(int i) throws SystemException {
+    public void setTransactionTimeout(final int i) throws SystemException {
 
     }
 }

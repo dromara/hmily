@@ -74,15 +74,19 @@ public enum XaState {
     /**
      * Status rolling back xa state.
      */
-    STATUS_ROLLING_BACK(Status.STATUS_ROLLING_BACK),
-    ;
+    STATUS_ROLLING_BACK(Status.STATUS_ROLLING_BACK),;
 
     private final Integer state;
 
-    XaState(Integer state) {
+    XaState(final Integer state) {
         this.state = state;
     }
 
+    /**
+     * Gets state.
+     *
+     * @return the state
+     */
     public Integer getState() {
         return state;
     }

@@ -22,10 +22,10 @@ package org.dromara.hmily.xa.core;
  *
  * @author sixh chenbin
  */
-public interface Mock {
+public interface Remote {
 
     /**
-     * 2pc phase 1;
+     * 2pc phase 1.
      *
      * @return int int
      */
@@ -42,6 +42,11 @@ public interface Mock {
     void commit();
 
     /**
+     * 1 pc .
+     */
+    void onePhaseCommit();
+
+    /**
      * The enum Result.
      */
     enum Result {
@@ -56,10 +61,15 @@ public interface Mock {
         /**
          * Readonly result.
          */
-        READONLY,
-        ;
+        READONLY;
 
-        public static Result getResult(int r) {
+        /**
+         * Gets result.
+         *
+         * @param r the r
+         * @return the result
+         */
+        public static Result getResult(final int r) {
             Result rs = READONLY;
             switch (r) {
                 case 0:

@@ -17,6 +17,10 @@
 
 package org.dromara.hmily.xa.p6spy;
 
+import javax.sql.ConnectionEventListener;
+import javax.sql.StatementEventListener;
+import javax.sql.XAConnection;
+import javax.transaction.xa.XAResource;
 import java.sql.Array;
 import java.sql.Blob;
 import java.sql.CallableStatement;
@@ -41,41 +45,48 @@ import java.util.concurrent.Executor;
  *
  * @author sixh chenbin
  */
-public class HmilyXaConnection implements Connection {
-
+public class HmilyXaConnection implements Connection, XAConnection {
     /**
      * original connection;
      */
-    private Connection connection;
+    private final XAConnection xaConnection;
 
-    public HmilyXaConnection(Connection connection) {
-        this.connection = connection;
+    private final Connection connection;
+
+    /**
+     * Instantiates a new Hmily xa connection.
+     *
+     * @param xaConnection the connection
+     */
+    public HmilyXaConnection(final XAConnection xaConnection) throws SQLException {
+        this.xaConnection = xaConnection;
+        this.connection = xaConnection.getConnection();
     }
 
     @Override
     public Statement createStatement() throws SQLException {
         Statement statement = connection.createStatement();
-        return new HmilyXaStatement(connection, statement);
+        return new HmilyXaStatement(connection, xaConnection, statement);
     }
 
     @Override
-    public PreparedStatement prepareStatement(String sql) throws SQLException {
+    public PreparedStatement prepareStatement(final String sql) throws SQLException {
         PreparedStatement statement = connection.prepareStatement(sql);
-        return new HmilyXaPreparedStatement(connection, statement);
+        return new HmilyXaPreparedStatement(connection, xaConnection, statement);
     }
 
     @Override
-    public CallableStatement prepareCall(String sql) throws SQLException {
+    public CallableStatement prepareCall(final String sql) throws SQLException {
         return connection.prepareCall(sql);
     }
 
     @Override
-    public String nativeSQL(String sql) throws SQLException {
+    public String nativeSQL(final String sql) throws SQLException {
         return connection.nativeSQL(sql);
     }
 
     @Override
-    public void setAutoCommit(boolean autoCommit) throws SQLException {
+    public void setAutoCommit(final boolean autoCommit) throws SQLException {
         connection.setAutoCommit(autoCommit);
     }
 
@@ -95,8 +106,33 @@ public class HmilyXaConnection implements Connection {
     }
 
     @Override
+    public Connection getConnection() throws SQLException {
+        return null;
+    }
+
+    @Override
     public void close() throws SQLException {
         connection.close();
+    }
+
+    @Override
+    public void addConnectionEventListener(final ConnectionEventListener listener) {
+
+    }
+
+    @Override
+    public void removeConnectionEventListener(final ConnectionEventListener listener) {
+
+    }
+
+    @Override
+    public void addStatementEventListener(final StatementEventListener listener) {
+
+    }
+
+    @Override
+    public void removeStatementEventListener(final StatementEventListener listener) {
+
     }
 
     @Override
@@ -110,7 +146,7 @@ public class HmilyXaConnection implements Connection {
     }
 
     @Override
-    public void setReadOnly(boolean readOnly) throws SQLException {
+    public void setReadOnly(final boolean readOnly) throws SQLException {
         connection.setReadOnly(readOnly);
     }
 
@@ -120,7 +156,7 @@ public class HmilyXaConnection implements Connection {
     }
 
     @Override
-    public void setCatalog(String catalog) throws SQLException {
+    public void setCatalog(final String catalog) throws SQLException {
         connection.setCatalog(catalog);
     }
 
@@ -130,7 +166,7 @@ public class HmilyXaConnection implements Connection {
     }
 
     @Override
-    public void setTransactionIsolation(int level) throws SQLException {
+    public void setTransactionIsolation(final int level) throws SQLException {
         connection.setTransactionIsolation(level);
     }
 
@@ -150,19 +186,19 @@ public class HmilyXaConnection implements Connection {
     }
 
     @Override
-    public Statement createStatement(int resultSetType, int resultSetConcurrency) throws SQLException {
+    public Statement createStatement(final int resultSetType, final int resultSetConcurrency) throws SQLException {
         Statement statement = connection.createStatement(resultSetType, resultSetConcurrency);
-        return new HmilyXaStatement(connection, statement);
+        return new HmilyXaStatement(connection, xaConnection, statement);
     }
 
     @Override
-    public PreparedStatement prepareStatement(String sql, int resultSetType, int resultSetConcurrency) throws SQLException {
+    public PreparedStatement prepareStatement(final String sql, final int resultSetType, final int resultSetConcurrency) throws SQLException {
         PreparedStatement statement = connection.prepareStatement(sql, resultSetType, resultSetConcurrency);
-        return new HmilyXaPreparedStatement(connection, statement);
+        return new HmilyXaPreparedStatement(connection, xaConnection, statement);
     }
 
     @Override
-    public CallableStatement prepareCall(String sql, int resultSetType, int resultSetConcurrency) throws SQLException {
+    public CallableStatement prepareCall(final String sql, final int resultSetType, final int resultSetConcurrency) throws SQLException {
         return connection.prepareCall(sql, resultSetType, resultSetConcurrency);
     }
 
@@ -172,12 +208,12 @@ public class HmilyXaConnection implements Connection {
     }
 
     @Override
-    public void setTypeMap(Map<String, Class<?>> map) throws SQLException {
+    public void setTypeMap(final Map<String, Class<?>> map) throws SQLException {
         connection.setTypeMap(map);
     }
 
     @Override
-    public void setHoldability(int holdability) throws SQLException {
+    public void setHoldability(final int holdability) throws SQLException {
         connection.setHoldability(holdability);
     }
 
@@ -192,53 +228,53 @@ public class HmilyXaConnection implements Connection {
     }
 
     @Override
-    public Savepoint setSavepoint(String name) throws SQLException {
+    public Savepoint setSavepoint(final String name) throws SQLException {
         return connection.setSavepoint(name);
     }
 
     @Override
-    public void rollback(Savepoint savepoint) throws SQLException {
+    public void rollback(final Savepoint savepoint) throws SQLException {
         connection.rollback(savepoint);
     }
 
     @Override
-    public void releaseSavepoint(Savepoint savepoint) throws SQLException {
+    public void releaseSavepoint(final Savepoint savepoint) throws SQLException {
         connection.releaseSavepoint(savepoint);
     }
 
     @Override
-    public Statement createStatement(int resultSetType, int resultSetConcurrency, int resultSetHoldability) throws SQLException {
+    public Statement createStatement(final int resultSetType, final int resultSetConcurrency, final int resultSetHoldability) throws SQLException {
         Statement statement = connection.createStatement(resultSetType, resultSetConcurrency, resultSetHoldability);
-        return new HmilyXaStatement(connection, statement);
+        return new HmilyXaStatement(connection, xaConnection, statement);
     }
 
     @Override
-    public PreparedStatement prepareStatement(String sql, int resultSetType, int resultSetConcurrency, int resultSetHoldability) throws SQLException {
+    public PreparedStatement prepareStatement(final String sql, final int resultSetType, final int resultSetConcurrency, final int resultSetHoldability) throws SQLException {
         PreparedStatement statement = connection.prepareStatement(sql, resultSetType, resultSetConcurrency, resultSetHoldability);
-        return new HmilyXaPreparedStatement(connection, statement);
+        return new HmilyXaPreparedStatement(connection, xaConnection, statement);
     }
 
     @Override
-    public CallableStatement prepareCall(String sql, int resultSetType, int resultSetConcurrency, int resultSetHoldability) throws SQLException {
+    public CallableStatement prepareCall(final String sql, final int resultSetType, final int resultSetConcurrency, final int resultSetHoldability) throws SQLException {
         return connection.prepareCall(sql, resultSetType, resultSetConcurrency, resultSetHoldability);
     }
 
     @Override
-    public PreparedStatement prepareStatement(String sql, int autoGeneratedKeys) throws SQLException {
+    public PreparedStatement prepareStatement(final String sql, final int autoGeneratedKeys) throws SQLException {
         PreparedStatement statement = connection.prepareStatement(sql, autoGeneratedKeys);
-        return new HmilyXaPreparedStatement(connection, statement);
+        return new HmilyXaPreparedStatement(connection, xaConnection, statement);
     }
 
     @Override
-    public PreparedStatement prepareStatement(String sql, int[] columnIndexes) throws SQLException {
+    public PreparedStatement prepareStatement(final String sql, final int[] columnIndexes) throws SQLException {
         PreparedStatement statement = connection.prepareStatement(sql, columnIndexes);
-        return new HmilyXaPreparedStatement(connection, statement);
+        return new HmilyXaPreparedStatement(connection, xaConnection, statement);
     }
 
     @Override
-    public PreparedStatement prepareStatement(String sql, String[] columnNames) throws SQLException {
+    public PreparedStatement prepareStatement(final String sql, final String[] columnNames) throws SQLException {
         PreparedStatement statement = connection.prepareStatement(sql, columnNames);
-        return new HmilyXaPreparedStatement(connection, statement);
+        return new HmilyXaPreparedStatement(connection, xaConnection, statement);
     }
 
     @Override
@@ -262,22 +298,22 @@ public class HmilyXaConnection implements Connection {
     }
 
     @Override
-    public boolean isValid(int timeout) throws SQLException {
+    public boolean isValid(final int timeout) throws SQLException {
         return connection.isValid(timeout);
     }
 
     @Override
-    public void setClientInfo(String name, String value) throws SQLClientInfoException {
+    public void setClientInfo(final String name, final String value) throws SQLClientInfoException {
         connection.setClientInfo(name, value);
     }
 
     @Override
-    public void setClientInfo(Properties properties) throws SQLClientInfoException {
+    public void setClientInfo(final Properties properties) throws SQLClientInfoException {
         connection.setClientInfo(properties);
     }
 
     @Override
-    public String getClientInfo(String name) throws SQLException {
+    public String getClientInfo(final String name) throws SQLException {
         return connection.getClientInfo(name);
     }
 
@@ -287,17 +323,17 @@ public class HmilyXaConnection implements Connection {
     }
 
     @Override
-    public Array createArrayOf(String typeName, Object[] elements) throws SQLException {
+    public Array createArrayOf(final String typeName, final Object[] elements) throws SQLException {
         return connection.createArrayOf(typeName, elements);
     }
 
     @Override
-    public Struct createStruct(String typeName, Object[] attributes) throws SQLException {
+    public Struct createStruct(final String typeName, final Object[] attributes) throws SQLException {
         return connection.createStruct(typeName, attributes);
     }
 
     @Override
-    public void setSchema(String schema) throws SQLException {
+    public void setSchema(final String schema) throws SQLException {
         connection.setSchema(schema);
     }
 
@@ -307,12 +343,12 @@ public class HmilyXaConnection implements Connection {
     }
 
     @Override
-    public void abort(Executor executor) throws SQLException {
+    public void abort(final Executor executor) throws SQLException {
         connection.abort(executor);
     }
 
     @Override
-    public void setNetworkTimeout(Executor executor, int milliseconds) throws SQLException {
+    public void setNetworkTimeout(final Executor executor, final int milliseconds) throws SQLException {
         connection.setNetworkTimeout(executor, milliseconds);
     }
 
@@ -322,12 +358,17 @@ public class HmilyXaConnection implements Connection {
     }
 
     @Override
-    public <T> T unwrap(Class<T> iface) throws SQLException {
+    public <T> T unwrap(final Class<T> iface) throws SQLException {
         return connection.unwrap(iface);
     }
 
     @Override
-    public boolean isWrapperFor(Class<?> iface) throws SQLException {
+    public boolean isWrapperFor(final Class<?> iface) throws SQLException {
         return connection.isWrapperFor(iface);
+    }
+
+    @Override
+    public XAResource getXAResource() throws SQLException {
+        return null;
     }
 }

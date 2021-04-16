@@ -17,11 +17,21 @@
 
 package org.dromara.hmily.xa.core;
 
+import javax.transaction.Synchronization;
+
 /**
- * XaEvent .
- * Define the relevant Xa state processor
+ * Synchronization .
+ *
  * @author sixh chenbin
  */
-public class XaStateEvent {
+public class SynchronizationImpl implements Synchronization {
+    @Override
+    public void beforeCompletion() {
 
+    }
+
+    @Override
+    public void afterCompletion(final int status) {
+
+    }
 }

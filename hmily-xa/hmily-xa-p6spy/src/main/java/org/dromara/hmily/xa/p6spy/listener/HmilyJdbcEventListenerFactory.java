@@ -26,9 +26,9 @@ import com.p6spy.engine.spy.JdbcEventListenerFactory;
  * @author xiaoyu
  */
 public class HmilyJdbcEventListenerFactory implements JdbcEventListenerFactory {
-    
+
     private static volatile JdbcEventListener jdbcEventListener;
-    
+
     @Override
     public JdbcEventListener createJdbcEventListener() {
         if (jdbcEventListener == null) {

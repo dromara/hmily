@@ -17,9 +17,7 @@
 
 package org.dromara.hmily.xa.p6spy.test;
 
-import com.alibaba.druid.pool.DruidDataSource;
-import com.atomikos.icatch.jta.UserTransactionImp;
-import com.atomikos.jdbc.AtomikosDataSourceBean;
+import com.alibaba.druid.pool.xa.DruidXADataSource;
 import org.dromara.hmily.xa.core.UserTransactionImpl;
 import org.dromara.hmily.xa.p6spy.HmilyXAP6Datasource;
 import org.junit.Test;
@@ -60,11 +58,11 @@ public class HmilyXaTest {
     }
 
     private DataSource getDataSource() {
-        DruidDataSource druidDataSource = new DruidDataSource();
+        DruidXADataSource druidDataSource = new DruidXADataSource();
         druidDataSource.setUrl("jdbc:mysql://192.168.3.26:3306/xa_test");
         druidDataSource.setUsername("root");
         druidDataSource.setPassword("123456");
-        druidDataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
+        druidDataSource.setDriverClassName("com.mysql.jdbc.Driver");
         return new HmilyXAP6Datasource(druidDataSource);
     }
 }

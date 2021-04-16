@@ -19,9 +19,9 @@ package org.dromara.hmily.xa.p6spy;
 
 import com.p6spy.engine.spy.P6DataSource;
 import lombok.Getter;
-import org.dromara.hmily.xa.core.TransactionManagerImpl;
 
 import javax.sql.DataSource;
+import javax.sql.XAConnection;
 import javax.sql.XADataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -49,24 +49,24 @@ public class HmilyXAP6Datasource extends P6DataSource {
 
     @Override
     public Connection getConnection() throws SQLException {
-        Connection connection = super.getConnection();
-        return getHmilyConnection(connection);
+        XAConnection xaConnection = super.getXAConnection();
+        return getHmilyConnection(xaConnection);
     }
 
     @Override
-    public Connection getConnection(String username, String password) throws SQLException {
-        Connection connection = super.getConnection(username, password);
+    public Connection getConnection(final String username, final String password) throws SQLException {
+        XAConnection connection = super.getXAConnection(username, password);
         return getHmilyConnection(connection);
     }
 
     /**
      * Gets hmily connection.
      *
-     * @param connection the connection
+     * @param xaConnection the connection
      * @return the hmily connection
      */
-    private Connection getHmilyConnection(Connection connection) {
-        return new HmilyXaConnection(connection);
+    private Connection getHmilyConnection(final XAConnection xaConnection) throws SQLException {
+        return new HmilyXaConnection(xaConnection);
     }
 
     private void init() {
@@ -76,6 +76,5 @@ public class HmilyXAP6Datasource extends P6DataSource {
         if (!(this.targetDataSource instanceof XADataSource)) {
             throw new RuntimeException("targetDataSource have not instanceof XADataSource");
         }
-        TransactionManagerImpl.INST.initialized();
     }
 }
