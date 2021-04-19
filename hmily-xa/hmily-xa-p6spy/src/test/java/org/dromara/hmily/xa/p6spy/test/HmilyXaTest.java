@@ -39,7 +39,9 @@ public class HmilyXaTest {
     @Test
     public void testDataSource() throws SystemException, SQLException {
         Connection connection = null;
+        Connection connection2 = null;
         PreparedStatement preparedStatement = null;
+        PreparedStatement preparedStatement2 = null;
         UserTransaction userTransaction = new UserTransactionImpl();
         try {
             userTransaction.begin();
@@ -48,13 +50,31 @@ public class HmilyXaTest {
             String sql = "insert into xa_data (name) values ('chenbin')";
             preparedStatement = connection.prepareStatement(sql);
             preparedStatement.executeUpdate();
+
+            DataSource dataSource2 = getDataSource2();
+            connection2 = dataSource2.getConnection();
+            String sql2 = "insert into xa_data (name) values ('chenbin')";
+            preparedStatement2 = connection2.prepareStatement(sql2);
+            preparedStatement2.executeUpdate();
             userTransaction.commit();
         } catch (Exception e) {
             userTransaction.rollback();
+            e.printStackTrace();
         } finally {
             connection.close();
             preparedStatement.close();
+            connection2.close();
+            preparedStatement2.close();
         }
+    }
+
+    private DataSource getDataSource2() {
+        DruidXADataSource druidDataSource = new DruidXADataSource();
+        druidDataSource.setUrl("jdbc:mysql://192.168.3.18:3306/xa_test");
+        druidDataSource.setUsername("root");
+        druidDataSource.setPassword("123456");
+        druidDataSource.setDriverClassName("com.mysql.jdbc.Driver");
+        return new HmilyXAP6Datasource(druidDataSource);
     }
 
     private DataSource getDataSource() {

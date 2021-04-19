@@ -20,9 +20,16 @@ package org.dromara.hmily.xa.core;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.transaction.HeuristicMixedException;
+import javax.transaction.HeuristicRollbackException;
+import javax.transaction.InvalidTransactionException;
+import javax.transaction.NotSupportedException;
+import javax.transaction.RollbackException;
 import javax.transaction.Status;
 import javax.transaction.SystemException;
 import javax.transaction.Transaction;
+import javax.transaction.TransactionManager;
+import javax.transaction.xa.XAResource;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -31,7 +38,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @author sixh chenbin
  */
-public class HmilyXaTransactionManager {
+public class HmilyXaTransactionManager implements TransactionManager {
 
     private final Logger logger = LoggerFactory.getLogger(HmilyXaTransactionManager.class);
 
@@ -55,50 +62,53 @@ public class HmilyXaTransactionManager {
     }
 
     /**
-     * Create transaction transaction.
-     *
-     * @return the transaction
-     * @throws SystemException the system exception
-     */
-    public Transaction createTransaction() throws SystemException {
-        Transaction threadTransaction = getThreadTransaction();
-        Transaction rct = threadTransaction;
-        //xa;
-        if (threadTransaction != null) {
-            synchronized (this) {
-                if (xidTransactionMap.containsValue(rct)) {
-                    if (!txCanRollback(rct)) {
-                        throw new RuntimeException(" Nested transactions not supported ");
-                    }
-                }
-            }
-        }
-        XIdImpl xId = new XIdImpl();
-        //Main business coordinator
-        rct = new TransactionImpl(xId);
-        setTxTotr(rct);
-        xidTransactionMap.put(xId, rct);
-        return rct;
-    }
-
-    /**
-     * tx  to threadLocal.
-     */
-    private void setTxTotr(final Transaction transaction) {
-        tms.set(transaction);
-    }
-
-    /**
      * Gets transaction.
      *
      * @return the transaction
      */
+    @Override
     public Transaction getTransaction() {
         Transaction transaction = getThreadTransaction();
         if (transaction == null) {
             logger.warn("transaction is null");
         }
         return transaction;
+    }
+
+    @Override
+    public void resume(final Transaction transaction) throws InvalidTransactionException, IllegalStateException, SystemException {
+        if (transaction == null) {
+            this.clearTxTotr();
+            return;
+        }
+        Transaction thm1 = this.getTransaction();
+        if (thm1 != null) {
+            if (thm1.equals(transaction)) {
+                return;
+            }
+            throw new IllegalStateException("The transaction of this thread is consistent with the one you passed in");
+        }
+        boolean b = !(transaction instanceof TransactionImpl);
+        if (b) {
+            throw new InvalidTransactionException("transaction not TransactionImpl");
+        }
+
+        TransactionImpl inTx = (TransactionImpl) transaction;
+        XaState xaState = XaState.valueOf(inTx.getStatus());
+        switch (xaState) {
+            case STATUS_ACTIVE:
+            case STATUS_COMMITTING:
+            case STATUS_PREPARING:
+                break;
+            default:
+                throw new InvalidTransactionException("transaction state invalid");
+        }
+        setTxTotr(transaction);
+        try {
+            inTx.doEnList(null, XAResource.TMRESUME);
+        } catch (RollbackException e) {
+            throw new SystemException("RollbackException" + e.getMessage());
+        }
     }
 
     /**
@@ -110,31 +120,80 @@ public class HmilyXaTransactionManager {
         return tms.get();
     }
 
-    /**
-     * Rollback transaction.
-     *
-     * @return the transaction
-     */
-    public Transaction rollback() {
-        Transaction threadTransaction = getThreadTransaction();
-        if (threadTransaction != null) {
-            tms.remove();
+    @Override
+    public void setRollbackOnly() throws IllegalStateException, SystemException {
+        Transaction transaction = this.getTransaction();
+        if (transaction == null) {
+            throw new IllegalStateException("cannot get Transaction for setRollbackOnly");
         }
-        return threadTransaction;
+        transaction.setRollbackOnly();
     }
 
-    /**
-     * Commit transaction.
-     *
-     * @return the transaction
-     */
-    public Transaction commit() {
+    @Override
+    public void setTransactionTimeout(final int seconds) throws SystemException {
+
+    }
+
+    @Override
+    public Transaction suspend() throws SystemException {
+        Transaction transaction = this.getTransaction();
+        if (transaction != null) {
+            if (transaction instanceof TransactionImpl) {
+                ((TransactionImpl) transaction).doDeList(XAResource.TMSUSPEND);
+            }
+            this.clearTxTotr();
+        }
+        return transaction;
+    }
+
+    @Override
+    public void begin() throws NotSupportedException, SystemException {
+        //开始一个事务.
+        Transaction threadTransaction = getThreadTransaction();
+        Transaction rct = threadTransaction;
+        //xa;
+        if (threadTransaction != null) {
+            synchronized (this) {
+                if (xidTransactionMap.containsValue(rct)) {
+                    if (!txCanRollback(rct)) {
+                        throw new NotSupportedException(" Nested transactions not supported ");
+                    }
+                }
+            }
+        }
+        XIdImpl xId = new XIdImpl();
+        //Main business coordinator
+        rct = new TransactionImpl(xId);
+        setTxTotr(rct);
+        //todo:这里还需要清除map的相关信息.
+        xidTransactionMap.put(xId, rct);
+    }
+
+    @Override
+    public void commit() throws RollbackException, HeuristicMixedException, HeuristicRollbackException, SecurityException, IllegalStateException, SystemException {
         Transaction threadTransaction = getThreadTransaction();
         if (threadTransaction == null) {
             throw new IllegalStateException("Transaction is null,can not commit");
         }
-        tms.remove();
-        return threadTransaction;
+        try {
+            threadTransaction.commit();
+        } catch (Exception ex) {
+            clearTxTotr();
+        }
+    }
+
+    @Override
+    public void rollback() throws IllegalStateException, SecurityException, SystemException {
+        Transaction transaction = this.getTransaction();
+        if (transaction != null) {
+            transaction.rollback();
+        }
+        clearTxTotr();
+    }
+
+    @Override
+    public int getStatus() throws SystemException {
+        return this.getTransaction().getStatus();
     }
 
     private boolean txCanRollback(final Transaction transaction) throws SystemException {
@@ -158,5 +217,16 @@ public class HmilyXaTransactionManager {
             return XaState.STATUS_NO_TRANSACTION.getState();
         }
         return transaction.getStatus();
+    }
+
+    private void clearTxTotr() {
+        tms.remove();
+    }
+
+    /**
+     * tx  to threadLocal.
+     */
+    private void setTxTotr(final Transaction transaction) {
+        tms.set(transaction);
     }
 }

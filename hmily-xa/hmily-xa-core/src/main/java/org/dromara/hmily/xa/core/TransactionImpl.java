@@ -28,6 +28,7 @@ import javax.transaction.SystemException;
 import javax.transaction.Transaction;
 import javax.transaction.xa.XAException;
 import javax.transaction.xa.XAResource;
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -60,6 +61,7 @@ public class TransactionImpl implements Transaction {
     public TransactionImpl(final XIdImpl xId) {
         this.xid = xId;
         context = new TransactionContext(null, xId);
+        //todo:这里还要设置超时器.
         subCoordinator(true, true);
     }
 
@@ -67,7 +69,11 @@ public class TransactionImpl implements Transaction {
     public void commit() throws RollbackException, HeuristicMixedException, HeuristicRollbackException, SecurityException, IllegalStateException, SystemException {
         Coordinator coordinator = context.getCoordinator();
         if (coordinator != null) {
-            coordinator.commit();
+            try {
+                coordinator.commit();
+            } catch (RemoteException e) {
+                throw new SystemException(e.getMessage());
+            }
         }
         if (subCoordinator != null) {
             subCoordinator.commit();
@@ -84,8 +90,16 @@ public class TransactionImpl implements Transaction {
      */
     public void doEnList(final XAResource xaResource, final int flag) throws SystemException, RollbackException {
         //xaResource;
-        if (flag == XAResource.TMJOIN) {
+        if (flag == XAResource.TMJOIN
+                || flag == XAResource.TMNOFLAGS) {
             enlistResource(xaResource);
+        } else if (flag == XAResource.TMRESUME) {
+            //进行事务的恢复.
+            if (delistResourceList != null) {
+                for (final XAResource resource : delistResourceList) {
+                    this.enlistResource(resource);
+                }
+            }
         }
         delistResourceList = null;
 
@@ -111,7 +125,8 @@ public class TransactionImpl implements Transaction {
         }
         HmilyXaResource myResoure = (HmilyXaResource) xaResource;
         try {
-            xaResource.end(myResoure.getXid(), flag);
+            //flags - TMSUCCESS、TMFAIL 或 TMSUSPEND 之一。
+            myResoure.end(flag);
             enlistResourceList.remove(xaResource);
             return true;
         } catch (XAException e) {
@@ -134,10 +149,17 @@ public class TransactionImpl implements Transaction {
         boolean found = subCoordinator.addXaResource(hmilyXaResource);
         int flag = found ? XAResource.TMJOIN : XAResource.TMNOFLAGS;
         try {
+            if (delistResourceList != null && delistResourceList.contains(hmilyXaResource)) {
+                flag = XAResource.TMRESUME;
+            }
+            // TMNOFLAGS、TMJOIN 或 TMRESUME 之一。
             hmilyXaResource.start(flag);
         } catch (XAException e) {
             logger.error("", e);
             throw new IllegalStateException(e);
+        }
+        if (!enlistResourceList.contains(hmilyXaResource)) {
+            enlistResourceList.add(hmilyXaResource);
         }
         return true;
     }
@@ -163,7 +185,10 @@ public class TransactionImpl implements Transaction {
 
     @Override
     public void rollback() throws IllegalStateException, SystemException {
-
+        Coordinator coordinator = context.getCoordinator();
+        if (coordinator != null) {
+            coordinator.rollback();
+        }
         if (subCoordinator != null) {
             subCoordinator.rollback();
         }
@@ -171,7 +196,14 @@ public class TransactionImpl implements Transaction {
 
     @Override
     public void setRollbackOnly() throws IllegalStateException, SystemException {
-        subCoordinator(false, false);
+        Coordinator coordinator = context.getCoordinator();
+        if (coordinator != null) {
+            coordinator.setRollbackOnly();
+        }
+        if (subCoordinator == null) {
+            subCoordinator(false, false);
+        }
+        subCoordinator.setRollbackOnly();
     }
 
     private void subCoordinator(final boolean newCoordinator, final boolean stateActive) {

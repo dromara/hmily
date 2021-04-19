@@ -23,12 +23,15 @@ import org.slf4j.LoggerFactory;
 import javax.transaction.RollbackException;
 import javax.transaction.Synchronization;
 import javax.transaction.SystemException;
+import javax.transaction.TransactionRolledbackException;
 import javax.transaction.xa.XAException;
 import javax.transaction.xa.XAResource;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Vector;
 
 import static org.dromara.hmily.xa.core.XaState.STATUS_PREPARED;
+import static org.dromara.hmily.xa.core.XaState.STATUS_ROLLING_BACK;
 
 /**
  * SubCoordinator .
@@ -69,6 +72,25 @@ public class SubCoordinator implements Remote {
 
     @Override
     public Result prepare() {
+        try {
+            // xa end.
+            transaction.doDeList(XAResource.TMSUCCESS);
+        } catch (Exception exception) {
+            logger.error("do delist error", exception);
+        }
+        switch (state) {
+            case STATUS_MARKED_ROLLBACK:
+                state = STATUS_ROLLING_BACK;
+                return Result.ROLLBACK;
+            case STATUS_COMMITTED:
+                return Result.COMMIT;
+            default:
+                break;
+        }
+        return doPrepare();
+    }
+
+    private synchronized Result doPrepare() {
         Result result = Result.READONLY;
         if (resources.size() == 0) {
             state = XaState.STATUS_COMMITTED;
@@ -156,10 +178,11 @@ public class SubCoordinator implements Remote {
         }
     }
 
-    //2pc.
+    /**
+     * 2pc.
+     */
     private synchronized void doCommit() {
         state = XaState.STATUS_COMMITTING;
-
         for (int i = 0; i < resources.size(); i++) {
             HmilyXaResource xaResource = (HmilyXaResource) resources.elementAt(i);
             try {
@@ -169,6 +192,7 @@ public class SubCoordinator implements Remote {
                 logger.error("rollback  error");
             }
         }
+        state = XaState.STATUS_COMMITTED;
     }
 
     @Override
@@ -183,8 +207,70 @@ public class SubCoordinator implements Remote {
     }
 
     @Override
-    public void onePhaseCommit() {
+    public void onePhaseCommit() throws TransactionRolledbackException {
+        if (state == XaState.STATUS_ROLLEDBACK) {
+            try {
+                transaction.doDeList(XAResource.TMSUCCESS);
+            } catch (SystemException e) {
+                logger.error("error doDeList error", e);
+                throw new TransactionRolledbackException(e.getMessage());
+            }
+        }
+        if (state == XaState.STATUS_MARKED_ROLLBACK) {
+            try {
+                //todo 完成事务前的处理.
+                transaction.doDeList(XAResource.TMSUCCESS);
+            } catch (SystemException e) {
+                logger.error("error doDeList error", e);
+            }
+            doRollback();
+            throw new TransactionRolledbackException();
+        }
+        if (state == XaState.STATUS_COMMITTED) {
+            try {
+                transaction.doDeList(XAResource.TMSUCCESS);
+            } catch (SystemException e) {
+                logger.error("error doDeList error", e);
+            }
+            return;
+        }
+        try {
+            transaction.doDeList(XAResource.TMSUCCESS);
+        } catch (SystemException e) {
+            logger.error("deList xaResource:{}", e);
+        }
+        if (resources.size() == 1) {
+            doOnePhaseCommit();
+            return;
+        }
+        Result result = doPrepare();
+        if (result == Result.COMMIT) {
+            doCommit();
+        } else if (result == Result.READONLY) {
+            //这里需要处理一下.
+        } else if (result == Result.ROLLBACK) {
+            this.doRollback();
+            throw new TransactionRolledbackException();
+        }
+    }
 
+    /**
+     * 表示为第一阶断的直接提交.
+     */
+    private void doOnePhaseCommit() throws TransactionRolledbackException {
+        state = XaState.STATUS_COMMITTING;
+        HmilyXaResource xaResource = (HmilyXaResource) resources.get(0);
+        try {
+            xaResource.commit(true);
+            state = XaState.STATUS_COMMITTED;
+        } catch (XAException ex) {
+            state = XaState.STATUS_UNKNOWN;
+            logger.error("xa commit error{}", xaResource);
+            if (Objects.equals(ex.errorCode, XAException.XA_RBROLLBACK)) {
+                throw new TransactionRolledbackException("XAException:" + ex.getMessage());
+            }
+            throw new RuntimeException("XAException" + ex.getMessage());
+        }
     }
 
     /**
@@ -212,15 +298,15 @@ public class SubCoordinator implements Remote {
             default:
                 throw new RuntimeException("status == " + state);
         }
-        Optional<XAResource> isSameRM = resources.stream().filter(e -> {
+        Optional<XAResource> isSame = resources.stream().filter(e -> {
             try {
-                return !e.isSameRM(xaResource);
+                return e.isSameRM(xaResource);
             } catch (XAException xaException) {
                 logger.error("xa isSameRM", xaException);
                 return false;
             }
         }).findFirst();
-        if (!isSameRM.isPresent()) {
+        if (!isSame.isPresent()) {
             this.resources.add(xaResource);
             return false;
         }
@@ -241,6 +327,15 @@ public class SubCoordinator implements Remote {
         if (state == XaState.STATUS_MARKED_ROLLBACK || state == XaState.STATUS_ROLLEDBACK) {
             synchronizations.add(synchronization);
             throw new RollbackException();
+        }
+    }
+
+    /**
+     * Sets rollback only.
+     */
+    public void setRollbackOnly() {
+        if (state == XaState.STATUS_PREPARING) {
+            state = XaState.STATUS_MARKED_ROLLBACK;
         }
     }
 

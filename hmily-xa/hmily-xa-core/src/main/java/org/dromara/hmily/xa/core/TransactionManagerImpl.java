@@ -54,19 +54,12 @@ public enum TransactionManagerImpl implements TransactionManager {
 
     @Override
     public void begin() throws NotSupportedException, SystemException {
-        //开始一个事务.
-        Transaction transaction = hmilyXaTransactionManager.createTransaction();
-        if (transaction == null) {
-            throw new NullPointerException("begin Transaction error");
-        }
+        hmilyXaTransactionManager.begin();
     }
 
     @Override
     public void commit() throws RollbackException, HeuristicMixedException, HeuristicRollbackException, SecurityException, IllegalStateException, SystemException {
-        Transaction transaction = hmilyXaTransactionManager.commit();
-        if (transaction != null) {
-            transaction.commit();
-        }
+        hmilyXaTransactionManager.commit();
     }
 
     @Override
@@ -81,29 +74,26 @@ public enum TransactionManagerImpl implements TransactionManager {
 
     @Override
     public void resume(final Transaction transaction) throws InvalidTransactionException, IllegalStateException, SystemException {
-
+        hmilyXaTransactionManager.resume(transaction);
     }
 
     @Override
     public void rollback() throws IllegalStateException, SecurityException, SystemException {
-        Transaction transaction = hmilyXaTransactionManager.rollback();
-        if (transaction != null) {
-            transaction.rollback();
-        }
+        hmilyXaTransactionManager.rollback();
     }
 
     @Override
     public void setRollbackOnly() throws IllegalStateException, SystemException {
-
+        hmilyXaTransactionManager.setRollbackOnly();
     }
 
     @Override
     public void setTransactionTimeout(final int i) throws SystemException {
-
+        hmilyXaTransactionManager.setTransactionTimeout(i);
     }
 
     @Override
     public Transaction suspend() throws SystemException {
-        return null;
+        return hmilyXaTransactionManager.suspend();
     }
 }

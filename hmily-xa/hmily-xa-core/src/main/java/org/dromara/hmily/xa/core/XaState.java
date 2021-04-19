@@ -18,6 +18,7 @@
 package org.dromara.hmily.xa.core;
 
 import javax.transaction.Status;
+import java.util.Arrays;
 
 /**
  * XaState .
@@ -74,7 +75,8 @@ public enum XaState {
     /**
      * Status rolling back xa state.
      */
-    STATUS_ROLLING_BACK(Status.STATUS_ROLLING_BACK),;
+    STATUS_ROLLING_BACK(Status.STATUS_ROLLING_BACK),
+    ;
 
     private final Integer state;
 
@@ -89,5 +91,15 @@ public enum XaState {
      */
     public Integer getState() {
         return state;
+    }
+
+    /**
+     * Value of xa state.
+     *
+     * @param state the state
+     * @return the xa state
+     */
+    public static XaState valueOf(final int state) {
+        return Arrays.stream(XaState.values()).filter(e -> e.getState() == state).findFirst().orElse(STATUS_UNKNOWN);
     }
 }

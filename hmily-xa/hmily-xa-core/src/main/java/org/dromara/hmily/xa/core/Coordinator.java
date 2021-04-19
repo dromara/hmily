@@ -20,6 +20,11 @@ package org.dromara.hmily.xa.core;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.transaction.SystemException;
+import javax.transaction.TransactionRequiredException;
+import javax.transaction.TransactionRolledbackException;
+import java.rmi.RemoteException;
+import java.time.LocalDateTime;
 import java.util.Vector;
 
 /**
@@ -41,13 +46,19 @@ public class Coordinator implements Remote {
     private XaState state = XaState.STATUS_ACTIVE;
 
     /**
+     * 事务开始的时间.
+     */
+    private LocalDateTime date;
+
+    /**
      * Instantiates a new Coordinator.
      *
      * @param xid the xid
      */
     public Coordinator(final XIdImpl xid) {
         this.xid = xid;
-        coordinators.add(this);
+        date = LocalDateTime.now();
+        //主事务的问题处理.
     }
 
     @Override
@@ -73,7 +84,7 @@ public class Coordinator implements Remote {
     }
 
     @Override
-    public void commit() {
+    public void commit() throws RemoteException {
         switch (state) {
             case STATUS_ACTIVE:
                 break;
@@ -82,27 +93,83 @@ public class Coordinator implements Remote {
                 return;
             case STATUS_ROLLEDBACK:
                 logger.warn("commit state == STATUS_ROLLEDBACK");
-                return;
+                //todo:完成.
+                throw new TransactionRolledbackException();
             case STATUS_MARKED_ROLLBACK:
                 doRollback();
-                return;
+                throw new TransactionRolledbackException();
             default:
-                break;
+                throw new TransactionRequiredException("status error");
+        }
+        //哪果只有一个数据就表示只是自己本身，@Coordinator.
+        if (this.coordinators.size() == 1) {
+            state = XaState.STATUS_COMMITTING;
+            Remote remote = coordinators.get(0);
+            //第一阶段直接提交.
+            try {
+                remote.onePhaseCommit();
+                state = XaState.STATUS_COMMITTED;
+            } catch (TransactionRolledbackException rx) {
+                state = XaState.STATUS_MARKED_ROLLBACK;
+            } catch (Exception ex) {
+                logger.error("onPhaseCommit error size to 1", ex);
+                state = XaState.STATUS_UNKNOWN;
+            }
+            return;
         }
         //Start 1 pc.
-        onePhaseCommit();
-
-        //Start 2 pc.
-        doCommit();
+        Result result = doPrepare();
+        if (result == Result.COMMIT) {
+            doCommit();
+        } else if (result == Result.READONLY) {
+            doRollback();
+        } else {
+            state = XaState.STATUS_COMMITTED;
+        }
     }
 
     @Override
-    public void onePhaseCommit() {
-
+    public void onePhaseCommit() throws RemoteException {
+        logger.info("onePhaseCommit{}", this.xid);
+        doCommit();
     }
 
-    private void doPrepare() {
-
+    private Result doPrepare() {
+        // 开始 1pc.
+        Result rs = Result.READONLY;
+        if (coordinators.size() == 0) {
+            state = XaState.STATUS_COMMITTED;
+            return rs;
+        }
+        state = XaState.STATUS_PREPARING;
+        int errors = 0;
+        for (final Remote coordinator : coordinators) {
+            /*
+             * 开始调用1pc阶段.
+             */
+            if (errors > 0) {
+                break;
+            } else {
+                try {
+                    Result prepare = coordinator.prepare();
+                    if (prepare == Result.ROLLBACK) {
+                        errors++;
+                        rs = Result.ROLLBACK;
+                    } else if (prepare == Result.COMMIT) {
+                        rs = Result.COMMIT;
+                    }
+                } catch (Exception ex) {
+                    errors++;
+                    rs = Result.ROLLBACK;
+                }
+            }
+        }
+        if (rs == Result.COMMIT) {
+            state = XaState.STATUS_PREPARED;
+        } else if (rs == Result.READONLY) {
+            state = XaState.STATUS_COMMITTED;
+        }
+        return rs;
     }
 
     /**
@@ -128,12 +195,12 @@ public class Coordinator implements Remote {
     }
 
     /**
-     * Gets sub xid.
-     *
-     * @return the sub xid
+     * Sets rollback only.
      */
-    public XIdImpl getSubXid() {
-        return this.xid.newBranchId();
+    public void setRollbackOnly() {
+        if (state == XaState.STATUS_ACTIVE) {
+            state = XaState.STATUS_MARKED_ROLLBACK;
+        }
     }
 
     private void doRollback() {
@@ -147,5 +214,13 @@ public class Coordinator implements Remote {
 
     private void doCommit() {
         state = XaState.STATUS_COMMITTED;
+        for (int i = 0; i < this.coordinators.size(); i++) {
+            Remote remote = coordinators.get(i);
+            try {
+                remote.commit();
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

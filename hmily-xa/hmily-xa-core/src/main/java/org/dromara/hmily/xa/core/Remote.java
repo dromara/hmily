@@ -17,6 +17,9 @@
 
 package org.dromara.hmily.xa.core;
 
+import javax.transaction.TransactionRolledbackException;
+import java.rmi.RemoteException;
+
 /**
  * Mock .
  *
@@ -38,13 +41,18 @@ public interface Remote {
 
     /**
      * Commit.
+     *
+     * @throws TransactionRolledbackException the transaction rolledback exception
+     * @throws RemoteException                the remote exception
      */
-    void commit();
+    void commit() throws TransactionRolledbackException, RemoteException;
 
     /**
      * 1 pc .
+     *
+     * @throws RemoteException the remote exception
      */
-    void onePhaseCommit();
+    void onePhaseCommit() throws RemoteException;
 
     /**
      * The enum Result.
