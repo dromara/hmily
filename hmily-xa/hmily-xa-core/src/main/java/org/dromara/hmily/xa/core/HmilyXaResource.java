@@ -35,29 +35,11 @@ public class HmilyXaResource implements XAResource {
     /**
      * Instantiates a new Hmily xa resource.
      *
-     * @param xaResource the xa resource
-     */
-    public HmilyXaResource(final XAResource xaResource) {
-        this.xaResource = xaResource;
-    }
-
-    /**
-     * Instantiates a new Hmily xa resource.
-     *
      * @param xid        the xid
      * @param xaResource the xa resource
      */
     public HmilyXaResource(final Xid xid, final XAResource xaResource) {
         this.xaResource = xaResource;
-        this.xid = xid;
-    }
-
-    /**
-     * Sets xid.
-     *
-     * @param xid the xid
-     */
-    public void setXid(final Xid xid) {
         this.xid = xid;
     }
 

@@ -68,6 +68,52 @@ public class HmilyXaTest {
         }
     }
 
+    @Test
+    public void test001() throws SystemException, SQLException {
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        UserTransaction userTransaction = new UserTransactionImpl();
+        try {
+            userTransaction.begin();
+            DataSource dataSource = getDataSource();
+            connection = dataSource.getConnection();
+            String sql = "insert into xa_data (name) values ('chenbin')";
+            preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.executeUpdate();
+            //调用test002()，测试事务嵌套.
+            this.test002();
+            userTransaction.commit();
+        } catch (Exception e) {
+            userTransaction.rollback();
+            e.printStackTrace();
+        } finally {
+            connection.close();
+            assert preparedStatement != null;
+            preparedStatement.close();
+        }
+    }
+
+    private void test002() throws SystemException, SQLException {
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        UserTransaction userTransaction = new UserTransactionImpl();
+        try {
+            userTransaction.begin();
+            DataSource dataSource = getDataSource2();
+            connection = dataSource.getConnection();
+            String sql = "insert into xa_data (name) values ('chenbin')";
+            preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.executeUpdate();
+            userTransaction.commit();
+        } catch (Exception e) {
+            userTransaction.rollback();
+            e.printStackTrace();
+        } finally {
+            connection.close();
+            preparedStatement.close();
+        }
+    }
+
     private DataSource getDataSource2() {
         DruidXADataSource druidDataSource = new DruidXADataSource();
         druidDataSource.setUrl("jdbc:mysql://192.168.3.18:3306/xa_test");

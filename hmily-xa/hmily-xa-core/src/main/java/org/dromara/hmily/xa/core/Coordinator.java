@@ -20,7 +20,6 @@ package org.dromara.hmily.xa.core;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.transaction.SystemException;
 import javax.transaction.TransactionRequiredException;
 import javax.transaction.TransactionRolledbackException;
 import java.rmi.RemoteException;
@@ -32,14 +31,14 @@ import java.util.Vector;
  *
  * @author sixh chenbin
  */
-public class Coordinator implements Remote {
+public class Coordinator implements Resource {
 
     private final Logger logger = LoggerFactory.getLogger(Coordinator.class);
 
     /**
      * all SubCoordinator.
      */
-    private final Vector<Remote> coordinators = new Vector<>();
+    private final Vector<Resource> coordinators = new Vector<>();
 
     private final XIdImpl xid;
 
@@ -104,10 +103,10 @@ public class Coordinator implements Remote {
         //哪果只有一个数据就表示只是自己本身，@Coordinator.
         if (this.coordinators.size() == 1) {
             state = XaState.STATUS_COMMITTING;
-            Remote remote = coordinators.get(0);
+            Resource resource = coordinators.get(0);
             //第一阶段直接提交.
             try {
-                remote.onePhaseCommit();
+                resource.onePhaseCommit();
                 state = XaState.STATUS_COMMITTED;
             } catch (TransactionRolledbackException rx) {
                 state = XaState.STATUS_MARKED_ROLLBACK;
@@ -143,7 +142,7 @@ public class Coordinator implements Remote {
         }
         state = XaState.STATUS_PREPARING;
         int errors = 0;
-        for (final Remote coordinator : coordinators) {
+        for (final Resource coordinator : coordinators) {
             /*
              * 开始调用1pc阶段.
              */
@@ -184,14 +183,14 @@ public class Coordinator implements Remote {
     /**
      * Add coordinators boolean.
      *
-     * @param remote the remote
+     * @param resource the remote
      * @return the boolean
      */
-    public synchronized boolean addCoordinators(final Remote remote) {
-        if (coordinators.contains(remote)) {
+    public synchronized boolean addCoordinators(final Resource resource) {
+        if (coordinators.contains(resource)) {
             return true;
         }
-        return this.coordinators.add(remote);
+        return this.coordinators.add(resource);
     }
 
     /**
@@ -205,22 +204,28 @@ public class Coordinator implements Remote {
 
     private void doRollback() {
         state = XaState.STATUS_ROLLEDBACK;
-        for (Remote remote : this.coordinators) {
-            if (remote != null) {
-                remote.rollback();
+        for (Resource resource : this.coordinators) {
+            if (resource != null) {
+                resource.rollback();
             }
         }
     }
 
-    private void doCommit() {
-        state = XaState.STATUS_COMMITTED;
-        for (int i = 0; i < this.coordinators.size(); i++) {
-            Remote remote = coordinators.get(i);
+    private void doCommit() throws TransactionRolledbackException {
+        state = XaState.STATUS_COMMITTING;
+        int commitErrors = 0;
+        for (Resource resource : this.coordinators) {
             try {
-                remote.commit();
+                resource.commit();
             } catch (RemoteException e) {
-                e.printStackTrace();
+                commitErrors++;
             }
+        }
+        if (commitErrors == 0) {
+            state = XaState.STATUS_COMMITTED;
+        } else {
+            state = XaState.STATUS_ROLLEDBACK;
+            throw new TransactionRolledbackException();
         }
     }
 }

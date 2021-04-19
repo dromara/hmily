@@ -21,6 +21,7 @@ import com.google.common.base.Splitter;
 import org.dromara.hmily.common.utils.NetUtils;
 
 import javax.transaction.xa.Xid;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -159,6 +160,14 @@ public class XIdImpl implements Xid {
     @Override
     public boolean equals(final Object obj) {
         return super.equals(obj);
+    }
+
+    @Override
+    public String toString() {
+        return "XIdImpl{" +
+                "globalId='" + globalId + '\'' +
+                ", branchId='" + branchId + '\'' +
+                '}';
     }
 }
 

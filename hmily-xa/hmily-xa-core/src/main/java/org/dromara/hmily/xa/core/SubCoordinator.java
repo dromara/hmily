@@ -30,15 +30,12 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Vector;
 
-import static org.dromara.hmily.xa.core.XaState.STATUS_PREPARED;
-import static org.dromara.hmily.xa.core.XaState.STATUS_ROLLING_BACK;
-
 /**
  * SubCoordinator .
  *
  * @author sixh chenbin
  */
-public class SubCoordinator implements Remote {
+public class SubCoordinator implements Resource,Synchronization {
 
     private final Logger logger = LoggerFactory.getLogger(SubCoordinator.class);
 
@@ -58,8 +55,6 @@ public class SubCoordinator implements Remote {
      */
     private final Vector<Synchronization> synchronizations = new Vector<>();
 
-    private final XIdImpl xId;
-
     /**
      * Instantiates a new Sub coordinator.
      *
@@ -67,7 +62,6 @@ public class SubCoordinator implements Remote {
      */
     public SubCoordinator(final TransactionImpl transaction) {
         this.transaction = transaction;
-        xId = transaction.getXid().newBranchId();
     }
 
     @Override
@@ -80,7 +74,7 @@ public class SubCoordinator implements Remote {
         }
         switch (state) {
             case STATUS_MARKED_ROLLBACK:
-                state = STATUS_ROLLING_BACK;
+                state = XaState.STATUS_ROLLING_BACK;
                 return Result.ROLLBACK;
             case STATUS_COMMITTED:
                 return Result.COMMIT;
@@ -112,6 +106,7 @@ public class SubCoordinator implements Remote {
                     int prepare = xaResource.prepare();
                     switch (prepare) {
                         case XAResource.XA_OK:
+                            //todo : 这里是不是要记录一下日志呢？
                             result = Result.COMMIT;
                             break;
                         case XAResource.XA_RDONLY:
@@ -131,7 +126,7 @@ public class SubCoordinator implements Remote {
                 state = XaState.STATUS_ROLLING_BACK;
                 break;
             case COMMIT:
-                state = STATUS_PREPARED;
+                state = XaState.STATUS_PREPARED;
                 break;
             case READONLY:
                 state = XaState.STATUS_COMMITTED;
@@ -168,13 +163,21 @@ public class SubCoordinator implements Remote {
 
     private synchronized void doRollback() {
         state = XaState.STATUS_ROLLEDBACK;
+        int rollbackError = 0;
         for (int i = 0; i < resources.size(); i++) {
             HmilyXaResource xaResource = (HmilyXaResource) resources.elementAt(i);
             try {
                 xaResource.rollback();
+                if (logger.isDebugEnabled()) {
+                    logger.debug("xa rollback{}", xaResource.getXid());
+                }
             } catch (XAException e) {
-                logger.error("rollback  error");
+                logger.error("rollback  error {}", xaResource.getXid());
+                rollbackError++;
             }
+        }
+        if (rollbackError > 0) {
+            state = XaState.STATUS_UNKNOWN;
         }
     }
 
@@ -183,27 +186,35 @@ public class SubCoordinator implements Remote {
      */
     private synchronized void doCommit() {
         state = XaState.STATUS_COMMITTING;
+        int commitError = 0;
         for (int i = 0; i < resources.size(); i++) {
             HmilyXaResource xaResource = (HmilyXaResource) resources.elementAt(i);
             try {
                 // false is 2pc.
                 xaResource.commit(false);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("xa commit{}", xaResource.getXid());
+                }
             } catch (XAException e) {
-                logger.error("rollback  error");
+                logger.error("rollback  error,{}", xaResource.getXid());
+                commitError++;
             }
         }
-        state = XaState.STATUS_COMMITTED;
+        if (commitError > 0) {
+            state = XaState.STATUS_UNKNOWN;
+        } else {
+            state = XaState.STATUS_COMMITTED;
+        }
     }
 
     @Override
     public void commit() {
-        switch (state) {
-            case STATUS_PREPARED:
-                break;
-            default:
-                return;
+        if (state == XaState.STATUS_PREPARED) {
+            doCommit();
+            logger.info("commit: start");
+        } else {
+            logger.error("commit: bad status {}", state);
         }
-        doCommit();
     }
 
     @Override
@@ -237,7 +248,7 @@ public class SubCoordinator implements Remote {
         try {
             transaction.doDeList(XAResource.TMSUCCESS);
         } catch (SystemException e) {
-            logger.error("deList xaResource:{}", e);
+            logger.error("deList xaResource:", e);
         }
         if (resources.size() == 1) {
             doOnePhaseCommit();
@@ -346,5 +357,15 @@ public class SubCoordinator implements Remote {
      */
     public XaState getState() {
         return state;
+    }
+
+    @Override
+    public void beforeCompletion() {
+
+    }
+
+    @Override
+    public void afterCompletion(final int status) {
+
     }
 }

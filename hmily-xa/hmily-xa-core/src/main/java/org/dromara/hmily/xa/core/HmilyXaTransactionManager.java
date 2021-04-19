@@ -29,6 +29,7 @@ import javax.transaction.Status;
 import javax.transaction.SystemException;
 import javax.transaction.Transaction;
 import javax.transaction.TransactionManager;
+import javax.transaction.TransactionalException;
 import javax.transaction.xa.XAResource;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -71,6 +72,7 @@ public class HmilyXaTransactionManager implements TransactionManager {
         Transaction transaction = getThreadTransaction();
         if (transaction == null) {
             logger.warn("transaction is null");
+            throw new IllegalStateException("transaction is null");
         }
         return transaction;
     }
@@ -165,7 +167,7 @@ public class HmilyXaTransactionManager implements TransactionManager {
         //Main business coordinator
         rct = new TransactionImpl(xId);
         setTxTotr(rct);
-        //todo:这里还需要清除map的相关信息.
+        //todo: 这里还需要清除map的相关信息.
         xidTransactionMap.put(xId, rct);
     }
 
@@ -177,7 +179,7 @@ public class HmilyXaTransactionManager implements TransactionManager {
         }
         try {
             threadTransaction.commit();
-        } catch (Exception ex) {
+        } finally {
             clearTxTotr();
         }
     }
@@ -185,15 +187,23 @@ public class HmilyXaTransactionManager implements TransactionManager {
     @Override
     public void rollback() throws IllegalStateException, SecurityException, SystemException {
         Transaction transaction = this.getTransaction();
-        if (transaction != null) {
-            transaction.rollback();
+        if (transaction == null) {
+            throw new IllegalStateException("Transaction is null,can not rollback");
         }
-        clearTxTotr();
+        try {
+            transaction.rollback();
+        } finally {
+            clearTxTotr();
+        }
     }
 
     @Override
     public int getStatus() throws SystemException {
-        return this.getTransaction().getStatus();
+        Transaction transaction = this.getTransaction();
+        if (transaction == null) {
+            throw new IllegalStateException("Transaction is null,can not getStatus");
+        }
+        return transaction.getStatus();
     }
 
     private boolean txCanRollback(final Transaction transaction) throws SystemException {

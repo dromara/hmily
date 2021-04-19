@@ -25,7 +25,7 @@ import java.rmi.RemoteException;
  *
  * @author sixh chenbin
  */
-public interface Remote {
+public interface Resource {
 
     /**
      * 2pc phase 1.
