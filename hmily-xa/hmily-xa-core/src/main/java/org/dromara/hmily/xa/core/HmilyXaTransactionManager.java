@@ -29,9 +29,9 @@ import javax.transaction.Status;
 import javax.transaction.SystemException;
 import javax.transaction.Transaction;
 import javax.transaction.TransactionManager;
-import javax.transaction.TransactionalException;
 import javax.transaction.xa.XAResource;
 import java.util.Map;
+import java.util.Stack;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -43,7 +43,10 @@ public class HmilyXaTransactionManager implements TransactionManager {
 
     private final Logger logger = LoggerFactory.getLogger(HmilyXaTransactionManager.class);
 
-    private final ThreadLocal<Transaction> tms = new ThreadLocal<>();
+    /**
+     * onveniently realize the processing of nested transactions。
+     */
+    private final ThreadLocal<Stack<Transaction>> tms = new ThreadLocal<>();
 
     private final Map<XIdImpl, Transaction> xidTransactionMap = new ConcurrentHashMap<>();
 
@@ -51,6 +54,7 @@ public class HmilyXaTransactionManager implements TransactionManager {
      * Instantiates a new Hmily xa transaction manager.
      */
     public HmilyXaTransactionManager() {
+
     }
 
     /**
@@ -119,7 +123,13 @@ public class HmilyXaTransactionManager implements TransactionManager {
      * @return the thread transaction
      */
     public Transaction getThreadTransaction() {
-        return tms.get();
+        synchronized (tms) {
+            Stack<Transaction> stack = tms.get();
+            if (stack == null) {
+                return null;
+            }
+            return stack.peek();
+        }
     }
 
     @Override
@@ -155,20 +165,14 @@ public class HmilyXaTransactionManager implements TransactionManager {
         Transaction rct = threadTransaction;
         //xa;
         if (threadTransaction != null) {
-            synchronized (this) {
-                if (xidTransactionMap.containsValue(rct)) {
-                    if (!txCanRollback(rct)) {
-                        throw new NotSupportedException(" Nested transactions not supported ");
-                    }
-                }
-            }
+            TransactionImpl tx = (TransactionImpl) rct;
+            rct = tx.createSubTransaction();
+        } else {
+            XIdImpl xId = new XIdImpl();
+            //Main business coordinator
+            rct = new TransactionImpl(xId);
         }
-        XIdImpl xId = new XIdImpl();
-        //Main business coordinator
-        rct = new TransactionImpl(xId);
         setTxTotr(rct);
-        //todo: 这里还需要清除map的相关信息.
-        xidTransactionMap.put(xId, rct);
     }
 
     @Override
@@ -230,13 +234,26 @@ public class HmilyXaTransactionManager implements TransactionManager {
     }
 
     private void clearTxTotr() {
-        tms.remove();
+        synchronized (tms) {
+            Stack<Transaction> stack = tms.get();
+            Transaction pop = stack.pop();
+            if (stack.empty()) {
+                tms.remove();
+            }
+        }
     }
 
     /**
      * tx  to threadLocal.
      */
     private void setTxTotr(final Transaction transaction) {
-        tms.set(transaction);
+        synchronized (tms) {
+            Stack<Transaction> stack = tms.get();
+            if (stack == null) {
+                stack = new Stack<>();
+                tms.set(stack);
+            }
+            stack.push(transaction);
+        }
     }
 }

@@ -101,7 +101,7 @@ public class HmilyXaTest {
             userTransaction.begin();
             DataSource dataSource = getDataSource2();
             connection = dataSource.getConnection();
-            String sql = "insert into xa_data (name) values ('chenbin')";
+            String sql = "insert into xa_dataz (name) values ('chenbin')";
             preparedStatement = connection.prepareStatement(sql);
             preparedStatement.executeUpdate();
             userTransaction.commit();

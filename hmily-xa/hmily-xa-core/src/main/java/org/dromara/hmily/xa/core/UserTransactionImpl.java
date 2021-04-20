@@ -58,16 +58,16 @@ public class UserTransactionImpl implements UserTransaction {
 
     @Override
     public void setRollbackOnly() throws IllegalStateException, SystemException {
-
+        getTm().setRollbackOnly();
     }
 
     @Override
     public int getStatus() throws SystemException {
-        return tm.getStatus();
+        return getTm().getStatus();
     }
 
     @Override
     public void setTransactionTimeout(final int i) throws SystemException {
-
+        getTm().setTransactionTimeout(i);
     }
 }

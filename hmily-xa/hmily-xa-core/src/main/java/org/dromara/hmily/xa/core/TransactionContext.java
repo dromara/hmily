@@ -28,6 +28,8 @@ public class TransactionContext {
 
     private final XIdImpl xId;
 
+    private Finally oneFinally;
+
     /**
      * Instantiates a new Transaction context.
      *
@@ -37,6 +39,9 @@ public class TransactionContext {
     public TransactionContext(final Coordinator coordinator, final XIdImpl xId) {
         this.coordinator = coordinator;
         this.xId = xId;
+        if (coordinator != null) {
+            oneFinally = coordinator;
+        }
     }
 
     /**
@@ -46,6 +51,24 @@ public class TransactionContext {
      */
     public Coordinator getCoordinator() {
         return coordinator;
+    }
+
+    /**
+     * Gets one finally.
+     *
+     * @return the one finally
+     */
+    public Finally getOneFinally() {
+        return oneFinally;
+    }
+
+    /**
+     * Sets one finally.
+     *
+     * @param oneFinally the one finally
+     */
+    public void setOneFinally(final Finally oneFinally) {
+        this.oneFinally = oneFinally;
     }
 
     /**

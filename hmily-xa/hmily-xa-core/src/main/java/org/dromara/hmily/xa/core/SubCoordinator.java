@@ -32,10 +32,11 @@ import java.util.Vector;
 
 /**
  * SubCoordinator .
+ * 需要处理一下，等待总协调者的通知，如果没有通知，就表示回滚。
  *
  * @author sixh chenbin
  */
-public class SubCoordinator implements Resource,Synchronization {
+public class SubCoordinator implements Resource, Synchronization {
 
     private final Logger logger = LoggerFactory.getLogger(SubCoordinator.class);
 
@@ -50,8 +51,6 @@ public class SubCoordinator implements Resource,Synchronization {
 
     /**
      * all Synchronization.
-     *
-     * @see SynchronizationImpl
      */
     private final Vector<Synchronization> synchronizations = new Vector<>();
 

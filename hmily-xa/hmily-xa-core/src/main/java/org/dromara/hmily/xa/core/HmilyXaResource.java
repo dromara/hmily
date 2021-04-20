@@ -26,11 +26,11 @@ import javax.transaction.xa.Xid;
  *
  * @author sixh chenbin
  */
-public class HmilyXaResource implements XAResource {
+public class HmilyXaResource implements XaResourceWrapped {
 
     private final XAResource xaResource;
 
-    private Xid xid;
+    private final Xid xid;
 
     /**
      * Instantiates a new Hmily xa resource.
@@ -38,7 +38,8 @@ public class HmilyXaResource implements XAResource {
      * @param xid        the xid
      * @param xaResource the xa resource
      */
-    public HmilyXaResource(final Xid xid, final XAResource xaResource) {
+    public HmilyXaResource(final Xid xid,
+                           final XAResource xaResource) {
         this.xaResource = xaResource;
         this.xid = xid;
     }

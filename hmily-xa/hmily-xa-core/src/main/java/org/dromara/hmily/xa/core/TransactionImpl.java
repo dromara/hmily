@@ -17,6 +17,7 @@
 
 package org.dromara.hmily.xa.core;
 
+import org.dromara.hmily.xa.core.timer.TimerRemovalListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,12 +27,14 @@ import javax.transaction.RollbackException;
 import javax.transaction.Synchronization;
 import javax.transaction.SystemException;
 import javax.transaction.Transaction;
+import javax.transaction.TransactionRolledbackException;
 import javax.transaction.xa.XAException;
 import javax.transaction.xa.XAResource;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * TransactionImpl .
@@ -39,7 +42,7 @@ import java.util.List;
  *
  * @author sixh chenbin
  */
-public class TransactionImpl implements Transaction {
+public class TransactionImpl implements Transaction, TimerRemovalListener<Resource> {
 
     private final Logger logger = LoggerFactory.getLogger(TransactionImpl.class);
 
@@ -58,25 +61,48 @@ public class TransactionImpl implements Transaction {
      *
      * @param xId the x id
      */
-    public TransactionImpl(final XIdImpl xId) {
+    TransactionImpl(final XIdImpl xId) {
         this.xid = xId;
         context = new TransactionContext(null, xId);
         //todo:这里还要设置超时器.
         subCoordinator(true, true);
     }
 
+    /**
+     * Instantiates a new Transaction.
+     *
+     * @param impl the
+     */
+    private TransactionImpl(final TransactionImpl impl) {
+        this.xid = impl.getXid().newBranchId();
+        context = impl.getContext();
+        this.delistResourceList = null;
+        subCoordinator(true, true);
+    }
+
     @Override
     public void commit() throws RollbackException, HeuristicMixedException, HeuristicRollbackException, SecurityException, IllegalStateException, SystemException {
-        Coordinator coordinator = context.getCoordinator();
-        if (coordinator != null) {
+        Finally oneFinally = context.getOneFinally();
+        if (oneFinally != null) {
             try {
-                coordinator.commit();
+                oneFinally.commit();
+            } catch (TransactionRolledbackException e) {
+                logger.error("error rollback", e);
+                throw new RollbackException();
             } catch (RemoteException e) {
+                logger.error("error", e);
                 throw new SystemException(e.getMessage());
             }
+            return;
         }
         if (subCoordinator != null) {
-            subCoordinator.commit();
+            try {
+                //第1阶段提交.
+                subCoordinator.onePhaseCommit();
+            } catch (TransactionRolledbackException e) {
+                logger.error("onePhaseCommit()");
+                throw new RollbackException();
+            }
         }
     }
 
@@ -92,6 +118,7 @@ public class TransactionImpl implements Transaction {
         //xaResource;
         if (flag == XAResource.TMJOIN
                 || flag == XAResource.TMNOFLAGS) {
+            //这里需要处理不同的xa事务数据.
             enlistResource(xaResource);
         } else if (flag == XAResource.TMRESUME) {
             //进行事务的恢复.
@@ -102,7 +129,6 @@ public class TransactionImpl implements Transaction {
             }
         }
         delistResourceList = null;
-
     }
 
     /**
@@ -119,7 +145,8 @@ public class TransactionImpl implements Transaction {
     }
 
     @Override
-    public boolean delistResource(final XAResource xaResource, final int flag) throws IllegalStateException, SystemException {
+    public boolean delistResource(final XAResource xaResource, final int flag) throws
+            IllegalStateException, SystemException {
         if (!enlistResourceList.contains(xaResource)) {
             return false;
         }
@@ -136,7 +163,8 @@ public class TransactionImpl implements Transaction {
     }
 
     @Override
-    public boolean enlistResource(final XAResource xaResource) throws RollbackException, IllegalStateException, SystemException {
+    public boolean enlistResource(final XAResource xaResource) throws
+            RollbackException, IllegalStateException, SystemException {
         //is null .
         if (subCoordinator == null) {
             subCoordinator(false, false);
@@ -173,7 +201,8 @@ public class TransactionImpl implements Transaction {
     }
 
     @Override
-    public void registerSynchronization(final Synchronization synchronization) throws RollbackException, IllegalStateException, SystemException {
+    public void registerSynchronization(final Synchronization synchronization) throws
+            RollbackException, IllegalStateException, SystemException {
         if (synchronization == null) {
             return;
         }
@@ -185,9 +214,10 @@ public class TransactionImpl implements Transaction {
 
     @Override
     public void rollback() throws IllegalStateException, SystemException {
-        Coordinator coordinator = context.getCoordinator();
-        if (coordinator != null) {
-            coordinator.rollback();
+        Finally oneFinally = context.getOneFinally();
+        if (oneFinally != null) {
+            oneFinally.rollback();
+            return;
         }
         if (subCoordinator != null) {
             subCoordinator.rollback();
@@ -215,8 +245,13 @@ public class TransactionImpl implements Transaction {
             Coordinator coordinator = context.getCoordinator();
             if (newCoordinator && coordinator == null) {
                 coordinator = new Coordinator(xid);
+                context.setCoordinator(coordinator);
+                if (context.getOneFinally() == null) {
+                    context.setOneFinally(coordinator);
+                }
+                coordinator.getTimer().put(coordinator, 30000, TimeUnit.SECONDS);
+                coordinator.getTimer().addRemovalListener(this);
             }
-            context.setCoordinator(coordinator);
             coordinator.addCoordinators(subCoordinator);
         } catch (Exception ex) {
             logger.error("build SubCoordinator error");
@@ -230,5 +265,30 @@ public class TransactionImpl implements Transaction {
      */
     public XIdImpl getXid() {
         return xid;
+    }
+
+    /**
+     * Gets context.
+     *
+     * @return the context
+     */
+    public TransactionContext getContext() {
+        return context;
+    }
+
+    /**
+     * 创建一个子任务.
+     *
+     * @return the transaction
+     */
+    public TransactionImpl createSubTransaction() {
+        return new TransactionImpl(this);
+    }
+
+    @Override
+    public void onRemoval(final Resource value, final Long expire, final Long elapsed) {
+        if (value instanceof Coordinator) {
+
+        }
     }
 }

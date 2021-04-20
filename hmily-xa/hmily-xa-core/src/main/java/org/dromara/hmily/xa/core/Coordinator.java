@@ -17,6 +17,8 @@
 
 package org.dromara.hmily.xa.core;
 
+import org.dromara.hmily.xa.core.timer.HmilyTimer;
+import org.dromara.hmily.xa.core.timer.TimerRemovalListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,13 +27,14 @@ import javax.transaction.TransactionRolledbackException;
 import java.rmi.RemoteException;
 import java.time.LocalDateTime;
 import java.util.Vector;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Coordinator .
  *
  * @author sixh chenbin
  */
-public class Coordinator implements Resource {
+public class Coordinator implements Resource, Finally, TimerRemovalListener<Resource> {
 
     private final Logger logger = LoggerFactory.getLogger(Coordinator.class);
 
@@ -49,6 +52,8 @@ public class Coordinator implements Resource {
      */
     private LocalDateTime date;
 
+    private HmilyTimer<Resource> hmilyTimer;
+
     /**
      * Instantiates a new Coordinator.
      *
@@ -58,12 +63,22 @@ public class Coordinator implements Resource {
         this.xid = xid;
         date = LocalDateTime.now();
         //主事务的问题处理.
+        hmilyTimer = new HmilyTimer<>(30000, TimeUnit.SECONDS, xid.getGlobalId());
+        hmilyTimer.addRemovalListener(this);
+    }
+
+    /**
+     * Gets timer.
+     *
+     * @return the timer
+     */
+    public HmilyTimer<Resource> getTimer() {
+        return hmilyTimer;
     }
 
     @Override
     public Result prepare() {
-        doPrepare();
-        return Result.READONLY;
+        return doPrepare();
     }
 
     @Override
@@ -190,7 +205,11 @@ public class Coordinator implements Resource {
         if (coordinators.contains(resource)) {
             return true;
         }
-        return this.coordinators.add(resource);
+        boolean add = this.coordinators.add(resource);
+        if (add) {
+            hmilyTimer.put(resource);
+        }
+        return add;
     }
 
     /**
@@ -226,6 +245,13 @@ public class Coordinator implements Resource {
         } else {
             state = XaState.STATUS_ROLLEDBACK;
             throw new TransactionRolledbackException();
+        }
+    }
+
+    @Override
+    public void onRemoval(final Resource value, final Long expire, final Long elapsed) {
+        if (value instanceof SubCoordinator) {
+
         }
     }
 }
