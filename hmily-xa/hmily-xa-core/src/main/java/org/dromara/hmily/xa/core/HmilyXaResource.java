@@ -160,4 +160,9 @@ public class HmilyXaResource implements XaResourceWrapped {
     public void start(final int i) throws XAException {
         this.start(this.xid, i);
     }
+
+    @Override
+    public String getName() {
+        return "local";
+    }
 }

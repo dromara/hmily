@@ -15,17 +15,30 @@
  *  limitations under the License.
  */
 
-package org.dromara.hmily.xa.core;
+package org.dromara.hmily.xa.core.recovery;
 
-import javax.transaction.xa.XAResource;
+import lombok.Data;
+import org.dromara.hmily.xa.core.XaState;
 
 /**
- * XaResourceExtends .
- * 扩展 XaResources扩展.
+ * CoordinatorLogEntry .
  *
  * @author sixh chenbin
  */
-public interface XaResourceWrapped extends XAResource {
+@Data
+public class CoordinatorLogEntry {
 
-    String getName();
+    private String globalId;
+
+    private String branchId;
+
+    private Long endBxid;
+
+    private Long endXId;
+
+    private String superCoordinatorId;
+
+    private XaState state;
+
+    private Boolean isCoordinator = true;
 }

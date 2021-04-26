@@ -98,7 +98,7 @@ public class SubCoordinator implements Resource, Synchronization {
                 try {
                     xaResource.rollback();
                 } catch (XAException e) {
-                    logger.error("call xa.rollback error ", e);
+                    logger.error("call xa.rollback error {} ", HmliyXaException.getMessage(e));
                 }
             } else {
                 try {
@@ -117,6 +117,7 @@ public class SubCoordinator implements Resource, Synchronization {
                 } catch (XAException e) {
                     result = Result.ROLLBACK;
                     isError = true;
+                    logger.error("{}", HmliyXaException.getMessage(e));
                 }
             }
         }
@@ -171,7 +172,7 @@ public class SubCoordinator implements Resource, Synchronization {
                     logger.debug("xa rollback{}", xaResource.getXid());
                 }
             } catch (XAException e) {
-                logger.error("rollback  error {}", xaResource.getXid());
+                logger.error("rollback  error {}:{}", xaResource.getXid(), HmliyXaException.getMessage(e));
                 rollbackError++;
             }
         }
@@ -195,7 +196,7 @@ public class SubCoordinator implements Resource, Synchronization {
                     logger.debug("xa commit{}", xaResource.getXid());
                 }
             } catch (XAException e) {
-                logger.error("rollback  error,{}", xaResource.getXid());
+                logger.error("rollback  error,{}:{}", xaResource.getXid(), HmliyXaException.getMessage(e));
                 commitError++;
             }
         }
@@ -275,7 +276,7 @@ public class SubCoordinator implements Resource, Synchronization {
             state = XaState.STATUS_COMMITTED;
         } catch (XAException ex) {
             state = XaState.STATUS_UNKNOWN;
-            logger.error("xa commit error{}", xaResource);
+            logger.error("xa commit error{}:{}", xaResource, HmliyXaException.getMessage(ex));
             if (Objects.equals(ex.errorCode, XAException.XA_RBROLLBACK)) {
                 throw new TransactionRolledbackException("XAException:" + ex.getMessage());
             }
@@ -312,7 +313,7 @@ public class SubCoordinator implements Resource, Synchronization {
             try {
                 return e.isSameRM(xaResource);
             } catch (XAException xaException) {
-                logger.error("xa isSameRM", xaException);
+                logger.error("xa isSameRM,{}:{}", xaException, HmliyXaException.getMessage(xaException));
                 return false;
             }
         }).findFirst();

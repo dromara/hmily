@@ -50,9 +50,13 @@ public class Coordinator implements Resource, Finally, TimerRemovalListener<Reso
     /**
      * 事务开始的时间.
      */
-    private LocalDateTime date;
+    private final LocalDateTime date;
 
-    private HmilyTimer<Resource> hmilyTimer;
+    private final HmilyTimer<Resource> hmilyTimer;
+    /**
+     * 父协调器.
+     */
+    private String superCoordinator;
 
     /**
      * Instantiates a new Coordinator.

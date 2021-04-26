@@ -157,7 +157,7 @@ public class TransactionImpl implements Transaction, TimerRemovalListener<Resour
             enlistResourceList.remove(xaResource);
             return true;
         } catch (XAException e) {
-            logger.info("xa resource end ", e);
+            logger.info("xa resource end,{}", HmliyXaException.getMessage(e), e);
         }
         return false;
     }
@@ -183,7 +183,7 @@ public class TransactionImpl implements Transaction, TimerRemovalListener<Resour
             // TMNOFLAGS、TMJOIN 或 TMRESUME 之一。
             hmilyXaResource.start(flag);
         } catch (XAException e) {
-            logger.error("", e);
+            logger.error("{}", HmliyXaException.getMessage(e), e);
             throw new IllegalStateException(e);
         }
         if (!enlistResourceList.contains(hmilyXaResource)) {

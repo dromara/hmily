@@ -27,8 +27,13 @@ import java.net.UnknownHostException;
  */
 public class NetUtils {
 
-    private static String localAddress;
+    private static volatile String localAddress;
 
+    /**
+     * Gets local ip.
+     *
+     * @return the local ip
+     */
     public static String getLocalIp() {
         if (localAddress == null) {
             synchronized (NetUtils.class) {

@@ -17,15 +17,23 @@
 
 package org.dromara.hmily.xa.core;
 
-import javax.transaction.xa.XAResource;
+import lombok.Data;
+import org.dromara.hmily.config.api.AbstractConfig;
+import org.dromara.hmily.spi.HmilySPI;
 
 /**
- * XaResourceExtends .
- * 扩展 XaResources扩展.
+ * XaConfig .
  *
  * @author sixh chenbin
  */
-public interface XaResourceWrapped extends XAResource {
+@Data
+@HmilySPI("hmilyXa")
+public class XaConfig extends AbstractConfig {
 
-    String getName();
+    private String tmUnique;
+
+    @Override
+    public String prefix() {
+        return "hmily.xa";
+    }
 }

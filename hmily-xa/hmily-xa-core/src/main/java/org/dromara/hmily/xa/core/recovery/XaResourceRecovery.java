@@ -15,17 +15,27 @@
  *  limitations under the License.
  */
 
-package org.dromara.hmily.xa.core;
-
-import javax.transaction.xa.XAResource;
+package org.dromara.hmily.xa.core.recovery;
 
 /**
- * XaResourceExtends .
- * 扩展 XaResources扩展.
+ * XaResourceRecovery .
+ * 事务恢复的处理.
  *
  * @author sixh chenbin
  */
-public interface XaResourceWrapped extends XAResource {
+public interface XaResourceRecovery {
 
-    String getName();
+    /**
+     * 提交一个恢复日志log.
+     *
+     * @param recoveryLog the recovery log
+     */
+    void commitLog(RecoveryLog recoveryLog);
+
+    /**
+     * Rollback log.
+     *
+     * @param recoveryLog the recovery log
+     */
+    void rollbackLog(RecoveryLog recoveryLog);
 }

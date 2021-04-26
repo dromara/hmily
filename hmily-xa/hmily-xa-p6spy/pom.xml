@@ -42,11 +42,6 @@
             <artifactId>javax.transaction-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.atomikos</groupId>
-            <artifactId>transactions-jdbc</artifactId>
-            <version>4.0.6</version>
-        </dependency>
-        <dependency>
             <groupId>org.dromara</groupId>
             <artifactId>hmily-common</artifactId>
             <version>${project.version}</version>

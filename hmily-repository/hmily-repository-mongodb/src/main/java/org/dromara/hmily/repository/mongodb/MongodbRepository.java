@@ -277,4 +277,7 @@ public class MongodbRepository implements HmilyRepository {
         return Pair.of(key, value);
     }
 
+    public MongodbTemplateService getService() {
+        return service;
+    }
 }

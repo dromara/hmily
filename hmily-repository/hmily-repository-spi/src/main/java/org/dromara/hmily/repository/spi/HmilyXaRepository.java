@@ -15,17 +15,33 @@
  *  limitations under the License.
  */
 
-package org.dromara.hmily.xa.core;
+package org.dromara.hmily.repository.spi;
 
-import javax.transaction.xa.XAResource;
+import org.dromara.hmily.repository.spi.entity.HmilyXaRecovery;
+
+import java.util.List;
 
 /**
- * XaResourceExtends .
- * 扩展 XaResources扩展.
+ * HmilyXaRepository .
+ * xa相关的查询.
  *
  * @author sixh chenbin
  */
-public interface XaResourceWrapped extends XAResource {
+public interface HmilyXaRepository {
 
-    String getName();
+    /**
+     * Query by tm unique list.
+     *
+     * @param tmUnique the tm unique
+     * @param state    the state
+     * @return the list
+     */
+    List<HmilyXaRecovery> queryByTmUnique(String tmUnique, Integer state);
+
+    /**
+     * Add log.
+     *
+     * @param log the log
+     */
+    void addLog(HmilyXaRecovery log);
 }
