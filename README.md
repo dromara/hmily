@@ -100,11 +100,11 @@
 -------------------------------------------------------------------------------
 
 # Documentation
-[![EN doc](https://img.shields.io/badge/document-English-blue.svg)](https://dromara.org/en-us/docs/hmily/index.html)
+[![EN doc](https://img.shields.io/badge/document-English-blue.svg)](https://dromara.org/projects/hmily)
 
-[![CN doc](https://img.shields.io/badge/文档-中文版-blue.svg)](https://dromara.org/zh-cn/docs/hmily/index.html)
+[![CN doc](https://img.shields.io/badge/文档-中文版-blue.svg)](https://dromara.org/zh/projects/hmily)
 
-If you want to use it, you can refer to [Quick Start](https://dromara.org/en-us/docs/hmily/index.html)
+If you want to use it, you can refer to [Quick Start](https://dromara.org/projects/hmily)
 
 # About Hmily 
 
