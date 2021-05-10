@@ -51,6 +51,6 @@ public abstract class AbstractHmilyTransactionAspect {
      */
     @Around("hmilyInterceptor()")
     public Object interceptTccMethod(final ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
-        return interceptor.interceptor(proceedingJoinPoint);
+        return interceptor.invoke(proceedingJoinPoint);
     }
 }

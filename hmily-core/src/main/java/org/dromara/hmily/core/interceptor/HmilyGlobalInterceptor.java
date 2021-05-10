@@ -17,13 +17,19 @@
 
 package org.dromara.hmily.core.interceptor;
 
-import java.util.Optional;
 import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.reflect.MethodSignature;
+import org.dromara.hmily.annotation.HmilyTCC;
+import org.dromara.hmily.annotation.TransTypeEnum;
 import org.dromara.hmily.core.context.HmilyTransactionContext;
 import org.dromara.hmily.core.mediator.LocalParameterLoader;
 import org.dromara.hmily.core.mediator.RpcParameterLoader;
-import org.dromara.hmily.core.service.HmilyTransactionAspectInvoker;
+import org.dromara.hmily.core.service.HmilyTransactionHandlerFactory;
 import org.dromara.hmily.spi.ExtensionLoaderFactory;
+
+import java.lang.reflect.Method;
+import java.util.EnumMap;
+import java.util.Optional;
 
 /**
  * The type Hmily global interceptor.
@@ -34,13 +40,31 @@ public class HmilyGlobalInterceptor implements HmilyTransactionInterceptor {
     
     private static RpcParameterLoader parameterLoader;
     
+    private static final EnumMap<TransTypeEnum, HmilyTransactionHandlerFactory> FACTORY_MAP = new EnumMap<>(TransTypeEnum.class);
+    
     static {
         parameterLoader = Optional.ofNullable(ExtensionLoaderFactory.load(RpcParameterLoader.class)).orElse(new LocalParameterLoader());
     }
     
+    static {
+        FACTORY_MAP.put(TransTypeEnum.TCC, ExtensionLoaderFactory.load(HmilyTransactionHandlerFactory.class, "tcc"));
+        FACTORY_MAP.put(TransTypeEnum.TAC, ExtensionLoaderFactory.load(HmilyTransactionHandlerFactory.class, "tac"));
+    }
+    
     @Override
-    public Object interceptor(final ProceedingJoinPoint pjp) throws Throwable {
+    public Object invoke(final ProceedingJoinPoint pjp) throws Throwable {
         HmilyTransactionContext context = parameterLoader.load();
-        return HmilyTransactionAspectInvoker.getInstance().invoke(context, pjp);
+        return invokeWithinTransaction(context, pjp);
+    }
+    
+    private Object invokeWithinTransaction(final HmilyTransactionContext hmilyTransactionContext, final ProceedingJoinPoint point) throws Throwable {
+        MethodSignature signature = (MethodSignature) point.getSignature();
+        Method method = signature.getMethod();
+        final HmilyTCC hmilyTCC = method.getAnnotation(HmilyTCC.class);
+        if (null != hmilyTCC) {
+            return FACTORY_MAP.get(TransTypeEnum.TCC).factoryOf(hmilyTransactionContext).handler(point, hmilyTransactionContext);
+        } else {
+            return FACTORY_MAP.get(TransTypeEnum.TAC).factoryOf(hmilyTransactionContext).handler(point, hmilyTransactionContext);
+        }
     }
 }
