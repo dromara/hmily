@@ -17,8 +17,6 @@
 
 package org.dromara.hmily.tac.core.handler;
 
-import java.util.Optional;
-import java.util.function.Supplier;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.dromara.hmily.annotation.TransTypeEnum;
 import org.dromara.hmily.common.enums.HmilyActionEnum;
@@ -34,6 +32,9 @@ import org.dromara.hmily.metrics.spi.MetricsHandlerFacade;
 import org.dromara.hmily.metrics.spi.MetricsHandlerFacadeEngine;
 import org.dromara.hmily.repository.spi.entity.HmilyTransaction;
 import org.dromara.hmily.tac.core.transaction.HmilyTacStarterTransaction;
+
+import java.util.Optional;
+import java.util.function.Supplier;
 
 
 /**
@@ -57,7 +58,7 @@ public class StarterHmilyTacTransactionHandler implements HmilyTransactionHandle
     }
     
     @Override
-    public Object handler(final ProceedingJoinPoint point, final HmilyTransactionContext context)
+    public Object handleTransaction(final ProceedingJoinPoint point, final HmilyTransactionContext context)
             throws Throwable {
         Object returnValue;
         Supplier<Boolean> histogramSupplier = null;

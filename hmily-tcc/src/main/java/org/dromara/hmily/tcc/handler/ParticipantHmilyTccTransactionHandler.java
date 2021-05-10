@@ -17,9 +17,6 @@
 
 package org.dromara.hmily.tcc.handler;
 
-import java.lang.reflect.Method;
-import java.util.List;
-import java.util.Objects;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.dromara.hmily.annotation.TransTypeEnum;
@@ -36,6 +33,10 @@ import org.dromara.hmily.metrics.spi.MetricsHandlerFacadeEngine;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipant;
 import org.dromara.hmily.tcc.executor.HmilyTccTransactionExecutor;
 
+import java.lang.reflect.Method;
+import java.util.List;
+import java.util.Objects;
+
 /**
  * Participant Handler.
  *
@@ -46,7 +47,7 @@ public class ParticipantHmilyTccTransactionHandler implements HmilyTransactionHa
     private final HmilyTccTransactionExecutor executor = HmilyTccTransactionExecutor.getInstance();
     
     @Override
-    public Object handler(final ProceedingJoinPoint point, final HmilyTransactionContext context) throws Throwable {
+    public Object handleTransaction(final ProceedingJoinPoint point, final HmilyTransactionContext context) throws Throwable {
         HmilyParticipant hmilyParticipant = null;
         switch (HmilyActionEnum.acquireByCode(context.getAction())) {
             case TRYING:

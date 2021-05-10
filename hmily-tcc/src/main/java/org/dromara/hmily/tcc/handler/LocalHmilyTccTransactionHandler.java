@@ -30,7 +30,7 @@ import org.dromara.hmily.core.service.HmilyTransactionHandler;
 public class LocalHmilyTccTransactionHandler implements HmilyTransactionHandler {
     
     @Override
-    public Object handler(final ProceedingJoinPoint point, final HmilyTransactionContext context) throws Throwable {
+    public Object handleTransaction(final ProceedingJoinPoint point, final HmilyTransactionContext context) throws Throwable {
        /* if (HmilyActionEnum.TRYING.getCode() == context.getAction()) {
             MethodSignature signature = (MethodSignature) point.getSignature();
             Method method = signature.getMethod();

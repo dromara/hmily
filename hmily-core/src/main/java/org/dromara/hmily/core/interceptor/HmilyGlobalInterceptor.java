@@ -35,6 +35,7 @@ import java.util.Optional;
  * The type Hmily global interceptor.
  *
  * @author xiaoyu
+ * @author zhaojun
  */
 public class HmilyGlobalInterceptor implements HmilyTransactionInterceptor {
     
@@ -59,7 +60,7 @@ public class HmilyGlobalInterceptor implements HmilyTransactionInterceptor {
     
     private Object invokeWithinTransaction(final HmilyTransactionContext hmilyTransactionContext, final ProceedingJoinPoint point) throws Throwable {
         MethodSignature signature = (MethodSignature) point.getSignature();
-        return getRegistry(signature.getMethod()).select(hmilyTransactionContext).handler(point, hmilyTransactionContext);
+        return getRegistry(signature.getMethod()).select(hmilyTransactionContext).handleTransaction(point, hmilyTransactionContext);
     }
     
     private HmilyTransactionHandlerRegistry getRegistry(final Method method) {
