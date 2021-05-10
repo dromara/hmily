@@ -17,38 +17,49 @@
 
 package org.dromara.hmily.core.service;
 
-import java.util.Map;
-import java.util.Objects;
+import com.google.common.base.Preconditions;
+import lombok.Getter;
 import org.dromara.hmily.common.enums.HmilyRoleEnum;
 import org.dromara.hmily.core.context.HmilyTransactionContext;
+
+import java.util.EnumMap;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * The type Abstract hmily transaction handler.
  *
  * @author xiaoyu
  */
-public abstract class AbstractHmilyTransactionHandlerFactory implements HmilyTransactionHandlerFactory {
+public abstract class AbstractHmilyTransactionHandlerRegistry implements HmilyTransactionHandlerRegistry {
     
-    /**
-     * Gets map.
-     *
-     * @return the map
-     */
-    protected abstract Map<HmilyRoleEnum, HmilyTransactionHandler> getMap();
+    @Getter
+    private final Map<HmilyRoleEnum, HmilyTransactionHandler> handlers = new EnumMap<>(HmilyRoleEnum.class);
+    
+    public AbstractHmilyTransactionHandlerRegistry() {
+        register();
+    }
+    
+    protected abstract void register();
     
     @Override
-    public HmilyTransactionHandler factoryOf(final HmilyTransactionContext context) {
+    public HmilyTransactionHandler select(final HmilyTransactionContext context) {
         if (Objects.isNull(context)) {
-            return getMap().get(HmilyRoleEnum.START);
+            return getHandler(HmilyRoleEnum.START);
         } else {
             // if context not null and role is inline  is ParticipantHmilyTransactionHandler.
             if (context.getRole() == HmilyRoleEnum.LOCAL.getCode()) {
-                return getMap().get(HmilyRoleEnum.LOCAL);
+                return getHandler(HmilyRoleEnum.LOCAL);
             } else if (context.getRole() == HmilyRoleEnum.PARTICIPANT.getCode()
                     || context.getRole() == HmilyRoleEnum.START.getCode()) {
-                return getMap().get(HmilyRoleEnum.PARTICIPANT);
+                return getHandler(HmilyRoleEnum.PARTICIPANT);
             }
-            return getMap().get(HmilyRoleEnum.CONSUMER);
+            return getHandler(HmilyRoleEnum.CONSUMER);
         }
+    }
+    
+    private HmilyTransactionHandler getHandler(final HmilyRoleEnum role) {
+        Preconditions.checkState(handlers.containsKey(role));
+        return handlers.get(role);
     }
 }

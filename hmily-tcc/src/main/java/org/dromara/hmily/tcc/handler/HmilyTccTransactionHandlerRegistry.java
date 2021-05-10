@@ -17,33 +17,24 @@
 
 package org.dromara.hmily.tcc.handler;
 
-import java.util.EnumMap;
-import java.util.Map;
 import org.dromara.hmily.common.enums.HmilyRoleEnum;
-import org.dromara.hmily.core.service.AbstractHmilyTransactionHandlerFactory;
-import org.dromara.hmily.core.service.HmilyTransactionHandler;
+import org.dromara.hmily.core.service.AbstractHmilyTransactionHandlerRegistry;
 import org.dromara.hmily.spi.HmilySPI;
 
 
 /**
- * HmilyTransactionFactoryServiceImpl.
+ * Hmily Tcc transaction handler registry.
  *
  * @author xiaoyu
  */
 @HmilySPI("tcc")
-public class HmilyTccTransactionHandlerFactory extends AbstractHmilyTransactionHandlerFactory {
-    
-    private static final Map<HmilyRoleEnum, HmilyTransactionHandler> HANDLER_MAP = new EnumMap<>(HmilyRoleEnum.class);
-    
-    static {
-        HANDLER_MAP.put(HmilyRoleEnum.START, new StarterHmilyTccTransactionHandler());
-        HANDLER_MAP.put(HmilyRoleEnum.PARTICIPANT, new ParticipantHmilyTccTransactionHandler());
-        HANDLER_MAP.put(HmilyRoleEnum.CONSUMER, new ConsumeHmilyTccTransactionHandler());
-        HANDLER_MAP.put(HmilyRoleEnum.LOCAL, new LocalHmilyTccTransactionHandler());
-    }
+public class HmilyTccTransactionHandlerRegistry extends AbstractHmilyTransactionHandlerRegistry {
     
     @Override
-    protected Map<HmilyRoleEnum, HmilyTransactionHandler> getMap() {
-        return HANDLER_MAP;
+    public void register() {
+        getHandlers().put(HmilyRoleEnum.START, new StarterHmilyTccTransactionHandler());
+        getHandlers().put(HmilyRoleEnum.PARTICIPANT, new ParticipantHmilyTccTransactionHandler());
+        getHandlers().put(HmilyRoleEnum.CONSUMER, new ConsumeHmilyTccTransactionHandler());
+        getHandlers().put(HmilyRoleEnum.LOCAL, new LocalHmilyTccTransactionHandler());
     }
 }

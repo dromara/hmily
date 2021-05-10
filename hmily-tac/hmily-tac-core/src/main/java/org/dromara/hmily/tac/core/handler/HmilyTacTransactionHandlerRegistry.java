@@ -15,20 +15,25 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.core.service;
+package org.dromara.hmily.tac.core.handler;
 
-import org.dromara.hmily.core.context.HmilyTransactionContext;
+import org.dromara.hmily.common.enums.HmilyRoleEnum;
+import org.dromara.hmily.core.service.AbstractHmilyTransactionHandlerRegistry;
+import org.dromara.hmily.spi.HmilySPI;
+
 
 /**
- * The interface Hmily transaction handler factory.
+ * Hmily TAC transaction handler registry.
+ *
+ * @author xiaoyu
  */
-public interface HmilyTransactionHandlerFactory {
+@HmilySPI("tac")
+public class HmilyTacTransactionHandlerRegistry extends AbstractHmilyTransactionHandlerRegistry {
     
-    /**
-     * Factory of hmily transaction handler.
-     *
-     * @param context the context
-     * @return the hmily transaction handler
-     */
-    HmilyTransactionHandler factoryOf(HmilyTransactionContext context);
+    @Override
+    public void register() {
+        getHandlers().put(HmilyRoleEnum.START, new StarterHmilyTacTransactionHandler());
+        getHandlers().put(HmilyRoleEnum.PARTICIPANT, new ParticipantHmilyTacTransactionHandler());
+        getHandlers().put(HmilyRoleEnum.CONSUMER, new ConsumeHmilyTacTransactionHandler());
+    }
 }
