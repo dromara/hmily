@@ -19,6 +19,7 @@ package org.dromara.hmily.tac.sqlcompute.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.dromara.hmily.repository.spi.entity.HmilyDataSnapshot;
+import org.dromara.hmily.repository.spi.entity.tuple.HmilySQLManipulation;
 import org.dromara.hmily.repository.spi.entity.tuple.HmilySQLTuple;
 import org.dromara.hmily.tac.sqlcompute.HmilySQLComputeEngine;
 import org.dromara.hmily.tac.sqlcompute.exception.SQLComputeException;
@@ -27,6 +28,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Abstract hmily SQL compute engine.
@@ -44,6 +46,27 @@ public abstract class AbstractHmilySQLComputeEngine implements HmilySQLComputeEn
         } catch (final SQLException ex) {
             throw new SQLComputeException(ex);
         }
+        return result;
+    }
+    
+    /**
+     * Build tuple.
+     *
+     * @param tableName table name
+     * @param manipulation manipulation
+     * @param primaryKeyValues primary key values
+     * @param before before
+     * @param after after
+     * @return hmily SQL tuple
+     */
+    protected HmilySQLTuple buildTuple(final String tableName, final HmilySQLManipulation manipulation,
+                                     final List<Object> primaryKeyValues, final Map<String, Object> before, final Map<String, Object> after) {
+        HmilySQLTuple result = new HmilySQLTuple();
+        result.setTableName(tableName);
+        result.setManipulationType(manipulation);
+        result.setPrimaryKeyValues(primaryKeyValues);
+        result.setBeforeImage(before);
+        result.setAfterImage(after);
         return result;
     }
     

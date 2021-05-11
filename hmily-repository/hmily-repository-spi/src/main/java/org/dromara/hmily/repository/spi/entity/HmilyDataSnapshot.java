@@ -18,7 +18,7 @@
 package org.dromara.hmily.repository.spi.entity;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 import org.dromara.hmily.repository.spi.entity.tuple.HmilySQLTuple;
 
 import java.io.Serializable;
@@ -31,7 +31,7 @@ import java.util.LinkedList;
  *
  * @author xiaoyu
  */
-@RequiredArgsConstructor
+@NoArgsConstructor
 @Getter
 public class HmilyDataSnapshot implements Serializable {
     

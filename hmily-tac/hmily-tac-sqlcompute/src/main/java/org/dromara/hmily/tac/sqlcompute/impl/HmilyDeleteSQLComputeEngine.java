@@ -65,7 +65,7 @@ public final class HmilyDeleteSQLComputeEngine extends AbstractHmilySQLComputeEn
         Collection<HmilySQLTuple> result = new LinkedList<>();
         for (Map<String, Object> record : records) {
             List<Object> primaryKeyValues = tableMetaData.getPrimaryKeyColumns().stream().map(record::get).collect(Collectors.toList());
-            result.add(new HmilySQLTuple(tableMetaData.getTableName(), HmilySQLManipulation.DELETE, primaryKeyValues, record, new LinkedHashMap<>()));
+            result.add(buildTuple(tableMetaData.getTableName(), HmilySQLManipulation.DELETE, primaryKeyValues, record, new LinkedHashMap<>()));
         }
         return result;
     }

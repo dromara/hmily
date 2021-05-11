@@ -37,6 +37,7 @@ import org.dromara.hmily.tac.sqlparser.model.statement.dml.HmilyUpdateStatement;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -137,18 +138,23 @@ public final class HmilyUpdateSQLComputeEngine extends AbstractHmilySQLComputeEn
             List<Object> primaryKeyValues = new LinkedList<>();
             Map<String, Object> before = new LinkedHashMap<>();
             Map<String, Object> modified = new LinkedHashMap<>();
-            record.forEach((key, value) -> {
-                if (key.contains(DERIVED_COLUMN)) {
-                    // TODO skip date column here
-                    modified.put(key.replace(DERIVED_COLUMN, ""), value);
-                } else if (tableMetaData.getPrimaryKeyColumns().contains(key)) {
-                    modified.put(key, value);
-                    primaryKeyValues.add(value);
+            for (Map.Entry<String, Object> entry : record.entrySet()) {
+                if (entry.getKey().contains(DERIVED_COLUMN)) {
+                    String key = entry.getKey().replace(DERIVED_COLUMN, "");
+                    if (tableMetaData.getColumns().get(key).getDataType() == Types.DATE
+                        || tableMetaData.getColumns().get(key).getDataType() == Types.TIME
+                        || tableMetaData.getColumns().get(key).getDataType() == Types.TIMESTAMP) {
+                        continue;
+                    }
+                    modified.put(key, entry.getValue());
+                } else if (tableMetaData.getPrimaryKeyColumns().contains(entry.getKey())) {
+                    modified.put(entry.getKey(), entry.getValue());
+                    primaryKeyValues.add(entry.getValue());
                 } else {
-                    before.put(key, value);
+                    before.put(entry.getKey(), entry.getValue());
                 }
-            });
-            result.add(new HmilySQLTuple(tableMetaData.getTableName(), HmilySQLManipulation.UPDATE, primaryKeyValues, before, modified));
+            }
+            result.add(buildTuple(tableMetaData.getTableName(), HmilySQLManipulation.UPDATE, primaryKeyValues, before, modified));
         }
         return result;
     }

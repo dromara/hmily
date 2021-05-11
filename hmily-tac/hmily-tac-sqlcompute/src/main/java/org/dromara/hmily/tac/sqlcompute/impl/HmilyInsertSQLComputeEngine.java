@@ -90,7 +90,7 @@ public final class HmilyInsertSQLComputeEngine extends AbstractHmilySQLComputeEn
         Collection<HmilySQLTuple> result = new LinkedList<>();
         for (Map<String, Object> record : records) {
             List<Object> primaryKeyValues = tableMetaData.getPrimaryKeyColumns().stream().map(record::get).collect(Collectors.toList());
-            result.add(new HmilySQLTuple(tableMetaData.getTableName(), HmilySQLManipulation.INSERT, primaryKeyValues, new LinkedHashMap<>(), record));
+            result.add(buildTuple(tableMetaData.getTableName(), HmilySQLManipulation.INSERT, primaryKeyValues, new LinkedHashMap<>(), record));
         }
         return result;
     }
