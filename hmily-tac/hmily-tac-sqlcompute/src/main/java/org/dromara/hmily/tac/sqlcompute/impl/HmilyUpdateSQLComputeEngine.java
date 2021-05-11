@@ -43,7 +43,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * Hmily update SQL compute engine.
@@ -53,7 +52,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public final class HmilyUpdateSQLComputeEngine extends AbstractHmilySQLComputeEngine {
     
-    private static final String AFTER_IMAGE_COLUMN_SUFFIX = "_v2";
+    private static final String DERIVED_COLUMN = "_DERIVED";
     
     private final HmilyUpdateStatement sqlStatement;
     
@@ -73,7 +72,7 @@ public final class HmilyUpdateSQLComputeEngine extends AbstractHmilySQLComputeEn
         List<String> result = new LinkedList<>();
         result.add(HmilySQLComputeUtils.getAllColumns(tableSegment));
         sqlStatement.getSetAssignment().getAssignments().forEach(assignment -> result.add(
-            String.format("%s AS %s", ExpressionHandler.getValue(parameters, assignment.getValue()), assignment.getColumn().getIdentifier().getValue() + AFTER_IMAGE_COLUMN_SUFFIX)));
+            String.format("%s AS %s", ExpressionHandler.getValue(parameters, assignment.getValue()), assignment.getColumn().getIdentifier().getValue() + DERIVED_COLUMN)));
         return result;
     }
     
@@ -135,18 +134,21 @@ public final class HmilyUpdateSQLComputeEngine extends AbstractHmilySQLComputeEn
     private Collection<HmilySQLTuple> doConvert(final Collection<Map<String, Object>> records, final TableMetaData tableMetaData) {
         Collection<HmilySQLTuple> result = new LinkedList<>();
         for (Map<String, Object> record : records) {
+            List<Object> primaryKeyValues = new LinkedList<>();
             Map<String, Object> before = new LinkedHashMap<>();
-            Map<String, Object> after = new LinkedHashMap<>();
+            Map<String, Object> modified = new LinkedHashMap<>();
             record.forEach((key, value) -> {
-                if (!key.contains(AFTER_IMAGE_COLUMN_SUFFIX)) {
-                    before.put(key, value);
-                } else {
+                if (key.contains(DERIVED_COLUMN)) {
                     // TODO skip date column here
-                    after.put(key.replace(AFTER_IMAGE_COLUMN_SUFFIX, ""), value);
+                    modified.put(key.replace(DERIVED_COLUMN, ""), value);
+                } else if (tableMetaData.getPrimaryKeyColumns().contains(key)) {
+                    modified.put(key, value);
+                    primaryKeyValues.add(value);
+                } else {
+                    before.put(key, value);
                 }
             });
-            List<Object> primaryKeyValues = tableMetaData.getPrimaryKeyColumns().stream().map(before::get).collect(Collectors.toList());
-            result.add(new HmilySQLTuple(tableMetaData.getTableName(), HmilySQLManipulation.UPDATE, primaryKeyValues, before, after));
+            result.add(new HmilySQLTuple(tableMetaData.getTableName(), HmilySQLManipulation.UPDATE, primaryKeyValues, before, modified));
         }
         return result;
     }

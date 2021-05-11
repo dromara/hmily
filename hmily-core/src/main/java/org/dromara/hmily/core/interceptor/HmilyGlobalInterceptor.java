@@ -58,9 +58,9 @@ public class HmilyGlobalInterceptor implements HmilyTransactionInterceptor {
         return invokeWithinTransaction(context, pjp);
     }
     
-    private Object invokeWithinTransaction(final HmilyTransactionContext hmilyTransactionContext, final ProceedingJoinPoint point) throws Throwable {
+    private Object invokeWithinTransaction(final HmilyTransactionContext context, final ProceedingJoinPoint point) throws Throwable {
         MethodSignature signature = (MethodSignature) point.getSignature();
-        return getRegistry(signature.getMethod()).select(hmilyTransactionContext).handleTransaction(point, hmilyTransactionContext);
+        return getRegistry(signature.getMethod()).select(context).handleTransaction(point, context);
     }
     
     private HmilyTransactionHandlerRegistry getRegistry(final Method method) {
