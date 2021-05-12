@@ -18,12 +18,12 @@
 package org.dromara.hmily.core.service;
 
 /**
- * TransactionHandlerAlbum.
+ * Hmily transaction task.
  *
  * @author chenbin sixh
  */
 @FunctionalInterface
-public interface HmilyTransactionHandlerAlbum {
+public interface HmilyTransactionTask {
 
     /**
      * Run.

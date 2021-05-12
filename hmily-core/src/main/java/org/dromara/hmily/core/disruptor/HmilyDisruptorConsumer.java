@@ -17,27 +17,27 @@
 
 package org.dromara.hmily.core.disruptor;
 
-import com.lmax.disruptor.WorkHandler;
 import org.dromara.hmily.core.disruptor.event.DataEvent;
 
 /**
- * DisruptorConsumer.
- * disruptor consumer work handler.
+ * Hmily disruptor consumer.
+ * which is called in {@link HmilyDisruptorWorkHandler#onEvent(DataEvent)}.
  *
  * @author chenbin sixh
  */
-public class DisruptorConsumer<T> implements WorkHandler<DataEvent<T>> {
+public interface HmilyDisruptorConsumer<T> {
 
-    private DisruptorConsumerFactory<T> factory;
-
-    DisruptorConsumer(final DisruptorConsumerFactory<T> factory) {
-        this.factory = factory;
-    }
-
-    @Override
-    public void onEvent(final DataEvent<T> t) {
-        if (t != null) {
-            factory.create().execute(t.getT());
-        }
-    }
+    /**
+     * Fix name string.
+     *
+     * @return the string
+     */
+    String fixName();
+    
+    /**
+     * Consume event data.
+     *
+     * @param data event data
+     */
+    void execute(T data);
 }

@@ -26,13 +26,13 @@ import org.dromara.hmily.common.concurrent.HmilyThreadFactory;
 import org.dromara.hmily.core.disruptor.event.DataEvent;
 
 /**
- * DisruptorProviderManage.
+ * Hmily disruptor.
  * disruptor provider manager.
  *
  * @param <T> the type parameter
  * @author xiaoyu sixh
  */
-public class DisruptorProviderManage<T> {
+public class HmilyDisruptor<T> {
 
     public static final Integer DEFAULT_SIZE = 4096 << 1 << 1;
 
@@ -44,16 +44,16 @@ public class DisruptorProviderManage<T> {
 
     private Integer consumerSize;
 
-    private DisruptorConsumerFactory<T> consumerFactory;
+    private HmilyDisruptorConsumer<T> consumer;
 
     /**
      * Instantiates a new Disruptor provider manage.
      *
-     * @param consumerFactory the consumer factory
+     * @param consumer the consumer factory
      * @param ringBufferSize  the size
      */
-    public DisruptorProviderManage(final DisruptorConsumerFactory<T> consumerFactory, final Integer ringBufferSize) {
-        this(consumerFactory,
+    public HmilyDisruptor(final HmilyDisruptorConsumer<T> consumer, final Integer ringBufferSize) {
+        this(consumer,
                 DEFAULT_CONSUMER_SIZE,
                 ringBufferSize);
     }
@@ -61,26 +61,25 @@ public class DisruptorProviderManage<T> {
     /**
      * Instantiates a new Disruptor provider manage.
      *
-     * @param consumerFactory the consumer factory
+     * @param consumer the consumer factory
      */
-    public DisruptorProviderManage(final DisruptorConsumerFactory<T> consumerFactory) {
-        this(consumerFactory, DEFAULT_CONSUMER_SIZE, DEFAULT_SIZE);
+    public HmilyDisruptor(final HmilyDisruptorConsumer<T> consumer) {
+        this(consumer, DEFAULT_CONSUMER_SIZE, DEFAULT_SIZE);
     }
 
     /**
      * Instantiates a new Disruptor provider manage.
      *
-     * @param consumerFactory the consumer factory
+     * @param consumer the consumer factory
      * @param consumerSize    the consumer size
      * @param ringBufferSize  the ringBuffer size
      */
-    public DisruptorProviderManage(final DisruptorConsumerFactory<T> consumerFactory,
-                                   final int consumerSize,
-                                   final int ringBufferSize) {
-        this.consumerFactory = consumerFactory;
+    public HmilyDisruptor(final HmilyDisruptorConsumer<T> consumer,
+                          final int consumerSize,
+                          final int ringBufferSize) {
+        this.consumer = consumer;
         this.size = ringBufferSize;
         this.consumerSize = consumerSize;
-
     }
 
     /**
@@ -90,14 +89,14 @@ public class DisruptorProviderManage<T> {
     public void startup() {
         Disruptor<DataEvent<T>> disruptor = new Disruptor<>(new DisruptorEventFactory<>(),
                 size,
-                HmilyThreadFactory.create("disruptor_consumer_" + consumerFactory.fixName(), false),
+                HmilyThreadFactory.create("disruptor_consumer_" + consumer.fixName(), false),
                 ProducerType.MULTI,
                 new BlockingWaitStrategy());
-        DisruptorConsumer<T>[] consumers = new DisruptorConsumer[consumerSize];
+        HmilyDisruptorWorkHandler<T>[] workerPool = new HmilyDisruptorWorkHandler[consumerSize];
         for (int i = 0; i < consumerSize; i++) {
-            consumers[i] = new DisruptorConsumer<>(consumerFactory);
+            workerPool[i] = new HmilyDisruptorWorkHandler<>(consumer);
         }
-        disruptor.handleEventsWithWorkerPool(consumers);
+        disruptor.handleEventsWithWorkerPool(workerPool);
         disruptor.setDefaultExceptionHandler(new IgnoreExceptionHandler());
         disruptor.start();
         RingBuffer<DataEvent<T>> ringBuffer = disruptor.getRingBuffer();

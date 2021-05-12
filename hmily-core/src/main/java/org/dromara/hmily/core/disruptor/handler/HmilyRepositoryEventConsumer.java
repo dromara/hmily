@@ -1,32 +1,26 @@
 package org.dromara.hmily.core.disruptor.handler;
 
 import org.dromara.hmily.core.concurrent.ConsistentHashSelector;
-import org.dromara.hmily.core.disruptor.AbstractDisruptorConsumerExecutor;
-import org.dromara.hmily.core.disruptor.DisruptorConsumerFactory;
+import org.dromara.hmily.core.disruptor.HmilyDisruptorConsumer;
 import org.dromara.hmily.core.repository.HmilyRepositoryEvent;
 import org.dromara.hmily.core.repository.HmilyRepositoryEventDispatcher;
 
 /**
- * this is disruptor consumer.
+ * Hmily repository event consumer.
  *
  * @author xiaoyu(Myth)
  */
-public class HmilyRepositoryEventHandler extends AbstractDisruptorConsumerExecutor<HmilyRepositoryEvent> implements DisruptorConsumerFactory<HmilyRepositoryEvent> {
+public class HmilyRepositoryEventConsumer implements HmilyDisruptorConsumer<HmilyRepositoryEvent> {
     
     private ConsistentHashSelector executor;
     
-    public HmilyRepositoryEventHandler(final ConsistentHashSelector executor) {
+    public HmilyRepositoryEventConsumer(final ConsistentHashSelector executor) {
         this.executor = executor;
     }
     
     @Override
     public String fixName() {
-        return "HmilyRepositoryEventHandler";
-    }
-    
-    @Override
-    public AbstractDisruptorConsumerExecutor<HmilyRepositoryEvent> create() {
-        return this;
+        return "HmilyRepositoryEventConsumer";
     }
     
     @Override
