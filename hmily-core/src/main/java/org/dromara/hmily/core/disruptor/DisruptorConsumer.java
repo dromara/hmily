@@ -37,7 +37,7 @@ public class DisruptorConsumer<T> implements WorkHandler<DataEvent<T>> {
     @Override
     public void onEvent(final DataEvent<T> t) {
         if (t != null) {
-            factory.create().executor(t.getT());
+            factory.create().execute(t.getT());
         }
     }
 }

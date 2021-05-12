@@ -23,9 +23,9 @@ import org.dromara.hmily.config.api.entity.HmilyConfig;
 import org.dromara.hmily.core.concurrent.ConsistentHashSelector;
 import org.dromara.hmily.core.concurrent.SingletonExecutor;
 import org.dromara.hmily.core.disruptor.DisruptorProviderManage;
-import org.dromara.hmily.core.disruptor.handler.HmilyRepositoryDataHandler;
-import org.dromara.hmily.core.repository.HmilyRepositoryDispatcher;
+import org.dromara.hmily.core.disruptor.handler.HmilyRepositoryEventHandler;
 import org.dromara.hmily.core.repository.HmilyRepositoryEvent;
+import org.dromara.hmily.core.repository.HmilyRepositoryEventDispatcher;
 import org.dromara.hmily.repository.spi.entity.HmilyLock;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipant;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipantUndo;
@@ -70,7 +70,7 @@ public final class HmilyRepositoryEventPublisher implements AutoCloseable {
         ConsistentHashSelector selector = new ConsistentHashSelector(selects);
         disruptorProviderManage =
                 new DisruptorProviderManage<>(
-                        new HmilyRepositoryDataHandler(selector), 1, hmilyConfig.getBufferSize());
+                        new HmilyRepositoryEventHandler(selector), 1, hmilyConfig.getBufferSize());
         disruptorProviderManage.startup();
     }
     
@@ -127,7 +127,7 @@ public final class HmilyRepositoryEventPublisher implements AutoCloseable {
         event.setType(type);
         event.setTransId(hmilyLocks.iterator().next().getTransId());
         event.setHmilyLocks(hmilyLocks);
-        HmilyRepositoryDispatcher.getInstance().doDispatcher(event);
+        HmilyRepositoryEventDispatcher.getInstance().doDispatch(event);
     }
     
     /**
@@ -148,7 +148,7 @@ public final class HmilyRepositoryEventPublisher implements AutoCloseable {
         if (Objects.nonNull(hmilyConfig) && hmilyConfig.isAsyncRepository()) {
             disruptorProviderManage.getProvider().onData(event);
         } else {
-            HmilyRepositoryDispatcher.getInstance().doDispatcher(event);
+            HmilyRepositoryEventDispatcher.getInstance().doDispatch(event);
         }
     }
     

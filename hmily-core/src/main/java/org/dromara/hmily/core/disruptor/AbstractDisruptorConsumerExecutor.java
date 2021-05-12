@@ -70,5 +70,5 @@ public abstract class AbstractDisruptorConsumerExecutor<T> {
      *
      * @param data the data
      */
-    public abstract void executor(T data);
+    public abstract void execute(T data);
 }

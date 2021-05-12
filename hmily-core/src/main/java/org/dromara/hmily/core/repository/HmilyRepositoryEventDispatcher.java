@@ -23,13 +23,13 @@ import org.dromara.hmily.repository.spi.entity.HmilyParticipantUndo;
 import org.dromara.hmily.repository.spi.entity.HmilyTransaction;
 
 /**
- * The type Hmily repository dispatcher.
+ * The type Hmily repository event dispatcher.
  */
-public final class HmilyRepositoryDispatcher {
+public final class HmilyRepositoryEventDispatcher {
     
-    private static final HmilyRepositoryDispatcher INSTANCE = new HmilyRepositoryDispatcher();
+    private static final HmilyRepositoryEventDispatcher INSTANCE = new HmilyRepositoryEventDispatcher();
     
-    private HmilyRepositoryDispatcher() {
+    private HmilyRepositoryEventDispatcher() {
     }
     
     /**
@@ -37,16 +37,16 @@ public final class HmilyRepositoryDispatcher {
      *
      * @return the instance
      */
-    public static HmilyRepositoryDispatcher getInstance() {
+    public static HmilyRepositoryEventDispatcher getInstance() {
         return INSTANCE;
     }
     
     /**
-     * Do dispatcher.
+     * Do event dispatch.
      *
      * @param event the event
      */
-    public void doDispatcher(final HmilyRepositoryEvent event) {
+    public void doDispatch(final HmilyRepositoryEvent event) {
         EventTypeEnum eventTypeEnum = EventTypeEnum.buildByCode(event.getType());
         HmilyTransaction hmilyTransaction = event.getHmilyTransaction();
         HmilyParticipant hmilyParticipant = event.getHmilyParticipant();

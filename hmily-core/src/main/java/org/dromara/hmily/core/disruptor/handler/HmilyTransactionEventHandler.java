@@ -5,17 +5,17 @@ import org.dromara.hmily.core.disruptor.DisruptorConsumerFactory;
 import org.dromara.hmily.core.service.HmilyTransactionHandlerAlbum;
 
 /**
- * HmilyTransactionExecutorHandler
+ * Hmily transaction event consume handler.
  * .
  * About the processing of a rotation function.
  *
  * @author chenbin sixh
  */
-public class HmilyTransactionExecutorHandler extends AbstractDisruptorConsumerExecutor<HmilyTransactionHandlerAlbum> implements DisruptorConsumerFactory<HmilyTransactionHandlerAlbum> {
+public class HmilyTransactionEventHandler extends AbstractDisruptorConsumerExecutor<HmilyTransactionHandlerAlbum> implements DisruptorConsumerFactory<HmilyTransactionHandlerAlbum> {
     
     @Override
     public String fixName() {
-        return "HmilyTransactionExecutorHandler";
+        return "HmilyTransactionEventHandler";
     }
     
     @Override
@@ -24,7 +24,7 @@ public class HmilyTransactionExecutorHandler extends AbstractDisruptorConsumerEx
     }
 
     @Override
-    public void executor(final HmilyTransactionHandlerAlbum data) {
+    public void execute(final HmilyTransactionHandlerAlbum data) {
         data.run();
     }
 }

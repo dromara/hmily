@@ -38,22 +38,22 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * The type Hmily tac global transaction.
+ * Hmily Tac transaction manager.
  *
  * @author xiaoyu
  */
-public class HmilyTacStarterTransaction {
+public class HmilyTacTransactionManager {
     
-    private static final Logger LOGGER = LoggerFactory.getLogger(HmilyTacStarterTransaction.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(HmilyTacTransactionManager.class);
     
-    private static final HmilyTacStarterTransaction INSTANCE = new HmilyTacStarterTransaction();
+    private static final HmilyTacTransactionManager INSTANCE = new HmilyTacTransactionManager();
     
     /**
      * Gets instance.
      *
      * @return the instance
      */
-    public static HmilyTacStarterTransaction getInstance() {
+    public static HmilyTacTransactionManager getInstance() {
         return INSTANCE;
     }
     

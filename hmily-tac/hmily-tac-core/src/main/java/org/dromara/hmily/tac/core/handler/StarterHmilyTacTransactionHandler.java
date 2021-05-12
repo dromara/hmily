@@ -24,14 +24,14 @@ import org.dromara.hmily.common.enums.HmilyRoleEnum;
 import org.dromara.hmily.core.context.HmilyContextHolder;
 import org.dromara.hmily.core.context.HmilyTransactionContext;
 import org.dromara.hmily.core.disruptor.DisruptorProviderManage;
-import org.dromara.hmily.core.disruptor.handler.HmilyTransactionExecutorHandler;
+import org.dromara.hmily.core.disruptor.handler.HmilyTransactionEventHandler;
 import org.dromara.hmily.core.service.HmilyTransactionHandler;
 import org.dromara.hmily.core.service.HmilyTransactionHandlerAlbum;
 import org.dromara.hmily.metrics.enums.MetricsLabelEnum;
 import org.dromara.hmily.metrics.spi.MetricsHandlerFacade;
 import org.dromara.hmily.metrics.spi.MetricsHandlerFacadeEngine;
 import org.dromara.hmily.repository.spi.entity.HmilyTransaction;
-import org.dromara.hmily.tac.core.transaction.HmilyTacStarterTransaction;
+import org.dromara.hmily.tac.core.transaction.HmilyTacTransactionManager;
 
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -44,7 +44,7 @@ import java.util.function.Supplier;
  */
 public class StarterHmilyTacTransactionHandler implements HmilyTransactionHandler, AutoCloseable {
     
-    private final HmilyTacStarterTransaction globalTransaction = HmilyTacStarterTransaction.getInstance();
+    private final HmilyTacTransactionManager tm = HmilyTacTransactionManager.getInstance();
     
     private final DisruptorProviderManage<HmilyTransactionHandlerAlbum> disruptorProviderManage;
     
@@ -52,7 +52,7 @@ public class StarterHmilyTacTransactionHandler implements HmilyTransactionHandle
      * Instantiates a new Starter hmily tac transaction handler.
      */
     public StarterHmilyTacTransactionHandler() {
-        disruptorProviderManage = new DisruptorProviderManage<>(new HmilyTransactionExecutorHandler(),
+        disruptorProviderManage = new DisruptorProviderManage<>(new HmilyTransactionEventHandler(),
                 Runtime.getRuntime().availableProcessors() << 1, DisruptorProviderManage.DEFAULT_SIZE);
         disruptorProviderManage.startup();
     }
@@ -68,30 +68,30 @@ public class StarterHmilyTacTransactionHandler implements HmilyTransactionHandle
                 handlerFacade.get().counterIncrement(MetricsLabelEnum.TRANSACTION_TOTAL.getName(), TransTypeEnum.TAC.name());
                 histogramSupplier = handlerFacade.get().histogramStartTimer(MetricsLabelEnum.TRANSACTION_LATENCY.getName(), TransTypeEnum.TAC.name());
             }
-            globalTransaction.begin();
+            tm.begin();
             try {
                 //execute try
                 returnValue = point.proceed();
             } catch (Throwable throwable) {
                 //if exception ,execute cancel
-                final HmilyTransaction currentTransaction = globalTransaction.getHmilyTransaction();
+                final HmilyTransaction currentTransaction = tm.getHmilyTransaction();
                 disruptorProviderManage.getProvider().onData(() -> {
                     handlerFacade.ifPresent(metricsHandlerFacade -> metricsHandlerFacade.counterIncrement(MetricsLabelEnum.TRANSACTION_STATUS.getName(),
                             TransTypeEnum.TAC.name(), HmilyRoleEnum.START.name(), HmilyActionEnum.CANCELING.name()));
-                    globalTransaction.rollback(currentTransaction);
+                    tm.rollback(currentTransaction);
                 });
                 throw throwable;
             }
             // execute confirm
-            final HmilyTransaction currentTransaction = globalTransaction.getHmilyTransaction();
+            final HmilyTransaction currentTransaction = tm.getHmilyTransaction();
             disruptorProviderManage.getProvider().onData(() -> {
                 handlerFacade.ifPresent(metricsHandlerFacade -> metricsHandlerFacade.counterIncrement(MetricsLabelEnum.TRANSACTION_STATUS.getName(),
                         TransTypeEnum.TAC.name(), HmilyRoleEnum.START.name(), HmilyActionEnum.CONFIRMING.name()));
-                globalTransaction.commit(currentTransaction);
+                tm.commit(currentTransaction);
             });
         } finally {
             HmilyContextHolder.remove();
-            globalTransaction.remove();
+            tm.remove();
             if (null != histogramSupplier) {
                 histogramSupplier.get();
             }

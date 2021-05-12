@@ -24,7 +24,7 @@ import org.dromara.hmily.common.enums.HmilyRoleEnum;
 import org.dromara.hmily.core.context.HmilyContextHolder;
 import org.dromara.hmily.core.context.HmilyTransactionContext;
 import org.dromara.hmily.core.disruptor.DisruptorProviderManage;
-import org.dromara.hmily.core.disruptor.handler.HmilyTransactionExecutorHandler;
+import org.dromara.hmily.core.disruptor.handler.HmilyTransactionEventHandler;
 import org.dromara.hmily.core.holder.HmilyTransactionHolder;
 import org.dromara.hmily.core.service.HmilyTransactionHandler;
 import org.dromara.hmily.core.service.HmilyTransactionHandlerAlbum;
@@ -50,7 +50,7 @@ public class StarterHmilyTccTransactionHandler implements HmilyTransactionHandle
     private DisruptorProviderManage<HmilyTransactionHandlerAlbum> disruptorProviderManage;
     
     public StarterHmilyTccTransactionHandler() {
-        disruptorProviderManage = new DisruptorProviderManage<>(new HmilyTransactionExecutorHandler(),
+        disruptorProviderManage = new DisruptorProviderManage<>(new HmilyTransactionEventHandler(),
                 Runtime.getRuntime().availableProcessors() << 1, DisruptorProviderManage.DEFAULT_SIZE);
         disruptorProviderManage.startup();
     }
