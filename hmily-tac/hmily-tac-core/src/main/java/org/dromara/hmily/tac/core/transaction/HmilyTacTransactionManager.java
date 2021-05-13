@@ -18,6 +18,7 @@
 package org.dromara.hmily.tac.core.transaction;
 
 import com.google.common.collect.Lists;
+import lombok.extern.slf4j.Slf4j;
 import org.dromara.hmily.annotation.TransTypeEnum;
 import org.dromara.hmily.common.enums.ExecutorTypeEnum;
 import org.dromara.hmily.common.enums.HmilyActionEnum;
@@ -31,8 +32,6 @@ import org.dromara.hmily.core.reflect.HmilyReflector;
 import org.dromara.hmily.core.repository.HmilyRepositoryStorage;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipant;
 import org.dromara.hmily.repository.spi.entity.HmilyTransaction;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Objects;
@@ -42,9 +41,8 @@ import java.util.Objects;
  *
  * @author xiaoyu
  */
+@Slf4j
 public class HmilyTacTransactionManager {
-    
-    private static final Logger LOGGER = LoggerFactory.getLogger(HmilyTacTransactionManager.class);
     
     private static final HmilyTacTransactionManager INSTANCE = new HmilyTacTransactionManager();
     
@@ -80,6 +78,7 @@ public class HmilyTacTransactionManager {
         context.setTransType(TransTypeEnum.TAC.name());
         context.setParticipantId(hmilyParticipant.getParticipantId());
         HmilyContextHolder.set(context);
+        log.debug("TAC-tm-begin ::: {}", globalHmilyTransaction);
         return globalHmilyTransaction;
     }
     
@@ -99,6 +98,7 @@ public class HmilyTacTransactionManager {
         if (Objects.isNull(currentTransaction)) {
             return;
         }
+        log.debug("TAC-tm-rollback ::: {}", currentTransaction);
         List<HmilyParticipant> hmilyParticipants = currentTransaction.getHmilyParticipants();
         if (CollectionUtils.isEmpty(hmilyParticipants)) {
             return;
@@ -114,7 +114,7 @@ public class HmilyTacTransactionManager {
                 successList.add(true);
             } catch (Throwable e) {
                 successList.add(false);
-                LOGGER.error("HmilyParticipant rollback exception :{} ", participant.toString());
+                log.error("HmilyParticipant rollback exception :{} ", participant.toString());
             } finally {
                 HmilyContextHolder.remove();
             }
@@ -131,6 +131,7 @@ public class HmilyTacTransactionManager {
      * @param currentTransaction the current transaction
      */
     public void commit(final HmilyTransaction currentTransaction) {
+        log.debug("TAC-tm-commit ::: {}", currentTransaction);
         if (Objects.isNull(currentTransaction)) {
             return;
         }
@@ -149,7 +150,7 @@ public class HmilyTacTransactionManager {
                 successList.add(true);
             } catch (Throwable e) {
                 successList.add(false);
-                LOGGER.error("HmilyParticipant rollback exception :{} ", participant.toString());
+                log.error("HmilyParticipant rollback exception :{} ", participant.toString());
             } finally {
                 HmilyContextHolder.remove();
             }

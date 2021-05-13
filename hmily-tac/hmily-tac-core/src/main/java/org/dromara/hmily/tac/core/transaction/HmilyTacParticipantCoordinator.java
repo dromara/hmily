@@ -17,6 +17,7 @@
 
 package org.dromara.hmily.tac.core.transaction;
 
+import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.dromara.hmily.annotation.TransTypeEnum;
@@ -33,29 +34,26 @@ import org.dromara.hmily.core.reflect.HmilyReflector;
 import org.dromara.hmily.core.repository.HmilyRepositoryStorage;
 import org.dromara.hmily.repository.spi.entity.HmilyInvocation;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipant;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Method;
 import java.util.List;
 
 /**
- * The type Hmily tac participant transaction.
+ * The type Hmily tac participant coordinator.
  *
  * @author xiaoyu
  */
-public class HmilyTacParticipantTransaction {
+@Slf4j
+public class HmilyTacParticipantCoordinator {
     
-    private static final Logger LOGGER = LoggerFactory.getLogger(HmilyTacParticipantTransaction.class);
-    
-    private static final HmilyTacParticipantTransaction INSTANCE = new HmilyTacParticipantTransaction();
+    private static final HmilyTacParticipantCoordinator INSTANCE = new HmilyTacParticipantCoordinator();
     
     /**
      * Gets instance.
      *
      * @return the instance
      */
-    public static HmilyTacParticipantTransaction getInstance() {
+    public static HmilyTacParticipantCoordinator getInstance() {
         return INSTANCE;
     }
     
@@ -73,6 +71,7 @@ public class HmilyTacParticipantTransaction {
         HmilyRepositoryStorage.createHmilyParticipant(hmilyParticipant);
         context.setRole(HmilyRoleEnum.PARTICIPANT.getCode());
         HmilyContextHolder.set(context);
+        log.debug("TAC-participate-join ::: {}", hmilyParticipant);
         return hmilyParticipant;
         
     }
@@ -87,6 +86,7 @@ public class HmilyTacParticipantTransaction {
         if (CollectionUtils.isEmpty(hmilyParticipantList)) {
             return;
         }
+        log.debug("TAC-participate-rollback ::: {}", hmilyParticipantList);
         for (HmilyParticipant participant : hmilyParticipantList) {
             try {
                 if (participant.getParticipantId().equals(selfParticipantId)) {
@@ -95,7 +95,7 @@ public class HmilyTacParticipantTransaction {
                     HmilyReflector.executor(HmilyActionEnum.CANCELING, ExecutorTypeEnum.RPC, participant);
                 }
             } catch (Throwable e) {
-                LOGGER.error("HmilyParticipant rollback exception :{} ", participant.toString());
+                log.error("HmilyParticipant rollback exception :{} ", participant.toString());
                 throw new HmilyRuntimeException(" hmilyParticipant execute rollback exception:" + participant.toString());
             } finally {
                 // FIXME why remove context after first participator handled
@@ -114,6 +114,7 @@ public class HmilyTacParticipantTransaction {
         if (CollectionUtils.isEmpty(hmilyParticipantList)) {
             return;
         }
+        log.debug("TAC-participate-commit ::: {}", hmilyParticipantList);
         for (HmilyParticipant participant : hmilyParticipantList) {
             try {
                 if (participant.getParticipantId().equals(selfParticipantId)) {
