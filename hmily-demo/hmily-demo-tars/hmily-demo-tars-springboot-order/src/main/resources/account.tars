@@ -1,7 +1,0 @@
-module AccountApp
-{
-    interface Account
-    {
-        void payment(string userId, double amount);
-    };
-};
