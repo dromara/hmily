@@ -19,13 +19,12 @@ package org.dromara.hmily.demo.motan.order.service.impl;
 
 
 import com.weibo.api.motan.config.springsupport.annotation.MotanReferer;
-import org.dromara.hmily.annotation.HmilyTAC;
 import org.dromara.hmily.annotation.HmilyTCC;
 import org.dromara.hmily.common.exception.HmilyRuntimeException;
+import org.dromara.hmily.demo.common.account.api.AccountService;
 import org.dromara.hmily.demo.common.account.dto.AccountDTO;
 import org.dromara.hmily.demo.common.account.dto.AccountNestedDTO;
 import org.dromara.hmily.demo.common.account.entity.AccountDO;
-import org.dromara.hmily.demo.common.account.api.AccountService;
 import org.dromara.hmily.demo.common.inventory.api.InventoryService;
 import org.dromara.hmily.demo.common.inventory.dto.InventoryDTO;
 import org.dromara.hmily.demo.common.order.entity.Order;
@@ -77,16 +76,6 @@ public class PaymentServiceImpl implements PaymentService {
         accountService.payment(accountDTO);
         //进入扣减库存操作
         inventoryService.decrease(buildInventoryDTO(order));
-    }
-    
-    @Override
-    @HmilyTAC
-    public void makePaymentForTAC(Order order) {
-        updateOrderStatus(order, OrderStatusEnum.PAY_SUCCESS);
-        //扣除用户余额
-        accountService.paymentTAC(buildAccountDTO(order));
-        //进入扣减库存操作
-        inventoryService.decreaseTAC(buildInventoryDTO(order));
     }
     
     @Override

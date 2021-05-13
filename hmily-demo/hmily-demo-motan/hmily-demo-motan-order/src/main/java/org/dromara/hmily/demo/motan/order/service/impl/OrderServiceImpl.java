@@ -58,15 +58,6 @@ public class OrderServiceImpl implements OrderService {
     }
     
     @Override
-    public String saveOrderForTAC(Integer count, BigDecimal amount) {
-        Order order = saveOrder(count, amount);;
-        final long start = System.currentTimeMillis();
-        paymentService.makePaymentForTAC(order);
-        System.out.println("切面耗时：" + (System.currentTimeMillis() - start));
-        return "success";
-    }
-    
-    @Override
     public String testOrderPay(Integer count, BigDecimal amount) {
         Order order = saveOrder(count, amount);
         final long start = System.currentTimeMillis();

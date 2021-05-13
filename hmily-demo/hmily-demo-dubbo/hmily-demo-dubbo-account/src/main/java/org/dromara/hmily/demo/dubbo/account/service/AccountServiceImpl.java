@@ -17,15 +17,14 @@
 
 package org.dromara.hmily.demo.dubbo.account.service;
 
-import org.dromara.hmily.annotation.HmilyTAC;
 import org.dromara.hmily.annotation.HmilyTCC;
 import org.dromara.hmily.common.exception.HmilyRuntimeException;
+import org.dromara.hmily.demo.common.account.api.AccountService;
+import org.dromara.hmily.demo.common.account.api.InlineService;
 import org.dromara.hmily.demo.common.account.dto.AccountDTO;
 import org.dromara.hmily.demo.common.account.dto.AccountNestedDTO;
 import org.dromara.hmily.demo.common.account.entity.AccountDO;
 import org.dromara.hmily.demo.common.account.mapper.AccountMapper;
-import org.dromara.hmily.demo.common.account.api.AccountService;
-import org.dromara.hmily.demo.common.account.api.InlineService;
 import org.dromara.hmily.demo.common.inventory.api.InventoryService;
 import org.dromara.hmily.demo.common.inventory.dto.InventoryDTO;
 import org.slf4j.Logger;
@@ -111,12 +110,6 @@ public class AccountServiceImpl implements AccountService {
             throw new HmilyRuntimeException("库存不足");
         }
         return true;
-    }
-    
-    @Override
-    @HmilyTAC
-    public boolean paymentTAC(AccountDTO accountDTO) {
-        return accountMapper.updateTAC(accountDTO) > 0;
     }
     
     @Override

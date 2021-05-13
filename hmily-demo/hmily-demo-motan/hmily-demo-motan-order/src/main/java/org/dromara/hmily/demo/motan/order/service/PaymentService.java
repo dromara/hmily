@@ -35,13 +35,6 @@ public interface PaymentService {
     void makePayment(Order order);
     
     /**
-     * Make payment for tac.
-     *
-     * @param order the order
-     */
-    void makePaymentForTAC(Order order);
-    
-    /**
      * Test make payment.
      *
      * @param order the order

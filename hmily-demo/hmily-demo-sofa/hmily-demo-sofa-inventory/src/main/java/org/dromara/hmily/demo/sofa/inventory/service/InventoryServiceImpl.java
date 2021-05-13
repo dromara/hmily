@@ -18,7 +18,6 @@
 package org.dromara.hmily.demo.sofa.inventory.service;
 
 import com.google.common.collect.Lists;
-import org.dromara.hmily.annotation.HmilyTAC;
 import org.dromara.hmily.annotation.HmilyTCC;
 import org.dromara.hmily.common.exception.HmilyRuntimeException;
 import org.dromara.hmily.demo.common.inventory.api.InventoryService;
@@ -63,13 +62,6 @@ public class InventoryServiceImpl implements InventoryService {
     @Override
     @HmilyTCC(confirmMethod = "confirmMethod", cancelMethod = "cancelMethod")
     public Boolean decrease(InventoryDTO inventoryDTO) {
-        inventoryMapper.decrease(inventoryDTO);
-        return true;
-    }
-    
-    @Override
-    @HmilyTAC
-    public Boolean decreaseTAC(InventoryDTO inventoryDTO) {
         inventoryMapper.decrease(inventoryDTO);
         return true;
     }

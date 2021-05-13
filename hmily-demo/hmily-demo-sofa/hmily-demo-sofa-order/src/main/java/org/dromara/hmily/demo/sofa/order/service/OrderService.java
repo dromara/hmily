@@ -38,15 +38,6 @@ public interface OrderService {
     String orderPay(Integer count, BigDecimal amount);
     
     /**
-     * Save order for tac string.
-     *
-     * @param count  the count
-     * @param amount the amount
-     * @return the string
-     */
-    String saveOrderForTAC(Integer count, BigDecimal amount);
-    
-    /**
      * Test order pay string.
      *
      * @param count  the count
@@ -82,15 +73,6 @@ public interface OrderService {
      * @return string string
      */
     String mockInventoryWithTryException(Integer count, BigDecimal amount);
-    
-    /**
-     * Mock tac inventory with try exception string.
-     *
-     * @param count  the count
-     * @param amount the amount
-     * @return the string
-     */
-    String mockTacInventoryWithTryException(Integer count, BigDecimal amount);
     
     /**
      * 模拟在订单支付操作中，库存在try阶段中的timeout

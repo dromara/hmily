@@ -22,9 +22,8 @@
 
 package org.dromara.hmily.demo.tars.order.servant.orderapp;
 
-import com.qq.tars.protocol.annotation.*;
-import com.qq.tars.protocol.tars.annotation.*;
-import com.qq.tars.common.support.Holder;
+import com.qq.tars.protocol.annotation.Servant;
+import com.qq.tars.protocol.tars.annotation.TarsMethodParameter;
 
 @Servant
 public interface OrderServant {

@@ -50,15 +50,6 @@ public class OrderController {
         System.out.println("消耗时间为:" + (System.currentTimeMillis() - start));
         return "";
     }
-    @PostMapping(value = "/orderPayTAC")
-    @ApiOperation(value = "测试tac模式")
-    public String orderPayTAC(@RequestParam(value = "count") Integer count,
-                           @RequestParam(value = "amount") BigDecimal amount) {
-        final long start = System.currentTimeMillis();
-        orderService.saveOrderForTAC(count, amount);
-        System.out.println("消耗时间为:" + (System.currentTimeMillis() - start));
-        return "";
-    }
 
     @PostMapping(value = "/testOrderPay")
     @ApiOperation(value = "测试订单支付接口(这里是压测接口不添加分布式事务)")
@@ -77,13 +68,6 @@ public class OrderController {
         return orderService.mockInventoryWithTryException(count, amount);
     }
     
-    @PostMapping(value = "/mockTacInventoryWithTryException")
-    @ApiOperation(value = "TAC模式下，模拟下单付款操作在try阶段时候，库存异常，此时账户系统和订单状态会自动回滚，达到数据的一致性（注意:这里模拟的是系统异常，或者rpc异常）")
-    public String mockTacInventoryWithTryException(@RequestParam(value = "count") Integer count,
-                                                @RequestParam(value = "amount") BigDecimal amount) {
-        return orderService.mockTacInventoryWithTryException(count, amount);
-    }
-
     @PostMapping(value = "/mockInventoryWithTryTimeout")
     @ApiOperation(value = "模拟下单付款操作在try阶段时候，库存超时异常（但是自身最后又成功了），此时账户系统和订单状态会回滚，（库存依赖事务日志进行恢复），达到数据的一致性（异常指的是超时异常）")
     public String mockInventoryWithTryTimeout(@RequestParam(value = "count") Integer count,

@@ -35,13 +35,6 @@ public interface PaymentService {
     void makePayment(Order order);
     
     /**
-     * Make payment for tac.
-     *
-     * @param order the order
-     */
-    void makePaymentForTAC(Order order);
-    
-    /**
      * Test make payment.
      *
      * @param order the order
@@ -69,14 +62,6 @@ public interface PaymentService {
      * @return String string
      */
     String mockPaymentInventoryWithTryException(Order order);
-    
-    /**
-     * Mock tac payment inventory with try exception string.
-     *
-     * @param order the order
-     * @return the string
-     */
-    String mockTacPaymentInventoryWithTryException(Order order);
     
     /**
      * mock订单支付的时候库存超时

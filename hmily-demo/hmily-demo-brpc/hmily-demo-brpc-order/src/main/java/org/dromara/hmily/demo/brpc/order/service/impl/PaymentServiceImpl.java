@@ -21,7 +21,6 @@ package org.dromara.hmily.demo.brpc.order.service.impl;
 import com.baidu.brpc.spring.annotation.RpcProxy;
 import lombok.Getter;
 import lombok.Setter;
-import org.dromara.hmily.annotation.HmilyTAC;
 import org.dromara.hmily.annotation.HmilyTCC;
 import org.dromara.hmily.common.exception.HmilyRuntimeException;
 import org.dromara.hmily.demo.brpc.order.service.PaymentService;
@@ -38,7 +37,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author liu·yu
@@ -81,16 +79,6 @@ public class PaymentServiceImpl implements PaymentService {
         accountService.payment(buildAccountDTO(order));
         //进入扣减库存操作
         inventoryService.decrease(buildInventoryDTO(order));
-    }
-
-    @Override
-    @HmilyTAC
-    public void makePaymentForTAC(Order order) {
-        updateOrderStatus(order, OrderStatusEnum.PAY_SUCCESS);
-        //扣除用户余额
-        accountService.paymentTAC(buildAccountDTO(order));
-        //进入扣减库存操作
-        inventoryService.decreaseTAC(buildInventoryDTO(order));
     }
 
     @Override
@@ -139,15 +127,6 @@ public class PaymentServiceImpl implements PaymentService {
         accountService.payment(buildAccountDTO(order));
         inventoryService.mockWithTryException(buildInventoryDTO(order));
         return "success";
-    }
-
-    @Override
-    @HmilyTAC
-    @Transactional
-    public String mockTacPaymentInventoryWithTryException(Order order) {
-        updateOrderStatus(order, OrderStatusEnum.PAY_SUCCESS);
-        accountService.paymentTAC(buildAccountDTO(order));
-        throw new RuntimeException("");
     }
 
     @Override

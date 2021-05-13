@@ -21,21 +21,19 @@ import com.baidu.brpc.spring.annotation.RpcExporter;
 import com.baidu.brpc.spring.annotation.RpcProxy;
 import lombok.Getter;
 import lombok.Setter;
-import org.dromara.hmily.annotation.HmilyTAC;
 import org.dromara.hmily.annotation.HmilyTCC;
 import org.dromara.hmily.common.exception.HmilyRuntimeException;
+import org.dromara.hmily.demo.common.account.api.AccountService;
+import org.dromara.hmily.demo.common.account.api.InlineService;
 import org.dromara.hmily.demo.common.account.dto.AccountDTO;
 import org.dromara.hmily.demo.common.account.dto.AccountNestedDTO;
 import org.dromara.hmily.demo.common.account.entity.AccountDO;
 import org.dromara.hmily.demo.common.account.mapper.AccountMapper;
-import org.dromara.hmily.demo.common.account.api.AccountService;
-import org.dromara.hmily.demo.common.account.api.InlineService;
 import org.dromara.hmily.demo.common.inventory.api.InventoryService;
 import org.dromara.hmily.demo.common.inventory.dto.InventoryDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -111,12 +109,6 @@ public class AccountServiceImpl implements AccountService {
             throw new HmilyRuntimeException("库存不足");
         }
         return true;
-    }
-    
-    @Override
-    @HmilyTAC
-    public boolean paymentTAC(AccountDTO accountDTO) {
-        return accountMapper.updateTAC(accountDTO) > 0;
     }
     
     @Override

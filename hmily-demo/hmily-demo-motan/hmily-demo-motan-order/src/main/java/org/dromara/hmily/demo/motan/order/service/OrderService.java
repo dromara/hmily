@@ -39,15 +39,6 @@ public interface OrderService {
     String orderPay(Integer count, BigDecimal amount);
     
     /**
-     * Save order for tac string.
-     *
-     * @param count  the count
-     * @param amount the amount
-     * @return the string
-     */
-    String saveOrderForTAC(Integer count, BigDecimal amount);
-    
-    /**
      * Test order pay string.
      *
      * @param count  the count

@@ -19,7 +19,6 @@ package org.dromara.hmily.demo.motan.account.service;
 
 import com.weibo.api.motan.config.springsupport.annotation.MotanReferer;
 import com.weibo.api.motan.config.springsupport.annotation.MotanService;
-import org.dromara.hmily.annotation.HmilyTAC;
 import org.dromara.hmily.annotation.HmilyTCC;
 import org.dromara.hmily.common.exception.HmilyRuntimeException;
 import org.dromara.hmily.demo.common.account.api.AccountService;
@@ -97,13 +96,6 @@ public class AccountServiceImpl implements AccountService {
         if (decrease != 1) {
             throw new HmilyRuntimeException("库存不足");
         }
-        return true;
-    }
-
-    @Override
-    @HmilyTAC
-    public boolean paymentTAC(AccountDTO accountDTO) {
-        accountMapper.update(accountDTO);
         return true;
     }
 

@@ -96,11 +96,6 @@ public class AccountServiceImpl implements AccountService {
     }
     
     @Override
-    public boolean paymentTAC(final AccountDTO accountDTO) {
-        return false;
-    }
-    
-    @Override
     public boolean testPayment(final AccountDTO accountDTO) {
         accountMapper.testUpdate(accountDTO);
         return Boolean.TRUE;
