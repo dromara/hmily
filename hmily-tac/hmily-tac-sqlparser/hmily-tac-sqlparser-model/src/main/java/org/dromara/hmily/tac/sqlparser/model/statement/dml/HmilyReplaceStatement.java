@@ -19,6 +19,7 @@ package org.dromara.hmily.tac.sqlparser.model.statement.dml;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import org.dromara.hmily.tac.sqlparser.model.segment.dml.assignment.HmilyAssignmentSegment;
 import org.dromara.hmily.tac.sqlparser.model.segment.dml.assignment.HmilyInsertValuesSegment;
 import org.dromara.hmily.tac.sqlparser.model.segment.dml.assignment.HmilySetAssignmentSegment;
@@ -39,6 +40,7 @@ import java.util.Optional;
  */
 @Getter
 @Setter
+@ToString
 public final class HmilyReplaceStatement extends HmilyDMLStatement {
     
     private HmilySimpleTableSegment table;

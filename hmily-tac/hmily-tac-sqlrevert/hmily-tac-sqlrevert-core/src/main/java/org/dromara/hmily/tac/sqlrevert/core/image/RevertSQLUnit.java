@@ -19,6 +19,7 @@ package org.dromara.hmily.tac.sqlrevert.core.image;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
 import java.util.List;
 
@@ -29,6 +30,7 @@ import java.util.List;
  */
 @RequiredArgsConstructor
 @Getter
+@ToString
 public final class RevertSQLUnit {
     
     private final String sql;

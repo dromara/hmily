@@ -20,6 +20,7 @@ package org.dromara.hmily.repository.spi.entity;
 import com.google.common.base.Joiner;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
 import java.io.Serializable;
 
@@ -30,6 +31,7 @@ import java.io.Serializable;
  */
 @Getter
 @RequiredArgsConstructor
+@ToString
 public class HmilyLock implements Serializable {
     
     private static final long serialVersionUID = -6910542871629586617L;

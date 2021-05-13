@@ -17,6 +17,7 @@
 
 package org.dromara.hmily.tac.sqlparser.shardingsphere;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.shardingsphere.infra.parser.sql.SQLStatementParserEngineFactory;
 import org.apache.shardingsphere.sql.parser.sql.common.segment.dml.assignment.AssignmentSegment;
 import org.apache.shardingsphere.sql.parser.sql.common.segment.dml.column.ColumnSegment;
@@ -76,6 +77,7 @@ import java.util.LinkedList;
  * @author xiaoyu
  */
 @HmilySPI("shardingsphere")
+@Slf4j
 public class ShardingSphereSqlParserEngine implements HmilySqlParserEngine {
     
     @Override

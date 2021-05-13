@@ -19,6 +19,7 @@ package org.dromara.hmily.repository.spi.entity;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.dromara.hmily.repository.spi.entity.tuple.HmilySQLTuple;
 
 import java.io.Serializable;
@@ -33,6 +34,7 @@ import java.util.LinkedList;
  */
 @NoArgsConstructor
 @Getter
+@ToString
 public class HmilyDataSnapshot implements Serializable {
     
     private static final long serialVersionUID = -4406133196112007765L;

@@ -48,9 +48,7 @@ public final class HmilySQLComputeEngineFactory {
         } else if (hmilyStatement instanceof HmilyDeleteStatement) {
             return new HmilyDeleteSQLComputeEngine((HmilyDeleteStatement) hmilyStatement);
         } else {
-            // FIXME remove it after parser is OK
-            return new HmilyUpdateSQLComputeEngine(null);
-//            throw new SQLComputeException(String.format("do not support hmily SQL compute yet, SQLStatement:{%s}.", hmilyStatement));
+            throw new SQLComputeException(String.format("do not support hmily SQL compute yet, SQLStatement:{%s}.", hmilyStatement));
         }
     }
 }

@@ -50,7 +50,7 @@ public enum HmilyLockManager {
             Optional<HmilyLock> hmilyLock = HmilyLockCacheManager.getInstance().get(each.getLockId());
             if (hmilyLock.isPresent()) {
                 String message = String.format("current record [%s] has locked by transaction:[%s]", each.getLockId(), hmilyLock.get().getTransId());
-                log.warn(message);
+                log.error(message);
                 throw new HmilyLockConflictException(message);
             }
         }
@@ -66,5 +66,6 @@ public enum HmilyLockManager {
     public void releaseLocks(final Collection<HmilyLock> hmilyLocks) {
         HmilyRepositoryStorage.releaseHmilyLocks(hmilyLocks);
         hmilyLocks.forEach(lock -> HmilyLockCacheManager.getInstance().removeByKey(lock.getLockId()));
+        log.debug("TAC-release-lock ::: {}", hmilyLocks);
     }
 }

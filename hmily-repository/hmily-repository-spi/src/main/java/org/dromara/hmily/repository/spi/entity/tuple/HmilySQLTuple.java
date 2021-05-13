@@ -20,6 +20,7 @@ package org.dromara.hmily.repository.spi.entity.tuple;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.io.Serializable;
 import java.util.List;
@@ -33,6 +34,7 @@ import java.util.Map;
 @Getter
 @Setter
 @NoArgsConstructor
+@ToString
 public final class HmilySQLTuple implements Serializable {
     
     private static final long serialVersionUID = -5978500621198003611L;
