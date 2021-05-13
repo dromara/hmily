@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "org.dromara.hmily.demo.grpc.account.service";
+option java_outer_classname = "AccountServiceProto";
+option objc_class_prefix = "HLW";
+
+service AccountService {
+
+    rpc payment (AccountRequest) returns (AccountResponse);
+
+}
+
+message AccountRequest {
+
+    string userId = 1;
+
+    string amount = 2;
+}
+
+message AccountResponse {
+    bool result = 1;
+}
+

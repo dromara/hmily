@@ -1,0 +1,65 @@
+hmily :
+    motan : 
+        #注册中心配置
+        registry : 
+            regProtocol : zookeeper #注册中心协议
+            address : 127.0.0.1:2181 #注册中心地址
+            requestTimeout : 1000 #注册中心连接超时时间(毫秒)
+            connectTimeout : 3000 #注册中心请求超时时间(毫秒)
+        #协议配置
+        protocol : 
+            name : motan #协议名称
+            minWorkerThread : 20 #最小工作pool线程数
+            maxWorkerThread : 50 #最大工作pool线程数
+            filter : statistic
+            serialization: fastjson
+        #指定需要解析的包名
+        annotation :
+            package : org.dromara.hmily
+        #服务端配置
+        server : 
+            export :  'hmilyMotan:9996' #服务端口
+            group : hmily
+            registry : hmilyRegistryConfig
+        client:
+            protocol: hmilyMotan
+            group: hmily
+            check: false
+            requestTimeout: 30000 #请求超时时间(毫秒)
+            connectTimeout: 5000 #连接超时时间(毫秒)
+            registry: hmilyRegistryConfig
+
+    support:
+        rpc:
+            annotation: true
+server:
+    port: 8088
+    address: 0.0.0.0
+    servlet:
+        context-path: /
+
+spring:
+    main:
+        allow-bean-definition-overriding: true
+    datasource:
+        driver-class-name:  com.mysql.jdbc.Driver
+        url: jdbc:mysql://127.0.01:3306/hmily_order?useUnicode=true&characterEncoding=utf8
+        username: root
+        password:
+    application:
+        name: order-service
+
+mybatis:
+    type-aliases-package: org.dromara.hmily.demo.common.order.entity
+    config-location: classpath:mybatis/mybatis-config.xml
+
+logging:
+    level:
+        root: error
+        org.springframework.web: info
+        org.apache.ibatis: debug
+        org.dromara.hmily.demo.bonuspoint: debug
+        org.dromara.hmily.demo.lottery: debug
+        org.dromara.hmily.demo: debug
+        io.netty: info
+    path: "./logs"

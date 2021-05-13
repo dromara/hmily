@@ -1,0 +1,41 @@
+server:
+  port: 8077
+  address: 0.0.0.0
+  servlet:
+    context-path: /
+
+spring:
+    datasource:
+        driver-class-name:  com.mysql.jdbc.Driver
+        url: jdbc:mysql://127.0.0.1:3306/hmily_order?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
+        username: root
+        password:
+
+mybatis:
+  type-aliases-package: org.dromara.hmily.demo.common.order.entity
+  config-location: classpath:mybatis/mybatis-config.xml
+
+brpc:
+  global:
+    naming:
+      namingServiceUrl: zookeeper://127.0.0.1:2181/examples
+      group: "normal"
+      version: 2.0.0
+      ignoreFailOfNamingService: true
+    client:
+      workThreadNum: 1
+      ioThreadNum: 1
+      protocol-type: 30
+      max-try-times: 1
+      interceptor-bean-names: hmilyInterceptor
+
+logging:
+  level:
+    root: error
+    org.springframework.web: info
+    org.apache.ibatis: debug
+    org.dromara.hmily.demo.bonuspoint: debug
+    org.dromara.hmily.demo.lottery: debug
+    org.dromara.hmily.demo: debug
+    io.netty: info
+  path: "./logs"

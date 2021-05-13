@@ -1,0 +1,50 @@
+server:
+  port: 8885
+  address: 0.0.0.0
+  servlet:
+    context-path: /account-service
+
+spring:
+    datasource:
+        driver-class-name:  com.mysql.jdbc.Driver
+        url: jdbc:mysql://127.0.0.1:3306/hmily_account?useUnicode=true&characterEncoding=utf8
+        username: root
+        password:
+    application:
+      name: account-service
+    main:
+        allow-bean-definition-overriding: true
+
+mybatis:
+  type-aliases-package: org.dromara.hmily.demo.common.account.entity
+  config-location: classpath:mybatis/mybatis-config.xml
+#${random.int[9000,9999]}
+eureka:
+ client:
+     serviceUrl:
+       defaultZone: http://localhost:8761/eureka/
+ instance:
+   prefer-ip-address: true
+
+#Ribbon的负载均衡策略
+ribbon:
+  NFLoadBalancerRuleClassName:  com.netflix.loadbalancer.RandomRule
+  MaxAutoRetriesNextServer : 0
+  MaxAutoRetries: 0
+  ReadTimeout: 3000
+feign:
+  hystrix:
+    enabled : false
+    # 在feign中开启hystrix功能，默认情况下feign不开启hystrix功能
+
+logging:
+    level:
+        root: error
+        org.springframework.web: info
+        org.apache.ibatis: debug
+        org.dromara.hmily.demo.bonuspoint: debug
+        org.dromara.hmily.demo.lottery: debug
+        org.dromara.hmily.demo: debug
+        io.netty: info
+    path: "./logs"
+
