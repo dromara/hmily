@@ -51,4 +51,9 @@ public final class HmilyExpressionProjectionSegment implements HmilyProjectionSe
     public Optional<String> getAlias() {
         return null == alias ? Optional.empty() : Optional.ofNullable(alias.getIdentifier().getValue());
     }
+    
+    @Override
+    public int getStopIndex() {
+        return null != alias ? alias.getStopIndex() : stopIndex;
+    }
 }

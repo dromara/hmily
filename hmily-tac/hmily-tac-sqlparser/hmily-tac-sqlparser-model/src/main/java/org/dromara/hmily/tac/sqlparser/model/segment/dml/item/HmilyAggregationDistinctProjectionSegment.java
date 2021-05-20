@@ -29,8 +29,8 @@ public final class HmilyAggregationDistinctProjectionSegment extends HmilyAggreg
     
     private final String distinctExpression;
     
-    public HmilyAggregationDistinctProjectionSegment(final int startIndex, final int stopIndex, final HmilyAggregationType type, final int innerExpressionStartIndex, final String distinctExpression) {
-        super(startIndex, stopIndex, type, innerExpressionStartIndex);
+    public HmilyAggregationDistinctProjectionSegment(final int startIndex, final int stopIndex, final HmilyAggregationType type, final String innerExpression, final String distinctExpression) {
+        super(startIndex, stopIndex, type, innerExpression);
         this.distinctExpression = HmilySQLUtil.getExpressionWithoutOutsideParentheses(distinctExpression);
     }
 }

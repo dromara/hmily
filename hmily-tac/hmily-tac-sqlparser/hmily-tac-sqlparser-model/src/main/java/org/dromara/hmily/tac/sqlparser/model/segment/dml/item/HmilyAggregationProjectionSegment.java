@@ -37,16 +37,16 @@ public class HmilyAggregationProjectionSegment implements HmilyProjectionSegment
     
     private final HmilyAggregationType type;
     
-    private final int innerExpressionStartIndex;
+    private final String innerExpression;
     
     @Setter
     private HmilyAliasSegment alias;
     
-    public HmilyAggregationProjectionSegment(final int startIndex, final int stopIndex, final HmilyAggregationType type, final int innerExpressionStartIndex) {
+    public HmilyAggregationProjectionSegment(final int startIndex, final int stopIndex, final HmilyAggregationType type, final String innerExpression) {
         this.startIndex = startIndex;
         this.stopIndex = stopIndex;
         this.type = type;
-        this.innerExpressionStartIndex = innerExpressionStartIndex;
+        this.innerExpression = innerExpression;
     }
     
     @Override
