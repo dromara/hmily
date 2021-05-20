@@ -23,9 +23,6 @@ import lombok.Setter;
 import org.dromara.hmily.tac.sqlparser.model.segment.HmilySegment;
 import org.dromara.hmily.tac.sqlparser.model.segment.dml.expr.HmilyExpressionSegment;
 
-import java.util.Collection;
-import java.util.LinkedList;
-
 /**
  * Where segment.
  */

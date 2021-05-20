@@ -17,7 +17,6 @@
 
 package org.dromara.hmily.tac.sqlparser.model.segment.generic.table;
 
-import org.dromara.hmily.tac.sqlparser.model.segment.HmilySegment;
 import org.dromara.hmily.tac.sqlparser.model.segment.generic.HmilyAliasAvailable;
 
 /**
