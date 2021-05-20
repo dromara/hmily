@@ -37,6 +37,6 @@ public final class HmilyCollectionValue<T> implements HmilyValueASTNode<Collecti
      * @param hmilyCollectionValue collection value
      */
     public void combine(final HmilyCollectionValue<T> hmilyCollectionValue) {
-        value.addAll(hmilyCollectionValue.getValue());
+        value.addAll(hmilyCollectionValue.value);
     }
 }

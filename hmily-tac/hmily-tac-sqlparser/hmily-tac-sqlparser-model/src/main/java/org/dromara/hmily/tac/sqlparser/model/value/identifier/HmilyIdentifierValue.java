@@ -36,14 +36,13 @@ public final class HmilyIdentifierValue implements HmilyValueASTNode<String> {
         value = HmilySQLUtil.getExactlyValue(text);
         hmilyQuoteCharacter = HmilyQuoteCharacter.getQuoteCharacter(text);
     }
-    
-    public HmilyIdentifierValue(final String value, final HmilyQuoteCharacter hmilyQuoteCharacter) {
-        this.value = value;
-        this.hmilyQuoteCharacter = hmilyQuoteCharacter;
-    }
-    
-    @Override
-    public String toString() {
-        return hmilyQuoteCharacter.getStartDelimiter() + value + hmilyQuoteCharacter.getEndDelimiter();
+
+    /**
+     * Get value with quote characters, i.e. `table1` or `field1`
+     *
+     * @return value with quote characters
+     */
+    public String getValueWithQuoteCharacters() {
+        return null == value ? "" : hmilyQuoteCharacter.wrap(value);
     }
 }
