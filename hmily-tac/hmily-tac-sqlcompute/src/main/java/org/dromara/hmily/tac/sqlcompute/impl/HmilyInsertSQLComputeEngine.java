@@ -26,7 +26,7 @@ import org.dromara.hmily.tac.sqlparser.model.common.segment.dml.assignment.Hmily
 import org.dromara.hmily.tac.sqlparser.model.common.segment.dml.assignment.HmilyInsertValuesSegment;
 import org.dromara.hmily.tac.sqlparser.model.common.segment.dml.assignment.HmilySetAssignmentSegment;
 import org.dromara.hmily.tac.sqlparser.model.common.segment.dml.expr.HmilyExpressionSegment;
-import org.dromara.hmily.tac.sqlparser.model.common.statement.dml.HmilyInsertStatement;
+import org.dromara.hmily.tac.sqlparser.model.dialect.mysql.dml.HmilyMySQLInsertStatement;
 
 import java.sql.Connection;
 import java.util.Collection;
@@ -46,7 +46,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public final class HmilyInsertSQLComputeEngine extends AbstractHmilySQLComputeEngine {
     
-    private final HmilyInsertStatement sqlStatement;
+    private final HmilyMySQLInsertStatement sqlStatement;
     
     @Override
     Collection<HmilySQLTuple> createTuples(final String sql, final List<Object> parameters, final Connection connection, final String resourceId) {
@@ -63,7 +63,8 @@ public final class HmilyInsertSQLComputeEngine extends AbstractHmilySQLComputeEn
     private Collection<HmilySQLTuple> createTuplesByValues(final List<Object> parameters, final TableMetaData tableMetaData) {
         Collection<Map<String, Object>> records = new LinkedList<>();
         for (HmilyInsertValuesSegment each : sqlStatement.getValues()) {
-            List<String> columnNames = sqlStatement.getColumnNames().isEmpty() ? new LinkedList<>(tableMetaData.getColumns().keySet()) : sqlStatement.getColumnNames();
+            // TODO getColumnNames String
+            List<String> columnNames = new LinkedList<>(tableMetaData.getColumns().keySet());
             records.add(getRecord(parameters, columnNames, each));
         }
         return doConvert(records, tableMetaData);
