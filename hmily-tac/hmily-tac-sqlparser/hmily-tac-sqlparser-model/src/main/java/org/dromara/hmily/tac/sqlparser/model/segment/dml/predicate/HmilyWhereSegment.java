@@ -21,6 +21,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.dromara.hmily.tac.sqlparser.model.segment.HmilySegment;
+import org.dromara.hmily.tac.sqlparser.model.segment.dml.expr.HmilyExpressionSegment;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -37,5 +38,5 @@ public final class HmilyWhereSegment implements HmilySegment {
     
     private final int stopIndex;
     
-    private final Collection<HmilyAndPredicate> hmilyAndPredicates = new LinkedList<>();
+    private final HmilyExpressionSegment expr;
 }

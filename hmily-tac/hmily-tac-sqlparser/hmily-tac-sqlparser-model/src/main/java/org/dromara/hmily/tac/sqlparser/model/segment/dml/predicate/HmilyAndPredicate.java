@@ -19,6 +19,7 @@ package org.dromara.hmily.tac.sqlparser.model.segment.dml.predicate;
 
 import lombok.Getter;
 import org.dromara.hmily.tac.sqlparser.model.segment.HmilySegment;
+import org.dromara.hmily.tac.sqlparser.model.segment.dml.expr.HmilyExpressionSegment;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -33,5 +34,5 @@ public final class HmilyAndPredicate implements HmilySegment {
     
     private final int stopIndex = 0;
     
-    private final Collection<HmilyPredicateSegment> predicates = new LinkedList<>();
+    private final Collection<HmilyExpressionSegment> predicates = new LinkedList<>();
 }
