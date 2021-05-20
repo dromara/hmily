@@ -22,10 +22,9 @@ import lombok.Setter;
 import lombok.ToString;
 import org.dromara.hmily.tac.sqlparser.model.segment.dml.assignment.HmilySetAssignmentSegment;
 import org.dromara.hmily.tac.sqlparser.model.segment.dml.predicate.HmilyWhereSegment;
-import org.dromara.hmily.tac.sqlparser.model.segment.generic.table.HmilySimpleTableSegment;
+import org.dromara.hmily.tac.sqlparser.model.segment.generic.table.HmilyTableSegment;
+import org.dromara.hmily.tac.sqlparser.model.statement.AbstractHmilyStatement;
 
-import java.util.Collection;
-import java.util.LinkedList;
 import java.util.Optional;
 
 /**
@@ -34,9 +33,9 @@ import java.util.Optional;
 @Getter
 @Setter
 @ToString
-public final class HmilyUpdateStatement extends HmilyDMLStatement {
+public abstract class HmilyUpdateStatement extends AbstractHmilyStatement implements HmilyDMLStatement {
     
-    private final Collection<HmilySimpleTableSegment> tables = new LinkedList<>();
+    private HmilyTableSegment tableSegment;
     
     private HmilySetAssignmentSegment setAssignment;
     
