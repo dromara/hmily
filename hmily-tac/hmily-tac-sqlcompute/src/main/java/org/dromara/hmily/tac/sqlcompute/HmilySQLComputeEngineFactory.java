@@ -21,10 +21,10 @@ import org.dromara.hmily.tac.sqlcompute.exception.SQLComputeException;
 import org.dromara.hmily.tac.sqlcompute.impl.HmilyDeleteSQLComputeEngine;
 import org.dromara.hmily.tac.sqlcompute.impl.HmilyInsertSQLComputeEngine;
 import org.dromara.hmily.tac.sqlcompute.impl.HmilyUpdateSQLComputeEngine;
-import org.dromara.hmily.tac.sqlparser.model.statement.HmilyStatement;
-import org.dromara.hmily.tac.sqlparser.model.statement.dml.HmilyDeleteStatement;
-import org.dromara.hmily.tac.sqlparser.model.statement.dml.HmilyInsertStatement;
-import org.dromara.hmily.tac.sqlparser.model.statement.dml.HmilyUpdateStatement;
+import org.dromara.hmily.tac.sqlparser.model.common.statement.HmilyStatement;
+import org.dromara.hmily.tac.sqlparser.model.common.statement.dml.HmilyDeleteStatement;
+import org.dromara.hmily.tac.sqlparser.model.common.statement.dml.HmilyInsertStatement;
+import org.dromara.hmily.tac.sqlparser.model.common.statement.dml.HmilyUpdateStatement;
 
 /**
  * Hmily SQL compute engine factory.

@@ -22,11 +22,11 @@ import org.dromara.hmily.repository.spi.entity.tuple.HmilySQLManipulation;
 import org.dromara.hmily.repository.spi.entity.tuple.HmilySQLTuple;
 import org.dromara.hmily.tac.metadata.HmilyMetaDataManager;
 import org.dromara.hmily.tac.metadata.model.TableMetaData;
-import org.dromara.hmily.tac.sqlparser.model.segment.dml.assignment.HmilyAssignmentSegment;
-import org.dromara.hmily.tac.sqlparser.model.segment.dml.assignment.HmilyInsertValuesSegment;
-import org.dromara.hmily.tac.sqlparser.model.segment.dml.assignment.HmilySetAssignmentSegment;
-import org.dromara.hmily.tac.sqlparser.model.segment.dml.expr.HmilyExpressionSegment;
-import org.dromara.hmily.tac.sqlparser.model.statement.dml.HmilyInsertStatement;
+import org.dromara.hmily.tac.sqlparser.model.common.segment.dml.assignment.HmilyAssignmentSegment;
+import org.dromara.hmily.tac.sqlparser.model.common.segment.dml.assignment.HmilyInsertValuesSegment;
+import org.dromara.hmily.tac.sqlparser.model.common.segment.dml.assignment.HmilySetAssignmentSegment;
+import org.dromara.hmily.tac.sqlparser.model.common.segment.dml.expr.HmilyExpressionSegment;
+import org.dromara.hmily.tac.sqlparser.model.common.statement.dml.HmilyInsertStatement;
 
 import java.sql.Connection;
 import java.util.Collection;

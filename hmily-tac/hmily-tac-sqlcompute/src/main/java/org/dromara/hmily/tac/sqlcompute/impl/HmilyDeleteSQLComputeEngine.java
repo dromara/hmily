@@ -23,8 +23,8 @@ import org.dromara.hmily.repository.spi.entity.tuple.HmilySQLManipulation;
 import org.dromara.hmily.repository.spi.entity.tuple.HmilySQLTuple;
 import org.dromara.hmily.tac.metadata.HmilyMetaDataManager;
 import org.dromara.hmily.tac.metadata.model.TableMetaData;
-import org.dromara.hmily.tac.sqlparser.model.segment.generic.table.HmilySimpleTableSegment;
-import org.dromara.hmily.tac.sqlparser.model.statement.dml.HmilyDeleteStatement;
+import org.dromara.hmily.tac.sqlparser.model.common.segment.generic.table.HmilySimpleTableSegment;
+import org.dromara.hmily.tac.sqlparser.model.common.statement.dml.HmilyDeleteStatement;
 
 import java.sql.Connection;
 import java.sql.SQLException;

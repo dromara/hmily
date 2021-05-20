@@ -38,7 +38,7 @@ import org.dromara.hmily.tac.core.lock.HmilyLockManager;
 import org.dromara.hmily.tac.p6spy.threadlocal.AutoCommitThreadLocal;
 import org.dromara.hmily.tac.sqlcompute.HmilySQLComputeEngine;
 import org.dromara.hmily.tac.sqlcompute.HmilySQLComputeEngineFactory;
-import org.dromara.hmily.tac.sqlparser.model.statement.HmilyStatement;
+import org.dromara.hmily.tac.sqlparser.model.common.statement.HmilyStatement;
 import org.dromara.hmily.tac.sqlparser.spi.HmilySqlParserEngineFactory;
 
 import java.sql.Connection;
