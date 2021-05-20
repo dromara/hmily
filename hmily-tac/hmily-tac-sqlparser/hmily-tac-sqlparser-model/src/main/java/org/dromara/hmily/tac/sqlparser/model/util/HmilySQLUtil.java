@@ -20,8 +20,13 @@ package org.dromara.hmily.tac.sqlparser.model.util;
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Strings;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import org.dromara.hmily.tac.sqlparser.model.constant.HmilyParen;
+import org.dromara.hmily.tac.sqlparser.model.statement.HmilyStatement;
+import org.dromara.hmily.tac.sqlparser.model.statement.dml.HmilyDMLStatement;
+import org.dromara.hmily.tac.sqlparser.model.statement.dml.HmilyDeleteStatement;
+import org.dromara.hmily.tac.sqlparser.model.statement.dml.HmilyInsertStatement;
+import org.dromara.hmily.tac.sqlparser.model.statement.dml.HmilyUpdateStatement;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -29,7 +34,7 @@ import java.math.BigInteger;
 /**
  * SQL utility class.
  */
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class HmilySQLUtil {
     
     /**
@@ -95,9 +100,33 @@ public final class HmilySQLUtil {
     
     private static int getParenthesesOffset(final String value) {
         int result = 0;
+        if (Strings.isNullOrEmpty(value)) {
+            return result;
+        }
         while (HmilyParen.PARENTHESES.getLeftParen() == value.charAt(result)) {
             result++;
         }
         return result;
+    }
+    
+    /**
+     * Determine whether SQL is read-only.
+     *
+     * @param sqlStatement SQL statement
+     * @return true if read-only, otherwise false
+     */
+    public static boolean isReadOnly(final HmilyStatement sqlStatement) {
+        if (sqlStatement instanceof HmilyDMLStatement) {
+            return isReadOnly((HmilyDMLStatement) sqlStatement);
+        }
+        throw new UnsupportedOperationException(String.format("Unsupported SQL Type `%s`", sqlStatement.getClass().getSimpleName()));
+    }
+    
+    private static boolean isReadOnly(final HmilyDMLStatement sqlStatement) {
+
+        if (sqlStatement instanceof HmilyUpdateStatement || sqlStatement instanceof HmilyDeleteStatement || sqlStatement instanceof HmilyInsertStatement) {
+            return false;
+        }
+        throw new UnsupportedOperationException(String.format("Unsupported SQL Type `%s`", sqlStatement.getClass().getSimpleName()));
     }
 }
