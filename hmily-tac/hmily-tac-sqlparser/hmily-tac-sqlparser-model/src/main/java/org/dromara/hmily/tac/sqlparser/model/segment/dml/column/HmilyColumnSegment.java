@@ -47,14 +47,17 @@ public final class HmilyColumnSegment implements HmilyExpressionSegment, HmilyPr
     private HmilyOwnerSegment owner;
     
     /**
-     * Get qualified name.
+     * Get qualified name with quote characters.
+     * i.e. `field1`, `table1`, field1, table1, `table1`.`field1`, `table1`.field1, table1.`field1` or table1.field1
      *
-     * @return qualified name
+     * @return qualified name with quote characters
      */
     public String getQualifiedName() {
-        return null == owner ? identifier.getValue() : owner.getIdentifier().getValue() + "." + identifier.getValue();
+        return null == owner
+                ? identifier.getValueWithQuoteCharacters()
+                : String.join(".", owner.getIdentifier().getValueWithQuoteCharacters(), identifier.getValueWithQuoteCharacters());
     }
-
+    
     @Override
     public Optional<HmilyOwnerSegment> getOwner() {
         return Optional.ofNullable(owner);

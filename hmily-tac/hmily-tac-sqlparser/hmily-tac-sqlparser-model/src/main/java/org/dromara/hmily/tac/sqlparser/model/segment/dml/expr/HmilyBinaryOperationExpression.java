@@ -15,22 +15,19 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.tac.sqlparser.model.segment.dml.expr.complex;
+package org.dromara.hmily.tac.sqlparser.model.segment.dml.expr;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.ToString;
-import org.dromara.hmily.tac.sqlparser.model.segment.dml.expr.HmilyExpressionSegment;
+import lombok.Setter;
 
 /**
- * Hmily binary operation expression segment.
- *
- * @author zhaojun
+ * Binary operation expression.
  */
 @RequiredArgsConstructor
 @Getter
-@ToString
-public final class HmilyBinaryOperationExpressionSegment implements HmilyComplexExpressionSegment {
+@Setter
+public final class HmilyBinaryOperationExpression implements HmilyExpressionSegment {
     
     private final int startIndex;
     
