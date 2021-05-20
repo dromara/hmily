@@ -17,6 +17,7 @@
 
 package org.dromara.hmily.tac.sqlparser.model.constant;
 
+import java.util.Arrays;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -40,12 +41,7 @@ public enum HmilyParen {
      * @return is left paren or not
      */
     public static boolean isLeftParen(final char token) {
-        for (HmilyParen each : HmilyParen.values()) {
-            if (each.leftParen == token) {
-                return true;
-            }
-        }
-        return false;
+        return Arrays.stream(values()).anyMatch(each -> each.leftParen == token);
     }
     
     /**

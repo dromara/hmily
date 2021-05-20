@@ -17,6 +17,8 @@
 
 package org.dromara.hmily.tac.sqlparser.model.constant;
 
+import java.util.Arrays;
+
 /**
  * Aggregation function enum.
  */
@@ -30,11 +32,6 @@ public enum HmilyAggregationType {
      * @return is aggregation type or not
      */
     public static boolean isAggregationType(final String aggregationType) {
-        for (HmilyAggregationType each : HmilyAggregationType.values()) {
-            if (aggregationType.equalsIgnoreCase(each.name())) {
-                return true;
-            }
-        }
-        return false;
+        return Arrays.stream(values()).anyMatch(each -> aggregationType.equalsIgnoreCase(each.name()));
     }
 }

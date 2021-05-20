@@ -17,8 +17,11 @@
 
 package org.dromara.hmily.tac.sqlparser.model.constant;
 
+import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+
+import java.util.Arrays;
 
 /**
  * Quote character.
@@ -43,21 +46,24 @@ public enum HmilyQuoteCharacter {
     
     /**
      * Get quote character.
-     * 
+     *
      * @param value value to be get quote character
      * @return value of quote character
      */
     public static HmilyQuoteCharacter getQuoteCharacter(final String value) {
-        if ("BACK_QUOTE".equals(value)) {
-            return HmilyQuoteCharacter.BACK_QUOTE;
-        } else if ("SINGLE_QUOTE".equals(value)) {
-            return HmilyQuoteCharacter.SINGLE_QUOTE;
-        } else if ("QUOTE".equals(value)) {
-            return HmilyQuoteCharacter.QUOTE;
-        } else if ("BRACKETS".equals(value)) {
-            return HmilyQuoteCharacter.BRACKETS;
-        } else {
-            return HmilyQuoteCharacter.NONE;
+        if (Strings.isNullOrEmpty(value)) {
+            return NONE;
         }
+        return Arrays.stream(values()).filter(each -> NONE != each && each.startDelimiter.charAt(0) == value.charAt(0)).findFirst().orElse(NONE);
+    }
+    
+    /**
+     * Wrap value with quote character.
+     *
+     * @param value value to be wrapped
+     * @return wrapped value
+     */
+    public String wrap(final String value) {
+        return String.format("%s%s%s", startDelimiter, value, endDelimiter);
     }
 }

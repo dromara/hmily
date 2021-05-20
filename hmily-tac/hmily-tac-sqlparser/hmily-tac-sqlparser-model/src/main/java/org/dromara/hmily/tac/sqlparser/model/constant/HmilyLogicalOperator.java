@@ -43,11 +43,6 @@ public enum HmilyLogicalOperator {
      * @return logical operator value
      */
     public static Optional<HmilyLogicalOperator> valueFrom(final String text) {
-        for (HmilyLogicalOperator each : HmilyLogicalOperator.values()) {
-            if (each.texts.contains(text)) {
-                return Optional.of(each);
-            }
-        }
-        return Optional.empty();
+        return Arrays.stream(values()).filter(each -> each.texts.contains(text)).findFirst();
     }
 }
