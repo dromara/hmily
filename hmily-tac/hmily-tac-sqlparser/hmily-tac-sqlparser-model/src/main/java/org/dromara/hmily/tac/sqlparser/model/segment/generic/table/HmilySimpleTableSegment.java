@@ -56,9 +56,7 @@ public final class HmilySimpleTableSegment implements HmilyTableSegment, HmilyOw
     
     @Override
     public int getStopIndex() {
-        return tableName.getStopIndex();
-        //FIXME: Rewriter need to handle alias as well
-//        return null == alias ? tableName.getStopIndex() : alias.getStopIndex();
+        return null == alias ? tableName.getStopIndex() : alias.getStopIndex();
     }
     
     @Override

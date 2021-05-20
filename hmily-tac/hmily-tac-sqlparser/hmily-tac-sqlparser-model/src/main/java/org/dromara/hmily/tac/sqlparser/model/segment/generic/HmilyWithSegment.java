@@ -15,13 +15,25 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.tac.sqlparser.model.segment.generic.table;
+package org.dromara.hmily.tac.sqlparser.model.segment.generic;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.dromara.hmily.tac.sqlparser.model.segment.HmilySegment;
-import org.dromara.hmily.tac.sqlparser.model.segment.generic.HmilyAliasAvailable;
+import org.dromara.hmily.tac.sqlparser.model.segment.dml.expr.complex.HmilyCommonTableExpressionSegment;
+
+import java.util.Collection;
 
 /**
- * Table segment.
+ * With segment.
  */
-public interface HmilyTableSegment extends HmilyAliasAvailable {
+@RequiredArgsConstructor
+@Getter
+public final class HmilyWithSegment implements HmilySegment {
+    
+    private final int startIndex;
+    
+    private final int stopIndex;
+    
+    private final Collection<HmilyCommonTableExpressionSegment> commonTableExpressions;
 }

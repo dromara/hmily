@@ -18,22 +18,36 @@
 package org.dromara.hmily.tac.sqlparser.model.segment.generic.table;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.ToString;
-import org.dromara.hmily.tac.sqlparser.model.segment.HmilySegment;
-import org.dromara.hmily.tac.sqlparser.model.value.identifier.HmilyIdentifierValue;
+import lombok.Setter;
+import org.dromara.hmily.tac.sqlparser.model.segment.dml.column.HmilyColumnSegment;
+import org.dromara.hmily.tac.sqlparser.model.segment.dml.expr.HmilyExpressionSegment;
+import org.dromara.hmily.tac.sqlparser.model.segment.generic.HmilyAliasSegment;
 
-/**
- * Table name segment.
- */
-@RequiredArgsConstructor
+import java.util.List;
+import java.util.Optional;
+
 @Getter
-@ToString
-public final class HmilyTableNameSegment implements HmilySegment {
+@Setter
+public final class HmilyJoinTableSegment implements HmilyTableSegment {
     
-    private final int startIndex;
+    private int startIndex;
     
-    private final int stopIndex;
+    private int stopIndex;
     
-    private final HmilyIdentifierValue identifier;
+    private HmilyAliasSegment alias;
+    
+    private HmilyTableSegment left;
+    
+    private String joinType;
+    
+    private HmilyTableSegment right;
+    
+    private List<HmilyColumnSegment> using;
+    
+    private HmilyExpressionSegment condition;
+    
+    @Override
+    public Optional<String> getAlias() {
+        return null == alias ? Optional.empty() : Optional.ofNullable(alias.getIdentifier().getValue());
+    }
 }

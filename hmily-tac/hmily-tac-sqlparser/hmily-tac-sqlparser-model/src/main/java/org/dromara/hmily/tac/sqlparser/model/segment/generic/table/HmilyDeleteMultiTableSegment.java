@@ -17,11 +17,33 @@
 
 package org.dromara.hmily.tac.sqlparser.model.segment.generic.table;
 
-import org.dromara.hmily.tac.sqlparser.model.segment.HmilySegment;
-import org.dromara.hmily.tac.sqlparser.model.segment.generic.HmilyAliasAvailable;
+import lombok.Getter;
+import lombok.Setter;
+import org.dromara.hmily.tac.sqlparser.model.segment.generic.HmilyAliasSegment;
 
-/**
- * Table segment.
- */
-public interface HmilyTableSegment extends HmilyAliasAvailable {
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
+
+@Setter
+@Getter
+public final class HmilyDeleteMultiTableSegment implements HmilyTableSegment {
+    
+    private int startIndex;
+    
+    private int stopIndex;
+    
+    private List<HmilySimpleTableSegment> actualDeleteTables = new LinkedList<>();
+    
+    private HmilyTableSegment relationTable;
+    
+    @Override
+    public Optional<String> getAlias() {
+        return Optional.empty();
+    }
+    
+    @Override
+    public void setAlias(final HmilyAliasSegment alias) {
+    
+    }
 }

@@ -15,25 +15,31 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.tac.sqlparser.model.segment.generic.table;
+package org.dromara.hmily.tac.sqlparser.model.segment.dml.expr.complex;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
-import org.dromara.hmily.tac.sqlparser.model.segment.HmilySegment;
+import org.dromara.hmily.tac.sqlparser.model.segment.dml.column.HmilyColumnSegment;
+import org.dromara.hmily.tac.sqlparser.model.segment.dml.expr.HmilyExpressionSegment;
 import org.dromara.hmily.tac.sqlparser.model.value.identifier.HmilyIdentifierValue;
 
+import java.util.Collection;
+import java.util.LinkedList;
+
 /**
- * Table name segment.
+ * Common table expression segment.
  */
 @RequiredArgsConstructor
 @Getter
 @ToString
-public final class HmilyTableNameSegment implements HmilySegment {
+public final class HmilyCommonTableExpressionSegment implements HmilyExpressionSegment {
     
     private final int startIndex;
     
     private final int stopIndex;
     
     private final HmilyIdentifierValue identifier;
+    
+    private final Collection<HmilyColumnSegment> columns = new LinkedList<>();
 }

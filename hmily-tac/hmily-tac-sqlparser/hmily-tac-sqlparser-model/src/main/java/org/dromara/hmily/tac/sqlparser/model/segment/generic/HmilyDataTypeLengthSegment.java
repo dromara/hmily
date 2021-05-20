@@ -40,6 +40,6 @@ public final class HmilyDataTypeLengthSegment implements HmilySegment {
      * @return Optional.
      */
     public Optional<Integer> getScale() {
-        return Optional.ofNullable(scale);
+        return Optional.of(scale);
     }
 }
