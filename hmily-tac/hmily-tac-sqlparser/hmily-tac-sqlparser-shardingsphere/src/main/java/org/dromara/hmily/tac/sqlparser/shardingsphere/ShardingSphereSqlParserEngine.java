@@ -41,30 +41,28 @@ import org.apache.shardingsphere.sql.parser.sql.common.statement.dml.UpdateState
 import org.apache.shardingsphere.sql.parser.sql.common.util.ExpressionBuilder;
 import org.dromara.hmily.spi.HmilySPI;
 import org.dromara.hmily.tac.common.database.type.DatabaseType;
-import org.dromara.hmily.tac.sqlparser.model.constant.HmilyQuoteCharacter;
-import org.dromara.hmily.tac.sqlparser.model.segment.dml.assignment.HmilyAssignmentSegment;
-import org.dromara.hmily.tac.sqlparser.model.segment.dml.assignment.HmilySetAssignmentSegment;
-import org.dromara.hmily.tac.sqlparser.model.segment.dml.column.HmilyColumnSegment;
-import org.dromara.hmily.tac.sqlparser.model.segment.dml.expr.HmilyExpressionSegment;
-import org.dromara.hmily.tac.sqlparser.model.segment.dml.expr.complex.HmilyBinaryOperationExpressionSegment;
-import org.dromara.hmily.tac.sqlparser.model.segment.dml.expr.complex.HmilyCommonExpressionSegment;
-import org.dromara.hmily.tac.sqlparser.model.segment.dml.expr.simple.HmilyLiteralExpressionSegment;
-import org.dromara.hmily.tac.sqlparser.model.segment.dml.expr.simple.HmilyParameterMarkerExpressionSegment;
-import org.dromara.hmily.tac.sqlparser.model.segment.dml.item.HmilyExpressionProjectionSegment;
-import org.dromara.hmily.tac.sqlparser.model.segment.dml.predicate.HmilyAndPredicate;
-import org.dromara.hmily.tac.sqlparser.model.segment.dml.predicate.HmilyPredicateSegment;
-import org.dromara.hmily.tac.sqlparser.model.segment.dml.predicate.HmilyWhereSegment;
-import org.dromara.hmily.tac.sqlparser.model.segment.dml.predicate.value.HmilyPredicateCompareRightValue;
-import org.dromara.hmily.tac.sqlparser.model.segment.dml.predicate.value.HmilyPredicateRightValue;
-import org.dromara.hmily.tac.sqlparser.model.segment.generic.HmilyAliasSegment;
-import org.dromara.hmily.tac.sqlparser.model.segment.generic.HmilyOwnerSegment;
-import org.dromara.hmily.tac.sqlparser.model.segment.generic.table.HmilySimpleTableSegment;
-import org.dromara.hmily.tac.sqlparser.model.segment.generic.table.HmilyTableNameSegment;
-import org.dromara.hmily.tac.sqlparser.model.statement.HmilyStatement;
-import org.dromara.hmily.tac.sqlparser.model.statement.dml.HmilyDeleteStatement;
-import org.dromara.hmily.tac.sqlparser.model.statement.dml.HmilyInsertStatement;
-import org.dromara.hmily.tac.sqlparser.model.statement.dml.HmilyUpdateStatement;
-import org.dromara.hmily.tac.sqlparser.model.value.identifier.HmilyIdentifierValue;
+import org.dromara.hmily.tac.sqlparser.model.common.segment.dml.assignment.HmilyAssignmentSegment;
+import org.dromara.hmily.tac.sqlparser.model.common.segment.dml.assignment.HmilySetAssignmentSegment;
+import org.dromara.hmily.tac.sqlparser.model.common.segment.dml.column.HmilyColumnSegment;
+import org.dromara.hmily.tac.sqlparser.model.common.segment.dml.expr.HmilyExpressionSegment;
+import org.dromara.hmily.tac.sqlparser.model.common.segment.dml.expr.complex.HmilyCommonExpressionSegment;
+import org.dromara.hmily.tac.sqlparser.model.common.segment.dml.expr.simple.HmilyLiteralExpressionSegment;
+import org.dromara.hmily.tac.sqlparser.model.common.segment.dml.expr.simple.HmilyParameterMarkerExpressionSegment;
+import org.dromara.hmily.tac.sqlparser.model.common.segment.dml.item.HmilyExpressionProjectionSegment;
+import org.dromara.hmily.tac.sqlparser.model.common.segment.dml.predicate.HmilyAndPredicate;
+import org.dromara.hmily.tac.sqlparser.model.common.segment.dml.predicate.HmilyWhereSegment;
+import org.dromara.hmily.tac.sqlparser.model.common.segment.generic.HmilyAliasSegment;
+import org.dromara.hmily.tac.sqlparser.model.common.segment.generic.HmilyOwnerSegment;
+import org.dromara.hmily.tac.sqlparser.model.common.segment.generic.table.HmilySimpleTableSegment;
+import org.dromara.hmily.tac.sqlparser.model.common.segment.generic.table.HmilyTableNameSegment;
+import org.dromara.hmily.tac.sqlparser.model.common.statement.HmilyStatement;
+import org.dromara.hmily.tac.sqlparser.model.common.statement.dml.HmilyDeleteStatement;
+import org.dromara.hmily.tac.sqlparser.model.common.statement.dml.HmilyInsertStatement;
+import org.dromara.hmily.tac.sqlparser.model.common.statement.dml.HmilyUpdateStatement;
+import org.dromara.hmily.tac.sqlparser.model.common.value.identifier.HmilyIdentifierValue;
+import org.dromara.hmily.tac.sqlparser.model.dialect.mysql.dml.HmilyMySQLDeleteStatement;
+import org.dromara.hmily.tac.sqlparser.model.dialect.mysql.dml.HmilyMySQLInsertStatement;
+import org.dromara.hmily.tac.sqlparser.model.dialect.mysql.dml.HmilyMySQLUpdateStatement;
 import org.dromara.hmily.tac.sqlparser.spi.HmilySqlParserEngine;
 import org.dromara.hmily.tac.sqlparser.spi.exception.SqlParserException;
 
@@ -95,7 +93,7 @@ public class ShardingSphereSqlParserEngine implements HmilySqlParserEngine {
     }
     
     private HmilyUpdateStatement generateHmilyUpdateStatement(final UpdateStatement updateStatement) {
-        HmilyUpdateStatement result = new HmilyUpdateStatement();
+        HmilyMySQLUpdateStatement result = new HmilyMySQLUpdateStatement();
         assembleSimpleTableSegment(updateStatement, result);
         assembleSetAssignmentSegment(updateStatement, result);
         if (updateStatement.getWhere().isPresent()) {
@@ -104,29 +102,28 @@ public class ShardingSphereSqlParserEngine implements HmilySqlParserEngine {
         return result;
     }
     
-    private void assembleSimpleTableSegment(final UpdateStatement updateStatement, final HmilyUpdateStatement result) {
+    private void assembleSimpleTableSegment(final UpdateStatement updateStatement, final HmilyMySQLUpdateStatement result) {
         SimpleTableSegment simpleTableSegment = (SimpleTableSegment) updateStatement.getTableSegment();
         TableNameSegment tableNameSegment = simpleTableSegment.getTableName();
-        HmilyQuoteCharacter quoteCharacter = HmilyQuoteCharacter.getQuoteCharacter(tableNameSegment.getIdentifier().getQuoteCharacter().toString());
-        HmilyIdentifierValue hmilyIdentifierValue = new HmilyIdentifierValue(tableNameSegment.getIdentifier().getValue(), quoteCharacter);
+        HmilyIdentifierValue hmilyIdentifierValue = new HmilyIdentifierValue(tableNameSegment.getIdentifier().getValue());
         HmilyTableNameSegment hmilyTableNameSegment = new HmilyTableNameSegment(tableNameSegment.getStartIndex(), tableNameSegment.getStopIndex(), hmilyIdentifierValue);
         HmilyOwnerSegment hmilyOwnerSegment = null;
         OwnerSegment ownerSegment;
         if (simpleTableSegment.getOwner().isPresent()) {
             ownerSegment = simpleTableSegment.getOwner().get();
             hmilyOwnerSegment = new HmilyOwnerSegment(ownerSegment.getStartIndex(), ownerSegment.getStopIndex(),
-                new HmilyIdentifierValue(ownerSegment.getIdentifier().getValue(), HmilyQuoteCharacter.getQuoteCharacter(ownerSegment.getIdentifier().getQuoteCharacter().toString())));
+                new HmilyIdentifierValue(ownerSegment.getIdentifier().getValue()));
         }
         HmilyAliasSegment hmilyAliasSegment = null;
         String aliasSegmentString;
         if (simpleTableSegment.getAlias().isPresent()) {
             aliasSegmentString = simpleTableSegment.getAlias().get();
-            hmilyAliasSegment = new HmilyAliasSegment(0, 0, new HmilyIdentifierValue(aliasSegmentString, HmilyQuoteCharacter.NONE));
+            hmilyAliasSegment = new HmilyAliasSegment(0, 0, new HmilyIdentifierValue(aliasSegmentString));
         }
         HmilySimpleTableSegment hmilySimpleTableSegment = new HmilySimpleTableSegment(hmilyTableNameSegment);
         hmilySimpleTableSegment.setOwner(hmilyOwnerSegment);
         hmilySimpleTableSegment.setAlias(hmilyAliasSegment);
-        result.getTables().add(hmilySimpleTableSegment);
+        result.setTableSegment(hmilySimpleTableSegment);
     }
     
     private void assembleSetAssignmentSegment(final UpdateStatement updateStatement, final HmilyUpdateStatement result) {
@@ -141,25 +138,22 @@ public class ShardingSphereSqlParserEngine implements HmilySqlParserEngine {
         result.setSetAssignment(hmilySetAssignmentSegment);
     }
     
-    private void assembleWhereSegment(final UpdateStatement updateStatement, final HmilyUpdateStatement result) {
+    private void assembleWhereSegment(final UpdateStatement updateStatement, final HmilyMySQLUpdateStatement result) {
         updateStatement.getWhere().ifPresent(whereSegment -> {
-            HmilyWhereSegment hmilyWhereSegment = new HmilyWhereSegment(whereSegment.getStartIndex(), whereSegment.getStopIndex());
+            HmilyWhereSegment hmilyWhereSegment = null;
             OrPredicateSegment orPredicateSegment = new ExpressionBuilder(whereSegment.getExpr()).extractAndPredicates();
             for (AndPredicate andPredicate : orPredicateSegment.getAndPredicates()) {
                 HmilyAndPredicate hmilyAndPredicate = new HmilyAndPredicate();
                 for (ExpressionSegment expression : andPredicate.getPredicates()) {
-                    HmilyPredicateSegment hmilyPredicateSegment = null;
                     if (expression instanceof BinaryOperationExpression && ((BinaryOperationExpression) expression).getLeft() instanceof ColumnSegment) {
                         HmilyColumnSegment hmilyColumnSegment = assembleColumnSegment((ColumnSegment) ((BinaryOperationExpression) expression).getLeft());
                         ExpressionSegment right = ((BinaryOperationExpression) expression).getRight();
                         HmilyExpressionSegment hmilyExpressionSegment;
-                        HmilyPredicateRightValue hmilyPredicateRightValue = null;
                         if (right instanceof ParameterMarkerExpressionSegment) {
                             hmilyExpressionSegment = new HmilyParameterMarkerExpressionSegment(right.getStartIndex(), right.getStopIndex(), ((ParameterMarkerExpressionSegment) right)
                                 .getParameterMarkerIndex());
-                            hmilyPredicateRightValue = new HmilyPredicateCompareRightValue(((BinaryOperationExpression) expression).getOperator(), hmilyExpressionSegment);
+                            hmilyWhereSegment = new HmilyWhereSegment(whereSegment.getStartIndex(), whereSegment.getStopIndex(), hmilyExpressionSegment);
                         }
-                        hmilyPredicateSegment = new HmilyPredicateSegment(expression.getStartIndex(), expression.getStopIndex(), hmilyColumnSegment, hmilyPredicateRightValue);
                     }
                     if (expression instanceof InExpression && ((InExpression) expression).getLeft() instanceof ColumnSegment) {
                         // TODO
@@ -169,9 +163,7 @@ public class ShardingSphereSqlParserEngine implements HmilySqlParserEngine {
                         // TODO
                         ColumnSegment column = (ColumnSegment) ((BetweenExpression) expression).getLeft();
                     }
-                    hmilyAndPredicate.getPredicates().add(hmilyPredicateSegment);
                 }
-                hmilyWhereSegment.getHmilyAndPredicates().add(hmilyAndPredicate);
             }
             result.setWhere(hmilyWhereSegment);
             
@@ -179,11 +171,10 @@ public class ShardingSphereSqlParserEngine implements HmilySqlParserEngine {
     }
     
     private HmilyColumnSegment assembleColumnSegment(final ColumnSegment column) {
-        HmilyQuoteCharacter hmilyQuoteCharacter = HmilyQuoteCharacter.getQuoteCharacter(column.getIdentifier().getQuoteCharacter().name());
-        HmilyIdentifierValue hmilyIdentifierValue = new HmilyIdentifierValue(column.getIdentifier().getValue(), hmilyQuoteCharacter);
+        HmilyIdentifierValue hmilyIdentifierValue = new HmilyIdentifierValue(column.getIdentifier().getValue());
         HmilyColumnSegment result = new HmilyColumnSegment(column.getStartIndex(), column.getStopIndex(), hmilyIdentifierValue);
         column.getOwner().ifPresent(ownerSegment -> {
-            HmilyIdentifierValue identifierValue = new HmilyIdentifierValue(ownerSegment.getIdentifier().getValue(), hmilyQuoteCharacter);
+            HmilyIdentifierValue identifierValue = new HmilyIdentifierValue(ownerSegment.getIdentifier().getValue());
             result.setOwner(new HmilyOwnerSegment(ownerSegment.getStartIndex(), ownerSegment.getStopIndex(), identifierValue));
         });
         return result;
@@ -202,13 +193,6 @@ public class ShardingSphereSqlParserEngine implements HmilySqlParserEngine {
         } else if (expression instanceof LiteralExpressionSegment) {
             result = new HmilyLiteralExpressionSegment(expression.getStartIndex(),
                 expression.getStopIndex(), ((LiteralExpressionSegment) expression).getLiterals());
-        } else if (expression instanceof BinaryOperationExpression) {
-            ExpressionSegment left = ((BinaryOperationExpression) expression).getLeft();
-            ExpressionSegment right = ((BinaryOperationExpression) expression).getRight();
-            String operator = ((BinaryOperationExpression) expression).getOperator();
-            String text = ((BinaryOperationExpression) expression).getText();
-            result = new HmilyBinaryOperationExpressionSegment(expression.getStartIndex(), expression.getStopIndex(),
-                assembleExpressionSegment(left), assembleExpressionSegment(right), operator, text);
         } else if (expression instanceof ParameterMarkerExpressionSegment) {
             result = new HmilyParameterMarkerExpressionSegment(expression.getStartIndex(),
                 expression.getStopIndex(), ((ParameterMarkerExpressionSegment) expression).getParameterMarkerIndex());
@@ -217,12 +201,12 @@ public class ShardingSphereSqlParserEngine implements HmilySqlParserEngine {
     }
     
     private HmilyInsertStatement generateHmilyInsertStatement(final InsertStatement insertStatement) {
-        HmilyInsertStatement result = new HmilyInsertStatement();
+        HmilyInsertStatement result = new HmilyMySQLInsertStatement();
         return result;
     }
     
     private HmilyDeleteStatement generateHmilyDeleteStatement(final DeleteStatement deleteStatement) {
-        HmilyDeleteStatement result = new HmilyDeleteStatement();
+        HmilyDeleteStatement result = new HmilyMySQLDeleteStatement();
         return result;
     }
 }

@@ -17,7 +17,7 @@
 
 package org.dromara.hmily.tac.sqlcompute.impl;
 
-import org.dromara.hmily.tac.sqlparser.model.segment.generic.table.HmilySimpleTableSegment;
+import org.dromara.hmily.tac.sqlparser.model.common.segment.generic.table.HmilySimpleTableSegment;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

@@ -23,7 +23,7 @@ import org.apache.shardingsphere.sql.parser.sql.common.util.ExpressionBuilder;
 import org.apache.shardingsphere.sql.parser.sql.dialect.statement.mysql.dml.MySQLUpdateStatement;
 import org.dromara.hmily.tac.common.constants.DatabaseConstant;
 import org.dromara.hmily.tac.common.database.type.MySQLDatabaseType;
-import org.dromara.hmily.tac.sqlparser.model.statement.HmilyStatement;
+import org.dromara.hmily.tac.sqlparser.model.common.statement.HmilyStatement;
 import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;

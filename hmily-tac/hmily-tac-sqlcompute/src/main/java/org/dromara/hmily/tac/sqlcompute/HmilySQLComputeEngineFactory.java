@@ -21,10 +21,10 @@ import org.dromara.hmily.tac.sqlcompute.exception.SQLComputeException;
 import org.dromara.hmily.tac.sqlcompute.impl.HmilyDeleteSQLComputeEngine;
 import org.dromara.hmily.tac.sqlcompute.impl.HmilyInsertSQLComputeEngine;
 import org.dromara.hmily.tac.sqlcompute.impl.HmilyUpdateSQLComputeEngine;
-import org.dromara.hmily.tac.sqlparser.model.statement.HmilyStatement;
-import org.dromara.hmily.tac.sqlparser.model.statement.dml.HmilyDeleteStatement;
-import org.dromara.hmily.tac.sqlparser.model.statement.dml.HmilyInsertStatement;
-import org.dromara.hmily.tac.sqlparser.model.statement.dml.HmilyUpdateStatement;
+import org.dromara.hmily.tac.sqlparser.model.common.statement.HmilyStatement;
+import org.dromara.hmily.tac.sqlparser.model.dialect.mysql.dml.HmilyMySQLDeleteStatement;
+import org.dromara.hmily.tac.sqlparser.model.dialect.mysql.dml.HmilyMySQLInsertStatement;
+import org.dromara.hmily.tac.sqlparser.model.dialect.mysql.dml.HmilyMySQLUpdateStatement;
 
 /**
  * Hmily SQL compute engine factory.
@@ -41,12 +41,12 @@ public final class HmilySQLComputeEngineFactory {
      * @throws SQLComputeException SQL compute Exception
      */
     public static HmilySQLComputeEngine newInstance(final HmilyStatement hmilyStatement) throws SQLComputeException {
-        if (hmilyStatement instanceof HmilyInsertStatement) {
-            return new HmilyInsertSQLComputeEngine((HmilyInsertStatement) hmilyStatement);
-        } else if (hmilyStatement instanceof HmilyUpdateStatement) {
-            return new HmilyUpdateSQLComputeEngine((HmilyUpdateStatement) hmilyStatement);
-        } else if (hmilyStatement instanceof HmilyDeleteStatement) {
-            return new HmilyDeleteSQLComputeEngine((HmilyDeleteStatement) hmilyStatement);
+        if (hmilyStatement instanceof HmilyMySQLInsertStatement) {
+            return new HmilyInsertSQLComputeEngine((HmilyMySQLInsertStatement) hmilyStatement);
+        } else if (hmilyStatement instanceof HmilyMySQLUpdateStatement) {
+            return new HmilyUpdateSQLComputeEngine((HmilyMySQLUpdateStatement) hmilyStatement);
+        } else if (hmilyStatement instanceof HmilyMySQLDeleteStatement) {
+            return new HmilyDeleteSQLComputeEngine((HmilyMySQLDeleteStatement) hmilyStatement);
         } else {
             throw new SQLComputeException(String.format("do not support hmily SQL compute yet, SQLStatement:{%s}.", hmilyStatement));
         }

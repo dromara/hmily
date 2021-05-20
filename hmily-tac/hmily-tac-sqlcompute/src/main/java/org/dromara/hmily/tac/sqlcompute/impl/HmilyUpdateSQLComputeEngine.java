@@ -18,22 +18,15 @@
 package org.dromara.hmily.tac.sqlcompute.impl;
 
 import com.google.common.base.Joiner;
-import com.google.common.base.Preconditions;
 import lombok.RequiredArgsConstructor;
 import org.dromara.hmily.repository.spi.entity.tuple.HmilySQLManipulation;
 import org.dromara.hmily.repository.spi.entity.tuple.HmilySQLTuple;
 import org.dromara.hmily.tac.metadata.HmilyMetaDataManager;
 import org.dromara.hmily.tac.metadata.model.TableMetaData;
-import org.dromara.hmily.tac.sqlparser.model.segment.dml.expr.HmilyExpressionSegment;
-import org.dromara.hmily.tac.sqlparser.model.segment.dml.expr.simple.HmilyParameterMarkerExpressionSegment;
-import org.dromara.hmily.tac.sqlparser.model.segment.dml.predicate.HmilyAndPredicate;
-import org.dromara.hmily.tac.sqlparser.model.segment.dml.predicate.HmilyPredicateSegment;
-import org.dromara.hmily.tac.sqlparser.model.segment.dml.predicate.value.HmilyPredicateBetweenRightValue;
-import org.dromara.hmily.tac.sqlparser.model.segment.dml.predicate.value.HmilyPredicateCompareRightValue;
-import org.dromara.hmily.tac.sqlparser.model.segment.dml.predicate.value.HmilyPredicateInRightValue;
-import org.dromara.hmily.tac.sqlparser.model.segment.dml.predicate.value.HmilyPredicateRightValue;
-import org.dromara.hmily.tac.sqlparser.model.segment.generic.table.HmilySimpleTableSegment;
-import org.dromara.hmily.tac.sqlparser.model.statement.dml.HmilyUpdateStatement;
+import org.dromara.hmily.tac.sqlparser.model.common.segment.dml.expr.HmilyExpressionSegment;
+import org.dromara.hmily.tac.sqlparser.model.common.segment.dml.expr.simple.HmilyParameterMarkerExpressionSegment;
+import org.dromara.hmily.tac.sqlparser.model.common.segment.generic.table.HmilySimpleTableSegment;
+import org.dromara.hmily.tac.sqlparser.model.dialect.mysql.dml.HmilyMySQLUpdateStatement;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -55,16 +48,16 @@ public final class HmilyUpdateSQLComputeEngine extends AbstractHmilySQLComputeEn
     
     private static final String DERIVED_COLUMN = "_DERIVED";
     
-    private final HmilyUpdateStatement sqlStatement;
+    private final HmilyMySQLUpdateStatement sqlStatement;
     
     @Override
     Collection<HmilySQLTuple> createTuples(final String sql, final List<Object> parameters, final Connection connection, final String resourceId) throws SQLException {
         Collection<HmilySQLTuple> result = new LinkedList<>();
-        Preconditions.checkState(sqlStatement.getTables().size() == 1, "Do not support multiple tables in update statement");
-        HmilySimpleTableSegment tableSegment = sqlStatement.getTables().iterator().next();
+        HmilySimpleTableSegment tableSegment = (HmilySimpleTableSegment) sqlStatement.getTableSegment();
         String tableName = sql.substring(tableSegment.getStartIndex(), tableSegment.getStopIndex() + 1);
         String selectSQL = String.format("SELECT %s FROM %s %s", Joiner.on(", ").join(getSelectItems(parameters, tableSegment)), tableName, getWhereCondition(sql));
-        Collection<Map<String, Object>> records = HmilySQLComputeUtils.executeQuery(connection, selectSQL, getWhereParameters(parameters));
+        // TODO add WhereParameters
+        Collection<Map<String, Object>> records = HmilySQLComputeUtils.executeQuery(connection, selectSQL, null);
         result.addAll(doConvert(records, HmilyMetaDataManager.get(resourceId).getTableMetaDataMap().get(tableSegment.getTableName().getIdentifier().getValue())));
         return result;
     }
@@ -79,50 +72,6 @@ public final class HmilyUpdateSQLComputeEngine extends AbstractHmilySQLComputeEn
     
     private String getWhereCondition(final String sql) {
         return sqlStatement.getWhere().map(segment -> sql.substring(segment.getStartIndex(), segment.getStopIndex() + 1)).orElse("");
-    }
-    
-    private List<Object> getWhereParameters(final List<Object> parameters) {
-        List<Object> result = new LinkedList<>();
-        sqlStatement.getWhere().ifPresent(whereSegment -> {
-            for (HmilyAndPredicate predicate : whereSegment.getHmilyAndPredicates()) {
-                result.addAll(getPredicateSegmentParameters(parameters, predicate));
-            }
-        });
-        return result;
-    }
-    
-    private List<Object> getPredicateSegmentParameters(final List<Object> parameters, final HmilyAndPredicate predicate) {
-        List<Object> result = new LinkedList<>();
-        for (HmilyPredicateSegment segment : predicate.getPredicates()) {
-            HmilyPredicateRightValue rightValue = segment.getRightValue();
-            if (rightValue instanceof HmilyPredicateBetweenRightValue) {
-                result.addAll(getPredicateBetweenRightValueParameters(parameters, (HmilyPredicateBetweenRightValue) rightValue));
-            } else if (rightValue instanceof HmilyPredicateCompareRightValue) {
-                Optional<Object> parameter = getExpressionParameter(parameters, ((HmilyPredicateCompareRightValue) rightValue).getExpression());
-                parameter.ifPresent(result::add);
-            } else if (rightValue instanceof HmilyPredicateInRightValue) {
-                result.addAll(getPredicateInRightValue(parameters, (HmilyPredicateInRightValue) rightValue));
-            }
-        }
-        return result;
-    }
-    
-    private List<Object> getPredicateBetweenRightValueParameters(final List<Object> parameters, final HmilyPredicateBetweenRightValue predicateRightValue) {
-        List<Object> result = new LinkedList<>();
-        Optional<Object> andParameter = getExpressionParameter(parameters, predicateRightValue.getAndExpression());
-        Optional<Object> betweenParameter = getExpressionParameter(parameters, predicateRightValue.getBetweenExpression());
-        andParameter.ifPresent(result::add);
-        betweenParameter.ifPresent(result::add);
-        return result;
-    }
-    
-    private List<Object> getPredicateInRightValue(final List<Object> parameters, final HmilyPredicateInRightValue predicateInRightValue) {
-        List<Object> result = new LinkedList<>();
-        for (HmilyExpressionSegment expressionSegment : predicateInRightValue.getSqlExpressions()) {
-            Optional<Object> parameter = getExpressionParameter(parameters, expressionSegment);
-            parameter.ifPresent(result::add);
-        }
-        return result;
     }
     
     private Optional<Object> getExpressionParameter(final List<Object> parameters, final HmilyExpressionSegment expressionSegment) {

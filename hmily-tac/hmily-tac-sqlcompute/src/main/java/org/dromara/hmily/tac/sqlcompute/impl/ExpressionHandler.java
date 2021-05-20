@@ -19,13 +19,12 @@ package org.dromara.hmily.tac.sqlcompute.impl;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import org.dromara.hmily.tac.sqlparser.model.segment.dml.column.HmilyColumnSegment;
-import org.dromara.hmily.tac.sqlparser.model.segment.dml.expr.HmilyExpressionSegment;
-import org.dromara.hmily.tac.sqlparser.model.segment.dml.expr.complex.HmilyBinaryOperationExpressionSegment;
-import org.dromara.hmily.tac.sqlparser.model.segment.dml.expr.complex.HmilyCommonExpressionSegment;
-import org.dromara.hmily.tac.sqlparser.model.segment.dml.expr.simple.HmilyLiteralExpressionSegment;
-import org.dromara.hmily.tac.sqlparser.model.segment.dml.expr.simple.HmilyParameterMarkerExpressionSegment;
-import org.dromara.hmily.tac.sqlparser.model.segment.dml.item.HmilyExpressionProjectionSegment;
+import org.dromara.hmily.tac.sqlparser.model.common.segment.dml.column.HmilyColumnSegment;
+import org.dromara.hmily.tac.sqlparser.model.common.segment.dml.expr.HmilyExpressionSegment;
+import org.dromara.hmily.tac.sqlparser.model.common.segment.dml.expr.complex.HmilyCommonExpressionSegment;
+import org.dromara.hmily.tac.sqlparser.model.common.segment.dml.expr.simple.HmilyLiteralExpressionSegment;
+import org.dromara.hmily.tac.sqlparser.model.common.segment.dml.expr.simple.HmilyParameterMarkerExpressionSegment;
+import org.dromara.hmily.tac.sqlparser.model.common.segment.dml.item.HmilyExpressionProjectionSegment;
 
 import java.util.List;
 
@@ -55,11 +54,6 @@ public final class ExpressionHandler {
         if (expressionSegment instanceof HmilyExpressionProjectionSegment) {
             String value = ((HmilyExpressionProjectionSegment) expressionSegment).getText();
             return "null".equals(value) ? null : value;
-        }
-        if (expressionSegment instanceof HmilyBinaryOperationExpressionSegment) {
-            Object left = getValue(parameters, ((HmilyBinaryOperationExpressionSegment) expressionSegment).getLeft());
-            Object right = getValue(parameters, ((HmilyBinaryOperationExpressionSegment) expressionSegment).getRight());
-            return String.format("%s %s %s", left, ((HmilyBinaryOperationExpressionSegment) expressionSegment).getOperator(), right);
         }
         if (expressionSegment instanceof HmilyColumnSegment) {
             return ((HmilyColumnSegment) expressionSegment).getQualifiedName();

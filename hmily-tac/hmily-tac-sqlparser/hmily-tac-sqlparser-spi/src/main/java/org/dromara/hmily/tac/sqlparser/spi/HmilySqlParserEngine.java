@@ -18,7 +18,7 @@
 package org.dromara.hmily.tac.sqlparser.spi;
 
 import org.dromara.hmily.tac.common.database.type.DatabaseType;
-import org.dromara.hmily.tac.sqlparser.model.statement.HmilyStatement;
+import org.dromara.hmily.tac.sqlparser.model.common.statement.HmilyStatement;
 import org.dromara.hmily.tac.sqlparser.spi.exception.SqlParserException;
 
 /**
