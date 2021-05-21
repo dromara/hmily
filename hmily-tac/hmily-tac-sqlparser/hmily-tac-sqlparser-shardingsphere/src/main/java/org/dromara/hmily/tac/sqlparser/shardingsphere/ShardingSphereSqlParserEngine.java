@@ -35,10 +35,10 @@ import org.apache.shardingsphere.sql.parser.sql.common.segment.generic.OwnerSegm
 import org.apache.shardingsphere.sql.parser.sql.common.segment.generic.table.SimpleTableSegment;
 import org.apache.shardingsphere.sql.parser.sql.common.segment.generic.table.TableNameSegment;
 import org.apache.shardingsphere.sql.parser.sql.common.statement.SQLStatement;
-import org.apache.shardingsphere.sql.parser.sql.common.statement.dml.DeleteStatement;
-import org.apache.shardingsphere.sql.parser.sql.common.statement.dml.InsertStatement;
-import org.apache.shardingsphere.sql.parser.sql.common.statement.dml.UpdateStatement;
 import org.apache.shardingsphere.sql.parser.sql.common.util.ExpressionBuilder;
+import org.apache.shardingsphere.sql.parser.sql.dialect.statement.mysql.dml.MySQLDeleteStatement;
+import org.apache.shardingsphere.sql.parser.sql.dialect.statement.mysql.dml.MySQLInsertStatement;
+import org.apache.shardingsphere.sql.parser.sql.dialect.statement.mysql.dml.MySQLUpdateStatement;
 import org.dromara.hmily.spi.HmilySPI;
 import org.dromara.hmily.tac.common.database.type.DatabaseType;
 import org.dromara.hmily.tac.sqlparser.model.common.segment.dml.assignment.HmilyAssignmentSegment;
@@ -81,18 +81,18 @@ public class ShardingSphereSqlParserEngine implements HmilySqlParserEngine {
     @Override
     public HmilyStatement parser(final String sql, final DatabaseType databaseType) throws SqlParserException {
         SQLStatement sqlStatement = SQLStatementParserEngineFactory.getSQLStatementParserEngine(databaseType.getName()).parse(sql, true);
-        if (sqlStatement instanceof UpdateStatement) {
-            return generateHmilyUpdateStatement((UpdateStatement) sqlStatement);
-        } else if (sqlStatement instanceof InsertStatement) {
-            return generateHmilyInsertStatement((InsertStatement) sqlStatement);
-        } else if (sqlStatement instanceof DeleteStatement) {
-            return generateHmilyDeleteStatement((DeleteStatement) sqlStatement);
+        if (sqlStatement instanceof MySQLUpdateStatement) {
+            return generateHmilyUpdateStatement((MySQLUpdateStatement) sqlStatement);
+        } else if (sqlStatement instanceof MySQLInsertStatement) {
+            return generateHmilyInsertStatement((MySQLInsertStatement) sqlStatement);
+        } else if (sqlStatement instanceof MySQLDeleteStatement) {
+            return generateHmilyDeleteStatement((MySQLDeleteStatement) sqlStatement);
         } else {
             throw new SqlParserException("Unsupported SQL Type.");
         }
     }
     
-    private HmilyUpdateStatement generateHmilyUpdateStatement(final UpdateStatement updateStatement) {
+    private HmilyUpdateStatement generateHmilyUpdateStatement(final MySQLUpdateStatement updateStatement) {
         HmilyMySQLUpdateStatement result = new HmilyMySQLUpdateStatement();
         assembleSimpleTableSegment(updateStatement, result);
         assembleSetAssignmentSegment(updateStatement, result);
@@ -102,7 +102,7 @@ public class ShardingSphereSqlParserEngine implements HmilySqlParserEngine {
         return result;
     }
     
-    private void assembleSimpleTableSegment(final UpdateStatement updateStatement, final HmilyMySQLUpdateStatement result) {
+    private void assembleSimpleTableSegment(final MySQLUpdateStatement updateStatement, final HmilyMySQLUpdateStatement result) {
         SimpleTableSegment simpleTableSegment = (SimpleTableSegment) updateStatement.getTableSegment();
         TableNameSegment tableNameSegment = simpleTableSegment.getTableName();
         HmilyIdentifierValue hmilyIdentifierValue = new HmilyIdentifierValue(tableNameSegment.getIdentifier().getValue());
@@ -126,7 +126,7 @@ public class ShardingSphereSqlParserEngine implements HmilySqlParserEngine {
         result.setTableSegment(hmilySimpleTableSegment);
     }
     
-    private void assembleSetAssignmentSegment(final UpdateStatement updateStatement, final HmilyUpdateStatement result) {
+    private void assembleSetAssignmentSegment(final MySQLUpdateStatement updateStatement, final HmilyUpdateStatement result) {
         Collection<HmilyAssignmentSegment> assignments = new LinkedList<>();
         for (AssignmentSegment each : updateStatement.getSetAssignment().getAssignments()) {
             HmilyColumnSegment hmilyColumnSegment = assembleColumnSegment(each.getColumn());
@@ -138,7 +138,7 @@ public class ShardingSphereSqlParserEngine implements HmilySqlParserEngine {
         result.setSetAssignment(hmilySetAssignmentSegment);
     }
     
-    private void assembleWhereSegment(final UpdateStatement updateStatement, final HmilyMySQLUpdateStatement result) {
+    private void assembleWhereSegment(final MySQLUpdateStatement updateStatement, final HmilyMySQLUpdateStatement result) {
         updateStatement.getWhere().ifPresent(whereSegment -> {
             HmilyWhereSegment hmilyWhereSegment = null;
             OrPredicateSegment orPredicateSegment = new ExpressionBuilder(whereSegment.getExpr()).extractAndPredicates();
@@ -200,12 +200,12 @@ public class ShardingSphereSqlParserEngine implements HmilySqlParserEngine {
         return result;
     }
     
-    private HmilyInsertStatement generateHmilyInsertStatement(final InsertStatement insertStatement) {
+    private HmilyInsertStatement generateHmilyInsertStatement(final MySQLInsertStatement insertStatement) {
         HmilyInsertStatement result = new HmilyMySQLInsertStatement();
         return result;
     }
     
-    private HmilyDeleteStatement generateHmilyDeleteStatement(final DeleteStatement deleteStatement) {
+    private HmilyDeleteStatement generateHmilyDeleteStatement(final MySQLDeleteStatement deleteStatement) {
         HmilyDeleteStatement result = new HmilyMySQLDeleteStatement();
         return result;
     }
