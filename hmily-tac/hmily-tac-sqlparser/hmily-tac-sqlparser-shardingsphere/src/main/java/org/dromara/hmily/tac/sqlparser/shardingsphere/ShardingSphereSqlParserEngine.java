@@ -56,9 +56,6 @@ import org.dromara.hmily.tac.sqlparser.model.common.segment.generic.HmilyOwnerSe
 import org.dromara.hmily.tac.sqlparser.model.common.segment.generic.table.HmilySimpleTableSegment;
 import org.dromara.hmily.tac.sqlparser.model.common.segment.generic.table.HmilyTableNameSegment;
 import org.dromara.hmily.tac.sqlparser.model.common.statement.HmilyStatement;
-import org.dromara.hmily.tac.sqlparser.model.common.statement.dml.HmilyDeleteStatement;
-import org.dromara.hmily.tac.sqlparser.model.common.statement.dml.HmilyInsertStatement;
-import org.dromara.hmily.tac.sqlparser.model.common.statement.dml.HmilyUpdateStatement;
 import org.dromara.hmily.tac.sqlparser.model.common.value.identifier.HmilyIdentifierValue;
 import org.dromara.hmily.tac.sqlparser.model.dialect.mysql.dml.HmilyMySQLDeleteStatement;
 import org.dromara.hmily.tac.sqlparser.model.dialect.mysql.dml.HmilyMySQLInsertStatement;
@@ -126,7 +123,7 @@ public class ShardingSphereSqlParserEngine implements HmilySqlParserEngine {
         result.setTableSegment(hmilySimpleTableSegment);
     }
     
-    private void assembleSetAssignmentSegment(final MySQLUpdateStatement updateStatement, final HmilyUpdateStatement result) {
+    private void assembleSetAssignmentSegment(final MySQLUpdateStatement updateStatement, final HmilyMySQLUpdateStatement result) {
         Collection<HmilyAssignmentSegment> assignments = new LinkedList<>();
         for (AssignmentSegment each : updateStatement.getSetAssignment().getAssignments()) {
             HmilyColumnSegment hmilyColumnSegment = assembleColumnSegment(each.getColumn());
