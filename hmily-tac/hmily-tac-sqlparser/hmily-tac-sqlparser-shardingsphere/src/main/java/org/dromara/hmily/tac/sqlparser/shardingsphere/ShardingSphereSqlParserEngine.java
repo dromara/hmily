@@ -92,7 +92,7 @@ public class ShardingSphereSqlParserEngine implements HmilySqlParserEngine {
         }
     }
     
-    private HmilyUpdateStatement generateHmilyUpdateStatement(final MySQLUpdateStatement updateStatement) {
+    private HmilyMySQLUpdateStatement generateHmilyUpdateStatement(final MySQLUpdateStatement updateStatement) {
         HmilyMySQLUpdateStatement result = new HmilyMySQLUpdateStatement();
         assembleSimpleTableSegment(updateStatement, result);
         assembleSetAssignmentSegment(updateStatement, result);
@@ -200,12 +200,12 @@ public class ShardingSphereSqlParserEngine implements HmilySqlParserEngine {
         return result;
     }
     
-    private HmilyInsertStatement generateHmilyInsertStatement(final MySQLInsertStatement insertStatement) {
+    private HmilyMySQLInsertStatement generateHmilyInsertStatement(final MySQLInsertStatement insertStatement) {
         HmilyMySQLInsertStatement result = new HmilyMySQLInsertStatement();
         return result;
     }
     
-    private HmilyDeleteStatement generateHmilyDeleteStatement(final MySQLDeleteStatement deleteStatement) {
+    private HmilyMySQLDeleteStatement generateHmilyDeleteStatement(final MySQLDeleteStatement deleteStatement) {
         HmilyMySQLDeleteStatement result = new HmilyMySQLDeleteStatement();
         return result;
     }
