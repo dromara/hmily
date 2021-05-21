@@ -201,12 +201,12 @@ public class ShardingSphereSqlParserEngine implements HmilySqlParserEngine {
     }
     
     private HmilyInsertStatement generateHmilyInsertStatement(final MySQLInsertStatement insertStatement) {
-        HmilyInsertStatement result = new HmilyMySQLInsertStatement();
+        HmilyMySQLInsertStatement result = new HmilyMySQLInsertStatement();
         return result;
     }
     
     private HmilyDeleteStatement generateHmilyDeleteStatement(final MySQLDeleteStatement deleteStatement) {
-        HmilyDeleteStatement result = new HmilyMySQLDeleteStatement();
+        HmilyMySQLDeleteStatement result = new HmilyMySQLDeleteStatement();
         return result;
     }
 }
