@@ -27,6 +27,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>hmily-xa-p6spy</artifactId>
+    <properties>
+        <atomikos.version>5.0.0</atomikos.version>
+    </properties>
 
     <dependencies>
         <dependency>
@@ -64,6 +67,58 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
+        </dependency>
+<!--        atomikos-->
+        <dependency>
+            <groupId>com.atomikos</groupId>
+            <artifactId>atomikos-util</artifactId>
+            <version>${atomikos.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.atomikos</groupId>
+            <artifactId>transactions</artifactId>
+            <version>${atomikos.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.atomikos</groupId>
+            <artifactId>transactions-jta</artifactId>
+            <version>${atomikos.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.atomikos</groupId>
+            <artifactId>transactions-jdbc</artifactId>
+            <version>${atomikos.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.atomikos</groupId>
+            <artifactId>transactions-api</artifactId>
+            <version>${atomikos.version}</version>
+        </dependency>
+        <!--        //分布式事务-->
+        <dependency>
+            <groupId>jotm</groupId>
+            <artifactId>jotm</artifactId>
+            <version>2.0.10</version>
+        </dependency>
+        <dependency>
+            <groupId>org.ow2.jotm</groupId>
+            <artifactId>jotm-core</artifactId>
+            <version>2.3.1-M1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.ow2.jotm</groupId>
+            <artifactId>jotm-datasource</artifactId>
+            <version>2.3.1-M1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.ow2.jotm</groupId>
+            <artifactId>jotm-standalone</artifactId>
+            <version>2.3.1-M1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.experlog</groupId>
+            <artifactId>xapool</artifactId>
+            <version>1.6-beta</version>
         </dependency>
 
         <dependency>

@@ -36,7 +36,7 @@ public class ParticipantLogEntry {
 
     private Long endBxid;
 
-    private Long endXId;
+    private Long endXid;
 
     private String url;
 

@@ -153,6 +153,7 @@ public class SubCoordinator implements Resource, Synchronization {
             case STATUS_PREPARED:
                 break;
             case STATUS_ROLLEDBACK:
+                logger.warn("state == STATUS_ROLLEDBACK");
                 return;
             default:
                 return;
@@ -259,6 +260,7 @@ public class SubCoordinator implements Resource, Synchronization {
             doCommit();
         } else if (result == Result.READONLY) {
             //这里需要处理一下.
+
         } else if (result == Result.ROLLBACK) {
             this.doRollback();
             throw new TransactionRolledbackException();
