@@ -60,11 +60,6 @@ public class InventoryServiceImpl implements InventoryService {
     }
     
     @Override
-    public Boolean decreaseTAC(final InventoryDTO inventoryDTO) {
-        return null;
-    }
-    
-    @Override
     public List<InventoryDTO> testInLine() {
         return null;
     }

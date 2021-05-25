@@ -66,23 +66,6 @@ public class OrderController {
     }
     
     /**
-     * Order pay tac string.
-     *
-     * @param count  the count
-     * @param amount the amount
-     * @return the string
-     */
-    @PostMapping(value = "/orderPayTAC")
-    @ApiOperation(value = "测试tac模式")
-    public String orderPayTAC(@RequestParam(value = "count") Integer count,
-                           @RequestParam(value = "amount") BigDecimal amount) {
-        final long start = System.currentTimeMillis();
-        orderService.saveOrderForTAC(count, amount);
-        System.out.println("消耗时间为:" + (System.currentTimeMillis() - start));
-        return "";
-    }
-    
-    /**
      * Test order pay string.
      *
      * @param count  the count
