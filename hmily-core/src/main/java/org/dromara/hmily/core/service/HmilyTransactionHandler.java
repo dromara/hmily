@@ -17,8 +17,8 @@
 
 package org.dromara.hmily.core.service;
 
-import org.dromara.hmily.core.context.HmilyTransactionContext;
 import org.aspectj.lang.ProceedingJoinPoint;
+import org.dromara.hmily.core.context.HmilyTransactionContext;
 
 /**
  * HmilyTransactionHandler.
@@ -28,12 +28,12 @@ import org.aspectj.lang.ProceedingJoinPoint;
 public interface HmilyTransactionHandler {
 
     /**
-     * aop handler.
+     * Handle hmily transaction.
      *
      * @param point                 point
      * @param hmilyTransactionContext transaction context
      * @return Object
      * @throws Throwable e
      */
-    Object handler(ProceedingJoinPoint point, HmilyTransactionContext hmilyTransactionContext) throws Throwable;
+    Object handleTransaction(ProceedingJoinPoint point, HmilyTransactionContext hmilyTransactionContext) throws Throwable;
 }

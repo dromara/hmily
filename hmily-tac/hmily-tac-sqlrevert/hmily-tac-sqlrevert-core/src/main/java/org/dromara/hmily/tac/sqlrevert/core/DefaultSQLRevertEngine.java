@@ -65,6 +65,7 @@ public class DefaultSQLRevertEngine implements HmilySQLRevertEngine {
     }
     
     private int executeUpdate(final Connection connection, final RevertSQLUnit unit) {
+        log.debug("TAC-revert-sql :::: {}", unit.toString());
         try (PreparedStatement preparedStatement = connection.prepareStatement(unit.getSql())) {
             int index = 1;
             for (Object each : unit.getParameters()) {

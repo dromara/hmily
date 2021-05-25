@@ -42,7 +42,7 @@ public final class UpdateSQLImageMapper implements SQLImageMapper {
     
     @Override
     public RevertSQLUnit cast() {
-        String sql = String.format("UPDATE %s SET %s WHERE %s",
+        String sql = String.format("UPDATE `%s` SET %s WHERE %s",
             tableName, CreateSQLUtil.getKeyValueClause(beforeImages.keySet(), ", "), CreateSQLUtil.getKeyValueClause(afterImages.keySet(), " AND "));
         List<Object> parameters = new LinkedList<>();
         parameters.addAll(beforeImages.values());

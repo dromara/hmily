@@ -19,11 +19,12 @@ package org.dromara.hmily.tac.sqlcompute.impl;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import org.dromara.hmily.tac.sqlparser.model.segment.dml.expr.HmilyExpressionSegment;
-import org.dromara.hmily.tac.sqlparser.model.segment.dml.expr.complex.HmilyCommonExpressionSegment;
-import org.dromara.hmily.tac.sqlparser.model.segment.dml.expr.simple.HmilyLiteralExpressionSegment;
-import org.dromara.hmily.tac.sqlparser.model.segment.dml.expr.simple.HmilyParameterMarkerExpressionSegment;
-import org.dromara.hmily.tac.sqlparser.model.segment.dml.item.HmilyExpressionProjectionSegment;
+import org.dromara.hmily.tac.sqlparser.model.common.segment.dml.column.HmilyColumnSegment;
+import org.dromara.hmily.tac.sqlparser.model.common.segment.dml.expr.HmilyExpressionSegment;
+import org.dromara.hmily.tac.sqlparser.model.common.segment.dml.expr.complex.HmilyCommonExpressionSegment;
+import org.dromara.hmily.tac.sqlparser.model.common.segment.dml.expr.simple.HmilyLiteralExpressionSegment;
+import org.dromara.hmily.tac.sqlparser.model.common.segment.dml.expr.simple.HmilyParameterMarkerExpressionSegment;
+import org.dromara.hmily.tac.sqlparser.model.common.segment.dml.item.HmilyExpressionProjectionSegment;
 
 import java.util.List;
 
@@ -45,10 +46,6 @@ public final class ExpressionHandler {
     public static Object getValue(final List<Object> parameters, final HmilyExpressionSegment expressionSegment) {
         if (expressionSegment instanceof HmilyCommonExpressionSegment) {
             String value = ((HmilyCommonExpressionSegment) expressionSegment).getText();
-            //FIXME shardingsphere has bug with set `set balance = balance - ?`
-            if (value.contains("?")) {
-                return value.replace("?", parameters.get(0).toString());
-            }
             return "null".equals(value) ? null : value;
         }
         if (expressionSegment instanceof HmilyParameterMarkerExpressionSegment) {
@@ -57,6 +54,9 @@ public final class ExpressionHandler {
         if (expressionSegment instanceof HmilyExpressionProjectionSegment) {
             String value = ((HmilyExpressionProjectionSegment) expressionSegment).getText();
             return "null".equals(value) ? null : value;
+        }
+        if (expressionSegment instanceof HmilyColumnSegment) {
+            return ((HmilyColumnSegment) expressionSegment).getQualifiedName();
         }
         // TODO match result type with metadata
         return ((HmilyLiteralExpressionSegment) expressionSegment).getLiterals();

@@ -54,15 +54,6 @@ public interface AccountService {
     boolean mockTryPaymentTimeout(AccountDTO accountDTO);
     
     /**
-     * Payment tac boolean.
-     *
-     * @param accountDTO the account dto
-     * @return the boolean
-     */
-    @Hmily
-    boolean paymentTAC(AccountDTO accountDTO);
-    
-    /**
      * Test payment boolean.
      *
      * @param accountDTO the account dto

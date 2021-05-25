@@ -9,6 +9,10 @@
 </p>
 
 <p align="center">
+  English | <a href="https://github.com/dromara/hmily/blob/master/README_CN.md">简体中文</a>
+</p>
+
+<p align="center">
     <a target="_blank" href="https://search.maven.org/search?q=g:org.dromara%20AND%20hmily">
         <img src="https://img.shields.io/maven-central/v/org.dromara/hmily.svg?label=maven%20central" />
     </a>
@@ -27,8 +31,8 @@
     <a href="https://codecov.io/gh/dromara/hmily">
         <img src="https://codecov.io/gh/dromara/hmily/branch/master/graph/badge.svg"/>
     </a>
-    <a target="_blank" href='https://gitee.com/shuaiqiyu/hmily/stargazers'>
-        <img src='https://gitee.com/shuaiqiyu/hmily/badge/star.svg?theme=gvp' alt='gitee stars'/>
+    <a target="_blank" href='https://gitee.com/dromara/hmily/stargazers'>
+        <img src='https://gitee.com/dromara/hmily/badge/star.svg?theme=gvp' alt='gitee stars'/>
     </a>
     <a target="_blank" href='https://github.com/dromara/hmily'>
         <img src="https://img.shields.io/github/forks/dromara/hmily.svg" alt="github forks"/>
@@ -96,11 +100,11 @@
 -------------------------------------------------------------------------------
 
 # Documentation
-[![EN doc](https://img.shields.io/badge/document-English-blue.svg)](https://dromara.org/en-us/docs/hmily/index.html)
+[![EN doc](https://img.shields.io/badge/document-English-blue.svg)](https://dromara.org/projects/hmily)
 
-[![CN doc](https://img.shields.io/badge/文档-中文版-blue.svg)](https://dromara.org/zh-cn/docs/hmily/index.html)
+[![CN doc](https://img.shields.io/badge/文档-中文版-blue.svg)](https://dromara.org/zh/projects/hmily)
 
-If you want to use it, you can refer to [Quick Start](https://dromara.org/en-us/docs/hmily/index.html)
+If you want to use it, you can refer to [Quick Start](https://dromara.org/projects/hmily)
 
 # About Hmily 
 

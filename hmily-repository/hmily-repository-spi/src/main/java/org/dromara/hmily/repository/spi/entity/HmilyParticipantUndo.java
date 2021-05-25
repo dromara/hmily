@@ -20,6 +20,7 @@ package org.dromara.hmily.repository.spi.entity;
 import com.google.common.base.Joiner;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -33,6 +34,7 @@ import java.util.stream.Collectors;
  */
 @Data
 @EqualsAndHashCode
+@ToString
 public final class HmilyParticipantUndo implements Serializable {
     
     private static final long serialVersionUID = 6869663782220867407L;

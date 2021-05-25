@@ -37,7 +37,7 @@ public interface AccountMapper {
      */
     @Update("update account set balance = balance - #{amount}," +
             " freeze_amount= freeze_amount + #{amount} ,update_time = now()" +
-            " where user_id =#{userId}  and  balance > 0  ")
+            " where user_id =#{userId}  and  balance >= #{amount}  ")
     int update(AccountDTO accountDTO);
     
     /**
@@ -47,7 +47,7 @@ public interface AccountMapper {
      * @return the int
      */
     @Update("update account set balance = balance - #{amount}, update_time = now()" +
-            " where user_id =#{userId} and balance > 0  ")
+            " where user_id =#{userId} and balance >= #{amount}  ")
     int updateTAC(AccountDTO accountDTO);
     
     /**
@@ -57,7 +57,7 @@ public interface AccountMapper {
      * @return the int
      */
     @Update("update account set balance = balance - #{amount}, update_time = now() " +
-            " where user_id =#{userId}  and  balance > 0  ")
+            " where user_id =#{userId}  and  balance >= #{amount}  ")
     int testUpdate(AccountDTO accountDTO);
     
     /**
@@ -68,7 +68,7 @@ public interface AccountMapper {
      */
     @Update("update account set " +
             " freeze_amount= freeze_amount - #{amount}" +
-            " where user_id =#{userId}  and freeze_amount >0 ")
+            " where user_id =#{userId}  and freeze_amount >= #{amount} ")
     int confirm(AccountDTO accountDTO);
     
     /**
@@ -79,7 +79,7 @@ public interface AccountMapper {
      */
     @Update("update account set balance = balance + #{amount}," +
             " freeze_amount= freeze_amount -  #{amount} " +
-            " where user_id =#{userId}  and freeze_amount >0")
+            " where user_id =#{userId}  and freeze_amount >= #{amount}")
     int cancel(AccountDTO accountDTO);
     
     /**

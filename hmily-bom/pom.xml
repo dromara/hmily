@@ -101,6 +101,7 @@
         <guice.version>4.2.3</guice.version>
         <msgpack.version>0.6.12</msgpack.version>
         <p6spy.version>3.9.1</p6spy.version>
+        <shardingsphere.version>5.0.0-alpha</shardingsphere.version>
     </properties>
 
     <dependencyManagement>
@@ -214,6 +215,17 @@
                 <groupId>org.apache.dubbo</groupId>
                 <artifactId>dubbo</artifactId>
                 <version>${apache.dubbo.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.shardingsphere</groupId>
+                <artifactId>shardingsphere-sql-parser-mysql</artifactId>
+                <version>${shardingsphere.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.shardingsphere</groupId>
+                <artifactId>shardingsphere-infra-parser</artifactId>
+                <version>${shardingsphere.version}</version>
             </dependency>
 
             <!-- baidu-brpc config-->

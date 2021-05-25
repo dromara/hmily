@@ -38,7 +38,7 @@ import org.dromara.hmily.tac.core.lock.HmilyLockManager;
 import org.dromara.hmily.tac.p6spy.threadlocal.AutoCommitThreadLocal;
 import org.dromara.hmily.tac.sqlcompute.HmilySQLComputeEngine;
 import org.dromara.hmily.tac.sqlcompute.HmilySQLComputeEngineFactory;
-import org.dromara.hmily.tac.sqlparser.model.statement.HmilyStatement;
+import org.dromara.hmily.tac.sqlparser.model.common.statement.HmilyStatement;
 import org.dromara.hmily.tac.sqlparser.spi.HmilySqlParserEngineFactory;
 
 import java.sql.Connection;
@@ -91,16 +91,21 @@ public enum HmilyExecuteTemplate {
         if (check()) {
             return;
         }
-        // TODO prepared sql will improve performance of parser engine
-        HmilyStatement statement = HmilySqlParserEngineFactory.newInstance().parser(sql, DatabaseTypes.INSTANCE.getDatabaseType());
+        HmilyStatement statement;
+        try {
+            statement = HmilySqlParserEngineFactory.newInstance().parser(sql, DatabaseTypes.INSTANCE.getDatabaseType());
+            log.debug("TAC-parse-sql ::: statement: {}", statement);
+        } catch (final Exception ex) {
+            return;
+        }
         String resourceId = ResourceIdUtils.INSTANCE.getResourceId(connectionInformation.getUrl());
         HmilySQLComputeEngine sqlComputeEngine = HmilySQLComputeEngineFactory.newInstance(statement);
-        if (null != sqlComputeEngine) {
-            HmilyDataSnapshot snapshot = sqlComputeEngine.execute(sql, parameters, connectionInformation.getConnection(), resourceId);
-            HmilyUndoContext undoContext = buildUndoContext(HmilyContextHolder.get(), snapshot, resourceId);
-            HmilyLockManager.INSTANCE.tryAcquireLocks(undoContext.getHmilyLocks());
-            HmilyUndoContextCacheManager.INSTANCE.set(undoContext);
-        }
+        HmilyDataSnapshot snapshot = sqlComputeEngine.execute(sql, parameters, connectionInformation.getConnection(), resourceId);
+        log.debug("TAC-compute-sql ::: {}", snapshot);
+        HmilyUndoContext undoContext = buildUndoContext(HmilyContextHolder.get(), snapshot, resourceId);
+        HmilyLockManager.INSTANCE.tryAcquireLocks(undoContext.getHmilyLocks());
+        log.debug("TAC-try-lock ::: {}", undoContext.getHmilyLocks());
+        HmilyUndoContextCacheManager.INSTANCE.set(undoContext);
     }
     
     private HmilyUndoContext buildUndoContext(final HmilyTransactionContext transactionContext, final HmilyDataSnapshot dataSnapshot, final String resourceId) {
@@ -123,12 +128,10 @@ public enum HmilyExecuteTemplate {
         }
         List<HmilyParticipantUndo> undoList = buildUndoList();
         for (HmilyParticipantUndo undo : undoList) {
-            //缓存
             HmilyParticipantUndoCacheManager.getInstance().cacheHmilyParticipantUndo(undo);
-            //存储
             HmilyRepositoryStorage.createHmilyParticipantUndo(undo);
         }
-        //清除
+        log.debug("TAC-persist-undo ::: {}", undoList);
         clean(connection);
     }
     

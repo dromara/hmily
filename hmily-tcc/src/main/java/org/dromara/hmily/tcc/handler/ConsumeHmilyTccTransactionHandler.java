@@ -29,7 +29,7 @@ import org.dromara.hmily.core.service.HmilyTransactionHandler;
 public class ConsumeHmilyTccTransactionHandler implements HmilyTransactionHandler {
 
     @Override
-    public Object handler(final ProceedingJoinPoint point, final HmilyTransactionContext context) throws Throwable {
+    public Object handleTransaction(final ProceedingJoinPoint point, final HmilyTransactionContext context) throws Throwable {
         return point.proceed();
     }
 }

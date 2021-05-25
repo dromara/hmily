@@ -14,14 +14,10 @@
         <version>2.1.1.RELEASE</version>
     </parent>
     <modules>
-        <module>hmily-demo-dubbo</module>
-        <module>hmily-demo-springcloud</module>
-        <module>hmily-demo-motan</module>
         <module>hmily-demo-common</module>
-        <module>hmily-demo-sofa</module>
-        <module>hmily-demo-brpc</module>
-        <module>hmily-demo-grpc</module>
-        <module>hmily-demo-tars</module>
+        <module>hmily-demo-tac</module>
+        <module>hmily-demo-tcc</module>
+        <module>hmily-demo-xa</module>
     </modules>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -133,7 +129,6 @@
             <artifactId>mysql-connector-java</artifactId>
             <version>${mysql.version}</version>
         </dependency>
-
     </dependencies>
 
     <build>

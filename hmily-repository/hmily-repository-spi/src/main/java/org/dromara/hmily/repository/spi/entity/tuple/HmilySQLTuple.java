@@ -18,7 +18,9 @@
 package org.dromara.hmily.repository.spi.entity.tuple;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.io.Serializable;
 import java.util.List;
@@ -29,19 +31,21 @@ import java.util.Map;
  *
  * @author zhaojun
  */
-@RequiredArgsConstructor
 @Getter
+@Setter
+@NoArgsConstructor
+@ToString
 public final class HmilySQLTuple implements Serializable {
     
     private static final long serialVersionUID = -5978500621198003611L;
     
-    private final String tableName;
+    private String tableName;
     
-    private final HmilySQLManipulation manipulationType;
+    private HmilySQLManipulation manipulationType;
     
-    private final List<Object> primaryKeyValues;
+    private List<Object> primaryKeyValues;
     
-    private final Map<String, Object> beforeImage;
+    private Map<String, Object> beforeImage;
     
-    private final Map<String, Object> afterImage;
+    private Map<String, Object> afterImage;
 }

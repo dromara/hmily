@@ -17,24 +17,25 @@
 
 package org.dromara.hmily.tcc.handler;
 
-import java.util.Optional;
-import java.util.function.Supplier;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.dromara.hmily.annotation.TransTypeEnum;
 import org.dromara.hmily.common.enums.HmilyActionEnum;
 import org.dromara.hmily.common.enums.HmilyRoleEnum;
 import org.dromara.hmily.core.context.HmilyContextHolder;
 import org.dromara.hmily.core.context.HmilyTransactionContext;
-import org.dromara.hmily.core.disruptor.DisruptorProviderManage;
-import org.dromara.hmily.core.disruptor.handler.HmilyTransactionExecutorHandler;
+import org.dromara.hmily.core.disruptor.HmilyDisruptor;
+import org.dromara.hmily.core.disruptor.handler.HmilyTransactionEventConsumer;
 import org.dromara.hmily.core.holder.HmilyTransactionHolder;
 import org.dromara.hmily.core.service.HmilyTransactionHandler;
-import org.dromara.hmily.core.service.HmilyTransactionHandlerAlbum;
+import org.dromara.hmily.core.service.HmilyTransactionTask;
 import org.dromara.hmily.metrics.enums.MetricsLabelEnum;
 import org.dromara.hmily.metrics.spi.MetricsHandlerFacade;
 import org.dromara.hmily.metrics.spi.MetricsHandlerFacadeEngine;
 import org.dromara.hmily.repository.spi.entity.HmilyTransaction;
 import org.dromara.hmily.tcc.executor.HmilyTccTransactionExecutor;
+
+import java.util.Optional;
+import java.util.function.Supplier;
 
 
 /**
@@ -46,16 +47,16 @@ public class StarterHmilyTccTransactionHandler implements HmilyTransactionHandle
     
     private final HmilyTccTransactionExecutor executor = HmilyTccTransactionExecutor.getInstance();
     
-    private DisruptorProviderManage<HmilyTransactionHandlerAlbum> disruptorProviderManage;
+    private HmilyDisruptor<HmilyTransactionTask> disruptor;
     
     public StarterHmilyTccTransactionHandler() {
-        disruptorProviderManage = new DisruptorProviderManage<>(new HmilyTransactionExecutorHandler(),
-                Runtime.getRuntime().availableProcessors() << 1, DisruptorProviderManage.DEFAULT_SIZE);
-        disruptorProviderManage.startup();
+        disruptor = new HmilyDisruptor<>(new HmilyTransactionEventConsumer(),
+                Runtime.getRuntime().availableProcessors() << 1, HmilyDisruptor.DEFAULT_SIZE);
+        disruptor.startup();
     }
     
     @Override
-    public Object handler(final ProceedingJoinPoint point, final HmilyTransactionContext context)
+    public Object handleTransaction(final ProceedingJoinPoint point, final HmilyTransactionContext context)
             throws Throwable {
         Object returnValue;
         Supplier<Boolean> histogramSupplier = null;
@@ -74,7 +75,7 @@ public class StarterHmilyTccTransactionHandler implements HmilyTransactionHandle
             } catch (Throwable throwable) {
                 //if exception ,execute cancel
                 final HmilyTransaction currentTransaction = HmilyTransactionHolder.getInstance().getCurrentTransaction();
-                disruptorProviderManage.getProvider().onData(() -> {
+                disruptor.getProvider().onData(() -> {
                     handlerFacade.ifPresent(metricsHandlerFacade -> metricsHandlerFacade.counterIncrement(MetricsLabelEnum.TRANSACTION_STATUS.getName(),
                             TransTypeEnum.TCC.name(), HmilyRoleEnum.START.name(), HmilyActionEnum.CANCELING.name()));
                     executor.globalCancel(currentTransaction);
@@ -83,7 +84,7 @@ public class StarterHmilyTccTransactionHandler implements HmilyTransactionHandle
             }
             //execute confirm
             final HmilyTransaction currentTransaction = HmilyTransactionHolder.getInstance().getCurrentTransaction();
-            disruptorProviderManage.getProvider().onData(() -> {
+            disruptor.getProvider().onData(() -> {
                 handlerFacade.ifPresent(metricsHandlerFacade -> metricsHandlerFacade.counterIncrement(MetricsLabelEnum.TRANSACTION_STATUS.getName(),
                         TransTypeEnum.TCC.name(), HmilyRoleEnum.START.name(), HmilyActionEnum.CONFIRMING.name()));
                 executor.globalConfirm(currentTransaction);
@@ -100,6 +101,6 @@ public class StarterHmilyTccTransactionHandler implements HmilyTransactionHandle
     
     @Override
     public void close() {
-        disruptorProviderManage.getProvider().shutdown();
+        disruptor.getProvider().shutdown();
     }
 }

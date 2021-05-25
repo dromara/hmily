@@ -17,23 +17,24 @@
 
 package org.dromara.hmily.tac.core.handler;
 
-import java.util.Optional;
-import java.util.function.Supplier;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.dromara.hmily.annotation.TransTypeEnum;
 import org.dromara.hmily.common.enums.HmilyActionEnum;
 import org.dromara.hmily.common.enums.HmilyRoleEnum;
 import org.dromara.hmily.core.context.HmilyContextHolder;
 import org.dromara.hmily.core.context.HmilyTransactionContext;
-import org.dromara.hmily.core.disruptor.DisruptorProviderManage;
-import org.dromara.hmily.core.disruptor.handler.HmilyTransactionExecutorHandler;
+import org.dromara.hmily.core.disruptor.HmilyDisruptor;
+import org.dromara.hmily.core.disruptor.handler.HmilyTransactionEventConsumer;
 import org.dromara.hmily.core.service.HmilyTransactionHandler;
-import org.dromara.hmily.core.service.HmilyTransactionHandlerAlbum;
+import org.dromara.hmily.core.service.HmilyTransactionTask;
 import org.dromara.hmily.metrics.enums.MetricsLabelEnum;
 import org.dromara.hmily.metrics.spi.MetricsHandlerFacade;
 import org.dromara.hmily.metrics.spi.MetricsHandlerFacadeEngine;
 import org.dromara.hmily.repository.spi.entity.HmilyTransaction;
-import org.dromara.hmily.tac.core.transaction.HmilyTacStarterTransaction;
+import org.dromara.hmily.tac.core.transaction.HmilyTacTransactionManager;
+
+import java.util.Optional;
+import java.util.function.Supplier;
 
 
 /**
@@ -43,54 +44,54 @@ import org.dromara.hmily.tac.core.transaction.HmilyTacStarterTransaction;
  */
 public class StarterHmilyTacTransactionHandler implements HmilyTransactionHandler, AutoCloseable {
     
-    private final HmilyTacStarterTransaction globalTransaction = HmilyTacStarterTransaction.getInstance();
+    private final HmilyTacTransactionManager tm = HmilyTacTransactionManager.getInstance();
     
-    private final DisruptorProviderManage<HmilyTransactionHandlerAlbum> disruptorProviderManage;
+    private final HmilyDisruptor<HmilyTransactionTask> disruptor;
     
     /**
      * Instantiates a new Starter hmily tac transaction handler.
      */
     public StarterHmilyTacTransactionHandler() {
-        disruptorProviderManage = new DisruptorProviderManage<>(new HmilyTransactionExecutorHandler(),
-                Runtime.getRuntime().availableProcessors() << 1, DisruptorProviderManage.DEFAULT_SIZE);
-        disruptorProviderManage.startup();
+        disruptor = new HmilyDisruptor<>(new HmilyTransactionEventConsumer(),
+                Runtime.getRuntime().availableProcessors() << 1, HmilyDisruptor.DEFAULT_SIZE);
+        disruptor.startup();
     }
     
     @Override
-    public Object handler(final ProceedingJoinPoint point, final HmilyTransactionContext context)
+    public Object handleTransaction(final ProceedingJoinPoint point, final HmilyTransactionContext context)
             throws Throwable {
         Object returnValue;
         Supplier<Boolean> histogramSupplier = null;
-        Optional<MetricsHandlerFacade> handlerFacade = MetricsHandlerFacadeEngine.load();
+        Optional<MetricsHandlerFacade> metricsFacade = MetricsHandlerFacadeEngine.load();
         try {
-            if (handlerFacade.isPresent()) {
-                handlerFacade.get().counterIncrement(MetricsLabelEnum.TRANSACTION_TOTAL.getName(), TransTypeEnum.TAC.name());
-                histogramSupplier = handlerFacade.get().histogramStartTimer(MetricsLabelEnum.TRANSACTION_LATENCY.getName(), TransTypeEnum.TAC.name());
+            if (metricsFacade.isPresent()) {
+                metricsFacade.get().counterIncrement(MetricsLabelEnum.TRANSACTION_TOTAL.getName(), TransTypeEnum.TAC.name());
+                histogramSupplier = metricsFacade.get().histogramStartTimer(MetricsLabelEnum.TRANSACTION_LATENCY.getName(), TransTypeEnum.TAC.name());
             }
-            globalTransaction.begin();
+            tm.begin();
             try {
                 //execute try
                 returnValue = point.proceed();
             } catch (Throwable throwable) {
                 //if exception ,execute cancel
-                final HmilyTransaction currentTransaction = globalTransaction.getHmilyTransaction();
-                disruptorProviderManage.getProvider().onData(() -> {
-                    handlerFacade.ifPresent(metricsHandlerFacade -> metricsHandlerFacade.counterIncrement(MetricsLabelEnum.TRANSACTION_STATUS.getName(),
+                final HmilyTransaction currentTransaction = tm.getHmilyTransaction();
+                disruptor.getProvider().onData(() -> {
+                    metricsFacade.ifPresent(metricsHandlerFacade -> metricsHandlerFacade.counterIncrement(MetricsLabelEnum.TRANSACTION_STATUS.getName(),
                             TransTypeEnum.TAC.name(), HmilyRoleEnum.START.name(), HmilyActionEnum.CANCELING.name()));
-                    globalTransaction.rollback(currentTransaction);
+                    tm.rollback(currentTransaction);
                 });
                 throw throwable;
             }
             // execute confirm
-            final HmilyTransaction currentTransaction = globalTransaction.getHmilyTransaction();
-            disruptorProviderManage.getProvider().onData(() -> {
-                handlerFacade.ifPresent(metricsHandlerFacade -> metricsHandlerFacade.counterIncrement(MetricsLabelEnum.TRANSACTION_STATUS.getName(),
+            final HmilyTransaction currentTransaction = tm.getHmilyTransaction();
+            disruptor.getProvider().onData(() -> {
+                metricsFacade.ifPresent(metricsHandlerFacade -> metricsHandlerFacade.counterIncrement(MetricsLabelEnum.TRANSACTION_STATUS.getName(),
                         TransTypeEnum.TAC.name(), HmilyRoleEnum.START.name(), HmilyActionEnum.CONFIRMING.name()));
-                globalTransaction.commit(currentTransaction);
+                tm.commit(currentTransaction);
             });
         } finally {
             HmilyContextHolder.remove();
-            globalTransaction.remove();
+            tm.remove();
             if (null != histogramSupplier) {
                 histogramSupplier.get();
             }
@@ -100,6 +101,6 @@ public class StarterHmilyTacTransactionHandler implements HmilyTransactionHandle
     
     @Override
     public void close() {
-        disruptorProviderManage.getProvider().shutdown();
+        disruptor.getProvider().shutdown();
     }
 }

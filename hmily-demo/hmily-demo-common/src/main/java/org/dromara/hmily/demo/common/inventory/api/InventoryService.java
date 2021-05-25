@@ -41,15 +41,6 @@ public interface InventoryService {
     Boolean decrease(InventoryDTO inventoryDTO);
     
     /**
-     * Decrease tac boolean.
-     *
-     * @param inventoryDTO the inventory dto
-     * @return the boolean
-     */
-    @Hmily
-    Boolean decreaseTAC(InventoryDTO inventoryDTO);
-    
-    /**
      * Test in line list.
      *
      * @return the list

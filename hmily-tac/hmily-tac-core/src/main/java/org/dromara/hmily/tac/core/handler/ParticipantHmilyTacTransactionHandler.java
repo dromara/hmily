@@ -17,9 +17,6 @@
 
 package org.dromara.hmily.tac.core.handler;
 
-import java.lang.reflect.Method;
-import java.util.List;
-import java.util.Objects;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.dromara.hmily.annotation.TransTypeEnum;
@@ -34,7 +31,11 @@ import org.dromara.hmily.core.service.HmilyTransactionHandler;
 import org.dromara.hmily.metrics.enums.MetricsLabelEnum;
 import org.dromara.hmily.metrics.spi.MetricsHandlerFacadeEngine;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipant;
-import org.dromara.hmily.tac.core.transaction.HmilyTacParticipantTransaction;
+import org.dromara.hmily.tac.core.transaction.HmilyTacParticipantCoordinator;
+
+import java.lang.reflect.Method;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * Participant Handler.
@@ -43,15 +44,15 @@ import org.dromara.hmily.tac.core.transaction.HmilyTacParticipantTransaction;
  */
 public class ParticipantHmilyTacTransactionHandler implements HmilyTransactionHandler {
     
-    private final HmilyTacParticipantTransaction executor = HmilyTacParticipantTransaction.getInstance();
+    private final HmilyTacParticipantCoordinator coordinator = HmilyTacParticipantCoordinator.getInstance();
     
     @Override
-    public Object handler(final ProceedingJoinPoint point, final HmilyTransactionContext context) throws Throwable {
+    public Object handleTransaction(final ProceedingJoinPoint point, final HmilyTransactionContext context) throws Throwable {
         HmilyParticipant hmilyParticipant = null;
         switch (HmilyActionEnum.acquireByCode(context.getAction())) {
             case TRYING:
                 try {
-                    hmilyParticipant = executor.beginParticipant(context, point);
+                    hmilyParticipant = coordinator.beginParticipant(context, point);
                     final Object proceed = point.proceed();
                     hmilyParticipant.setStatus(HmilyActionEnum.TRYING.getCode());
                     //update log status to try
@@ -71,13 +72,13 @@ public class ParticipantHmilyTacTransactionHandler implements HmilyTransactionHa
                 MetricsHandlerFacadeEngine.load().ifPresent(metricsHandlerFacade -> metricsHandlerFacade.counterIncrement(MetricsLabelEnum.TRANSACTION_STATUS.getName(),
                         TransTypeEnum.TAC.name(), HmilyRoleEnum.PARTICIPANT.name(), HmilyActionEnum.CONFIRMING.name()));
                 List<HmilyParticipant> confirmList = HmilyParticipantCacheManager.getInstance().get(context.getParticipantId());
-                executor.commitParticipant(confirmList, context.getParticipantId());
+                coordinator.commitParticipant(confirmList, context.getParticipantId());
                 break;
             case CANCELING:
                 MetricsHandlerFacadeEngine.load().ifPresent(metricsHandlerFacade -> metricsHandlerFacade.counterIncrement(MetricsLabelEnum.TRANSACTION_STATUS.getName(),
                         TransTypeEnum.TAC.name(), HmilyRoleEnum.PARTICIPANT.name(), HmilyActionEnum.CANCELING.name()));
                 List<HmilyParticipant> cancelList = HmilyParticipantCacheManager.getInstance().get(context.getParticipantId());
-                executor.rollbackParticipant(cancelList, context.getParticipantId());
+                coordinator.rollbackParticipant(cancelList, context.getParticipantId());
                 break;
             default:
                 break;
