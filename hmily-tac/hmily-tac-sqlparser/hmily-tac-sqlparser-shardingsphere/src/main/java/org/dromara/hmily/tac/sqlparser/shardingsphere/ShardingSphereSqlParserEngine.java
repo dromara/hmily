@@ -46,7 +46,7 @@ import org.dromara.hmily.tac.sqlparser.spi.HmilySqlParserEngine;
 import org.dromara.hmily.tac.sqlparser.spi.exception.SqlParserException;
 
 /**
- * The type ShardingSphere SQL parser engine.
+ * ShardingSphere SQL parser engine.
  *
  * @author xiaoyu
  */
