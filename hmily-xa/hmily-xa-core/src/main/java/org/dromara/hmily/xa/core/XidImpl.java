@@ -29,7 +29,7 @@ import java.util.concurrent.atomic.AtomicLong;
  *
  * @author sixh chenbin
  */
-public class XIdImpl implements Xid {
+public class XidImpl implements Xid {
 
     private static final Integer DEF_ID = 8808;
 
@@ -51,7 +51,7 @@ public class XIdImpl implements Xid {
     /**
      * Instantiates a new X id.
      */
-    public XIdImpl() {
+    public XidImpl() {
         Long id = XID.getAndIncrement();
         String bid = "0";
         String newId = id + "-" + bid + "-" + NetUtils.getLocalIp();
@@ -66,7 +66,7 @@ public class XIdImpl implements Xid {
      *
      * @param xId the x id
      */
-    public XIdImpl(final XIdImpl xId) {
+    public XidImpl(final XidImpl xId) {
         String bid;
         String gid;
         List<String> xxIdx = Splitter.on("-").splitToList(xId.getGlobalId());
@@ -85,7 +85,7 @@ public class XIdImpl implements Xid {
      * @param xId   the x id
      * @param index the index
      */
-    public XIdImpl(final XIdImpl xId, final Integer index) {
+    public XidImpl(final XidImpl xId, final Integer index) {
         String bid;
         String gid;
         List<String> xxIdx = Splitter.on("-").splitToList(xId.getGlobalId());
@@ -96,6 +96,18 @@ public class XIdImpl implements Xid {
         this.branchIdByte = newId.getBytes();
         this.globalId = xId.getGlobalId();
         this.globalIdByte = xId.globalIdByte;
+    }
+
+    /**
+     * Instantiates a new X id.
+     *
+     * @param xid the xid
+     */
+    public XidImpl(final Xid xid) {
+        this.globalIdByte = xid.getGlobalTransactionId ();
+        this.branchIdByte = xid.getBranchQualifier ();
+        this.globalId = new String(xid.getGlobalTransactionId ());
+        this.branchId= new String(xid.getBranchQualifier ());
     }
 
 
@@ -137,8 +149,8 @@ public class XIdImpl implements Xid {
      *
      * @return the x id
      */
-    public XIdImpl newBranchId() {
-        return new XIdImpl(this);
+    public XidImpl newBranchId() {
+        return new XidImpl(this);
     }
 
     /**
@@ -147,8 +159,8 @@ public class XIdImpl implements Xid {
      * @param index the index
      * @return the x id
      */
-    public XIdImpl newResId(final int index) {
-        return new XIdImpl(this, index);
+    public XidImpl newResId(final int index) {
+        return new XidImpl(this, index);
     }
 
     @Override

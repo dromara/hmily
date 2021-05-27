@@ -17,9 +17,11 @@
 
 package org.dromara.hmily.xa.core.recovery;
 
+import javax.transaction.xa.XAResource;
+
 /**
  * XaResourceRecovery .
- * 事务恢复的处理.
+ * Transaction recovery processing.
  *
  * @author sixh chenbin
  */
@@ -38,4 +40,11 @@ public interface XaResourceRecovery {
      * @param recoveryLog the recovery log
      */
     void rollbackLog(RecoveryLog recoveryLog);
+
+    /**
+     * 开始一个事务的恢复.
+     *
+     * @param resource the resource
+     */
+    void recover(XAResource resource);
 }

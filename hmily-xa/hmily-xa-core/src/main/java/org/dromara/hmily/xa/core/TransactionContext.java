@@ -26,7 +26,7 @@ public class TransactionContext {
 
     private Coordinator coordinator;
 
-    private final XIdImpl xId;
+    private final XidImpl xId;
 
     private Finally oneFinally;
 
@@ -36,7 +36,7 @@ public class TransactionContext {
      * @param coordinator the coordinator
      * @param xId         the x id
      */
-    public TransactionContext(final Coordinator coordinator, final XIdImpl xId) {
+    public TransactionContext(final Coordinator coordinator, final XidImpl xId) {
         this.coordinator = coordinator;
         this.xId = xId;
         if (coordinator != null) {
@@ -76,7 +76,7 @@ public class TransactionContext {
      *
      * @return the id
      */
-    public XIdImpl getXid() {
+    public XidImpl getXid() {
         return xId;
     }
 

@@ -18,7 +18,11 @@
 package org.dromara.hmily.xa.core.recovery;
 
 import lombok.Data;
+import org.dromara.hmily.repository.spi.entity.HmilyXaRecovery;
+import org.dromara.hmily.repository.spi.entity.HmilyXaRecoveryImpl;
 import org.dromara.hmily.xa.core.XaState;
+
+import java.time.LocalDateTime;
 
 /**
  * CoordinatorLogEntry .
@@ -26,7 +30,7 @@ import org.dromara.hmily.xa.core.XaState;
  * @author sixh chenbin
  */
 @Data
-public class CoordinatorLogEntry {
+public class CoordinatorLogEntry extends RecoveryLog {
 
     private String globalId;
 
@@ -40,5 +44,20 @@ public class CoordinatorLogEntry {
 
     private XaState state;
 
-    private Boolean isCoordinator = true;
+    private String tmName;
+
+    @Override
+    public HmilyXaRecovery getRecovery() {
+        HmilyXaRecoveryImpl recovery = new HmilyXaRecoveryImpl();
+        recovery.setVersion(1);
+        recovery.setIsCoordinator(true);
+        recovery.setState(state.getState());
+        recovery.setTmUnique(tmName);
+        recovery.setSuperId(superCoordinatorId);
+        recovery.setUpdateTime(LocalDateTime.now());
+        recovery.setEndXid(endXid);
+        recovery.setGlobalId(globalId);
+        recovery.setBranchId(branchId);
+        return recovery;
+    }
 }

@@ -21,8 +21,8 @@ import org.dromara.hmily.common.concurrent.HmilyThreadFactory;
 import java.util.concurrent.TimeUnit;
 
 /**
- * 实现一个关于时间的过期的缓存；当缓存的对象到期后，
- * 自动推送数据给相应的监听器。进行后续处理.
+ * Implement an expired cache about time; when the cached object expires,
+ * automatically push data to the corresponding listener. Perform follow-up processing.
  *
  * @param <V> the type parameter
  * @author chenbin
@@ -30,31 +30,31 @@ import java.util.concurrent.TimeUnit;
 public class HmilyTimer<V> {
 
     /**
-     * 过期时间.
+     * expire date.
      */
     private final long expire;
 
     /**
-     * 环形时间队列.
+     * circular time queue.
      */
     private final HashedWheelTimer timer;
 
     /**
-     * 增加监听器.
+     * add listener.
      */
     private TimerRemovalListener<V> timerRemovalListener;
 
     /**
-     * 超时的时间单位.
+     * Time unit of timeout.
      */
     private final TimeUnit unit;
 
     /**
-     * 生成一个过期缓存对象.
+     * Generate an expired cache object.
      *
-     * @param expire    执行；
-     * @param unit      时间单位；
-     * @param cacheName 设置一个缓存的名字；
+     * @param expire    carried out；
+     * @param unit      time unit；
+     * @param cacheName cache name；
      */
     public HmilyTimer(long expire, TimeUnit unit, String cacheName) {
         this.expire = expire;

@@ -48,7 +48,7 @@ public class HmilyXaTransactionManager implements TransactionManager {
      */
     private final ThreadLocal<Stack<Transaction>> tms = new ThreadLocal<>();
 
-    private final Map<XIdImpl, Transaction> xidTransactionMap = new ConcurrentHashMap<>();
+    private final Map<XidImpl, Transaction> xidTransactionMap = new ConcurrentHashMap<>();
 
     /**
      * Instantiates a new Hmily xa transaction manager.
@@ -168,7 +168,7 @@ public class HmilyXaTransactionManager implements TransactionManager {
             TransactionImpl tx = (TransactionImpl) rct;
             rct = tx.createSubTransaction();
         } else {
-            XIdImpl xId = new XIdImpl();
+            XidImpl xId = new XidImpl();
             //Main business coordinator
             rct = new TransactionImpl(xId);
         }

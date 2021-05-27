@@ -292,7 +292,7 @@ public class SubCoordinator implements Resource, Synchronization {
      * @param xId the x id
      * @return the x id
      */
-    public synchronized XIdImpl nextXid(final XIdImpl xId) {
+    public synchronized XidImpl nextXid(final XidImpl xId) {
         return xId.newResId(this.resources.size() + 1);
     }
 

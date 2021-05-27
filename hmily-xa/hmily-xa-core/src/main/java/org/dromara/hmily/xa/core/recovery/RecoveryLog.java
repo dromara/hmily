@@ -17,12 +17,20 @@
 
 package org.dromara.hmily.xa.core.recovery;
 
+import org.dromara.hmily.repository.spi.entity.HmilyXaRecovery;
+
 /**
  * RecoveryLog .
  * 恢复的日志处理.
  *
  * @author sixh chenbin
  */
-public class RecoveryLog {
+public abstract class RecoveryLog {
 
+    /**
+     * Gets recovery.
+     *
+     * @return the recovery
+     */
+    public abstract HmilyXaRecovery getRecovery();
 }

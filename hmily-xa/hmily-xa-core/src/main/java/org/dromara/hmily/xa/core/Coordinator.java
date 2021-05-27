@@ -43,7 +43,7 @@ public class Coordinator implements Resource, Finally, TimerRemovalListener<Reso
      */
     private final Vector<Resource> coordinators = new Vector<>();
 
-    private final XIdImpl xid;
+    private final XidImpl xid;
 
     private XaState state = XaState.STATUS_ACTIVE;
 
@@ -63,7 +63,7 @@ public class Coordinator implements Resource, Finally, TimerRemovalListener<Reso
      *
      * @param xid the xid
      */
-    public Coordinator(final XIdImpl xid) {
+    public Coordinator(final XidImpl xid) {
         this.xid = xid;
         date = LocalDateTime.now();
         //主事务的问题处理.
@@ -153,7 +153,7 @@ public class Coordinator implements Resource, Finally, TimerRemovalListener<Reso
     }
 
     private Result doPrepare() {
-        // 开始 1pc.
+        // start 1pc.
         Result rs = Result.READONLY;
         if (coordinators.size() == 0) {
             state = XaState.STATUS_COMMITTED;

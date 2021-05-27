@@ -46,7 +46,7 @@ public class TransactionImpl implements Transaction, TimerRemovalListener<Resour
 
     private final Logger logger = LoggerFactory.getLogger(TransactionImpl.class);
 
-    private final XIdImpl xid;
+    private final XidImpl xid;
 
     private SubCoordinator subCoordinator;
 
@@ -61,7 +61,7 @@ public class TransactionImpl implements Transaction, TimerRemovalListener<Resour
      *
      * @param xId the x id
      */
-    TransactionImpl(final XIdImpl xId) {
+    TransactionImpl(final XidImpl xId) {
         this.xid = xId;
         context = new TransactionContext(null, xId);
         //todo:这里还要设置超时器.
@@ -172,7 +172,7 @@ public class TransactionImpl implements Transaction, TimerRemovalListener<Resour
                 throw new SystemException("not create subCoordinator");
             }
         }
-        XIdImpl resId = this.subCoordinator.nextXid(this.xid);
+        XidImpl resId = this.subCoordinator.nextXid(this.xid);
         HmilyXaResource hmilyXaResource = new HmilyXaResource(resId, xaResource);
         boolean found = subCoordinator.addXaResource(hmilyXaResource);
         int flag = found ? XAResource.TMJOIN : XAResource.TMNOFLAGS;
@@ -263,7 +263,7 @@ public class TransactionImpl implements Transaction, TimerRemovalListener<Resour
      *
      * @return the xid
      */
-    public XIdImpl getXid() {
+    public XidImpl getXid() {
         return xid;
     }
 
