@@ -27,7 +27,7 @@ import java.util.List;
  *
  * @author sixh chenbin
  */
-public interface HmilyXaRepository {
+public interface HmilyXaRepository extends HmilyRepository {
 
     /**
      * Query by tm unique list.
