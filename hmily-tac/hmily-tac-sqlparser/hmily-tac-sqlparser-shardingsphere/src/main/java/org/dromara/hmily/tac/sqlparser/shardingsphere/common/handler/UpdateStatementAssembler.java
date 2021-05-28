@@ -27,22 +27,20 @@ import org.apache.shardingsphere.sql.parser.sql.common.segment.dml.expr.complex.
 import org.apache.shardingsphere.sql.parser.sql.common.segment.dml.expr.simple.LiteralExpressionSegment;
 import org.apache.shardingsphere.sql.parser.sql.common.segment.dml.expr.simple.ParameterMarkerExpressionSegment;
 import org.apache.shardingsphere.sql.parser.sql.common.segment.dml.item.ExpressionProjectionSegment;
-import org.apache.shardingsphere.sql.parser.sql.common.segment.dml.predicate.AndPredicate;
-import org.apache.shardingsphere.sql.parser.sql.common.segment.dml.predicate.OrPredicateSegment;
+import org.apache.shardingsphere.sql.parser.sql.common.segment.dml.predicate.WhereSegment;
 import org.apache.shardingsphere.sql.parser.sql.common.segment.generic.OwnerSegment;
 import org.apache.shardingsphere.sql.parser.sql.common.segment.generic.table.SimpleTableSegment;
 import org.apache.shardingsphere.sql.parser.sql.common.segment.generic.table.TableNameSegment;
 import org.apache.shardingsphere.sql.parser.sql.common.statement.dml.UpdateStatement;
-import org.apache.shardingsphere.sql.parser.sql.common.util.ExpressionBuilder;
 import org.dromara.hmily.tac.sqlparser.model.common.segment.dml.assignment.HmilyAssignmentSegment;
 import org.dromara.hmily.tac.sqlparser.model.common.segment.dml.assignment.HmilySetAssignmentSegment;
 import org.dromara.hmily.tac.sqlparser.model.common.segment.dml.column.HmilyColumnSegment;
+import org.dromara.hmily.tac.sqlparser.model.common.segment.dml.expr.HmilyBinaryOperationExpression;
 import org.dromara.hmily.tac.sqlparser.model.common.segment.dml.expr.HmilyExpressionSegment;
 import org.dromara.hmily.tac.sqlparser.model.common.segment.dml.expr.complex.HmilyCommonExpressionSegment;
 import org.dromara.hmily.tac.sqlparser.model.common.segment.dml.expr.simple.HmilyLiteralExpressionSegment;
 import org.dromara.hmily.tac.sqlparser.model.common.segment.dml.expr.simple.HmilyParameterMarkerExpressionSegment;
 import org.dromara.hmily.tac.sqlparser.model.common.segment.dml.item.HmilyExpressionProjectionSegment;
-import org.dromara.hmily.tac.sqlparser.model.common.segment.dml.predicate.HmilyAndPredicate;
 import org.dromara.hmily.tac.sqlparser.model.common.segment.dml.predicate.HmilyWhereSegment;
 import org.dromara.hmily.tac.sqlparser.model.common.segment.generic.HmilyAliasSegment;
 import org.dromara.hmily.tac.sqlparser.model.common.segment.generic.HmilyOwnerSegment;
@@ -64,15 +62,16 @@ public final class UpdateStatementAssembler {
      * @return hmily update statement
      */
     public static HmilyUpdateStatement assembleHmilyUpdateStatement(final UpdateStatement updateStatement, final HmilyUpdateStatement hmilyUpdateStatement) {
-        assembleSimpleTableSegment(updateStatement, hmilyUpdateStatement);
-        assembleSetAssignmentSegment(updateStatement, hmilyUpdateStatement);
-        if (updateStatement.getWhere().isPresent()) {
-            assembleWhereSegment(updateStatement, hmilyUpdateStatement);
-        }
+        HmilySimpleTableSegment hmilySimpleTableSegment = assembleHmilySimpleTableSegment(updateStatement);
+        HmilySetAssignmentSegment hmilySetAssignmentSegment = assembleHmilySetAssignmentSegment(updateStatement);
+        HmilyWhereSegment hmilyWhereSegment = assembleHmilyWhereSegment(updateStatement);
+        hmilyUpdateStatement.setTableSegment(hmilySimpleTableSegment);
+        hmilyUpdateStatement.setSetAssignment(hmilySetAssignmentSegment);
+        hmilyUpdateStatement.setWhere(hmilyWhereSegment);
         return hmilyUpdateStatement;
     }
     
-    private static void assembleSimpleTableSegment(final UpdateStatement updateStatement, final HmilyUpdateStatement hmilyUpdateStatement) {
+    private static HmilySimpleTableSegment assembleHmilySimpleTableSegment(final UpdateStatement updateStatement) {
         SimpleTableSegment simpleTableSegment = (SimpleTableSegment) updateStatement.getTableSegment();
         TableNameSegment tableNameSegment = simpleTableSegment.getTableName();
         HmilyIdentifierValue hmilyIdentifierValue = new HmilyIdentifierValue(tableNameSegment.getIdentifier().getValue());
@@ -93,53 +92,36 @@ public final class UpdateStatementAssembler {
         HmilySimpleTableSegment hmilySimpleTableSegment = new HmilySimpleTableSegment(hmilyTableNameSegment);
         hmilySimpleTableSegment.setOwner(hmilyOwnerSegment);
         hmilySimpleTableSegment.setAlias(hmilyAliasSegment);
-        hmilyUpdateStatement.setTableSegment(hmilySimpleTableSegment);
+        return hmilySimpleTableSegment;
     }
     
-    private static void assembleSetAssignmentSegment(final UpdateStatement updateStatement, final HmilyUpdateStatement result) {
+    private static HmilySetAssignmentSegment assembleHmilySetAssignmentSegment(final UpdateStatement updateStatement) {
         Collection<HmilyAssignmentSegment> assignments = new LinkedList<>();
         for (AssignmentSegment each : updateStatement.getSetAssignment().getAssignments()) {
-            HmilyColumnSegment hmilyColumnSegment = assembleColumnSegment(each.getColumn());
-            HmilyAssignmentSegment hmilyAssignmentSegment = new HmilyAssignmentSegment(each.getStartIndex(), each.getStopIndex(), hmilyColumnSegment, assembleExpressionSegment(each.getValue()));
+            HmilyColumnSegment hmilyColumnSegment = assembleHmilyColumnSegment(each.getColumn());
+            HmilyAssignmentSegment hmilyAssignmentSegment = new HmilyAssignmentSegment(each.getStartIndex(), each.getStopIndex(), hmilyColumnSegment, assembleHmilyExpressionSegment(each.getValue()));
             assignments.add(hmilyAssignmentSegment);
         }
-        HmilySetAssignmentSegment hmilySetAssignmentSegment = new HmilySetAssignmentSegment(updateStatement.getSetAssignment().getStartIndex(),
+        return new HmilySetAssignmentSegment(updateStatement.getSetAssignment().getStartIndex(),
                 updateStatement.getSetAssignment().getStopIndex(), assignments);
-        result.setSetAssignment(hmilySetAssignmentSegment);
     }
     
-    private static void assembleWhereSegment(final UpdateStatement updateStatement, final HmilyUpdateStatement result) {
-        updateStatement.getWhere().ifPresent(whereSegment -> {
-            HmilyWhereSegment hmilyWhereSegment = null;
-            OrPredicateSegment orPredicateSegment = new ExpressionBuilder(whereSegment.getExpr()).extractAndPredicates();
-            for (AndPredicate andPredicate : orPredicateSegment.getAndPredicates()) {
-                HmilyAndPredicate hmilyAndPredicate = new HmilyAndPredicate();
-                for (ExpressionSegment expression : andPredicate.getPredicates()) {
-                    if (expression instanceof BinaryOperationExpression && ((BinaryOperationExpression) expression).getLeft() instanceof ColumnSegment) {
-                        HmilyColumnSegment hmilyColumnSegment = assembleColumnSegment((ColumnSegment) ((BinaryOperationExpression) expression).getLeft());
-                        ExpressionSegment right = ((BinaryOperationExpression) expression).getRight();
-                        HmilyExpressionSegment hmilyExpressionSegment;
-                        if (right instanceof ParameterMarkerExpressionSegment) {
-                            hmilyExpressionSegment = new HmilyParameterMarkerExpressionSegment(right.getStartIndex(), right.getStopIndex(), ((ParameterMarkerExpressionSegment) right)
-                                    .getParameterMarkerIndex());
-                            hmilyWhereSegment = new HmilyWhereSegment(whereSegment.getStartIndex(), whereSegment.getStopIndex(), hmilyExpressionSegment);
-                        }
-                    }
-                    if (expression instanceof InExpression && ((InExpression) expression).getLeft() instanceof ColumnSegment) {
-                        // TODO
-                        ColumnSegment column = (ColumnSegment) ((InExpression) expression).getLeft();
-                    }
-                    if (expression instanceof BetweenExpression && ((BetweenExpression) expression).getLeft() instanceof ColumnSegment) {
-                        // TODO
-                        ColumnSegment column = (ColumnSegment) ((BetweenExpression) expression).getLeft();
-                    }
-                }
-            }
-            result.setWhere(hmilyWhereSegment);
-        });
+    private static HmilyWhereSegment assembleHmilyWhereSegment(final UpdateStatement updateStatement) {
+        WhereSegment whereSegment;
+        if (updateStatement.getWhere().isPresent()) {
+            whereSegment = updateStatement.getWhere().get();
+        } else {
+            return null;
+        }
+        HmilyExpressionSegment hmilyExpressionSegment = assembleHmilyExpressionSegment(whereSegment.getExpr());
+        return new HmilyWhereSegment(whereSegment.getStartIndex(), whereSegment.getStopIndex(), hmilyExpressionSegment);
     }
     
-    private static HmilyColumnSegment assembleColumnSegment(final ColumnSegment column) {
+    private static HmilyParameterMarkerExpressionSegment assembleHmilyParameterMarkerExpressionSegment(final ExpressionSegment right) {
+        return new HmilyParameterMarkerExpressionSegment(right.getStartIndex(), right.getStopIndex(), ((ParameterMarkerExpressionSegment) right).getParameterMarkerIndex());
+    }
+    
+    private static HmilyColumnSegment assembleHmilyColumnSegment(final ColumnSegment column) {
         HmilyIdentifierValue hmilyIdentifierValue = new HmilyIdentifierValue(column.getIdentifier().getValue());
         HmilyColumnSegment result = new HmilyColumnSegment(column.getStartIndex(), column.getStopIndex(), hmilyIdentifierValue);
         column.getOwner().ifPresent(ownerSegment -> {
@@ -148,11 +130,17 @@ public final class UpdateStatementAssembler {
         });
         return result;
     }
-    
-    private static HmilyExpressionSegment assembleExpressionSegment(final ExpressionSegment expression) {
+
+    private static HmilyExpressionSegment assembleHmilyExpressionSegment(final ExpressionSegment expression) {
         HmilyExpressionSegment result = null;
-        if (expression instanceof ColumnSegment) {
-            result = assembleColumnSegment((ColumnSegment) expression);
+        if (expression instanceof BinaryOperationExpression && ((BinaryOperationExpression) expression).getLeft() instanceof ColumnSegment
+                && ((BinaryOperationExpression) expression).getRight() instanceof ParameterMarkerExpressionSegment) {
+            HmilyColumnSegment hmilyLeft = assembleHmilyColumnSegment((ColumnSegment) ((BinaryOperationExpression) expression).getLeft());
+            HmilyParameterMarkerExpressionSegment hmilyRight = assembleHmilyParameterMarkerExpressionSegment(((BinaryOperationExpression) expression).getRight());
+            result = new HmilyBinaryOperationExpression(expression.getStartIndex(), expression.getStopIndex(), hmilyLeft, hmilyRight,
+                    ((BinaryOperationExpression) expression).getOperator(), ((BinaryOperationExpression) expression).getText());
+        } else if (expression instanceof ColumnSegment) {
+            result = assembleHmilyColumnSegment((ColumnSegment) expression);
         } else if (expression instanceof CommonExpressionSegment) {
             result = new HmilyCommonExpressionSegment(expression.getStartIndex(),
                     expression.getStopIndex(), ((CommonExpressionSegment) expression).getText());
@@ -165,8 +153,13 @@ public final class UpdateStatementAssembler {
         } else if (expression instanceof ParameterMarkerExpressionSegment) {
             result = new HmilyParameterMarkerExpressionSegment(expression.getStartIndex(),
                     expression.getStopIndex(), ((ParameterMarkerExpressionSegment) expression).getParameterMarkerIndex());
+        } else if (expression instanceof InExpression && ((InExpression) expression).getLeft() instanceof ColumnSegment) {
+            // TODO
+            ColumnSegment column = (ColumnSegment) ((InExpression) expression).getLeft();
+        } else if (expression instanceof BetweenExpression && ((BetweenExpression) expression).getLeft() instanceof ColumnSegment) {
+            // TODO
+            ColumnSegment column = (ColumnSegment) ((BetweenExpression) expression).getLeft();
         }
         return result;
     }
-    
 }
