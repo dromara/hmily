@@ -18,6 +18,7 @@
 package org.dromara.hmily.tac.sqlparser.shardingsphere.common.handler;
 
 import org.apache.shardingsphere.sql.parser.sql.common.segment.dml.assignment.AssignmentSegment;
+import org.apache.shardingsphere.sql.parser.sql.common.segment.dml.assignment.SetAssignmentSegment;
 import org.apache.shardingsphere.sql.parser.sql.common.segment.dml.column.ColumnSegment;
 import org.apache.shardingsphere.sql.parser.sql.common.segment.dml.expr.BetweenExpression;
 import org.apache.shardingsphere.sql.parser.sql.common.segment.dml.expr.BinaryOperationExpression;
@@ -62,17 +63,19 @@ public final class UpdateStatementAssembler {
      * @return hmily update statement
      */
     public static HmilyUpdateStatement assembleHmilyUpdateStatement(final UpdateStatement updateStatement, final HmilyUpdateStatement hmilyUpdateStatement) {
-        HmilySimpleTableSegment hmilySimpleTableSegment = assembleHmilySimpleTableSegment(updateStatement);
-        HmilySetAssignmentSegment hmilySetAssignmentSegment = assembleHmilySetAssignmentSegment(updateStatement);
-        HmilyWhereSegment hmilyWhereSegment = assembleHmilyWhereSegment(updateStatement);
+        HmilySimpleTableSegment hmilySimpleTableSegment = assembleHmilySimpleTableSegment((SimpleTableSegment) updateStatement.getTableSegment());
+        HmilySetAssignmentSegment hmilySetAssignmentSegment = assembleHmilySetAssignmentSegment(updateStatement.getSetAssignment());
+        HmilyWhereSegment hmilyWhereSegment = null;
+        if (updateStatement.getWhere().isPresent()) {
+            hmilyWhereSegment = assembleHmilyWhereSegment(updateStatement.getWhere().get());
+        }
         hmilyUpdateStatement.setTableSegment(hmilySimpleTableSegment);
         hmilyUpdateStatement.setSetAssignment(hmilySetAssignmentSegment);
         hmilyUpdateStatement.setWhere(hmilyWhereSegment);
         return hmilyUpdateStatement;
     }
     
-    private static HmilySimpleTableSegment assembleHmilySimpleTableSegment(final UpdateStatement updateStatement) {
-        SimpleTableSegment simpleTableSegment = (SimpleTableSegment) updateStatement.getTableSegment();
+    private static HmilySimpleTableSegment assembleHmilySimpleTableSegment(final SimpleTableSegment simpleTableSegment) {
         TableNameSegment tableNameSegment = simpleTableSegment.getTableName();
         HmilyIdentifierValue hmilyIdentifierValue = new HmilyIdentifierValue(tableNameSegment.getIdentifier().getValue());
         HmilyTableNameSegment hmilyTableNameSegment = new HmilyTableNameSegment(tableNameSegment.getStartIndex(), tableNameSegment.getStopIndex(), hmilyIdentifierValue);
@@ -95,30 +98,19 @@ public final class UpdateStatementAssembler {
         return hmilySimpleTableSegment;
     }
     
-    private static HmilySetAssignmentSegment assembleHmilySetAssignmentSegment(final UpdateStatement updateStatement) {
+    private static HmilySetAssignmentSegment assembleHmilySetAssignmentSegment(final SetAssignmentSegment setAssignmentSegment) {
         Collection<HmilyAssignmentSegment> assignments = new LinkedList<>();
-        for (AssignmentSegment each : updateStatement.getSetAssignment().getAssignments()) {
+        for (AssignmentSegment each : setAssignmentSegment.getAssignments()) {
             HmilyColumnSegment hmilyColumnSegment = assembleHmilyColumnSegment(each.getColumn());
             HmilyAssignmentSegment hmilyAssignmentSegment = new HmilyAssignmentSegment(each.getStartIndex(), each.getStopIndex(), hmilyColumnSegment, assembleHmilyExpressionSegment(each.getValue()));
             assignments.add(hmilyAssignmentSegment);
         }
-        return new HmilySetAssignmentSegment(updateStatement.getSetAssignment().getStartIndex(),
-                updateStatement.getSetAssignment().getStopIndex(), assignments);
+        return new HmilySetAssignmentSegment(setAssignmentSegment.getStartIndex(), setAssignmentSegment.getStopIndex(), assignments);
     }
     
-    private static HmilyWhereSegment assembleHmilyWhereSegment(final UpdateStatement updateStatement) {
-        WhereSegment whereSegment;
-        if (updateStatement.getWhere().isPresent()) {
-            whereSegment = updateStatement.getWhere().get();
-        } else {
-            return null;
-        }
+    private static HmilyWhereSegment assembleHmilyWhereSegment(final WhereSegment whereSegment) {
         HmilyExpressionSegment hmilyExpressionSegment = assembleHmilyExpressionSegment(whereSegment.getExpr());
         return new HmilyWhereSegment(whereSegment.getStartIndex(), whereSegment.getStopIndex(), hmilyExpressionSegment);
-    }
-    
-    private static HmilyParameterMarkerExpressionSegment assembleHmilyParameterMarkerExpressionSegment(final ExpressionSegment right) {
-        return new HmilyParameterMarkerExpressionSegment(right.getStartIndex(), right.getStopIndex(), ((ParameterMarkerExpressionSegment) right).getParameterMarkerIndex());
     }
     
     private static HmilyColumnSegment assembleHmilyColumnSegment(final ColumnSegment column) {
@@ -136,7 +128,7 @@ public final class UpdateStatementAssembler {
         if (expression instanceof BinaryOperationExpression && ((BinaryOperationExpression) expression).getLeft() instanceof ColumnSegment
                 && ((BinaryOperationExpression) expression).getRight() instanceof ParameterMarkerExpressionSegment) {
             HmilyColumnSegment hmilyLeft = assembleHmilyColumnSegment((ColumnSegment) ((BinaryOperationExpression) expression).getLeft());
-            HmilyParameterMarkerExpressionSegment hmilyRight = assembleHmilyParameterMarkerExpressionSegment(((BinaryOperationExpression) expression).getRight());
+            HmilyParameterMarkerExpressionSegment hmilyRight = (HmilyParameterMarkerExpressionSegment) assembleHmilyExpressionSegment(((BinaryOperationExpression) expression).getRight());
             result = new HmilyBinaryOperationExpression(expression.getStartIndex(), expression.getStopIndex(), hmilyLeft, hmilyRight,
                     ((BinaryOperationExpression) expression).getOperator(), ((BinaryOperationExpression) expression).getText());
         } else if (expression instanceof ColumnSegment) {
