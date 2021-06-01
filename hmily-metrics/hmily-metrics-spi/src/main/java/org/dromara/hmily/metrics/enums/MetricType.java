@@ -15,27 +15,30 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.metrics.api;
+package org.dromara.hmily.metrics.enums;
+
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 /**
- * Metrics tracker.
- *
- * @author xiaoyu
+ * Metric type.
  */
-public interface MetricsTracker {
+@Getter
+@RequiredArgsConstructor
+public enum MetricType {
     
     /**
-     * Metrics label.
-     *
-     * @return metrics label
+     * Counter metric type.
      */
-    String metricsLabel();
+    COUNTER,
     
     /**
-     * Metrics type.
-     *
-     * @return metrics type
+     * Gauge metric type.
      */
-    String metricsType();
+    GAUGE,
+    
+    /**
+     * Histogram metric type.
+     */
+    HISTOGRAM
 }
-

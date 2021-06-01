@@ -15,19 +15,26 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.metrics.api;
+package org.dromara.hmily.metrics.spi;
+
+import org.dromara.hmily.config.api.entity.HmilyMetricsConfig;
 
 /**
- * Summary metrics tracker delegate.
- *
- * @author xiaoyu
+ * Metrics tracker manager.
  */
-public interface SummaryMetricsTrackerDelegate {
+public interface MetricsBootService {
     
     /**
-     * Observe amount of time in seconds since start time.
+     * Start metrics tracker.
+     *
+     * @param metricsConfig metrics config
+     * @param register the register
      */
-    default void observeDuration() {
-    }
+    void start(HmilyMetricsConfig metricsConfig, MetricsRegister register);
+    
+    /**
+     * Stop metrics tracker.
+     */
+    void stop();
 }
 

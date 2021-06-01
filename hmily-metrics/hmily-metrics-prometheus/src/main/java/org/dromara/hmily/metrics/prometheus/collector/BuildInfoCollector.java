@@ -15,19 +15,17 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.metrics.prometheus.impl.collector;
+package org.dromara.hmily.metrics.prometheus.collector;
 
 import io.prometheus.client.Collector;
 import io.prometheus.client.GaugeMetricFamily;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-
 /**
  * The type Build info collector.
- *
- * @author xiaoyu
  */
 public class BuildInfoCollector extends Collector {
     
