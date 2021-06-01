@@ -20,6 +20,7 @@ package org.dromara.hmily.tac.sqlcompute.impl;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.dromara.hmily.tac.sqlparser.model.common.segment.dml.column.HmilyColumnSegment;
+import org.dromara.hmily.tac.sqlparser.model.common.segment.dml.expr.HmilyBinaryOperationExpression;
 import org.dromara.hmily.tac.sqlparser.model.common.segment.dml.expr.HmilyExpressionSegment;
 import org.dromara.hmily.tac.sqlparser.model.common.segment.dml.expr.complex.HmilyCommonExpressionSegment;
 import org.dromara.hmily.tac.sqlparser.model.common.segment.dml.expr.simple.HmilyLiteralExpressionSegment;
@@ -54,6 +55,11 @@ public final class ExpressionHandler {
         if (expressionSegment instanceof HmilyExpressionProjectionSegment) {
             String value = ((HmilyExpressionProjectionSegment) expressionSegment).getText();
             return "null".equals(value) ? null : value;
+        }
+        if (expressionSegment instanceof HmilyBinaryOperationExpression) {
+            Object left = getValue(parameters, ((HmilyBinaryOperationExpression) expressionSegment).getLeft());
+            Object right = getValue(parameters, ((HmilyBinaryOperationExpression) expressionSegment).getRight());
+            return String.format("%s %s %s", left, ((HmilyBinaryOperationExpression) expressionSegment).getOperator(), right);
         }
         if (expressionSegment instanceof HmilyColumnSegment) {
             return ((HmilyColumnSegment) expressionSegment).getQualifiedName();

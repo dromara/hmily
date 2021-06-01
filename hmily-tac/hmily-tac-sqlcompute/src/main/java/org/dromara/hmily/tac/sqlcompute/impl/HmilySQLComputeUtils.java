@@ -71,16 +71,17 @@ public class HmilySQLComputeUtils {
      * Get all columns.
      *
      * @param segment hmily simple table segment
+     * @param tableName table name
      * @return all table columns in asterisk way
      */
-    public static String getAllColumns(final HmilySimpleTableSegment segment) {
+    public static String getAllColumns(final HmilySimpleTableSegment segment, final String tableName) {
         String result;
         if (segment.getAlias().isPresent()) {
             result = String.format("%s.*", segment.getAlias().get());
         } else if (segment.getOwner().isPresent()) {
-            result = String.format("%s.%s.*", segment.getOwner(), segment.getTableName().getIdentifier().toString());
+            result = String.format("%s.%s.*", segment.getOwner(), tableName);
         } else {
-            result = String.format("%s.*", segment.getTableName().getIdentifier().toString());
+            result = String.format("%s.*", tableName);
         }
         return result;
     }

@@ -49,7 +49,7 @@ public final class HmilyDeleteSQLComputeEngine extends AbstractHmilySQLComputeEn
         Collection<HmilySQLTuple> result = new LinkedList<>();
         HmilySimpleTableSegment tableSegment = (HmilySimpleTableSegment) sqlStatement.getTableSegment();
         String tableName = sql.substring(tableSegment.getStartIndex(), tableSegment.getStopIndex());
-        String selectSQL = String.format("SELECT %s FROM %s %s", HmilySQLComputeUtils.getAllColumns(tableSegment), tableName, getWhereCondition(sql));
+        String selectSQL = String.format("SELECT %s FROM %s %s", HmilySQLComputeUtils.getAllColumns(tableSegment, tableName), tableName, getWhereCondition(sql));
         Collection<Map<String, Object>> records = HmilySQLComputeUtils.executeQuery(connection, selectSQL, parameters);
         result.addAll(doConvert(records, HmilyMetaDataManager.get(resourceId).getTableMetaDataMap().get(tableName)));
         return result;
