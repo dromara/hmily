@@ -5,7 +5,7 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- *
+ *  
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -15,13 +15,25 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.metrics.api;
+package org.dromara.hmily.metrics.constant;
 
 /**
- * None summary metrics tracker delegate.
- *
- * @author xiaoyu
+ * The Label names.
  */
-public final class NoneSummaryMetricsTrackerDelegate implements SummaryMetricsTrackerDelegate {
+public final class LabelNames {
+    
+    /**
+     * The constant TRANSACTION_STATUS.
+     */
+    public static final String TRANSACTION_STATUS = "hmily_transaction_status";
+    
+    /**
+     * The constant TRANSACTION_TOTAL.
+     */
+    public static final String TRANSACTION_TOTAL = "hmily_transaction_total";
+    
+    /**
+     * The constant TRANSACTION_LATENCY.
+     */
+    public static final String TRANSACTION_LATENCY = "hmily_transaction_latency_histogram_millis";
 }
-

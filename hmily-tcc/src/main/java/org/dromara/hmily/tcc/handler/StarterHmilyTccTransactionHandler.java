@@ -28,14 +28,13 @@ import org.dromara.hmily.core.disruptor.handler.HmilyTransactionEventConsumer;
 import org.dromara.hmily.core.holder.HmilyTransactionHolder;
 import org.dromara.hmily.core.service.HmilyTransactionHandler;
 import org.dromara.hmily.core.service.HmilyTransactionTask;
-import org.dromara.hmily.metrics.enums.MetricsLabelEnum;
-import org.dromara.hmily.metrics.spi.MetricsHandlerFacade;
-import org.dromara.hmily.metrics.spi.MetricsHandlerFacadeEngine;
+import org.dromara.hmily.metrics.constant.LabelNames;
+import org.dromara.hmily.metrics.reporter.MetricsReporter;
 import org.dromara.hmily.repository.spi.entity.HmilyTransaction;
 import org.dromara.hmily.tcc.executor.HmilyTccTransactionExecutor;
 
-import java.util.Optional;
-import java.util.function.Supplier;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 
 /**
@@ -49,6 +48,11 @@ public class StarterHmilyTccTransactionHandler implements HmilyTransactionHandle
     
     private HmilyDisruptor<HmilyTransactionTask> disruptor;
     
+    static {
+        MetricsReporter.registerCounter(LabelNames.TRANSACTION_TOTAL, new String[]{"type"}, "hmily transaction total count");
+        MetricsReporter.registerHistogram(LabelNames.TRANSACTION_LATENCY, "hmily transaction Latency Histogram Millis (ms)");
+    }
+    
     public StarterHmilyTccTransactionHandler() {
         disruptor = new HmilyDisruptor<>(new HmilyTransactionEventConsumer(),
                 Runtime.getRuntime().availableProcessors() << 1, HmilyDisruptor.DEFAULT_SIZE);
@@ -59,13 +63,9 @@ public class StarterHmilyTccTransactionHandler implements HmilyTransactionHandle
     public Object handleTransaction(final ProceedingJoinPoint point, final HmilyTransactionContext context)
             throws Throwable {
         Object returnValue;
-        Supplier<Boolean> histogramSupplier = null;
-        Optional<MetricsHandlerFacade> handlerFacade = MetricsHandlerFacadeEngine.load();
+        MetricsReporter.counterIncrement(LabelNames.TRANSACTION_TOTAL, new String[]{TransTypeEnum.TCC.name()});
+        LocalDateTime starterTime = LocalDateTime.now();
         try {
-            if (handlerFacade.isPresent()) {
-                handlerFacade.get().counterIncrement(MetricsLabelEnum.TRANSACTION_TOTAL.getName(), TransTypeEnum.TCC.name());
-                histogramSupplier = handlerFacade.get().histogramStartTimer(MetricsLabelEnum.TRANSACTION_LATENCY.getName(), TransTypeEnum.TCC.name());
-            }
             HmilyTransaction hmilyTransaction = executor.preTry(point);
             try {
                 //execute try
@@ -76,8 +76,7 @@ public class StarterHmilyTccTransactionHandler implements HmilyTransactionHandle
                 //if exception ,execute cancel
                 final HmilyTransaction currentTransaction = HmilyTransactionHolder.getInstance().getCurrentTransaction();
                 disruptor.getProvider().onData(() -> {
-                    handlerFacade.ifPresent(metricsHandlerFacade -> metricsHandlerFacade.counterIncrement(MetricsLabelEnum.TRANSACTION_STATUS.getName(),
-                            TransTypeEnum.TCC.name(), HmilyRoleEnum.START.name(), HmilyActionEnum.CANCELING.name()));
+                    MetricsReporter.counterIncrement(LabelNames.TRANSACTION_STATUS, new String[]{TransTypeEnum.TCC.name(), HmilyRoleEnum.START.name(), HmilyActionEnum.CANCELING.name()});
                     executor.globalCancel(currentTransaction);
                 });
                 throw throwable;
@@ -85,16 +84,13 @@ public class StarterHmilyTccTransactionHandler implements HmilyTransactionHandle
             //execute confirm
             final HmilyTransaction currentTransaction = HmilyTransactionHolder.getInstance().getCurrentTransaction();
             disruptor.getProvider().onData(() -> {
-                handlerFacade.ifPresent(metricsHandlerFacade -> metricsHandlerFacade.counterIncrement(MetricsLabelEnum.TRANSACTION_STATUS.getName(),
-                        TransTypeEnum.TCC.name(), HmilyRoleEnum.START.name(), HmilyActionEnum.CONFIRMING.name()));
+                MetricsReporter.counterIncrement(LabelNames.TRANSACTION_STATUS, new String[]{TransTypeEnum.TCC.name(), HmilyRoleEnum.START.name(), HmilyActionEnum.CONFIRMING.name()});
                 executor.globalConfirm(currentTransaction);
             });
         } finally {
             HmilyContextHolder.remove();
             executor.remove();
-            if (null != histogramSupplier) {
-                histogramSupplier.get();
-            }
+            MetricsReporter.recordTime(LabelNames.TRANSACTION_LATENCY, starterTime.until(LocalDateTime.now(), ChronoUnit.MILLIS));
         }
         return returnValue;
     }

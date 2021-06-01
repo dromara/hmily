@@ -89,7 +89,8 @@
         <motan.version>1.0.0</motan.version>
         <disruptor.version>3.4.0</disruptor.version>
         <hikaricp.version>3.2.0</hikaricp.version>
-        <prometheus-java-client.version>0.6.0</prometheus-java-client.version>
+        <prometheus-java-client.version>0.10.0</prometheus-java-client.version>
+        <prometheus-jmx.version>0.15.0</prometheus-jmx.version>
         <zookeeper.version>3.6.0</zookeeper.version>
         <zkClient.version>0.4</zkClient.version>
         <aspectj.version>1.8.9</aspectj.version>
@@ -183,6 +184,13 @@
                 <groupId>io.prometheus</groupId>
                 <artifactId>simpleclient_hotspot</artifactId>
                 <version>${prometheus-java-client.version}</version>
+            </dependency>
+
+            <!-- https://mvnrepository.com/artifact/io.prometheus.jmx/collector -->
+            <dependency>
+                <groupId>io.prometheus.jmx</groupId>
+                <artifactId>collector</artifactId>
+                <version>${prometheus-jmx.version}</version>
             </dependency>
 
             <dependency>

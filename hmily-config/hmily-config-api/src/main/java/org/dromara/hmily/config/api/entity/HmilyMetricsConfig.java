@@ -17,15 +17,12 @@
 
 package org.dromara.hmily.config.api.entity;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
-import java.util.regex.Pattern;
-import javax.management.ObjectName;
 import lombok.Data;
 import org.dromara.hmily.config.api.AbstractConfig;
 import org.dromara.hmily.config.api.constant.PrefixConstants;
 import org.dromara.hmily.spi.HmilySPI;
+
+import java.util.Properties;
 
 /**
  * Metrics config.
@@ -42,10 +39,6 @@ public final class HmilyMetricsConfig extends AbstractConfig {
     
     private Integer port = 9091;
     
-    private boolean async = true;
-    
-    private Integer threadCount = Runtime.getRuntime().availableProcessors() << 1;
-    
     private String jmxConfig;
     
     private Properties props;
@@ -53,135 +46,6 @@ public final class HmilyMetricsConfig extends AbstractConfig {
     @Override
     public String prefix() {
         return PrefixConstants.METRICS_PREFIX;
-    }
-    
-    @Data
-    public static class HmilyJmxConfig {
-        
-        /**
-         * The Start delay seconds.
-         */
-        private Integer startDelaySeconds = 0;
-        
-        /**
-         * The Jmx url.
-         */
-        private String jmxUrl = "";
-        
-        /**
-         * The Username.
-         */
-        private String username = "";
-        
-        /**
-         * The Password.
-         */
-        private String password = "";
-        
-        /**
-         * The Ssl.
-         */
-        private boolean ssl;
-        
-        /**
-         * The Lowercase output name.
-         */
-        private boolean lowercaseOutputName;
-        
-        /**
-         * The Lowercase output label names.
-         */
-        private boolean lowercaseOutputLabelNames;
-        
-        /**
-         * The Whitelist object names.
-         */
-        private List<ObjectName> whitelistObjectNames = new ArrayList<>();
-        
-        /**
-         * The Blacklist object names.
-         */
-        private List<ObjectName> blacklistObjectNames = new ArrayList<>();
-        
-        /**
-         * The Rules.
-         */
-        private List<Rule> rules = new ArrayList<>();
-        
-        /**
-         * The type Rule.
-         */
-        @Data
-        public static class Rule {
-            
-            private Pattern pattern;
-            
-            /**
-             * The Name.
-             */
-            private String name;
-            
-            /**
-             * The Value.
-             */
-            private String value;
-            
-            /**
-             * The Value factor.
-             */
-            private Double valueFactor = 1.0;
-            
-            /**
-             * The Help.
-             */
-            private String help;
-            
-            /**
-             * The Attr name snake case.
-             */
-            private boolean attrNameSnakeCase;
-            
-            /**
-             * The Type.
-             */
-            private Type type = Type.UNTYPED;
-            
-            /**
-             * The Label names.
-             */
-            private List<String> labelNames = new ArrayList<>();
-            
-            /**
-             * The Label values.
-             */
-            private List<String> labelValues = new ArrayList<>();
-        }
-        
-        /**
-         * The enum Type.
-         */
-        public enum Type {
-            /**
-             * Counter type.
-             */
-            COUNTER,
-            /**
-             * Gauge type.
-             */
-            GAUGE,
-            /**
-             * Summary type.
-             */
-            SUMMARY,
-            /**
-             * Histogram type.
-             */
-            HISTOGRAM,
-            /**
-             * Untyped type.
-             */
-            UNTYPED,
-        }
     }
 }
 

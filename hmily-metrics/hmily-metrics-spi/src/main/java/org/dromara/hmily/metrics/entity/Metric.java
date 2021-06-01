@@ -15,21 +15,26 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.metrics.spi;
+package org.dromara.hmily.metrics.entity;
 
-import org.dromara.hmily.config.api.entity.HmilyMetricsConfig;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import org.dromara.hmily.metrics.enums.MetricType;
+
+import java.util.List;
 
 /**
- * The interface Metrics init.
- *
- * @author xiaoyu
+ * Metric.
  */
-public interface MetricsInit extends AutoCloseable {
+@Getter
+@RequiredArgsConstructor
+public final class Metric {
     
-    /**
-     * Init.
-     *
-     * @param metricsConfig the metrics config
-     */
-    void init(HmilyMetricsConfig metricsConfig);
+    private final MetricType type;
+    
+    private final String name;
+    
+    private final String document;
+    
+    private final List<String> labels;
 }
