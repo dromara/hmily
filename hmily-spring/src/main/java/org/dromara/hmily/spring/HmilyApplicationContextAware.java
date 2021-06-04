@@ -23,6 +23,8 @@ import org.dromara.hmily.core.provide.ObjectProvide;
 import org.dromara.hmily.spring.provide.SpringBeanProvide;
 import org.dromara.hmily.spring.utils.SpringBeanUtils;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -33,12 +35,19 @@ import org.springframework.lang.NonNull;
  *
  * @author xiaoyu
  */
-public class HmilyApplicationContextAware implements ApplicationContextAware {
+public class HmilyApplicationContextAware implements ApplicationContextAware, BeanFactoryPostProcessor {
     
     @Override
     public void setApplicationContext(@NonNull final ApplicationContext applicationContext) throws BeansException {
         SpringBeanUtils.INSTANCE.setCfgContext((ConfigurableApplicationContext) applicationContext);
         SingletonHolder.INST.register(ObjectProvide.class, new SpringBeanProvide());
+    }
+    
+    /**
+     * Fix metric register happen before initialize.
+     */
+    @Override
+    public void postProcessBeanFactory(@NonNull final ConfigurableListableBeanFactory beanFactory) throws BeansException {
         HmilyBootstrap.getInstance().start();
     }
 }

@@ -20,6 +20,7 @@ package org.dromara.hmily.core.interceptor;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.dromara.hmily.annotation.HmilyTCC;
+import org.dromara.hmily.annotation.TransTypeEnum;
 import org.dromara.hmily.core.context.HmilyTransactionContext;
 import org.dromara.hmily.core.mediator.LocalParameterLoader;
 import org.dromara.hmily.core.mediator.RpcParameterLoader;
@@ -27,6 +28,7 @@ import org.dromara.hmily.core.service.HmilyTransactionHandlerRegistry;
 import org.dromara.hmily.spi.ExtensionLoaderFactory;
 
 import java.lang.reflect.Method;
+import java.util.EnumMap;
 import java.util.Optional;
 
 /**
@@ -37,15 +39,22 @@ import java.util.Optional;
  */
 public class HmilyGlobalInterceptor implements HmilyTransactionInterceptor {
     
-    private static final RpcParameterLoader PARAMETER_LOADER;
+    private static RpcParameterLoader parameterLoader;
+    
+    private static final EnumMap<TransTypeEnum, HmilyTransactionHandlerRegistry> REGISTRY = new EnumMap<>(TransTypeEnum.class);
     
     static {
-        PARAMETER_LOADER = Optional.ofNullable(ExtensionLoaderFactory.load(RpcParameterLoader.class)).orElse(new LocalParameterLoader());
+        parameterLoader = Optional.ofNullable(ExtensionLoaderFactory.load(RpcParameterLoader.class)).orElse(new LocalParameterLoader());
+    }
+    
+    static {
+        REGISTRY.put(TransTypeEnum.TCC, ExtensionLoaderFactory.load(HmilyTransactionHandlerRegistry.class, "tcc"));
+        REGISTRY.put(TransTypeEnum.TAC, ExtensionLoaderFactory.load(HmilyTransactionHandlerRegistry.class, "tac"));
     }
     
     @Override
     public Object invoke(final ProceedingJoinPoint pjp) throws Throwable {
-        HmilyTransactionContext context = PARAMETER_LOADER.load();
+        HmilyTransactionContext context = parameterLoader.load();
         return invokeWithinTransaction(context, pjp);
     }
     
@@ -55,7 +64,6 @@ public class HmilyGlobalInterceptor implements HmilyTransactionInterceptor {
     }
     
     private HmilyTransactionHandlerRegistry getRegistry(final Method method) {
-        return null != method.getAnnotation(HmilyTCC.class) ? ExtensionLoaderFactory.load(HmilyTransactionHandlerRegistry.class, "tcc")
-                : ExtensionLoaderFactory.load(HmilyTransactionHandlerRegistry.class, "tac");
+        return null != method.getAnnotation(HmilyTCC.class) ? REGISTRY.get(TransTypeEnum.TCC) : REGISTRY.get(TransTypeEnum.TAC);
     }
 }
