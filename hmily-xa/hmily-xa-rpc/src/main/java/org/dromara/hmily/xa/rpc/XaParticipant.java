@@ -15,22 +15,33 @@
  *  limitations under the License.
  */
 
-package org.dromara.hmily.xa.core;
+package org.dromara.hmily.xa.rpc;
+
+import lombok.Data;
+import org.dromara.hmily.core.context.HmilyTransactionContext;
 
 import javax.transaction.xa.XAResource;
 
 /**
- * XaResourceExtends .
- * 扩展 XaResources扩展.
+ * XaParticipant .
+ * 1、处理相关的参与者相关的数据Rpc的传传递.
  *
  * @author sixh chenbin
  */
-public interface XaResourceWrapped extends XAResource {
+@Data
+public class XaParticipant {
 
     /**
-     * 获取一个事务类型的名称..
-     *
-     * @return the name
+     * 事务ID.
      */
-    String getName();
+    private String globalId;
+
+    private String branchId;
+
+    /**
+     * @see XAResource
+     */
+    private int flag;
+
+    private String cmd;
 }

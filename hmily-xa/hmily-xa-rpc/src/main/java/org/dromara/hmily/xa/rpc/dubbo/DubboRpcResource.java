@@ -17,7 +17,11 @@
 
 package org.dromara.hmily.xa.rpc.dubbo;
 
+import org.apache.dubbo.rpc.Invocation;
+import org.apache.dubbo.rpc.Invoker;
 import org.dromara.hmily.xa.rpc.RpcResource;
+import org.dromara.hmily.xa.rpc.RpcXaProxy;
+import org.dromara.hmily.xa.rpc.XaParticipant;
 
 import javax.transaction.xa.XAException;
 import javax.transaction.xa.XAResource;
@@ -30,9 +34,16 @@ import javax.transaction.xa.Xid;
  */
 public class DubboRpcResource extends RpcResource {
 
-    @Override
-    public void commit(final Xid xid, final boolean b) throws XAException {
+    /**
+     * 用于rpc真实调用的处理.
+     */
+    private final RpcXaProxy xaProxy;
 
+    /**
+     * Instantiates a new Dubbo rpc resource.
+     */
+    public DubboRpcResource(Invoker<?> invoker, Invocation invocation) {
+        this.xaProxy = new DubboRpcXaProxy(invoker, invocation);
     }
 
     @Override
@@ -47,7 +58,7 @@ public class DubboRpcResource extends RpcResource {
 
     @Override
     public int getTransactionTimeout() throws XAException {
-        return 0;
+        return xaProxy.getTimeout();
     }
 
     @Override
@@ -66,17 +77,24 @@ public class DubboRpcResource extends RpcResource {
     }
 
     @Override
-    public void rollback(final Xid xid) throws XAException {
-
-    }
-
-    @Override
     public boolean setTransactionTimeout(final int i) throws XAException {
-        return false;
+        //不需要实现
+        return true;
     }
 
     @Override
     public void start(final Xid xid, final int i) throws XAException {
+        //需要初始化一下错误调用的相关数据.
+        XaParticipant xaParticipant = new XaParticipant();
+        xaParticipant.setFlag(i);
+        xaParticipant.setBranchId(new String(xid.getBranchQualifier()));
+        xaParticipant.setGlobalId(new String(xid.getGlobalTransactionId()));
+    }
 
+
+
+    @Override
+    public String getName() {
+        return "dubbo";
     }
 }

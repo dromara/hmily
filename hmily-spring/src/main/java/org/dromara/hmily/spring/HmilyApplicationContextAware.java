@@ -34,11 +34,12 @@ import org.springframework.lang.NonNull;
  * @author xiaoyu
  */
 public class HmilyApplicationContextAware implements ApplicationContextAware {
-    
+
     @Override
     public void setApplicationContext(@NonNull final ApplicationContext applicationContext) throws BeansException {
         SpringBeanUtils.INSTANCE.setCfgContext((ConfigurableApplicationContext) applicationContext);
         SingletonHolder.INST.register(ObjectProvide.class, new SpringBeanProvide());
+        //todo:到这里去改造一下了.
         HmilyBootstrap.getInstance().start();
     }
 }

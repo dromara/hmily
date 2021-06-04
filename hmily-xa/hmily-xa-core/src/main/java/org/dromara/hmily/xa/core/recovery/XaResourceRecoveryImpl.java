@@ -64,11 +64,11 @@ public class XaResourceRecoveryImpl implements XaResourceRecovery {
     }
 
     @Override
-    public void recover(final XAResource resource) {
+    public void recover(String tmUnique, final XAResource resource) {
         if (resource == null) {
             return;
         }
-
+        List<HmilyXaRecovery> hmilyXaRecoveries = repository.queryByTmUnique(tmUnique, 0);
     }
 
     /**

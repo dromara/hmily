@@ -17,7 +17,10 @@
 
 package org.dromara.hmily.xa.rpc;
 
-import javax.transaction.xa.XAResource;
+import org.dromara.hmily.xa.core.XaResourceWrapped;
+
+import javax.transaction.xa.XAException;
+import javax.transaction.xa.Xid;
 
 /**
  * RpcResource .
@@ -25,6 +28,24 @@ import javax.transaction.xa.XAResource;
  *
  * @author sixh chenbin
  */
-public abstract class RpcResource implements XAResource {
+public abstract class RpcResource implements XaResourceWrapped {
+    @Override
+    public void commit(final Xid xid, final boolean b) throws XAException {
 
+    }
+
+    @Override
+    public int prepare(final Xid xid) throws XAException {
+        return 0;
+    }
+
+    @Override
+    public Xid[] recover(final int i) throws XAException {
+        return new Xid[0];
+    }
+
+    @Override
+    public void rollback(final Xid xid) throws XAException {
+
+    }
 }

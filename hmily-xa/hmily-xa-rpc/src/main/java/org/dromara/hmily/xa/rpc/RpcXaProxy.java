@@ -15,22 +15,52 @@
  *  limitations under the License.
  */
 
-package org.dromara.hmily.xa.core;
+package org.dromara.hmily.xa.rpc;
 
-import javax.transaction.xa.XAResource;
+import java.util.Map;
 
 /**
- * XaResourceExtends .
- * 扩展 XaResources扩展.
+ * RpcXaProxy .
+ * 定义一个代理处理rpc相关的信息.
  *
  * @author sixh chenbin
  */
-public interface XaResourceWrapped extends XAResource {
+public interface RpcXaProxy {
 
     /**
-     * 获取一个事务类型的名称..
-     *
-     * @return the name
+     * 执行成功
      */
-    String getName();
+    int YES = 0;
+
+    /**
+     * 执行有异常了.
+     */
+    int EXC = 1;
+
+    /**
+     * 执行不成功.
+     */
+    int NO = 2;
+
+    /**
+     * Cmd int.
+     *
+     * @param params the params
+     * @return the int
+     */
+    int cmd(Map<String, Object> params);
+
+    /**
+     * 获取一个超时的时间,这里返回的也就是一个Rpc timeout.
+     *
+     * @return timeout
+     */
+    int getTimeout();
+
+    /**
+     * 初始化一个参与者.
+     *
+     * @param participant the participant
+     */
+    void init(XaParticipant participant);
 }

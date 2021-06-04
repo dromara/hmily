@@ -19,6 +19,7 @@ package org.dromara.hmily.xa.rpc.dubbo;
 
 
 import org.apache.dubbo.common.Constants;
+import org.apache.dubbo.common.URL;
 import org.apache.dubbo.common.extension.Activate;
 import org.apache.dubbo.rpc.Filter;
 import org.apache.dubbo.rpc.Invocation;
@@ -68,7 +69,7 @@ public class DubboXaFilter implements Filter {
         //If it is an xa transaction that can be processed.
         Transaction transaction = TransactionManagerImpl.INST.getTransaction();
         if (transaction instanceof TransactionImpl) {
-            XAResource resource = new DubboRpcResource();
+            XAResource resource = new DubboRpcResource(invoker, invocation);
             try {
                 ((TransactionImpl) transaction).doEnList(resource, XAResource.TMJOIN);
             } catch (SystemException | RollbackException e) {

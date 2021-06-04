@@ -44,7 +44,8 @@ public interface XaResourceRecovery {
     /**
      * 开始一个事务的恢复.
      *
+     * @param tmUnique the tm unique
      * @param resource the resource
      */
-    void recover(XAResource resource);
+    void recover(String tmUnique, XAResource resource);
 }

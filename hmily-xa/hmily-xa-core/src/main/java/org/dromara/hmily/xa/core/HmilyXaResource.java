@@ -163,6 +163,10 @@ public class HmilyXaResource implements XaResourceWrapped {
 
     @Override
     public String getName() {
+        //如果是自己定义的就获取他的名称.
+        if (xaResource instanceof XaResourceWrapped) {
+            return ((XaResourceWrapped) xaResource).getName();
+        }
         return "local";
     }
 }
