@@ -124,10 +124,9 @@ public final class UpdateStatementAssembler {
 
     private static HmilyExpressionSegment assembleHmilyExpressionSegment(final ExpressionSegment expression) {
         HmilyExpressionSegment result = null;
-        if (expression instanceof BinaryOperationExpression && ((BinaryOperationExpression) expression).getLeft() instanceof ColumnSegment
-                && ((BinaryOperationExpression) expression).getRight() instanceof ParameterMarkerExpressionSegment) {
-            HmilyColumnSegment hmilyLeft = assembleHmilyColumnSegment((ColumnSegment) ((BinaryOperationExpression) expression).getLeft());
-            HmilyParameterMarkerExpressionSegment hmilyRight = (HmilyParameterMarkerExpressionSegment) assembleHmilyExpressionSegment(((BinaryOperationExpression) expression).getRight());
+        if (expression instanceof BinaryOperationExpression) {
+            HmilyExpressionSegment hmilyLeft = assembleHmilyExpressionSegment(((BinaryOperationExpression) expression).getLeft());
+            HmilyExpressionSegment hmilyRight = assembleHmilyExpressionSegment(((BinaryOperationExpression) expression).getRight());
             result = new HmilyBinaryOperationExpression(expression.getStartIndex(), expression.getStopIndex(), hmilyLeft, hmilyRight,
                     ((BinaryOperationExpression) expression).getOperator(), ((BinaryOperationExpression) expression).getText());
         } else if (expression instanceof ColumnSegment) {

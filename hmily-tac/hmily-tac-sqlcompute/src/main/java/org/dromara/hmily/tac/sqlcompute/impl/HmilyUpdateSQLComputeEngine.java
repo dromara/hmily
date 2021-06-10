@@ -22,7 +22,6 @@ import org.dromara.hmily.repository.spi.entity.tuple.HmilySQLManipulation;
 import org.dromara.hmily.repository.spi.entity.tuple.HmilySQLTuple;
 import org.dromara.hmily.tac.metadata.HmilyMetaDataManager;
 import org.dromara.hmily.tac.metadata.model.TableMetaData;
-import org.dromara.hmily.tac.sqlparser.model.common.segment.dml.column.HmilyColumnSegment;
 import org.dromara.hmily.tac.sqlparser.model.common.segment.dml.expr.HmilyBinaryOperationExpression;
 import org.dromara.hmily.tac.sqlparser.model.common.segment.dml.expr.HmilyExpressionSegment;
 import org.dromara.hmily.tac.sqlparser.model.common.segment.dml.expr.simple.HmilyParameterMarkerExpressionSegment;
@@ -77,13 +76,21 @@ public final class HmilyUpdateSQLComputeEngine extends AbstractHmilySQLComputeEn
         List<Object> result = new LinkedList<>();
         sqlStatement.getWhere().ifPresent(whereSegment -> {
             HmilyExpressionSegment hmilyExpressionSegment = whereSegment.getExpr();
-            if (hmilyExpressionSegment instanceof HmilyBinaryOperationExpression && ((HmilyBinaryOperationExpression) hmilyExpressionSegment).getLeft() instanceof HmilyColumnSegment
-                    && ((HmilyBinaryOperationExpression) hmilyExpressionSegment).getRight() instanceof HmilyParameterMarkerExpressionSegment) {
-                int parameterMarkerIndex = ((HmilyParameterMarkerExpressionSegment) ((HmilyBinaryOperationExpression) hmilyExpressionSegment).getRight()).getParameterMarkerIndex();
-                result.add(parameters.get(parameterMarkerIndex));
-            }
+            getParameters(hmilyExpressionSegment, parameters, result);
         });
         return result;
+    }
+    
+    private void getParameters(final HmilyExpressionSegment hmilyExpressionSegment, final List<Object> parameters, final List<Object> result) {
+        if (hmilyExpressionSegment instanceof HmilyParameterMarkerExpressionSegment) {
+            int parameterMarkerIndex = ((HmilyParameterMarkerExpressionSegment) hmilyExpressionSegment).getParameterMarkerIndex();
+            result.add(parameters.get(parameterMarkerIndex));
+            return;
+        }
+        if (hmilyExpressionSegment instanceof HmilyBinaryOperationExpression) {
+            getParameters(((HmilyBinaryOperationExpression) hmilyExpressionSegment).getLeft(), parameters, result);
+            getParameters(((HmilyBinaryOperationExpression) hmilyExpressionSegment).getRight(), parameters, result);
+        }
     }
     
     private Collection<HmilySQLTuple> doConvert(final Collection<Map<String, Object>> records, final TableMetaData tableMetaData) {
