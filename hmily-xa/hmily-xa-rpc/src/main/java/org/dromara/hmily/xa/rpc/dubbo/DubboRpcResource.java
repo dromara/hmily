@@ -19,9 +19,8 @@ package org.dromara.hmily.xa.rpc.dubbo;
 
 import org.apache.dubbo.rpc.Invocation;
 import org.apache.dubbo.rpc.Invoker;
+import org.dromara.hmily.core.context.XaParticipant;
 import org.dromara.hmily.xa.rpc.RpcResource;
-import org.dromara.hmily.xa.rpc.RpcXaProxy;
-import org.dromara.hmily.xa.rpc.XaParticipant;
 
 import javax.transaction.xa.XAException;
 import javax.transaction.xa.XAResource;
@@ -35,45 +34,33 @@ import javax.transaction.xa.Xid;
 public class DubboRpcResource extends RpcResource {
 
     /**
-     * 用于rpc真实调用的处理.
-     */
-    private final RpcXaProxy xaProxy;
-
-    /**
      * Instantiates a new Dubbo rpc resource.
      */
     public DubboRpcResource(Invoker<?> invoker, Invocation invocation) {
-        this.xaProxy = new DubboRpcXaProxy(invoker, invocation);
+        super(new DubboRpcXaProxy(invoker, invocation));
     }
 
     @Override
     public void end(final Xid xid, final int i) throws XAException {
-
+        //不需要实现.
     }
 
     @Override
     public void forget(final Xid xid) throws XAException {
-
+        //不需要实现.
     }
 
     @Override
     public int getTransactionTimeout() throws XAException {
-        return xaProxy.getTimeout();
+        return getXaProxy().getTimeout();
     }
 
     @Override
     public boolean isSameRM(final XAResource xaResource) throws XAException {
+        if (xaResource instanceof DubboRpcResource) {
+            return ((DubboRpcResource) xaResource).getXaProxy().equals(this.getXaProxy());
+        }
         return false;
-    }
-
-    @Override
-    public int prepare(final Xid xid) throws XAException {
-        return 0;
-    }
-
-    @Override
-    public Xid[] recover(final int i) throws XAException {
-        return new Xid[0];
     }
 
     @Override
@@ -83,18 +70,18 @@ public class DubboRpcResource extends RpcResource {
     }
 
     @Override
+    public String getName() {
+        return "dubbo";
+    }
+
+    @Override
     public void start(final Xid xid, final int i) throws XAException {
+        super.start(xid, i);
         //需要初始化一下错误调用的相关数据.
         XaParticipant xaParticipant = new XaParticipant();
         xaParticipant.setFlag(i);
         xaParticipant.setBranchId(new String(xid.getBranchQualifier()));
         xaParticipant.setGlobalId(new String(xid.getGlobalTransactionId()));
-    }
-
-
-
-    @Override
-    public String getName() {
-        return "dubbo";
+        this.getXaProxy().init(xaParticipant);
     }
 }

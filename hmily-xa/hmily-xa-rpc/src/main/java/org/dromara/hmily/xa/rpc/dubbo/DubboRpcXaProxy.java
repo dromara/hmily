@@ -21,12 +21,14 @@ import org.apache.dubbo.rpc.Invocation;
 import org.apache.dubbo.rpc.Invoker;
 import org.apache.dubbo.rpc.Result;
 import org.apache.dubbo.rpc.RpcContext;
+import org.dromara.hmily.core.context.HmilyTransactionContext;
+import org.dromara.hmily.core.context.XaParticipant;
 import org.dromara.hmily.core.mediator.RpcMediator;
 import org.dromara.hmily.xa.rpc.RpcXaProxy;
-import org.dromara.hmily.xa.rpc.XaParticipant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -47,6 +49,15 @@ public class DubboRpcXaProxy implements RpcXaProxy {
     private final Logger logger = LoggerFactory.getLogger(DubboRpcXaProxy.class);
 
     /**
+     * Gets url.
+     *
+     * @return the url
+     */
+    public String getUrl() {
+        return invoker.getUrl().toString();
+    }
+
+    /**
      * 初始化一个调用dubbo的rpc代理.
      *
      * @param invoker       the invoker
@@ -58,17 +69,34 @@ public class DubboRpcXaProxy implements RpcXaProxy {
     }
 
     @Override
-    public int cmd(final Map<String, Object> params) {
+    public Object cmd(final XaCmd cmd, final Map<String, Object> params) {
+        if (cmd == null) {
+            logger.warn("cmd is null");
+            return NO;
+        }
         if (params == null || params.isEmpty()) {
             return NO;
         }
+        //因为@see HmilyTransactionContext#xaParticipant#cmd字段.
+        params.put("xaParticipant.cmd", cmd.name());
         params.forEach((k, v) -> RpcContext.getContext().setAttachment(k, v.toString()));
         //如果是执行一个cmd的时候.
-        Result invoke = this.invoker.invoke(rpcInvocation);
-        if (invoke.hasException()) {
-            logger.warn("执行一个指令发送了异常，{}:{}", params, invoke.getException().getMessage());
+        Result result = this.invoker.invoke(rpcInvocation);
+        if (result.hasException()) {
+            logger.warn("执行一个指令发送了异常，{}:{}", params, result.getException().getMessage());
             return EXC;
         } else {
+            if (result.getValue() != null) {
+                if (result.getValue() instanceof Integer
+                        || result.getValue().getClass().isPrimitive()) {
+                    return Integer.parseInt(result.getValue().toString());
+                } else {
+                    Object value = result.getValue();
+                    if (value instanceof List) {
+                        return value;
+                    }
+                }
+            }
             return YES;
         }
     }
@@ -81,6 +109,17 @@ public class DubboRpcXaProxy implements RpcXaProxy {
 
     @Override
     public void init(final XaParticipant participant) {
-        RpcMediator.getInstance().transmit(RpcContext.getContext()::setAttachment, participant);
+        HmilyTransactionContext context = new HmilyTransactionContext();
+        context.setXaParticipant(participant);
+        RpcMediator.getInstance().transmit(RpcContext.getContext()::setAttachment, context);
     }
+
+    @Override
+    public boolean equals(final RpcXaProxy xaProxy) {
+        if (xaProxy instanceof DubboRpcXaProxy) {
+            return ((DubboRpcXaProxy) xaProxy).getUrl().equals(this.getUrl());
+        }
+        return false;
+    }
+
 }

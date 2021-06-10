@@ -17,6 +17,9 @@
 
 package org.dromara.hmily.xa.rpc;
 
+import org.dromara.hmily.core.context.XaParticipant;
+
+import javax.transaction.xa.Xid;
 import java.util.Map;
 
 /**
@@ -30,30 +33,32 @@ public interface RpcXaProxy {
     /**
      * 执行成功
      */
-    int YES = 0;
+    int YES = 10000;
 
     /**
      * 执行有异常了.
      */
-    int EXC = 1;
+    int EXC = 10001;
 
     /**
      * 执行不成功.
      */
-    int NO = 2;
+    int NO = 100002;
 
     /**
-     * Cmd int.
+     * 会调用远程执行的一些命令.
      *
+     * @param cmd    the cmd
      * @param params the params
      * @return the int
+     * @see XaCmd
      */
-    int cmd(Map<String, Object> params);
+    Object cmd(XaCmd cmd, Map<String, Object> params);
 
     /**
      * 获取一个超时的时间,这里返回的也就是一个Rpc timeout.
      *
-     * @return timeout
+     * @return timeout timeout
      */
     int getTimeout();
 
@@ -63,4 +68,45 @@ public interface RpcXaProxy {
      * @param participant the participant
      */
     void init(XaParticipant participant);
+
+    /**
+     * 判断2个proxy是不是一致的.
+     *
+     * @param xaProxy the xa proxy
+     * @return the boolean
+     */
+    boolean equals(RpcXaProxy xaProxy);
+
+    /**
+     * xa rpc 需要处理的命令.
+     */
+    enum XaCmd {
+        /**
+         * The Commit.
+         *
+         * @see RpcResource#commit(Xid, boolean) RpcResource#commit(Xid, boolean)RpcResource#commit(Xid, boolean)RpcResource#commit(Xid, boolean)RpcResource#commit(Xid, boolean)RpcResource#commit(Xid, boolean)
+         */
+        COMMIT,
+
+        /**
+         * The Prepare.
+         *
+         * @see RpcResource#prepare(Xid) RpcResource#prepare(Xid)RpcResource#prepare(Xid)RpcResource#prepare(Xid)RpcResource#prepare(Xid)RpcResource#prepare(Xid)
+         */
+        PREPARE,
+
+        /**
+         * The Recover.
+         *
+         * @see RpcResource#recover(int) RpcResource#recover(int)RpcResource#recover(int)RpcResource#recover(int)RpcResource#recover(int)RpcResource#recover(int)
+         */
+        RECOVER,
+
+        /**
+         * The Rollback.
+         *
+         * @see RpcResource#rollback(Xid) RpcResource#rollback(Xid)RpcResource#rollback(Xid)RpcResource#rollback(Xid)RpcResource#rollback(Xid)RpcResource#rollback(Xid)
+         */
+        ROLLBACK,
+    }
 }

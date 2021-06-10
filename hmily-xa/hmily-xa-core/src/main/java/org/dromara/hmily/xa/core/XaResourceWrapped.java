@@ -17,7 +17,9 @@
 
 package org.dromara.hmily.xa.core;
 
+import javax.transaction.xa.XAException;
 import javax.transaction.xa.XAResource;
+import javax.transaction.xa.Xid;
 
 /**
  * XaResourceExtends .
@@ -25,12 +27,62 @@ import javax.transaction.xa.XAResource;
  *
  * @author sixh chenbin
  */
-public interface XaResourceWrapped extends XAResource {
+public abstract class XaResourceWrapped implements XAResource {
 
     /**
      * 获取一个事务类型的名称..
      *
      * @return the name
      */
-    String getName();
+    public abstract String getName();
+
+    @Override
+    public void start(final Xid xid, final int flag) throws XAException {
+        XaResourcePool.INST.addResource(xid, this);
+        start0(xid, flag);
+    }
+
+    @Override
+    public void commit(final Xid xid, final boolean onePhase) throws XAException {
+        commit0(xid, onePhase);
+        XaResourcePool.INST.removeResource(xid);
+    }
+
+    @Override
+    public void rollback(final Xid xid) throws XAException {
+        rollback0(xid);
+        XaResourcePool.INST.removeResource(xid);
+    }
+
+    /**
+     * 子类实现. Start 0.
+     *
+     * @param xid  the xid
+     * @param flag the flag
+     * @throws XAException the xa exception
+     */
+    void start0(final Xid xid, final int flag) throws XAException {
+
+    }
+
+    /**
+     * 子类实现. Commit 0.
+     *
+     * @param xid      the xid
+     * @param onePhase the one phase
+     * @throws XAException the xa exception
+     */
+    void commit0(final Xid xid, final boolean onePhase) throws XAException {
+
+    }
+
+    /**
+     * 子类实现. Rollback 0.
+     *
+     * @param xid the xid
+     * @throws XAException the xa exception
+     */
+    void rollback0(final Xid xid) throws XAException {
+
+    }
 }

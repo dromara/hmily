@@ -23,7 +23,7 @@ import org.dromara.hmily.core.context.HmilyTransactionContext;
  * The interface Hmily transaction handler registry.
  */
 public interface HmilyTransactionHandlerRegistry {
-    
+
     /**
      * Get hmily transaction handler.
      *

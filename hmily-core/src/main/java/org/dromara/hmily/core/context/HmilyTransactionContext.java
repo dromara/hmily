@@ -21,6 +21,8 @@ import lombok.Data;
 import org.dromara.hmily.common.enums.HmilyActionEnum;
 import org.dromara.hmily.common.enums.HmilyRoleEnum;
 
+import javax.transaction.xa.XAResource;
+
 /**
  * HmilyTransactionContext.
  *
@@ -28,34 +30,40 @@ import org.dromara.hmily.common.enums.HmilyRoleEnum;
  */
 @Data
 public class HmilyTransactionContext {
-    
+
     /**
      * transId.
      */
     private Long transId;
-    
+
     /**
      * participant id.
      */
     private Long participantId;
-    
+
     /**
      * participant ref id.
      */
     private Long participantRefId;
-    
+
     /**
      * this hmily action. {@linkplain HmilyActionEnum}
      */
     private int action;
-    
+
     /**
      * 事务参与的角色. {@linkplain HmilyRoleEnum}
      */
     private int role;
-    
+
     /**
      * transType.
      */
     private String transType;
+
+    //以下为xa相关的参数.
+    /**
+     * xa相关的参数定义.
+     */
+    private XaParticipant xaParticipant;
 }

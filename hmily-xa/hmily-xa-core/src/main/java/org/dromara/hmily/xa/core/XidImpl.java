@@ -80,6 +80,20 @@ public class XidImpl implements Xid {
     }
 
     /**
+     * Instantiates a new Xid.
+     *
+     * @param xidStr the xid str
+     */
+    public XidImpl(final String xidStr) {
+        List<String> strings = Splitter.on("-").splitToList(xidStr);
+        this.branchId = xidStr;
+        this.branchIdByte = xidStr.getBytes();
+        String gid = strings.get(0);
+        this.globalId = gid;
+        this.globalIdByte = gid.getBytes();
+    }
+
+    /**
      * Instantiates a new X id.
      *
      * @param xId   the x id
@@ -104,10 +118,10 @@ public class XidImpl implements Xid {
      * @param xid the xid
      */
     public XidImpl(final Xid xid) {
-        this.globalIdByte = xid.getGlobalTransactionId ();
-        this.branchIdByte = xid.getBranchQualifier ();
-        this.globalId = new String(xid.getGlobalTransactionId ());
-        this.branchId= new String(xid.getBranchQualifier ());
+        this.globalIdByte = xid.getGlobalTransactionId();
+        this.branchIdByte = xid.getBranchQualifier();
+        this.globalId = new String(xid.getGlobalTransactionId());
+        this.branchId = new String(xid.getBranchQualifier());
     }
 
 
@@ -170,7 +184,14 @@ public class XidImpl implements Xid {
 
     @Override
     public boolean equals(final Object obj) {
-        return super.equals(obj);
+        if (obj == this) {
+            return true;
+        }
+        if (obj instanceof XidImpl) {
+            return ((XidImpl) obj).getGlobalId().equals(this.getGlobalId())
+                    && ((XidImpl) obj).getBranchId().equals(this.getBranchId());
+        }
+        return false;
     }
 
     @Override

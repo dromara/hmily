@@ -30,6 +30,17 @@ public class HmliyXaException extends XAException {
 
     private static final Map<Integer, String> errorCodes = new HashMap<>();
 
+    public static final int UNKNOWN = 1000;
+
+    /**
+     * Instantiates a new Hmliy xa exception.
+     *
+     * @param errorCode the error code
+     */
+    public HmliyXaException(final int errorCode) {
+        super(errorCode);
+    }
+
     static {
         //XA_RBBASE,XA_RBROLLBACK
         errorCodes.put(XAException.XA_RBROLLBACK, "the XaResource indicates that the rollback was caused by an unspecified reason.");
@@ -60,6 +71,12 @@ public class HmliyXaException extends XAException {
         errorCodes.put(XAException.XAER_OUTSIDE, "the XaResource the resource manager is doing work outside a global transaction.");
     }
 
+    /**
+     * Gets message.
+     *
+     * @param xaException the xa exception
+     * @return the message
+     */
     static String getMessage(XAException xaException) {
         int errorCode = xaException.errorCode;
         String s = errorCodes.get(errorCode);

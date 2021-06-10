@@ -26,7 +26,7 @@ import javax.transaction.xa.Xid;
  *
  * @author sixh chenbin
  */
-public class HmilyXaResource implements XaResourceWrapped {
+public class HmilyXaResource extends XaResourceWrapped {
 
     private final XAResource xaResource;
 
@@ -54,7 +54,7 @@ public class HmilyXaResource implements XaResourceWrapped {
     }
 
     @Override
-    public void commit(final Xid xid, final boolean b) throws XAException {
+    public void commit0(final Xid xid, final boolean b) throws XAException {
         this.xaResource.commit(xid, b);
     }
 
@@ -128,7 +128,7 @@ public class HmilyXaResource implements XaResourceWrapped {
     }
 
     @Override
-    public void rollback(final Xid xid) throws XAException {
+    public void rollback0(final Xid xid) throws XAException {
         this.xaResource.rollback(xid);
     }
 
@@ -147,7 +147,7 @@ public class HmilyXaResource implements XaResourceWrapped {
     }
 
     @Override
-    public void start(final Xid xid, final int i) throws XAException {
+    public void start0(final Xid xid, final int i) throws XAException {
         this.xaResource.start(xid, i);
     }
 

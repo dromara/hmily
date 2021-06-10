@@ -30,9 +30,7 @@ import javax.transaction.SystemException;
 import javax.transaction.Transaction;
 import javax.transaction.TransactionManager;
 import javax.transaction.xa.XAResource;
-import java.util.Map;
 import java.util.Stack;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * HmilyXaTransactionManager .
@@ -47,8 +45,6 @@ public class HmilyXaTransactionManager implements TransactionManager {
      * onveniently realize the processing of nested transactions。
      */
     private final ThreadLocal<Stack<Transaction>> tms = new ThreadLocal<>();
-
-    private final Map<XidImpl, Transaction> xidTransactionMap = new ConcurrentHashMap<>();
 
     /**
      * Instantiates a new Hmily xa transaction manager.

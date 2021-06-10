@@ -77,7 +77,6 @@ public class DubboXaFilter implements Filter {
                 throw new RuntimeException("dubbo xa resource tm join err", e);
             }
         }
-        //todo: 这里要把事务相关信息带过去.
         return invoker.invoke(invocation);
     }
 }

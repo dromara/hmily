@@ -15,33 +15,22 @@
  *  limitations under the License.
  */
 
-package org.dromara.hmily.xa.rpc;
+package org.dromara.hmily.xa.rpc.spring;
 
-import lombok.Data;
+import org.aspectj.lang.ProceedingJoinPoint;
 import org.dromara.hmily.core.context.HmilyTransactionContext;
-
-import javax.transaction.xa.XAResource;
+import org.dromara.hmily.core.service.HmilyTransactionHandler;
 
 /**
- * XaParticipant .
- * 1、处理相关的参与者相关的数据Rpc的传传递.
+ * DefHmilyTransactionHandler .
+ * 如果为null的时候，需要执行相关的业务逻辑。.
  *
  * @author sixh chenbin
  */
-@Data
-public class XaParticipant {
+public class DefHmilyTransactionHandler implements HmilyTransactionHandler {
 
-    /**
-     * 事务ID.
-     */
-    private String globalId;
-
-    private String branchId;
-
-    /**
-     * @see XAResource
-     */
-    private int flag;
-
-    private String cmd;
+    @Override
+    public Object handleTransaction(final ProceedingJoinPoint point, final HmilyTransactionContext hmilyTransactionContext) throws Throwable {
+        return point.proceed();
+    }
 }
