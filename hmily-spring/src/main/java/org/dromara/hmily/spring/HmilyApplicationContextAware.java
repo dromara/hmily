@@ -33,13 +33,19 @@ import org.springframework.lang.NonNull;
  *
  * @author xiaoyu
  */
-public class HmilyApplicationContextAware implements ApplicationContextAware {
-
+public class HmilyApplicationContextAware implements ApplicationContextAware, BeanFactoryPostProcessor {
+    
     @Override
     public void setApplicationContext(@NonNull final ApplicationContext applicationContext) throws BeansException {
         SpringBeanUtils.INSTANCE.setCfgContext((ConfigurableApplicationContext) applicationContext);
         SingletonHolder.INST.register(ObjectProvide.class, new SpringBeanProvide());
-        //todo:到这里去改造一下了.
+    }
+
+    /**
+     * Fix metric register happen before initialize.
+     */
+    @Override
+    public void postProcessBeanFactory(@NonNull final ConfigurableListableBeanFactory beanFactory) throws BeansException {
         HmilyBootstrap.getInstance().start();
     }
 }

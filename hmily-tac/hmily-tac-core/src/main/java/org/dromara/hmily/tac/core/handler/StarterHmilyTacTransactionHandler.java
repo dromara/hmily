@@ -1,10 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
+ * Copyright 2017-2021 Dromara.org
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -27,14 +26,13 @@ import org.dromara.hmily.core.disruptor.HmilyDisruptor;
 import org.dromara.hmily.core.disruptor.handler.HmilyTransactionEventConsumer;
 import org.dromara.hmily.core.service.HmilyTransactionHandler;
 import org.dromara.hmily.core.service.HmilyTransactionTask;
-import org.dromara.hmily.metrics.enums.MetricsLabelEnum;
-import org.dromara.hmily.metrics.spi.MetricsHandlerFacade;
-import org.dromara.hmily.metrics.spi.MetricsHandlerFacadeEngine;
+import org.dromara.hmily.metrics.constant.LabelNames;
+import org.dromara.hmily.metrics.reporter.MetricsReporter;
 import org.dromara.hmily.repository.spi.entity.HmilyTransaction;
 import org.dromara.hmily.tac.core.transaction.HmilyTacTransactionManager;
 
-import java.util.Optional;
-import java.util.function.Supplier;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 
 /**
@@ -47,6 +45,12 @@ public class StarterHmilyTacTransactionHandler implements HmilyTransactionHandle
     private final HmilyTacTransactionManager tm = HmilyTacTransactionManager.getInstance();
     
     private final HmilyDisruptor<HmilyTransactionTask> disruptor;
+    
+    static {
+        MetricsReporter.registerCounter(LabelNames.TRANSACTION_TOTAL, new String[]{"type"}, "hmily transaction total count");
+        MetricsReporter.registerHistogram(LabelNames.TRANSACTION_LATENCY, "hmily transaction Latency Histogram Millis (ms)");
+    }
+    
     
     /**
      * Instantiates a new Starter hmily tac transaction handler.
@@ -61,13 +65,9 @@ public class StarterHmilyTacTransactionHandler implements HmilyTransactionHandle
     public Object handleTransaction(final ProceedingJoinPoint point, final HmilyTransactionContext context)
             throws Throwable {
         Object returnValue;
-        Supplier<Boolean> histogramSupplier = null;
-        Optional<MetricsHandlerFacade> metricsFacade = MetricsHandlerFacadeEngine.load();
+        MetricsReporter.counterIncrement(LabelNames.TRANSACTION_TOTAL, new String[]{TransTypeEnum.TAC.name()});
+        LocalDateTime starterTime = LocalDateTime.now();
         try {
-            if (metricsFacade.isPresent()) {
-                metricsFacade.get().counterIncrement(MetricsLabelEnum.TRANSACTION_TOTAL.getName(), TransTypeEnum.TAC.name());
-                histogramSupplier = metricsFacade.get().histogramStartTimer(MetricsLabelEnum.TRANSACTION_LATENCY.getName(), TransTypeEnum.TAC.name());
-            }
             tm.begin();
             try {
                 //execute try
@@ -76,8 +76,7 @@ public class StarterHmilyTacTransactionHandler implements HmilyTransactionHandle
                 //if exception ,execute cancel
                 final HmilyTransaction currentTransaction = tm.getHmilyTransaction();
                 disruptor.getProvider().onData(() -> {
-                    metricsFacade.ifPresent(metricsHandlerFacade -> metricsHandlerFacade.counterIncrement(MetricsLabelEnum.TRANSACTION_STATUS.getName(),
-                            TransTypeEnum.TAC.name(), HmilyRoleEnum.START.name(), HmilyActionEnum.CANCELING.name()));
+                    MetricsReporter.counterIncrement(LabelNames.TRANSACTION_STATUS, new String[]{TransTypeEnum.TAC.name(), HmilyRoleEnum.START.name(), HmilyActionEnum.CANCELING.name()});
                     tm.rollback(currentTransaction);
                 });
                 throw throwable;
@@ -85,16 +84,13 @@ public class StarterHmilyTacTransactionHandler implements HmilyTransactionHandle
             // execute confirm
             final HmilyTransaction currentTransaction = tm.getHmilyTransaction();
             disruptor.getProvider().onData(() -> {
-                metricsFacade.ifPresent(metricsHandlerFacade -> metricsHandlerFacade.counterIncrement(MetricsLabelEnum.TRANSACTION_STATUS.getName(),
-                        TransTypeEnum.TAC.name(), HmilyRoleEnum.START.name(), HmilyActionEnum.CONFIRMING.name()));
+                MetricsReporter.counterIncrement(LabelNames.TRANSACTION_STATUS, new String[]{TransTypeEnum.TAC.name(), HmilyRoleEnum.START.name(), HmilyActionEnum.CONFIRMING.name()});
                 tm.commit(currentTransaction);
             });
         } finally {
             HmilyContextHolder.remove();
             tm.remove();
-            if (null != histogramSupplier) {
-                histogramSupplier.get();
-            }
+            MetricsReporter.recordTime(LabelNames.TRANSACTION_LATENCY, starterTime.until(LocalDateTime.now(), ChronoUnit.MILLIS));
         }
         return returnValue;
     }

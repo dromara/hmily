@@ -1,10 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
+ * Copyright 2017-2021 Dromara.org
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -20,6 +19,7 @@ package org.dromara.hmily.tac.sqlcompute.impl;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.dromara.hmily.tac.sqlparser.model.common.segment.dml.column.HmilyColumnSegment;
+import org.dromara.hmily.tac.sqlparser.model.common.segment.dml.expr.HmilyBinaryOperationExpression;
 import org.dromara.hmily.tac.sqlparser.model.common.segment.dml.expr.HmilyExpressionSegment;
 import org.dromara.hmily.tac.sqlparser.model.common.segment.dml.expr.complex.HmilyCommonExpressionSegment;
 import org.dromara.hmily.tac.sqlparser.model.common.segment.dml.expr.simple.HmilyLiteralExpressionSegment;
@@ -54,6 +54,11 @@ public final class ExpressionHandler {
         if (expressionSegment instanceof HmilyExpressionProjectionSegment) {
             String value = ((HmilyExpressionProjectionSegment) expressionSegment).getText();
             return "null".equals(value) ? null : value;
+        }
+        if (expressionSegment instanceof HmilyBinaryOperationExpression) {
+            Object left = getValue(parameters, ((HmilyBinaryOperationExpression) expressionSegment).getLeft());
+            Object right = getValue(parameters, ((HmilyBinaryOperationExpression) expressionSegment).getRight());
+            return String.format("%s %s %s", left, ((HmilyBinaryOperationExpression) expressionSegment).getOperator(), right);
         }
         if (expressionSegment instanceof HmilyColumnSegment) {
             return ((HmilyColumnSegment) expressionSegment).getQualifiedName();

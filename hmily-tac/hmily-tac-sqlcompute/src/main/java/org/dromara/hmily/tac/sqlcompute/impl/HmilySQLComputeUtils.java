@@ -1,10 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
+ * Copyright 2017-2021 Dromara.org
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -71,16 +70,17 @@ public class HmilySQLComputeUtils {
      * Get all columns.
      *
      * @param segment hmily simple table segment
+     * @param tableName table name
      * @return all table columns in asterisk way
      */
-    public static String getAllColumns(final HmilySimpleTableSegment segment) {
+    public static String getAllColumns(final HmilySimpleTableSegment segment, final String tableName) {
         String result;
         if (segment.getAlias().isPresent()) {
             result = String.format("%s.*", segment.getAlias().get());
         } else if (segment.getOwner().isPresent()) {
-            result = String.format("%s.%s.*", segment.getOwner(), segment.getTableName().getIdentifier().toString());
+            result = String.format("%s.%s.*", segment.getOwner(), tableName);
         } else {
-            result = String.format("%s.*", segment.getTableName().getIdentifier().toString());
+            result = String.format("%s.*", tableName);
         }
         return result;
     }

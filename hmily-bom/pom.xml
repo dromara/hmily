@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Licensed to the Apache Software Foundation (ASF) under one or more
-  ~ contributor license agreements.  See the NOTICE file distributed with
-  ~ this work for additional information regarding copyright ownership.
-  ~ The ASF licenses this file to You under the Apache License, Version 2.0
-  ~ (the "License"); you may not use this file except in compliance with
-  ~ the License.  You may obtain a copy of the License at
+  ~ Copyright 2017-2021 Dromara.org
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
   ~
   ~     http://www.apache.org/licenses/LICENSE-2.0
   ~
@@ -89,7 +88,8 @@
         <motan.version>1.0.0</motan.version>
         <disruptor.version>3.4.0</disruptor.version>
         <hikaricp.version>3.2.0</hikaricp.version>
-        <prometheus-java-client.version>0.6.0</prometheus-java-client.version>
+        <prometheus-java-client.version>0.10.0</prometheus-java-client.version>
+        <prometheus-jmx.version>0.15.0</prometheus-jmx.version>
         <zookeeper.version>3.6.0</zookeeper.version>
         <zkClient.version>0.4</zkClient.version>
         <aspectj.version>1.8.9</aspectj.version>
@@ -183,6 +183,13 @@
                 <groupId>io.prometheus</groupId>
                 <artifactId>simpleclient_hotspot</artifactId>
                 <version>${prometheus-java-client.version}</version>
+            </dependency>
+
+            <!-- https://mvnrepository.com/artifact/io.prometheus.jmx/collector -->
+            <dependency>
+                <groupId>io.prometheus.jmx</groupId>
+                <artifactId>collector</artifactId>
+                <version>${prometheus-jmx.version}</version>
             </dependency>
 
             <dependency>

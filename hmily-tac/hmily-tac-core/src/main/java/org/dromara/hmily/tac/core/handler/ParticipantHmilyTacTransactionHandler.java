@@ -1,10 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
+ * Copyright 2017-2021 Dromara.org
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -28,8 +27,8 @@ import org.dromara.hmily.core.context.HmilyContextHolder;
 import org.dromara.hmily.core.context.HmilyTransactionContext;
 import org.dromara.hmily.core.repository.HmilyRepositoryStorage;
 import org.dromara.hmily.core.service.HmilyTransactionHandler;
-import org.dromara.hmily.metrics.enums.MetricsLabelEnum;
-import org.dromara.hmily.metrics.spi.MetricsHandlerFacadeEngine;
+import org.dromara.hmily.metrics.constant.LabelNames;
+import org.dromara.hmily.metrics.reporter.MetricsReporter;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipant;
 import org.dromara.hmily.tac.core.transaction.HmilyTacParticipantCoordinator;
 
@@ -45,6 +44,10 @@ import java.util.Objects;
 public class ParticipantHmilyTacTransactionHandler implements HmilyTransactionHandler {
     
     private final HmilyTacParticipantCoordinator coordinator = HmilyTacParticipantCoordinator.getInstance();
+    
+    static {
+        MetricsReporter.registerCounter(LabelNames.TRANSACTION_STATUS, new String[]{"type", "role", "status"}, "collect hmily transaction count");
+    }
     
     @Override
     public Object handleTransaction(final ProceedingJoinPoint point, final HmilyTransactionContext context) throws Throwable {
@@ -69,14 +72,12 @@ public class ParticipantHmilyTacTransactionHandler implements HmilyTransactionHa
                     HmilyContextHolder.remove();
                 }
             case CONFIRMING:
-                MetricsHandlerFacadeEngine.load().ifPresent(metricsHandlerFacade -> metricsHandlerFacade.counterIncrement(MetricsLabelEnum.TRANSACTION_STATUS.getName(),
-                        TransTypeEnum.TAC.name(), HmilyRoleEnum.PARTICIPANT.name(), HmilyActionEnum.CONFIRMING.name()));
+                MetricsReporter.counterIncrement(LabelNames.TRANSACTION_STATUS, new String[]{TransTypeEnum.TAC.name(), HmilyRoleEnum.PARTICIPANT.name(), HmilyActionEnum.CONFIRMING.name()});
                 List<HmilyParticipant> confirmList = HmilyParticipantCacheManager.getInstance().get(context.getParticipantId());
                 coordinator.commitParticipant(confirmList, context.getParticipantId());
                 break;
             case CANCELING:
-                MetricsHandlerFacadeEngine.load().ifPresent(metricsHandlerFacade -> metricsHandlerFacade.counterIncrement(MetricsLabelEnum.TRANSACTION_STATUS.getName(),
-                        TransTypeEnum.TAC.name(), HmilyRoleEnum.PARTICIPANT.name(), HmilyActionEnum.CANCELING.name()));
+                MetricsReporter.counterIncrement(LabelNames.TRANSACTION_STATUS, new String[]{TransTypeEnum.TAC.name(), HmilyRoleEnum.PARTICIPANT.name(), HmilyActionEnum.CANCELING.name()});
                 List<HmilyParticipant> cancelList = HmilyParticipantCacheManager.getInstance().get(context.getParticipantId());
                 coordinator.rollbackParticipant(cancelList, context.getParticipantId());
                 break;

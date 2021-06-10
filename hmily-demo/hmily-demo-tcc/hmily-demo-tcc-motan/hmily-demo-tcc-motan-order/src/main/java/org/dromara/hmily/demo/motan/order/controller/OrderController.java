@@ -1,10 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
+ * Copyright 2017-2021 Dromara.org
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -61,23 +60,6 @@ public class OrderController {
                            @RequestParam(value = "amount") BigDecimal amount) {
         final long start = System.currentTimeMillis();
         orderService.orderPay(count, amount);
-        System.out.println("消耗时间为:" + (System.currentTimeMillis() - start));
-        return "";
-    }
-    
-    /**
-     * Order pay tac string.
-     *
-     * @param count  the count
-     * @param amount the amount
-     * @return the string
-     */
-    @PostMapping(value = "/orderPayTAC")
-    @ApiOperation(value = "测试tac模式")
-    public String orderPayTAC(@RequestParam(value = "count") Integer count,
-                           @RequestParam(value = "amount") BigDecimal amount) {
-        final long start = System.currentTimeMillis();
-        orderService.saveOrderForTAC(count, amount);
         System.out.println("消耗时间为:" + (System.currentTimeMillis() - start));
         return "";
     }

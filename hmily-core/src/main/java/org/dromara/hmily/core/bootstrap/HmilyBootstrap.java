@@ -1,13 +1,12 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- *
+ * Copyright 2017-2021 Dromara.org
+
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
  *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,7 +16,6 @@
 
 package org.dromara.hmily.core.bootstrap;
 
-import java.util.Objects;
 import org.dromara.hmily.common.exception.HmilyRuntimeException;
 import org.dromara.hmily.common.hook.HmilyShutdownHook;
 import org.dromara.hmily.common.utils.StringUtils;
@@ -33,12 +31,14 @@ import org.dromara.hmily.core.provide.ObjectProvide;
 import org.dromara.hmily.core.provide.ReflectObject;
 import org.dromara.hmily.core.repository.HmilyRepositoryFacade;
 import org.dromara.hmily.core.schedule.HmilyTransactionSelfRecoveryScheduled;
-import org.dromara.hmily.metrics.spi.MetricsInit;
+import org.dromara.hmily.metrics.facade.MetricsTrackerFacade;
 import org.dromara.hmily.repository.spi.HmilyRepository;
 import org.dromara.hmily.serializer.spi.HmilySerializer;
 import org.dromara.hmily.spi.ExtensionLoaderFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Objects;
 
 /**
  * The type Hmily bootstrap.
@@ -92,9 +92,9 @@ public final class HmilyBootstrap {
     private void initMetrics() {
         HmilyMetricsConfig metricsConfig = ConfigEnv.getInstance().getConfig(HmilyMetricsConfig.class);
         if (Objects.nonNull(metricsConfig) && StringUtils.isNoneBlank(metricsConfig.getMetricsName())) {
-            MetricsInit metricsInit = ExtensionLoaderFactory.load(MetricsInit.class);
-            metricsInit.init(metricsConfig);
-            registerAutoCloseable(metricsInit);
+            MetricsTrackerFacade facade = new MetricsTrackerFacade();
+            facade.start(metricsConfig);
+            registerAutoCloseable(facade);
         }
     }
     
