@@ -27,5 +27,5 @@ public class RpcResponse {
 
     private int xtState;
 
-    private
+    private int f ;
 }

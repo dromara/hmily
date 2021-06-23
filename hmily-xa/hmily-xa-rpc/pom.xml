@@ -40,13 +40,13 @@
         </dependency>
         <dependency>
             <groupId>org.dromara</groupId>
-            <artifactId>hmily-apache-dubbo</artifactId>
-            <version>2.1.2-SNAPSHOT</version>
+            <artifactId>hmily-xa-p6spy</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.dubbo</groupId>
             <artifactId>dubbo</artifactId>
-            <scope>compile</scope>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 

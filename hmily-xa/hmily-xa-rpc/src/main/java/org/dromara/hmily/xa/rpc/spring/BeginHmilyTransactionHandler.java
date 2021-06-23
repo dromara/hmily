@@ -35,17 +35,18 @@ import javax.transaction.xa.XAException;
  *
  * @author sixh chenbin
  */
-public class RollbackHmilyTransactionHandler implements HmilyTransactionHandler {
+public class BeginHmilyTransactionHandler implements HmilyTransactionHandler {
+
     @Override
     public Object handleTransaction(final ProceedingJoinPoint point, final HmilyTransactionContext hmilyTransactionContext) throws Throwable {
-        //完成rollback
+        //完成commit.
         XaParticipant xaParticipant = hmilyTransactionContext.getXaParticipant();
         String branchId = xaParticipant.getBranchId();
         XidImpl xid = new XidImpl(branchId);
         XaResourceWrapped resource = XaResourcePool.INST.getResource(xid);
-        //如果是远程调用就只能是rollback.
+        //如果是远程调用就只能是commit.
         try {
-            resource.rollback(xid);
+            resource.commit(xid, false);
         } catch (XAException ex) {
             throw new HmliyXaException(ex.errorCode);
         } catch (Exception ex) {

@@ -19,7 +19,7 @@ package org.dromara.hmily.xa.p6spy.test;
 
 import com.alibaba.druid.pool.xa.DruidXADataSource;
 import org.dromara.hmily.xa.core.UserTransactionImpl;
-import org.dromara.hmily.xa.p6spy.HmilyXAP6Datasource;
+import org.dromara.hmily.xa.p6spy.HmilyXaP6Datasource;
 import org.junit.Test;
 
 import javax.sql.DataSource;
@@ -120,7 +120,7 @@ public class HmilyXaTest {
         druidDataSource.setUsername("root");
         druidDataSource.setPassword("123456");
         druidDataSource.setDriverClassName("com.mysql.jdbc.Driver");
-        return new HmilyXAP6Datasource(druidDataSource);
+        return new HmilyXaP6Datasource(druidDataSource);
     }
 
     private DataSource getDataSource() {
@@ -129,6 +129,6 @@ public class HmilyXaTest {
         druidDataSource.setUsername("root");
         druidDataSource.setPassword("123456");
         druidDataSource.setDriverClassName("com.mysql.jdbc.Driver");
-        return new HmilyXAP6Datasource(druidDataSource);
+        return new HmilyXaP6Datasource(druidDataSource);
     }
 }

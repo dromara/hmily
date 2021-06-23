@@ -19,9 +19,11 @@ package org.dromara.hmily.xa.core;
 
 import javax.transaction.HeuristicMixedException;
 import javax.transaction.HeuristicRollbackException;
+import javax.transaction.InvalidTransactionException;
 import javax.transaction.NotSupportedException;
 import javax.transaction.RollbackException;
 import javax.transaction.SystemException;
+import javax.transaction.Transaction;
 import javax.transaction.TransactionManager;
 import javax.transaction.UserTransaction;
 
@@ -30,7 +32,7 @@ import javax.transaction.UserTransaction;
  *
  * @author sixh chenbin
  */
-public class UserTransactionImpl implements UserTransaction {
+public class UserTransactionImpl implements UserTransaction, TransactionManager {
 
     private TransactionManager tm;
 
@@ -67,7 +69,22 @@ public class UserTransactionImpl implements UserTransaction {
     }
 
     @Override
+    public Transaction getTransaction() throws SystemException {
+        return getTm().getTransaction();
+    }
+
+    @Override
+    public void resume(final Transaction transaction) throws InvalidTransactionException, IllegalStateException, SystemException {
+        getTm().resume(transaction);
+    }
+
+    @Override
     public void setTransactionTimeout(final int i) throws SystemException {
         getTm().setTransactionTimeout(i);
+    }
+
+    @Override
+    public Transaction suspend() throws SystemException {
+        return getTm().suspend();
     }
 }

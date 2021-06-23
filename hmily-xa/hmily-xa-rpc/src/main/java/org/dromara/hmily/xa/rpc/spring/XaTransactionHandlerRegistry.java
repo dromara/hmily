@@ -22,6 +22,7 @@ import org.dromara.hmily.core.context.HmilyTransactionContext;
 import org.dromara.hmily.core.context.XaParticipant;
 import org.dromara.hmily.core.service.HmilyTransactionHandler;
 import org.dromara.hmily.core.service.HmilyTransactionHandlerRegistry;
+import org.dromara.hmily.spi.HmilySPI;
 import org.dromara.hmily.xa.rpc.RpcXaProxy;
 
 import java.util.EnumMap;
@@ -32,6 +33,7 @@ import java.util.Map;
  *
  * @author sixh chenbin
  */
+@HmilySPI("xa")
 public class XaTransactionHandlerRegistry implements HmilyTransactionHandlerRegistry {
 
     /**
@@ -44,15 +46,15 @@ public class XaTransactionHandlerRegistry implements HmilyTransactionHandlerRegi
      */
     public XaTransactionHandlerRegistry() {
         enumsMap.put(RpcXaProxy.XaCmd.COMMIT, new CommitHmilyTransactionHandler());
-        enumsMap.put(RpcXaProxy.XaCmd.PREPARE, new CommitHmilyTransactionHandler());
-        enumsMap.put(RpcXaProxy.XaCmd.RECOVER, new CommitHmilyTransactionHandler());
-        enumsMap.put(RpcXaProxy.XaCmd.ROLLBACK, new CommitHmilyTransactionHandler());
+        enumsMap.put(RpcXaProxy.XaCmd.PREPARE, new PrepareHmilyTransactionHandler());
+        enumsMap.put(RpcXaProxy.XaCmd.RECOVER, new RecoverHmilyTransactionHandler());
+        enumsMap.put(RpcXaProxy.XaCmd.ROLLBACK, new RollbackHmilyTransactionHandler());
     }
 
     @Override
     public HmilyTransactionHandler select(final HmilyTransactionContext context) {
         HmilyTransactionHandler hmilyTransactionHandler = new DefHmilyTransactionHandler();
-        if (context.getXaParticipant() != null) {
+        if (context != null && context.getXaParticipant() != null) {
             XaParticipant xaParticipant = context.getXaParticipant();
             String cmd = xaParticipant.getCmd();
             if (!StringUtils.isBlank(cmd)) {

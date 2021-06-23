@@ -72,7 +72,6 @@ public class HmilyXaTransactionManager implements TransactionManager {
         Transaction transaction = getThreadTransaction();
         if (transaction == null) {
             logger.warn("transaction is null");
-            throw new IllegalStateException("transaction is null");
         }
         return transaction;
     }

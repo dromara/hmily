@@ -30,20 +30,19 @@ import java.sql.SQLException;
  *
  * @author xiaoyu
  */
-public class HmilyXAP6Datasource extends P6DataSource {
+public class HmilyXaP6Datasource extends P6DataSource {
 
     @Getter
-    private final DataSource targetDataSource;
+    private DataSource targetDataSource;
 
     /**
      * Instantiates a new Hmily p 6 datasource.
      *
      * @param delegate the delegate
      */
-    public HmilyXAP6Datasource(final DataSource delegate) {
+    public HmilyXaP6Datasource(final DataSource delegate) {
         super(delegate);
-        targetDataSource = delegate;
-        init();
+        init(delegate);
     }
 
     @Override
@@ -68,12 +67,13 @@ public class HmilyXAP6Datasource extends P6DataSource {
         return new HmilyXaConnection(xaConnection);
     }
 
-    private void init() {
-        if (this.targetDataSource == null) {
+    private void init(final DataSource delegate) {
+        if (delegate == null) {
             throw new NullPointerException("targetDataSource is null");
         }
-        if (!(this.targetDataSource instanceof XADataSource)) {
-            throw new RuntimeException("targetDataSource have not instanceof XADataSource");
+        if (!(delegate instanceof XADataSource)) {
+            throw new NullPointerException("datasource non implements XADataSource");
         }
+        targetDataSource = delegate;
     }
 }

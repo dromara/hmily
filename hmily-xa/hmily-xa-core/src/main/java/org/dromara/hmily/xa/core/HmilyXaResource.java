@@ -53,6 +53,10 @@ public class HmilyXaResource extends XaResourceWrapped {
         return xid;
     }
 
+    public XAResource getXaResource() {
+        return xaResource;
+    }
+
     @Override
     public void commit0(final Xid xid, final boolean b) throws XAException {
         this.xaResource.commit(xid, b);
@@ -104,6 +108,10 @@ public class HmilyXaResource extends XaResourceWrapped {
 
     @Override
     public boolean isSameRM(final XAResource xaResource) throws XAException {
+        if (xaResource instanceof HmilyXaResource) {
+            XAResource xaResource1 = ((HmilyXaResource) xaResource).getXaResource();
+            return this.xaResource.isSameRM(xaResource1);
+        }
         return this.xaResource.isSameRM(xaResource);
     }
 
