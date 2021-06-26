@@ -18,6 +18,7 @@
 package org.dromara.hmily.xa.core;
 
 import com.google.common.base.Splitter;
+import org.dromara.hmily.common.utils.IdWorkerUtils;
 import org.dromara.hmily.common.utils.NetUtils;
 
 import javax.transaction.xa.Xid;
@@ -32,8 +33,6 @@ import java.util.concurrent.atomic.AtomicLong;
 public class XidImpl implements Xid {
 
     private static final Integer DEF_ID = 8808;
-
-    private static final AtomicLong XID = new AtomicLong(10000);
 
     /**
      * Process branch Id.
@@ -52,13 +51,13 @@ public class XidImpl implements Xid {
      * Instantiates a new X id.
      */
     public XidImpl() {
-        Long id = XID.getAndIncrement();
+        Long id = IdWorkerUtils.getInstance().createUUID();
         String bid = "0";
         String newId = id + "-" + bid + "-" + NetUtils.getLocalIp();
-        this.globalId = newId;
+        this.globalId = id.toString();
         this.branchId = newId;
         this.branchIdByte = newId.getBytes();
-        this.globalIdByte = newId.getBytes();
+        this.globalIdByte = globalId.getBytes();
     }
 
     /**
@@ -82,12 +81,12 @@ public class XidImpl implements Xid {
     /**
      * Instantiates a new Xid.
      *
-     * @param xidStr the xid str
+     * @param branchId the xid str
      */
-    public XidImpl(final String xidStr) {
-        List<String> strings = Splitter.on("-").splitToList(xidStr);
-        this.branchId = xidStr;
-        this.branchIdByte = xidStr.getBytes();
+    public XidImpl(final String branchId) {
+        List<String> strings = Splitter.on("-").splitToList(branchId);
+        this.branchId = branchId;
+        this.branchIdByte = branchId.getBytes();
         String gid = strings.get(0);
         this.globalId = gid;
         this.globalIdByte = gid.getBytes();

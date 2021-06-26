@@ -21,6 +21,9 @@ import org.apache.dubbo.rpc.Invocation;
 import org.apache.dubbo.rpc.Invoker;
 import org.apache.dubbo.rpc.Result;
 import org.apache.dubbo.rpc.RpcContext;
+import org.dromara.hmily.common.constant.CommonConstant;
+import org.dromara.hmily.common.utils.GsonUtils;
+import org.dromara.hmily.common.utils.StringUtils;
 import org.dromara.hmily.core.context.HmilyTransactionContext;
 import org.dromara.hmily.core.context.XaParticipant;
 import org.dromara.hmily.core.mediator.RpcMediator;
@@ -28,6 +31,7 @@ import org.dromara.hmily.xa.rpc.RpcXaProxy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -69,34 +73,26 @@ public class DubboRpcXaProxy implements RpcXaProxy {
     }
 
     @Override
-    public Object cmd(final XaCmd cmd, final Map<String, Object> params) {
+    public Integer cmd(final XaCmd cmd, final Map<String, Object> params) {
         if (cmd == null) {
             logger.warn("cmd is null");
             return NO;
         }
-        if (params == null || params.isEmpty()) {
-            return NO;
-        }
         //因为@see HmilyTransactionContext#xaParticipant#cmd字段.
-        params.put("xaParticipant.cmd", cmd.name());
-        params.forEach((k, v) -> RpcContext.getContext().setAttachment(k, v.toString()));
+        //CommonConstant.HMILY_TRANSACTION_CONTEXT
         //如果是执行一个cmd的时候.
+        String attachment = rpcInvocation.getAttachment(CommonConstant.HMILY_TRANSACTION_CONTEXT);
+        //重新设置值.
+        if (StringUtils.isNoneBlank(attachment)) {
+            HmilyTransactionContext context = GsonUtils.getInstance().fromJson(attachment, HmilyTransactionContext.class);
+            context.getXaParticipant().setCmd(cmd.name());
+            RpcMediator.getInstance().transmit(RpcContext.getContext()::setAttachment, context);
+        }
         Result result = this.invoker.invoke(rpcInvocation);
         if (result.hasException()) {
             logger.warn("执行一个指令发送了异常，{}:{}", params, result.getException().getMessage());
             return EXC;
         } else {
-            if (result.getValue() != null) {
-                if (result.getValue() instanceof Integer
-                        || result.getValue().getClass().isPrimitive()) {
-                    return Integer.parseInt(result.getValue().toString());
-                } else {
-                    Object value = result.getValue();
-                    if (value instanceof List) {
-                        return value;
-                    }
-                }
-            }
             return YES;
         }
     }

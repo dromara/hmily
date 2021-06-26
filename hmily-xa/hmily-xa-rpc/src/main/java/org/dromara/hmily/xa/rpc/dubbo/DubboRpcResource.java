@@ -21,6 +21,7 @@ import org.apache.dubbo.rpc.Invocation;
 import org.apache.dubbo.rpc.Invoker;
 import org.dromara.hmily.core.context.XaParticipant;
 import org.dromara.hmily.xa.rpc.RpcResource;
+import org.dromara.hmily.xa.rpc.RpcXaProxy;
 
 import javax.transaction.xa.XAException;
 import javax.transaction.xa.XAResource;
@@ -71,7 +72,7 @@ public class DubboRpcResource extends RpcResource {
 
     @Override
     public String getName() {
-        return "dubbo";
+        return "META-INF/dubbo";
     }
 
     @Override
@@ -82,6 +83,7 @@ public class DubboRpcResource extends RpcResource {
         xaParticipant.setFlag(i);
         xaParticipant.setBranchId(new String(xid.getBranchQualifier()));
         xaParticipant.setGlobalId(new String(xid.getGlobalTransactionId()));
+        xaParticipant.setCmd(RpcXaProxy.XaCmd.START.name());
         this.getXaProxy().init(xaParticipant);
     }
 }

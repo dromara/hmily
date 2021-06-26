@@ -44,6 +44,7 @@ public class SubCoordinator implements Resource, Synchronization {
 
     private XaState state = XaState.STATUS_ACTIVE;
 
+    private final boolean hasSuper;
     /**
      * all xaResources.
      */
@@ -59,8 +60,9 @@ public class SubCoordinator implements Resource, Synchronization {
      *
      * @param transaction the transaction
      */
-    public SubCoordinator(final TransactionImpl transaction) {
+    public SubCoordinator(final TransactionImpl transaction, boolean hasSuper) {
         this.transaction = transaction;
+        this.hasSuper = hasSuper;
     }
 
     @Override

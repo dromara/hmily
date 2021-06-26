@@ -18,10 +18,12 @@
 package org.dromara.hmily.xa.rpc.spring;
 
 import org.aspectj.lang.ProceedingJoinPoint;
+import org.dromara.hmily.core.context.HmilyContextHolder;
 import org.dromara.hmily.core.context.HmilyTransactionContext;
 import org.dromara.hmily.core.context.XaParticipant;
 import org.dromara.hmily.core.service.HmilyTransactionHandler;
 import org.dromara.hmily.xa.core.HmliyXaException;
+import org.dromara.hmily.xa.core.TransactionContext;
 import org.dromara.hmily.xa.core.XaResourcePool;
 import org.dromara.hmily.xa.core.XaResourceWrapped;
 import org.dromara.hmily.xa.core.XidImpl;
@@ -39,19 +41,7 @@ public class BeginHmilyTransactionHandler implements HmilyTransactionHandler {
 
     @Override
     public Object handleTransaction(final ProceedingJoinPoint point, final HmilyTransactionContext hmilyTransactionContext) throws Throwable {
-        //完成commit.
-        XaParticipant xaParticipant = hmilyTransactionContext.getXaParticipant();
-        String branchId = xaParticipant.getBranchId();
-        XidImpl xid = new XidImpl(branchId);
-        XaResourceWrapped resource = XaResourcePool.INST.getResource(xid);
-        //如果是远程调用就只能是commit.
-        try {
-            resource.commit(xid, false);
-        } catch (XAException ex) {
-            throw new HmliyXaException(ex.errorCode);
-        } catch (Exception ex) {
-            throw new HmliyXaException(HmliyXaException.UNKNOWN);
-        }
-        return RpcXaProxy.YES;
+        HmilyContextHolder.set(hmilyTransactionContext);
+        return point.proceed();
     }
 }

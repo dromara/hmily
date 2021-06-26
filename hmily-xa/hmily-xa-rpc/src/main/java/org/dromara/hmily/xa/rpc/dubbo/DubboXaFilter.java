@@ -26,6 +26,7 @@ import org.apache.dubbo.rpc.Invocation;
 import org.apache.dubbo.rpc.Invoker;
 import org.apache.dubbo.rpc.Result;
 import org.apache.dubbo.rpc.RpcException;
+import org.dromara.hmily.annotation.Hmily;
 import org.dromara.hmily.annotation.HmilyXA;
 import org.dromara.hmily.common.utils.LogUtil;
 import org.dromara.hmily.xa.core.TransactionImpl;
@@ -58,7 +59,7 @@ public class DubboXaFilter implements Filter {
         String methodName = invocation.getMethodName();
         try {
             Method method = clazz.getMethod(methodName, args);
-            HmilyXA hmily = method.getAnnotation(HmilyXA.class);
+            Hmily hmily = method.getAnnotation(Hmily.class);
             if (Objects.isNull(hmily)) {
                 return invoker.invoke(invocation);
             }

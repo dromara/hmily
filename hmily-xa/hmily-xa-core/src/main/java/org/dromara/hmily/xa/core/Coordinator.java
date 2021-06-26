@@ -56,16 +56,17 @@ public class Coordinator implements Resource, Finally, TimerRemovalListener<Reso
     /**
      * 父协调器.
      */
-    private String superCoordinator;
+    private Boolean hasSuper;
 
     /**
      * Instantiates a new Coordinator.
      *
      * @param xid the xid
      */
-    public Coordinator(final XidImpl xid) {
+    public Coordinator(final XidImpl xid, boolean hasSuper) {
         this.xid = xid;
         date = LocalDateTime.now();
+        this.hasSuper = hasSuper;
         //主事务的问题处理.
         hmilyTimer = new HmilyTimer<>(30000, TimeUnit.SECONDS, xid.getGlobalId());
         hmilyTimer.addRemovalListener(this);

@@ -45,6 +45,7 @@ public class XaTransactionHandlerRegistry implements HmilyTransactionHandlerRegi
      * Instantiates a new Xa transaction handler registry.
      */
     public XaTransactionHandlerRegistry() {
+        enumsMap.put(RpcXaProxy.XaCmd.START, new BeginHmilyTransactionHandler());
         enumsMap.put(RpcXaProxy.XaCmd.COMMIT, new CommitHmilyTransactionHandler());
         enumsMap.put(RpcXaProxy.XaCmd.PREPARE, new PrepareHmilyTransactionHandler());
         enumsMap.put(RpcXaProxy.XaCmd.RECOVER, new RecoverHmilyTransactionHandler());

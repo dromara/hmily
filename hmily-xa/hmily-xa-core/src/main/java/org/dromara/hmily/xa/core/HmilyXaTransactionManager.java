@@ -17,13 +17,14 @@
 
 package org.dromara.hmily.xa.core;
 
+import org.dromara.hmily.core.context.HmilyContextHolder;
+import org.dromara.hmily.core.context.HmilyTransactionContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.transaction.HeuristicMixedException;
 import javax.transaction.HeuristicRollbackException;
 import javax.transaction.InvalidTransactionException;
-import javax.transaction.NotSupportedException;
 import javax.transaction.RollbackException;
 import javax.transaction.Status;
 import javax.transaction.SystemException;
@@ -154,7 +155,7 @@ public class HmilyXaTransactionManager implements TransactionManager {
     }
 
     @Override
-    public void begin() throws NotSupportedException, SystemException {
+    public void begin() {
         //开始一个事务.
         Transaction threadTransaction = getThreadTransaction();
         Transaction rct = threadTransaction;
@@ -163,9 +164,17 @@ public class HmilyXaTransactionManager implements TransactionManager {
             TransactionImpl tx = (TransactionImpl) rct;
             rct = tx.createSubTransaction();
         } else {
-            XidImpl xId = new XidImpl();
+            boolean hasSuper = false;
+            HmilyTransactionContext context = HmilyContextHolder.get();
+            XidImpl xId;
+            if (context != null && context.getXaParticipant() != null) {
+                xId = new XidImpl(context.getXaParticipant().getBranchId());
+                hasSuper = true;
+            } else {
+                xId = new XidImpl();
+            }
             //Main business coordinator
-            rct = new TransactionImpl(xId);
+            rct = new TransactionImpl(xId, hasSuper);
         }
         setTxTotr(rct);
     }

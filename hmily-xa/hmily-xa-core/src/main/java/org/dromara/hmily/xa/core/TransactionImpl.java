@@ -56,19 +56,23 @@ public class TransactionImpl implements Transaction, TimerRemovalListener<Resour
 
     private final TransactionContext context;
 
+    private final boolean hasSuper;
+
     /**
      * Instantiates a new Transaction.
      *
      * @param xId the x id
      */
-    TransactionImpl(final XidImpl xId) {
+    TransactionImpl(final XidImpl xId, boolean hasSuper) {
         this.xid = xId;
+        this.hasSuper = hasSuper;
         context = new TransactionContext(null, xId);
         //todo:这里还要设置超时器.
         subCoordinator(true, true);
     }
 
     /**
+     * Coordinator
      * Instantiates a new Transaction.
      *
      * @param impl the
@@ -77,6 +81,7 @@ public class TransactionImpl implements Transaction, TimerRemovalListener<Resour
         this.xid = impl.getXid().newBranchId();
         context = impl.getContext();
         this.delistResourceList = null;
+        hasSuper = impl.hasSuper;
         subCoordinator(true, true);
     }
 
@@ -85,7 +90,11 @@ public class TransactionImpl implements Transaction, TimerRemovalListener<Resour
         Finally oneFinally = context.getOneFinally();
         if (oneFinally != null) {
             try {
-                oneFinally.commit();
+                if (hasSuper) {
+                    doDeList(XAResource.TMSUCCESS);
+                } else {
+                    oneFinally.commit();
+                }
             } catch (TransactionRolledbackException e) {
                 logger.error("error rollback", e);
                 throw new RollbackException();
@@ -216,7 +225,11 @@ public class TransactionImpl implements Transaction, TimerRemovalListener<Resour
     public void rollback() throws IllegalStateException, SystemException {
         Finally oneFinally = context.getOneFinally();
         if (oneFinally != null) {
-            oneFinally.rollback();
+            if (hasSuper) {
+                doDeList(XAResource.TMSUCCESS);
+            } else {
+                oneFinally.rollback();
+            }
             return;
         }
         if (subCoordinator != null) {
@@ -238,13 +251,13 @@ public class TransactionImpl implements Transaction, TimerRemovalListener<Resour
 
     private void subCoordinator(final boolean newCoordinator, final boolean stateActive) {
         try {
-            subCoordinator = new SubCoordinator(this);
+            subCoordinator = new SubCoordinator(this, this.hasSuper);
             if (!stateActive) {
                 return;
             }
             Coordinator coordinator = context.getCoordinator();
             if (newCoordinator && coordinator == null) {
-                coordinator = new Coordinator(xid);
+                coordinator = new Coordinator(xid, this.hasSuper);
                 context.setCoordinator(coordinator);
                 if (context.getOneFinally() == null) {
                     context.setOneFinally(coordinator);

@@ -18,8 +18,15 @@
 package org.dromara.hmily.xa.core;
 
 import javax.transaction.xa.Xid;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * XaResourcePool .
@@ -41,6 +48,8 @@ public class XaResourcePool {
      */
     private final Map<Xid, XaResourceWrapped> pool = new ConcurrentHashMap<>();
 
+    private final Map<String, Set<Xid>> XIDS = new ConcurrentHashMap<>();
+
     private XaResourcePool() {
 
     }
@@ -51,8 +60,16 @@ public class XaResourcePool {
      * @param xid               the xid
      * @param xaResourceWrapped the xa resource wrapped
      */
-    public void addResource(final Xid xid, final XaResourceWrapped xaResourceWrapped) {
+    public synchronized void addResource(final Xid xid, final XaResourceWrapped xaResourceWrapped) {
         pool.put(xid, xaResourceWrapped);
+        //处理一下xid;
+        String globalId = new String(xid.getGlobalTransactionId());
+        Set<Xid> xids = XIDS.get(globalId);
+        if (xids == null) {
+            xids = new HashSet<>();
+        }
+        xids.add(xid);
+        XIDS.put(globalId, xids);
     }
 
     /**
@@ -63,6 +80,21 @@ public class XaResourcePool {
      */
     public XaResourceWrapped removeResource(final Xid xid) {
         return pool.remove(xid);
+    }
+
+    /**
+     * Remove all.
+     *
+     * @param globalId the global id
+     */
+    public void removeAll(final String globalId) {
+        Set<Xid> xids = XIDS.get(globalId);
+        if (xids != null) {
+            for (final Xid xid : xids) {
+                removeResource(xid);
+            }
+            XIDS.remove(globalId);
+        }
     }
 
     /**
@@ -77,5 +109,19 @@ public class XaResourcePool {
             //todo:从日志中查找.
         }
         return xaResourceWrapped;
+    }
+
+    /**
+     * Gets all resource.
+     *
+     * @param globalId the global id
+     * @return the all resource
+     */
+    public List<XaResourceWrapped> getAllResource(final String globalId) {
+        Set<Xid> xids = XIDS.get(globalId);
+        if (xids != null) {
+            return xids.stream().map(this::getResource).collect(Collectors.toList());
+        }
+        return Collections.emptyList();
     }
 }

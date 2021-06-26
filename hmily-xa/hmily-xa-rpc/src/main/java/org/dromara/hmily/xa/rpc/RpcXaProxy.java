@@ -43,7 +43,7 @@ public interface RpcXaProxy {
     /**
      * 执行不成功.
      */
-    int NO = 100002;
+    int NO = 10002;
 
     /**
      * 会调用远程执行的一些命令.
@@ -53,7 +53,7 @@ public interface RpcXaProxy {
      * @return the int
      * @see XaCmd
      */
-    Object cmd(XaCmd cmd, Map<String, Object> params);
+    Integer cmd(XaCmd cmd, Map<String, Object> params);
 
     /**
      * 获取一个超时的时间,这里返回的也就是一个Rpc timeout.
@@ -82,30 +82,35 @@ public interface RpcXaProxy {
      */
     enum XaCmd {
         /**
+         * 初始化的时候进行处理.
+         */
+        START,
+
+        /**
          * The Commit.
          *
-         * @see RpcResource#commit(Xid, boolean) RpcResource#commit(Xid, boolean)RpcResource#commit(Xid, boolean)RpcResource#commit(Xid, boolean)RpcResource#commit(Xid, boolean)RpcResource#commit(Xid, boolean)
+         * @see RpcResource#commit(Xid, boolean) RpcResource#commit(Xid, boolean)RpcResource#commit(Xid, boolean)RpcResource#commit(Xid, boolean)RpcResource#commit(Xid, boolean)RpcResource#commit(Xid, boolean)RpcResource#commit(Xid, boolean)
          */
         COMMIT,
 
         /**
          * The Prepare.
          *
-         * @see RpcResource#prepare(Xid) RpcResource#prepare(Xid)RpcResource#prepare(Xid)RpcResource#prepare(Xid)RpcResource#prepare(Xid)RpcResource#prepare(Xid)
+         * @see RpcResource#prepare(Xid) RpcResource#prepare(Xid)RpcResource#prepare(Xid)RpcResource#prepare(Xid)RpcResource#prepare(Xid)RpcResource#prepare(Xid)RpcResource#prepare(Xid)
          */
         PREPARE,
 
         /**
          * The Recover.
          *
-         * @see RpcResource#recover(int) RpcResource#recover(int)RpcResource#recover(int)RpcResource#recover(int)RpcResource#recover(int)RpcResource#recover(int)
+         * @see RpcResource#recover(int) RpcResource#recover(int)RpcResource#recover(int)RpcResource#recover(int)RpcResource#recover(int)RpcResource#recover(int)RpcResource#recover(int)
          */
         RECOVER,
 
         /**
          * The Rollback.
          *
-         * @see RpcResource#rollback(Xid) RpcResource#rollback(Xid)RpcResource#rollback(Xid)RpcResource#rollback(Xid)RpcResource#rollback(Xid)RpcResource#rollback(Xid)
+         * @see RpcResource#rollback(Xid) RpcResource#rollback(Xid)RpcResource#rollback(Xid)RpcResource#rollback(Xid)RpcResource#rollback(Xid)RpcResource#rollback(Xid)RpcResource#rollback(Xid)
          */
         ROLLBACK,
     }
