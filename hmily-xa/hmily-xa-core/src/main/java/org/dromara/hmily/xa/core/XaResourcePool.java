@@ -18,14 +18,12 @@
 package org.dromara.hmily.xa.core;
 
 import javax.transaction.xa.Xid;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -36,7 +34,7 @@ import java.util.stream.Collectors;
  *
  * @author sixh chenbin
  */
-public class XaResourcePool {
+public final class XaResourcePool {
 
     /**
      * The constant INST.
@@ -48,7 +46,7 @@ public class XaResourcePool {
      */
     private final Map<Xid, XaResourceWrapped> pool = new ConcurrentHashMap<>();
 
-    private final Map<String, Set<Xid>> XIDS = new ConcurrentHashMap<>();
+    private final Map<String, Set<Xid>> xids = new ConcurrentHashMap<>();
 
     private XaResourcePool() {
 
@@ -64,12 +62,12 @@ public class XaResourcePool {
         pool.put(xid, xaResourceWrapped);
         //处理一下xid;
         String globalId = new String(xid.getGlobalTransactionId());
-        Set<Xid> xids = XIDS.get(globalId);
+        Set<Xid> xids = this.xids.get(globalId);
         if (xids == null) {
             xids = new HashSet<>();
         }
         xids.add(xid);
-        XIDS.put(globalId, xids);
+        this.xids.put(globalId, xids);
     }
 
     /**
@@ -88,12 +86,12 @@ public class XaResourcePool {
      * @param globalId the global id
      */
     public void removeAll(final String globalId) {
-        Set<Xid> xids = XIDS.get(globalId);
+        Set<Xid> xids = this.xids.get(globalId);
         if (xids != null) {
             for (final Xid xid : xids) {
                 removeResource(xid);
             }
-            XIDS.remove(globalId);
+            this.xids.remove(globalId);
         }
     }
 
@@ -105,9 +103,9 @@ public class XaResourcePool {
      */
     public XaResourceWrapped getResource(final Xid xid) {
         XaResourceWrapped xaResourceWrapped = pool.get(xid);
-        if (xaResourceWrapped == null) {
-            //todo:从日志中查找.
-        }
+//        if (xaResourceWrapped == null) {
+//            //todo:从日志中查找.
+//        }
         return xaResourceWrapped;
     }
 
@@ -118,7 +116,7 @@ public class XaResourcePool {
      * @return the all resource
      */
     public List<XaResourceWrapped> getAllResource(final String globalId) {
-        Set<Xid> xids = XIDS.get(globalId);
+        Set<Xid> xids = this.xids.get(globalId);
         if (xids != null) {
             return xids.stream().map(this::getResource).collect(Collectors.toList());
         }

@@ -56,7 +56,14 @@ public class HmilyXaRecoveryImpl implements HmilyXaRecovery, Serializable {
 
     private Integer version;
 
-    public static <T extends HmilyXaRecovery> HmilyXaRecovery convert(T t) {
+    /**
+     * Convert hmily xa recovery.
+     *
+     * @param <T> the type parameter
+     * @param t   the t
+     * @return the hmily xa recovery
+     */
+    public static <T extends HmilyXaRecovery> HmilyXaRecovery convert(final T t) {
         HmilyXaRecoveryImpl impl = new HmilyXaRecoveryImpl();
         impl.setCreateTime(t.getCreateTime());
         impl.setUpdateTime(t.getUpdateTime());

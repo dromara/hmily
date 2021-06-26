@@ -13,10 +13,11 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
+
 package org.dromara.hmily.xa.core.timer;
 
 /**
- * A handle associated with a {@link TimerTask} that is returned by a
+ * A handle associated with a {@link TimerTask} that is returned by a.
  * {@link Timer}.
  */
 public interface Timeout {
@@ -75,4 +76,5 @@ public interface Timeout {
     default boolean isDefault() {
         return true;
     }
+
 }

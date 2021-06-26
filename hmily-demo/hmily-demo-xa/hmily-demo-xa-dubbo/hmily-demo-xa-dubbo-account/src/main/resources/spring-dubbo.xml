@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:dubbo="http://code.alibabatech.com/schema/dubbo" xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://code.alibabatech.com/schema/dubbo
+       http://code.alibabatech.com/schema/dubbo/dubbo.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <dubbo:application name="account_service">
+        <dubbo:parameter key="qos.enable" value="false"/>
+    </dubbo:application>
+
+    <dubbo:registry address="zookeeper://192.168.3.21:2181" transport="netty4" client="curator">
+        <dubbo:parameter key="client" value="curator"/>
+    </dubbo:registry>
+
+    <dubbo:protocol name="dubbo" port="-1"
+                    server="netty4"
+                    charset="UTF-8" threadpool="fixed" threads="500"
+                    queues="0" buffer="8192" accepts="0" payload="8388608" />
+
+    <aop:aspectj-autoproxy expose-proxy="true"/>
+    <bean id = "hmilyTransactionAspect" class="org.dromara.hmily.spring.aop.SpringHmilyTransactionAspect"/>
+    <bean id = "hmilyApplicationContextAware" class="org.dromara.hmily.spring.HmilyApplicationContextAware"/>
+
+    <bean class="org.dromara.hmily.xa.p6spy.HmilyXaP6Datasource" id="datasource1">
+        <constructor-arg index="0" ref="sourceOne"/>
+    </bean>
+
+    <!-- 将数据源映射到sqlSessionFactory中 -->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="configLocation" value="classpath:mybatis/mybatis-config.xml"/>
+        <property name="dataSource" ref="datasource1"/>
+        <property name="typeAliasesPackage" value="org.dromara.hmily.demo.common.order.entity"/>
+    </bean>
+
+    <bean id="transactionManager" class="org.springframework.transaction.jta.JtaTransactionManager">
+        <!-- 关联数据源 -->
+        <property name="userTransaction" ref="userTransaction"/>
+        <property name="transactionManager" ref="userTransaction"/>
+    </bean>
+
+    <bean class="com.mysql.jdbc.jdbc2.optional.MysqlXADataSource" id="sourceOne">
+        <property name="url"
+                  value="jdbc:mysql://192.168.3.18:3306/hmily_account?pinGlobalTxToPhysicalConnection=true"/>
+        <property name="user" value="root"/>
+        <property name="password" value="123456"/>
+        <property name="pinGlobalTxToPhysicalConnection" value="true"/>
+    </bean>
+    <bean id="userTransaction" class="org.dromara.hmily.xa.core.UserTransactionImpl"/>
+
+
+    <dubbo:service interface="org.dromara.hmily.demo.common.account.api.AccountService"
+                   ref="accountService" executes="20"/>
+
+    <dubbo:reference timeout="20000"
+                     interface="org.dromara.hmily.demo.common.inventory.api.InventoryService"
+                     id="inventoryService"
+                     retries="0" check="false" loadbalance="hmilyRandom"/>
+
+</beans>

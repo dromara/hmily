@@ -20,8 +20,6 @@ import lombok.Data;
 import org.dromara.hmily.common.enums.HmilyActionEnum;
 import org.dromara.hmily.common.enums.HmilyRoleEnum;
 
-import javax.transaction.xa.XAResource;
-
 /**
  * HmilyTransactionContext.
  *

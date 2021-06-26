@@ -45,6 +45,7 @@ public class SubCoordinator implements Resource, Synchronization {
     private XaState state = XaState.STATUS_ACTIVE;
 
     private final boolean hasSuper;
+
     /**
      * all xaResources.
      */
@@ -60,7 +61,7 @@ public class SubCoordinator implements Resource, Synchronization {
      *
      * @param transaction the transaction
      */
-    public SubCoordinator(final TransactionImpl transaction, boolean hasSuper) {
+    public SubCoordinator(final TransactionImpl transaction, final boolean hasSuper) {
         this.transaction = transaction;
         this.hasSuper = hasSuper;
     }
@@ -100,7 +101,7 @@ public class SubCoordinator implements Resource, Synchronization {
                 try {
                     xaResource.rollback();
                 } catch (XAException e) {
-                    logger.error("call xa.rollback error {} ", HmliyXaException.getMessage(e));
+                    logger.error("call xa.rollback error {} ", HmilyXaException.getMessage(e));
                 }
             } else {
                 try {
@@ -119,7 +120,7 @@ public class SubCoordinator implements Resource, Synchronization {
                 } catch (XAException e) {
                     result = Result.ROLLBACK;
                     isError = true;
-                    logger.error("{}", HmliyXaException.getMessage(e));
+                    logger.error("{}", HmilyXaException.getMessage(e));
                 }
             }
         }
@@ -175,7 +176,7 @@ public class SubCoordinator implements Resource, Synchronization {
                     logger.debug("xa rollback{}", xaResource.getXid());
                 }
             } catch (XAException e) {
-                logger.error("rollback  error {}:{}", xaResource.getXid(), HmliyXaException.getMessage(e));
+                logger.error("rollback  error {}:{}", xaResource.getXid(), HmilyXaException.getMessage(e));
                 rollbackError++;
             }
         }
@@ -199,7 +200,7 @@ public class SubCoordinator implements Resource, Synchronization {
                     logger.debug("xa commit{}", xaResource.getXid());
                 }
             } catch (XAException e) {
-                logger.error("rollback  error,{}:{}", xaResource.getXid(), HmliyXaException.getMessage(e));
+                logger.error("rollback  error,{}:{}", xaResource.getXid(), HmilyXaException.getMessage(e));
                 commitError++;
             }
         }
@@ -260,9 +261,8 @@ public class SubCoordinator implements Resource, Synchronization {
         Result result = doPrepare();
         if (result == Result.COMMIT) {
             doCommit();
-        } else if (result == Result.READONLY) {
-            //这里需要处理一下.
-
+//        } else if (result == Result.READONLY) {
+            //todo:这里需要处理一下.
         } else if (result == Result.ROLLBACK) {
             this.doRollback();
             throw new TransactionRolledbackException();
@@ -280,7 +280,7 @@ public class SubCoordinator implements Resource, Synchronization {
             state = XaState.STATUS_COMMITTED;
         } catch (XAException ex) {
             state = XaState.STATUS_UNKNOWN;
-            logger.error("xa commit error{}:{}", xaResource, HmliyXaException.getMessage(ex));
+            logger.error("xa commit error{}:{}", xaResource, HmilyXaException.getMessage(ex));
             if (Objects.equals(ex.errorCode, XAException.XA_RBROLLBACK)) {
                 throw new TransactionRolledbackException("XAException:" + ex.getMessage());
             }
@@ -317,7 +317,7 @@ public class SubCoordinator implements Resource, Synchronization {
             try {
                 return e.isSameRM(xaResource);
             } catch (XAException xaException) {
-                logger.error("xa isSameRM,{}:{}", xaException, HmliyXaException.getMessage(xaException));
+                logger.error("xa isSameRM,{}:{}", xaException, HmilyXaException.getMessage(xaException));
                 return false;
             }
         }).findFirst();

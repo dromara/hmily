@@ -43,7 +43,7 @@ public class HmilyXaTransactionManager implements TransactionManager {
     private final Logger logger = LoggerFactory.getLogger(HmilyXaTransactionManager.class);
 
     /**
-     * onveniently realize the processing of nested transactions。
+     * onveniently realize the processing of nested transactions.
      */
     private final ThreadLocal<Stack<Transaction>> tms = new ThreadLocal<>();
 

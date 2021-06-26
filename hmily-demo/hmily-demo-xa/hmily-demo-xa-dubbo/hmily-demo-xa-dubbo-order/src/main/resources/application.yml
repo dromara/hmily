@@ -1,0 +1,18 @@
+server:
+  port: 8087
+  address: 0.0.0.0
+  servlet:
+    context-path: /
+
+logging:
+    level:
+        root: info
+        org.springframework.web: info
+        org.apache.ibatis: debug
+        org.dromara.hmily.tac: debug
+        org.dromara.hmily.demo.bonuspoint: debug
+        org.dromara.hmily.demo.lottery: debug
+        org.dromara.hmily.demo: debug
+        io.netty: info
+    path: "./logs"
+

@@ -53,6 +53,11 @@ public class HmilyXaResource extends XaResourceWrapped {
         return xid;
     }
 
+    /**
+     * Gets xa resource.
+     *
+     * @return the xa resource
+     */
     public XAResource getXaResource() {
         return xaResource;
     }

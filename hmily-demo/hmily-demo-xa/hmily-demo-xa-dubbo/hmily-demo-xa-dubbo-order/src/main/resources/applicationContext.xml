@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop-3.0.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd"
+       default-autowire="byName">
+
+    <aop:aspectj-autoproxy expose-proxy="true"/>
+
+    <bean id="hmilyTransactionAspect" class="org.dromara.hmily.spring.aop.SpringHmilyTransactionAspect"/>
+
+    <bean id="hmilyApplicationContextAware" class="org.dromara.hmily.spring.HmilyApplicationContextAware"/>
+
+    <bean class="org.dromara.hmily.xa.p6spy.HmilyXaP6Datasource" id="datasource1">
+        <constructor-arg index="0" ref="sourceOne"/>
+    </bean>
+
+    <!-- 将数据源映射到sqlSessionFactory中 -->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="configLocation" value="classpath:mybatis/mybatis-config.xml"/>
+        <property name="dataSource" ref="datasource1"/>
+        <property name="typeAliasesPackage" value="org.dromara.hmily.demo.common.order.entity"/>
+    </bean>
+
+    <bean id="transactionManager" class="org.springframework.transaction.jta.JtaTransactionManager">
+        <!-- 关联数据源 -->
+        <property name="userTransaction" ref="userTransaction"/>
+        <property name="transactionManager" ref="userTransaction"/>
+    </bean>
+
+    <!--    <bean class="com.alibaba.druid.pool.xa.DruidXADataSource" id="sourceOne" init-method="init" destroy-method="close">-->
+    <!--        <property name="url"-->
+    <!--                  value="jdbc:mysql://192.168.3.18:3306/hmily_order?useUnicode=true&amp;characterEncoding=utf8&amp;useSSL=false&amp;pinGlobalTxToPhysicalConnection=true"/>-->
+    <!--        <property name="username" value="root"/>-->
+    <!--        <property name="password" value="123456"/>-->
+    <!--    </bean>-->
+
+
+    <bean class="com.mysql.jdbc.jdbc2.optional.MysqlXADataSource" id="sourceOne">
+        <property name="url"
+                  value="jdbc:mysql://192.168.3.26:3306/hmily_order?pinGlobalTxToPhysicalConnection=true"/>
+        <property name="user" value="root"/>
+        <property name="password" value="123456"/>
+        <property name="pinGlobalTxToPhysicalConnection" value="true"/>
+    </bean>
+
+
+    <bean id="userTransaction" class="org.dromara.hmily.xa.core.UserTransactionImpl"/>
+
+
+    <import resource="spring-dubbo.xml"/>
+</beans>

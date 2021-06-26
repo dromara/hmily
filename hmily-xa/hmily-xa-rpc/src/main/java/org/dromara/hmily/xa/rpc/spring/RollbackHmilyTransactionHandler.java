@@ -23,16 +23,14 @@ import org.dromara.hmily.common.utils.DefaultValueUtils;
 import org.dromara.hmily.core.context.HmilyTransactionContext;
 import org.dromara.hmily.core.context.XaParticipant;
 import org.dromara.hmily.core.service.HmilyTransactionHandler;
+import org.dromara.hmily.xa.core.HmilyXaException;
 import org.dromara.hmily.xa.core.HmilyXaResource;
-import org.dromara.hmily.xa.core.HmliyXaException;
 import org.dromara.hmily.xa.core.XaResourcePool;
 import org.dromara.hmily.xa.core.XaResourceWrapped;
 import org.dromara.hmily.xa.core.XidImpl;
-import org.dromara.hmily.xa.rpc.RpcXaProxy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.transaction.xa.XAException;
 import java.lang.reflect.Method;
 import java.util.List;
 
@@ -61,7 +59,7 @@ public class RollbackHmilyTransactionHandler implements HmilyTransactionHandler 
             }
         } catch (Exception ex) {
             logger.info("Rollback:执行一个事务异常", ex);
-            throw new HmliyXaException(HmliyXaException.UNKNOWN);
+            throw new HmilyXaException(HmilyXaException.UNKNOWN);
         }
         Method method = ((MethodSignature) (point.getSignature())).getMethod();
         return DefaultValueUtils.getDefaultValue(method.getReturnType());

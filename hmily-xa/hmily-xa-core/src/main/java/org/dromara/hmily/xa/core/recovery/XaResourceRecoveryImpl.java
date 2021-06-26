@@ -40,9 +40,8 @@ import java.util.List;
  */
 public class XaResourceRecoveryImpl implements XaResourceRecovery {
 
-    private static final Logger logger = LoggerFactory.getLogger(XaResourceRecoveryImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(XaResourceRecoveryImpl.class);
 
-    //get is repository.
     private volatile HmilyXaRepository repository;
 
     @Override
@@ -58,13 +57,10 @@ public class XaResourceRecoveryImpl implements XaResourceRecovery {
         Integer state = recovery.getState();
         //恢复一下日志.
         List<HmilyXaRecovery> hmilyXaRecoveries = repository.queryByTmUnique(tmUnique, state);
-        for (final HmilyXaRecovery hmilyXaRecovery : hmilyXaRecoveries) {
-
-        }
     }
 
     @Override
-    public void recover(String tmUnique, final XAResource resource) {
+    public void recover(final String tmUnique, final XAResource resource) {
         if (resource == null) {
             return;
         }
@@ -74,7 +70,7 @@ public class XaResourceRecoveryImpl implements XaResourceRecovery {
     /**
      * 查询当前的xids.
      */
-    private List<XidImpl> recoverXids(XAResource xaResource) {
+    private List<XidImpl> recoverXids(final XAResource xaResource) {
         //扫描需要恢复的事务.
         int flags = XAResource.TMSTARTRSCAN;
         List<XidImpl> xIds = new ArrayList<>();
@@ -83,7 +79,7 @@ public class XaResourceRecoveryImpl implements XaResourceRecovery {
             do {
                 Xid[] recover = xaResource.recover(flags);
                 flags = XAResource.TMNOFLAGS;
-                done = (recover == null || recover.length <= 0);
+                done = recover == null || recover.length <= 0;
                 if (!done) {
                     done = true;
                     for (final Xid xid : recover) {
@@ -96,7 +92,7 @@ public class XaResourceRecoveryImpl implements XaResourceRecovery {
                 }
             } while (!done);
         } catch (XAException xaException) {
-            logger.warn("recover xids error", xaException);
+            LOGGER.warn("recover xids error", xaException);
             return Collections.emptyList();
         }
         return xIds;

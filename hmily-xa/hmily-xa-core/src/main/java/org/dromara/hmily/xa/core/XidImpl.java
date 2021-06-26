@@ -195,10 +195,10 @@ public class XidImpl implements Xid {
 
     @Override
     public String toString() {
-        return "XIdImpl{" +
-                "globalId='" + globalId + '\'' +
-                ", branchId='" + branchId + '\'' +
-                '}';
+        return "XIdImpl{"
+                + "globalId='" + globalId + '\''
+                + ", branchId='" + branchId + '\''
+                + '}';
     }
 }
 

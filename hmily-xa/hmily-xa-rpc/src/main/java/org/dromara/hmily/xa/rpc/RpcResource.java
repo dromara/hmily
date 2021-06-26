@@ -17,18 +17,14 @@
 
 package org.dromara.hmily.xa.rpc;
 
-import com.sun.xml.internal.fastinfoset.tools.XML_SAX_StAX_FI;
-import org.dromara.hmily.xa.core.HmliyXaException;
-import org.dromara.hmily.xa.core.Resource;
+import org.dromara.hmily.xa.core.HmilyXaException;
 import org.dromara.hmily.xa.core.XaResourceWrapped;
-import org.dromara.hmily.xa.core.XidImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.transaction.xa.XAException;
 import javax.transaction.xa.Xid;
 import java.util.Collections;
-import java.util.List;
 import java.util.Objects;
 
 /**
@@ -86,7 +82,7 @@ public abstract class RpcResource extends XaResourceWrapped {
         if (cmd != null) {
             if (cmd > RpcXaProxy.YES) {
                 logger.warn("xa exception:cmd :{}", cmd);
-                throw new HmliyXaException(cmd);
+                throw new HmilyXaException(cmd);
             }
         }
     }

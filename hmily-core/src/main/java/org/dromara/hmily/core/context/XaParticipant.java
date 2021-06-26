@@ -35,10 +35,10 @@ public class XaParticipant {
      */
     private String globalId;
 
-
     private String branchId;
 
     /**
+     * flag.
      * @see XAResource
      */
     private int flag;

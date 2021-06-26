@@ -53,17 +53,19 @@ public class Coordinator implements Resource, Finally, TimerRemovalListener<Reso
     private final LocalDateTime date;
 
     private final HmilyTimer<Resource> hmilyTimer;
+
     /**
-     * 父协调器.
+     * 是否为父协调器.
      */
     private Boolean hasSuper;
 
     /**
      * Instantiates a new Coordinator.
      *
-     * @param xid the xid
+     * @param xid      the xid
+     * @param hasSuper the has super
      */
-    public Coordinator(final XidImpl xid, boolean hasSuper) {
+    public Coordinator(final XidImpl xid, final boolean hasSuper) {
         this.xid = xid;
         date = LocalDateTime.now();
         this.hasSuper = hasSuper;
@@ -128,7 +130,7 @@ public class Coordinator implements Resource, Finally, TimerRemovalListener<Reso
             try {
                 resource.onePhaseCommit();
                 state = XaState.STATUS_COMMITTED;
-            } catch (TransactionRolledbackException rx) {
+            } catch (TransactionRolledbackException e) {
                 state = XaState.STATUS_MARKED_ROLLBACK;
             } catch (Exception ex) {
                 logger.error("onPhaseCommit error size to 1", ex);
@@ -255,8 +257,6 @@ public class Coordinator implements Resource, Finally, TimerRemovalListener<Reso
 
     @Override
     public void onRemoval(final Resource value, final Long expire, final Long elapsed) {
-        if (value instanceof SubCoordinator) {
 
-        }
     }
 }

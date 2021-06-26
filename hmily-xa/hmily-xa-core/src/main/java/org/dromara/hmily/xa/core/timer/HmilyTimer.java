@@ -13,8 +13,8 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package org.dromara.hmily.xa.core.timer;
 
+package org.dromara.hmily.xa.core.timer;
 
 import org.dromara.hmily.common.concurrent.HmilyThreadFactory;
 
@@ -56,7 +56,7 @@ public class HmilyTimer<V> {
      * @param unit      time unit；
      * @param cacheName cache name；
      */
-    public HmilyTimer(long expire, TimeUnit unit, String cacheName) {
+    public HmilyTimer(final long expire, final TimeUnit unit, final String cacheName) {
         this.expire = expire;
         timer = new HashedWheelTimer(HmilyThreadFactory.create(cacheName, false));
         this.unit = unit;
@@ -67,7 +67,7 @@ public class HmilyTimer<V> {
      *
      * @param listener 监听器；
      */
-    public void addRemovalListener(TimerRemovalListener<V> listener) {
+    public void addRemovalListener(final TimerRemovalListener<V> listener) {
         this.timerRemovalListener = listener;
     }
 
@@ -78,7 +78,7 @@ public class HmilyTimer<V> {
      * @return timeout timeout
      * @see Timeout
      */
-    public Timeout put(V v) {
+    public Timeout put(final V v) {
         return put(v, this.expire, this.unit);
     }
 
@@ -90,7 +90,7 @@ public class HmilyTimer<V> {
      * @param unit   单位；
      * @return Timeout timeout
      */
-    public Timeout put(V v, long expire, TimeUnit unit) {
+    public Timeout put(final V v, final long expire, final TimeUnit unit) {
         Node node = new Node(v, expire, unit);
         return timer.newTimeout(node, expire, unit);
     }
@@ -126,7 +126,7 @@ public class HmilyTimer<V> {
          * @param expire 默认等待时间;
          * @param unit   默认等时间的单位;
          */
-        public Node(V value, long expire, TimeUnit unit) {
+        public Node(final V value, final long expire, final TimeUnit unit) {
             this.value = value;
             time = System.nanoTime();
             this.expire = expire;
@@ -152,7 +152,7 @@ public class HmilyTimer<V> {
         }
 
         @Override
-        public void run(Timeout timeout) {
+        public void run(final Timeout timeout) {
             if (HmilyTimer.this.timerRemovalListener != null) {
                 long elapsed = System.nanoTime() - time;
                 long sd = unit.toMillis(expire);

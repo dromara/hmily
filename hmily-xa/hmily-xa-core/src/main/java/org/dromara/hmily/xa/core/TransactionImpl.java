@@ -63,7 +63,7 @@ public class TransactionImpl implements Transaction, TimerRemovalListener<Resour
      *
      * @param xId the x id
      */
-    TransactionImpl(final XidImpl xId, boolean hasSuper) {
+    TransactionImpl(final XidImpl xId, final boolean hasSuper) {
         this.xid = xId;
         this.hasSuper = hasSuper;
         context = new TransactionContext(null, xId);
@@ -166,7 +166,7 @@ public class TransactionImpl implements Transaction, TimerRemovalListener<Resour
             enlistResourceList.remove(xaResource);
             return true;
         } catch (XAException e) {
-            logger.info("xa resource end,{}", HmliyXaException.getMessage(e), e);
+            logger.info("xa resource end,{}", HmilyXaException.getMessage(e), e);
         }
         return false;
     }
@@ -192,7 +192,7 @@ public class TransactionImpl implements Transaction, TimerRemovalListener<Resour
             // TMNOFLAGS、TMJOIN 或 TMRESUME 之一。
             hmilyXaResource.start(flag);
         } catch (XAException e) {
-            logger.error("{}", HmliyXaException.getMessage(e), e);
+            logger.error("{}", HmilyXaException.getMessage(e), e);
             throw new IllegalStateException(e);
         }
         if (!enlistResourceList.contains(hmilyXaResource)) {
@@ -300,8 +300,5 @@ public class TransactionImpl implements Transaction, TimerRemovalListener<Resour
 
     @Override
     public void onRemoval(final Resource value, final Long expire, final Long elapsed) {
-        if (value instanceof Coordinator) {
-
-        }
     }
 }

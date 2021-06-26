@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:dubbo="http://dubbo.apache.org/schema/dubbo"
+       xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+       http://dubbo.apache.org/schema/dubbo http://dubbo.apache.org/schema/dubbo/dubbo.xsd">
+
+    <dubbo:application name="order_service">
+        <dubbo:parameter key="qos.enable" value="false"/>
+    </dubbo:application>
+
+    <dubbo:registry address="zookeeper://192.168.3.21:2181" transport="netty4" client="curator">
+        <dubbo:parameter key="client" value="curator"/>
+    </dubbo:registry>
+
+    <dubbo:protocol name="dubbo" port="-1"
+                    server="netty4"
+                    charset="UTF-8" threadpool="fixed" threads="500"
+                    queues="0" buffer="8192" accepts="0" payload="8388608" />
+
+    <dubbo:reference timeout="500000000"
+                     interface="org.dromara.hmily.demo.common.inventory.api.InventoryService"
+                     id="inventoryService"
+                     retries="0" check="false" actives="20" loadbalance="hmilyRandom"/>
+    <dubbo:reference timeout="500000000"
+                     interface="org.dromara.hmily.demo.common.account.api.AccountService"
+                     id="accountService"
+                     retries="0" check="false" actives="20" loadbalance="hmilyRandom"/>
+</beans>

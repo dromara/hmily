@@ -41,7 +41,7 @@ public class MongodbXaRepository extends MongodbRepository implements HmilyXaRep
     /**
      * The Service.
      */
-    MongodbTemplateService service;
+    private MongodbTemplateService service;
 
     @Override
     public void init(final String appName) {
@@ -82,7 +82,7 @@ public class MongodbXaRepository extends MongodbRepository implements HmilyXaRep
      * @param entity the entity
      * @return the hmily xa recovery
      */
-    private HmilyXaRecovery convert(XaRecoveryMongoEntity entity) {
+    private HmilyXaRecovery convert(final XaRecoveryMongoEntity entity) {
         return HmilyXaRecoveryImpl.convert(entity);
     }
 }

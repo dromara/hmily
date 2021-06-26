@@ -1,0 +1,20 @@
+server:
+  port: 8084
+  servlet:
+    context-path: /
+  address: 0.0.0.0
+
+mybatis:
+  type-aliases-package: org.dromara.hmily.demo.common.account.entity
+  config-location: classpath:mybatis/mybatis-config.xml
+
+logging:
+    level:
+        root: info
+        org.springframework.web: info
+        org.apache.ibatis: debug
+        org.dromara.hmily.tac: debug
+        org.dromara.hmily.demo.bonuspoint: debug
+        org.dromara.hmily.demo.lottery: debug
+        org.dromara.hmily.demo: debug
+    path: "./logs"
