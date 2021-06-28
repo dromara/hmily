@@ -47,7 +47,7 @@ import java.util.concurrent.Executor;
  */
 public class HmilyXaConnection implements Connection, XAConnection {
     /**
-     * original connection;
+     * original connection.
      */
     private final XAConnection xaConnection;
 
@@ -57,6 +57,7 @@ public class HmilyXaConnection implements Connection, XAConnection {
      * Instantiates a new Hmily xa connection.
      *
      * @param xaConnection the connection
+     * @throws SQLException the sql exception
      */
     public HmilyXaConnection(final XAConnection xaConnection) throws SQLException {
         this.xaConnection = xaConnection;
@@ -369,6 +370,6 @@ public class HmilyXaConnection implements Connection, XAConnection {
 
     @Override
     public XAResource getXAResource() throws SQLException {
-        return null;
+        return xaConnection.getXAResource();
     }
 }

@@ -20,7 +20,6 @@ package org.dromara.hmily.xa.core;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.transaction.HeuristicCommitException;
 import javax.transaction.RollbackException;
 import javax.transaction.Synchronization;
 import javax.transaction.SystemException;
@@ -31,8 +30,6 @@ import java.rmi.RemoteException;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Vector;
-
-import static org.dromara.hmily.xa.core.XaState.STATUS_MARKED_ROLLBACK;
 
 /**
  * SubCoordinator .
@@ -90,7 +87,7 @@ public class SubCoordinator implements Resource {
                 beforeCompletion();
                 break;
         }
-        if (state == STATUS_MARKED_ROLLBACK) {
+        if (state == XaState.STATUS_MARKED_ROLLBACK) {
             doRollback();
             return Result.ROLLBACK;
         }
@@ -261,7 +258,7 @@ public class SubCoordinator implements Resource {
                 throw new TransactionRolledbackException(e.getMessage());
             }
         }
-        if (state == STATUS_MARKED_ROLLBACK) {
+        if (state == XaState.STATUS_MARKED_ROLLBACK) {
             try {
                 beforeCompletion();
                 transaction.doDeList(XAResource.TMSUCCESS);
@@ -285,7 +282,7 @@ public class SubCoordinator implements Resource {
         } catch (SystemException e) {
             logger.error("deList xaResource:", e);
         }
-        if (state == STATUS_MARKED_ROLLBACK) {
+        if (state == XaState.STATUS_MARKED_ROLLBACK) {
             doRollback();
             throw new TransactionRolledbackException();
         }
@@ -376,7 +373,7 @@ public class SubCoordinator implements Resource {
             synchronizations.add(synchronization);
             return;
         }
-        if (state == STATUS_MARKED_ROLLBACK || state == XaState.STATUS_ROLLEDBACK) {
+        if (state == XaState.STATUS_MARKED_ROLLBACK || state == XaState.STATUS_ROLLEDBACK) {
             synchronizations.add(synchronization);
             throw new RollbackException();
         }
@@ -387,7 +384,7 @@ public class SubCoordinator implements Resource {
      */
     public void setRollbackOnly() {
         if (state == XaState.STATUS_PREPARING) {
-            state = STATUS_MARKED_ROLLBACK;
+            state = XaState.STATUS_MARKED_ROLLBACK;
         }
     }
 

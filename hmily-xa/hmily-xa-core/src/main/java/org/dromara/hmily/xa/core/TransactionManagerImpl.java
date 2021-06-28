@@ -27,7 +27,6 @@ import javax.transaction.Synchronization;
 import javax.transaction.SystemException;
 import javax.transaction.Transaction;
 import javax.transaction.TransactionManager;
-import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -104,7 +103,13 @@ public enum TransactionManagerImpl implements TransactionManager {
         return hmilyXaTransactionManager.suspend();
     }
 
-    public boolean isExistDataSources(XAConnection connection) {
+    /**
+     * Is exist data sources boolean.
+     *
+     * @param connection the connection
+     * @return the boolean
+     */
+    public boolean isExistDataSources(final XAConnection connection) {
         boolean contains = enlisted.get().contains(connection);
         Transaction transaction = getTransaction();
         if (!contains) {

@@ -23,7 +23,6 @@ import org.dromara.hmily.common.utils.NetUtils;
 
 import javax.transaction.xa.Xid;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * XaId .

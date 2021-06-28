@@ -22,7 +22,6 @@ import org.dromara.hmily.xa.core.TransactionManagerImpl;
 
 import javax.sql.XAConnection;
 import javax.transaction.RollbackException;
-import javax.transaction.Synchronization;
 import javax.transaction.SystemException;
 import javax.transaction.Transaction;
 import javax.transaction.xa.XAResource;
@@ -31,8 +30,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLWarning;
 import java.sql.Statement;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * HmilyXaStatement .

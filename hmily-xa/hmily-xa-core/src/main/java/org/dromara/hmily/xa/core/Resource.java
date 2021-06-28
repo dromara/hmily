@@ -31,11 +31,14 @@ public interface Resource {
      * 2pc phase 1.
      *
      * @return int int
+     * @throws RemoteException the remote exception
      */
     Result prepare() throws RemoteException;
 
     /**
      * Rollback.
+     *
+     * @throws RemoteException the remote exception
      */
     void rollback() throws RemoteException;
 
