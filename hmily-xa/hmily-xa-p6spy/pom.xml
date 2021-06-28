@@ -26,11 +26,44 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>hmily-xa-p6spy</artifactId>
+    <properties>
+        <druid.version>1.1.21</druid.version>
+    </properties>
 
     <dependencies>
         <dependency>
             <groupId>p6spy</groupId>
             <artifactId>p6spy</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.dromara</groupId>
+            <artifactId>hmily-common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.dromara</groupId>
+            <artifactId>hmily-xa-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>druid</artifactId>
+            <version>${druid.version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>

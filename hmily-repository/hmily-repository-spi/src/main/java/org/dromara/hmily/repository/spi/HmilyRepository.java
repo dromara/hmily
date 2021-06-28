@@ -34,8 +34,8 @@ import java.util.Optional;
  * @author xiaoyu
  */
 public interface HmilyRepository {
-    
-    /**
+
+    /*
      * The constant ROWS.
      */
     int ROWS = 1;

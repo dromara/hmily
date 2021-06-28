@@ -37,7 +37,7 @@ public abstract class AbstractHmilyTransactionAspect {
     /**
      * this is point cut with {@linkplain HmilyTCC }.
      */
-    @Pointcut("@annotation(org.dromara.hmily.annotation.HmilyTCC) || @annotation(org.dromara.hmily.annotation.HmilyTAC)")
+    @Pointcut("@annotation(org.dromara.hmily.annotation.HmilyTCC) || @annotation(org.dromara.hmily.annotation.HmilyTAC) ||  @annotation(org.dromara.hmily.annotation.HmilyXA)")
     public void hmilyInterceptor() {
     }
 

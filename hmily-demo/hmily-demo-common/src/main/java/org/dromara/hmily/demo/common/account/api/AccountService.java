@@ -58,6 +58,7 @@ public interface AccountService {
      * @param accountDTO the account dto
      * @return the boolean
      */
+    @Hmily
     boolean testPayment(AccountDTO accountDTO);
     
     /**

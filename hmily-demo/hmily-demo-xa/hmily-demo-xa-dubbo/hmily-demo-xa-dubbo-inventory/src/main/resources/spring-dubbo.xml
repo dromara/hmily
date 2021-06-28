@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://code.alibabatech.com/schema/dubbo
+       http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
+
+    <dubbo:application name="inventory_service">
+        <dubbo:parameter key="qos.enable" value="false"/>
+    </dubbo:application>
+
+    <dubbo:registry address="zookeeper://192.168.3.21:2181" transport="netty4" client="curator">
+        <dubbo:parameter key="client" value="curator"/>
+    </dubbo:registry>
+
+    <dubbo:protocol name="dubbo" port="-1"
+                    server="netty4"
+                    charset="UTF-8" threadpool="fixed" threads="500"
+                    queues="0" buffer="8192" accepts="0" payload="8388608" />
+
+
+    <dubbo:service interface="org.dromara.hmily.demo.common.inventory.api.InventoryService"
+                   ref="inventoryService" executes="20"/>
+
+
+</beans>

@@ -22,7 +22,7 @@ import org.dromara.hmily.core.context.HmilyTransactionContext;
  * The interface Rpc parameter loader.
  */
 public interface RpcParameterLoader {
-    
+
     /**
      * Load hmily transaction context.
      *

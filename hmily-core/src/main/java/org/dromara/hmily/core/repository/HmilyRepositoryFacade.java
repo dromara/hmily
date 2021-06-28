@@ -16,6 +16,7 @@
 
 package org.dromara.hmily.core.repository;
 
+import lombok.Getter;
 import lombok.Setter;
 import org.dromara.hmily.common.enums.HmilyActionEnum;
 import org.dromara.hmily.config.api.ConfigEnv;
@@ -44,6 +45,7 @@ public final class HmilyRepositoryFacade {
     private final HmilyConfig hmilyConfig = ConfigEnv.getInstance().getConfig(HmilyConfig.class);
     
     @Setter
+    @Getter
     private HmilyRepository hmilyRepository;
     
     private HmilyRepositoryFacade() {

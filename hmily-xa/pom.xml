@@ -30,7 +30,7 @@
     <modules>
         <module>hmily-xa-p6spy</module>
         <module>hmily-xa-core</module>
+        <module>hmily-xa-rpc</module>
     </modules>
-
 
 </project>

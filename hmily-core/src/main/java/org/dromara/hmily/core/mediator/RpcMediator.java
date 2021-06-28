@@ -4,9 +4,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,6 +19,7 @@ package org.dromara.hmily.core.mediator;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
+
 import org.dromara.hmily.common.constant.CommonConstant;
 import org.dromara.hmily.common.utils.GsonUtils;
 import org.dromara.hmily.common.utils.StringUtils;
@@ -30,9 +31,9 @@ import org.dromara.hmily.core.context.HmilyTransactionContext;
  * @author xiaoyu(Myth)
  */
 public class RpcMediator {
-    
+
     private static final RpcMediator INSTANCE = new RpcMediator();
-    
+
     /**
      * Gets instance.
      *
@@ -41,7 +42,7 @@ public class RpcMediator {
     public static RpcMediator getInstance() {
         return INSTANCE;
     }
-    
+
     /**
      * Transmit.
      *
@@ -53,7 +54,20 @@ public class RpcMediator {
             rpcTransmit.transmit(CommonConstant.HMILY_TRANSACTION_CONTEXT, GsonUtils.getInstance().toJson(context));
         }
     }
-    
+
+    /**
+     * Transmit.
+     *
+     * @param <T>         the type parameter
+     * @param rpcTransmit the rpc transmit
+     * @param context     the context
+     */
+    public <T> void transmit(final RpcTransmit rpcTransmit, final T context) {
+        if (Objects.nonNull(context)) {
+            rpcTransmit.transmit(CommonConstant.HMILY_TRANSACTION_CONTEXT, GsonUtils.getInstance().toJson(context));
+        }
+    }
+
     /**
      * Acquire hmily transaction context.
      *
@@ -61,14 +75,26 @@ public class RpcMediator {
      * @return the hmily transaction context
      */
     public HmilyTransactionContext acquire(final RpcAcquire rpcAcquire) {
-        HmilyTransactionContext hmilyTransactionContext = null;
+        return acquire(rpcAcquire, HmilyTransactionContext.class);
+    }
+
+    /**
+     * Acquire hmily transaction context.
+     *
+     * @param <T>        the type parameter
+     * @param rpcAcquire the rpc acquire
+     * @param clazz      the clazz
+     * @return the hmily transaction context
+     */
+    public <T> T acquire(final RpcAcquire rpcAcquire, final Class<T> clazz) {
+        T hmilyTransactionContext = null;
         final String context = rpcAcquire.acquire(CommonConstant.HMILY_TRANSACTION_CONTEXT);
         if (StringUtils.isNoneBlank(context)) {
-            hmilyTransactionContext = GsonUtils.getInstance().fromJson(context, HmilyTransactionContext.class);
+            hmilyTransactionContext = GsonUtils.getInstance().fromJson(context, clazz);
         }
         return hmilyTransactionContext;
     }
-    
+
     /**
      * Gets and set.
      *

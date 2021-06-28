@@ -80,7 +80,7 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <mainClass>org.dromara.hmily.demo.dubbo.inventory.DubboHmilyInventoryApplication</mainClass>
+                    <mainClass>org.dromara.hmily.demo.dubbo.org.dromara.hmily.xa.demo.dubbo.inventory.DubboHmilyInventoryApplication</mainClass>
                     <executable>true</executable>
                 </configuration>
             </plugin>
