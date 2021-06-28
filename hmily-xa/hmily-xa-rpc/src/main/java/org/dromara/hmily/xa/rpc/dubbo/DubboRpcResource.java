@@ -72,7 +72,7 @@ public class DubboRpcResource extends RpcResource {
 
     @Override
     public String getName() {
-        return "META-INF/dubbo";
+        return "dubbo";
     }
 
     @Override
