@@ -71,6 +71,11 @@ public class HmilyXaPreparedStatement extends HmilyXaStatement implements Prepar
     }
 
     @Override
+    public void setNull(final int parameterIndex, final int sqlType, final String typeName) throws SQLException {
+        preparedStatement.setNull(parameterIndex, sqlType, typeName);
+    }
+
+    @Override
     public void setNull(final int parameterIndex, final int sqlType) throws SQLException {
         preparedStatement.setNull(parameterIndex, sqlType);
     }
@@ -131,8 +136,18 @@ public class HmilyXaPreparedStatement extends HmilyXaStatement implements Prepar
     }
 
     @Override
+    public void setDate(final int parameterIndex, final java.sql.Date x, final Calendar cal) throws SQLException {
+        preparedStatement.setDate(parameterIndex, x, cal);
+    }
+
+    @Override
     public void setTime(final int parameterIndex, final Time x) throws SQLException {
         preparedStatement.setTime(parameterIndex, x);
+    }
+
+    @Override
+    public void setTime(final int parameterIndex, final java.sql.Time x, final Calendar cal) throws SQLException {
+        preparedStatement.setTime(parameterIndex, x, cal);
     }
 
     @Override
@@ -141,7 +156,22 @@ public class HmilyXaPreparedStatement extends HmilyXaStatement implements Prepar
     }
 
     @Override
+    public void setTimestamp(final int parameterIndex, final Timestamp x, final Calendar cal) throws SQLException {
+        preparedStatement.setTimestamp(parameterIndex, x, cal);
+    }
+
+    @Override
     public void setAsciiStream(final int parameterIndex, final InputStream x, final int length) throws SQLException {
+        preparedStatement.setAsciiStream(parameterIndex, x, length);
+    }
+
+    @Override
+    public void setAsciiStream(final int parameterIndex, final InputStream x) throws SQLException {
+        preparedStatement.setAsciiStream(parameterIndex, x);
+    }
+
+    @Override
+    public void setAsciiStream(final int parameterIndex, final InputStream x, final long length) throws SQLException {
         preparedStatement.setAsciiStream(parameterIndex, x, length);
     }
 
@@ -153,6 +183,16 @@ public class HmilyXaPreparedStatement extends HmilyXaStatement implements Prepar
     @Override
     public void setBinaryStream(final int parameterIndex, final InputStream x, final int length) throws SQLException {
         preparedStatement.setBinaryStream(parameterIndex, x, length);
+    }
+
+    @Override
+    public void setBinaryStream(final int parameterIndex, final InputStream x, final long length) throws SQLException {
+        preparedStatement.setBinaryStream(parameterIndex, x, length);
+    }
+
+    @Override
+    public void setBinaryStream(final int parameterIndex, final InputStream x) throws SQLException {
+        preparedStatement.setBinaryStream(parameterIndex, x);
     }
 
     @Override
@@ -171,6 +211,11 @@ public class HmilyXaPreparedStatement extends HmilyXaStatement implements Prepar
     }
 
     @Override
+    public void setObject(final int parameterIndex, final Object x, final int targetSqlType, final int scaleOrLength) throws SQLException {
+        preparedStatement.setObject(parameterIndex, x, targetSqlType, scaleOrLength);
+    }
+
+    @Override
     public boolean execute() throws SQLException {
         return associateXa(preparedStatement::execute);
     }
@@ -186,18 +231,33 @@ public class HmilyXaPreparedStatement extends HmilyXaStatement implements Prepar
     }
 
     @Override
+    public void setCharacterStream(final int parameterIndex, final Reader reader) throws SQLException {
+        preparedStatement.setCharacterStream(parameterIndex, reader);
+    }
+
+    @Override
+    public void setCharacterStream(final int parameterIndex, final Reader reader, final long length) throws SQLException {
+        preparedStatement.setCharacterStream(parameterIndex, reader, length);
+    }
+
+    @Override
     public void setRef(final int parameterIndex, final Ref x) throws SQLException {
         preparedStatement.setRef(parameterIndex, x);
     }
 
     @Override
-    public void setBlob(final int parameterIndex, final Blob x) throws SQLException {
-        preparedStatement.setBlob(parameterIndex, x);
+    public void setClob(final int parameterIndex, final Clob x) throws SQLException {
+        preparedStatement.setClob(parameterIndex, x);
     }
 
     @Override
-    public void setClob(final int parameterIndex, final Clob x) throws SQLException {
-        preparedStatement.setClob(parameterIndex, x);
+    public void setClob(final int parameterIndex, final Reader reader) throws SQLException {
+        preparedStatement.setClob(parameterIndex, reader);
+    }
+
+    @Override
+    public void setClob(final int parameterIndex, final Reader reader, final long length) throws SQLException {
+        preparedStatement.setClob(parameterIndex, reader, length);
     }
 
     @Override
@@ -208,26 +268,6 @@ public class HmilyXaPreparedStatement extends HmilyXaStatement implements Prepar
     @Override
     public ResultSetMetaData getMetaData() throws SQLException {
         return preparedStatement.getMetaData();
-    }
-
-    @Override
-    public void setDate(final int parameterIndex, final Date x, final Calendar cal) throws SQLException {
-        preparedStatement.setDate(parameterIndex, x, cal);
-    }
-
-    @Override
-    public void setTime(final int parameterIndex, final Time x, final Calendar cal) throws SQLException {
-        preparedStatement.setTime(parameterIndex, x, cal);
-    }
-
-    @Override
-    public void setTimestamp(final int parameterIndex, final Timestamp x, final Calendar cal) throws SQLException {
-        preparedStatement.setTimestamp(parameterIndex, x, cal);
-    }
-
-    @Override
-    public void setNull(final int parameterIndex, final int sqlType, final String typeName) throws SQLException {
-        preparedStatement.setNull(parameterIndex, sqlType, typeName);
     }
 
     @Override
@@ -256,18 +296,13 @@ public class HmilyXaPreparedStatement extends HmilyXaStatement implements Prepar
     }
 
     @Override
+    public void setNCharacterStream(final int parameterIndex, final Reader value) throws SQLException {
+        preparedStatement.setNCharacterStream(parameterIndex, value);
+    }
+
+    @Override
     public void setNClob(final int parameterIndex, final NClob value) throws SQLException {
         preparedStatement.setNClob(parameterIndex, value);
-    }
-
-    @Override
-    public void setClob(final int parameterIndex, final Reader reader, final long length) throws SQLException {
-        preparedStatement.setClob(parameterIndex, reader, length);
-    }
-
-    @Override
-    public void setBlob(final int parameterIndex, final InputStream inputStream, final long length) throws SQLException {
-        preparedStatement.setBlob(parameterIndex, inputStream, length);
     }
 
     @Override
@@ -276,53 +311,23 @@ public class HmilyXaPreparedStatement extends HmilyXaStatement implements Prepar
     }
 
     @Override
+    public void setNClob(final int parameterIndex, final Reader reader) throws SQLException {
+        preparedStatement.setNClob(parameterIndex, reader);
+    }
+
+    @Override
     public void setSQLXML(final int parameterIndex, final SQLXML xmlObject) throws SQLException {
         preparedStatement.setSQLXML(parameterIndex, xmlObject);
     }
 
     @Override
-    public void setObject(final int parameterIndex, final Object x, final int targetSqlType, final int scaleOrLength) throws SQLException {
-        preparedStatement.setObject(parameterIndex, x, targetSqlType, scaleOrLength);
+    public void setBlob(final int parameterIndex, final Blob x) throws SQLException {
+        preparedStatement.setBlob(parameterIndex, x);
     }
 
     @Override
-    public void setAsciiStream(final int parameterIndex, final InputStream x, final long length) throws SQLException {
-        preparedStatement.setAsciiStream(parameterIndex, x, length);
-    }
-
-    @Override
-    public void setBinaryStream(final int parameterIndex, final InputStream x, final long length) throws SQLException {
-        preparedStatement.setBinaryStream(parameterIndex, x, length);
-    }
-
-    @Override
-    public void setCharacterStream(final int parameterIndex, final Reader reader, final long length) throws SQLException {
-        preparedStatement.setCharacterStream(parameterIndex, reader, length);
-    }
-
-    @Override
-    public void setAsciiStream(final int parameterIndex, final InputStream x) throws SQLException {
-        preparedStatement.setAsciiStream(parameterIndex, x);
-    }
-
-    @Override
-    public void setBinaryStream(final int parameterIndex, final InputStream x) throws SQLException {
-        preparedStatement.setBinaryStream(parameterIndex, x);
-    }
-
-    @Override
-    public void setCharacterStream(final int parameterIndex, final Reader reader) throws SQLException {
-        preparedStatement.setCharacterStream(parameterIndex, reader);
-    }
-
-    @Override
-    public void setNCharacterStream(final int parameterIndex, final Reader value) throws SQLException {
-        preparedStatement.setNCharacterStream(parameterIndex, value);
-    }
-
-    @Override
-    public void setClob(final int parameterIndex, final Reader reader) throws SQLException {
-        preparedStatement.setClob(parameterIndex, reader);
+    public void setBlob(final int parameterIndex, final InputStream inputStream, final long length) throws SQLException {
+        preparedStatement.setBlob(parameterIndex, inputStream, length);
     }
 
     @Override
@@ -330,8 +335,4 @@ public class HmilyXaPreparedStatement extends HmilyXaStatement implements Prepar
         preparedStatement.setBlob(parameterIndex, inputStream);
     }
 
-    @Override
-    public void setNClob(final int parameterIndex, final Reader reader) throws SQLException {
-        preparedStatement.setNClob(parameterIndex, reader);
-    }
 }

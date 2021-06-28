@@ -36,8 +36,11 @@ public class DubboRpcResource extends RpcResource {
 
     /**
      * Instantiates a new Dubbo rpc resource.
+     *
+     * @param invoker    the invoker
+     * @param invocation the invocation
      */
-    public DubboRpcResource(Invoker<?> invoker, Invocation invocation) {
+    public DubboRpcResource(final Invoker<?> invoker, final Invocation invocation) {
         super(new DubboRpcXaProxy(invoker, invocation));
     }
 

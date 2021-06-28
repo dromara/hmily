@@ -39,7 +39,7 @@ public class XaTransactionHandlerRegistry implements HmilyTransactionHandlerRegi
     /**
      * The Enums map.
      */
-    Map<RpcXaProxy.XaCmd, HmilyTransactionHandler> enumsMap = new EnumMap<>(RpcXaProxy.XaCmd.class);
+    private final Map<RpcXaProxy.XaCmd, HmilyTransactionHandler> enumsMap = new EnumMap<>(RpcXaProxy.XaCmd.class);
 
     /**
      * Instantiates a new Xa transaction handler registry.

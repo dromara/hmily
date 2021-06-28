@@ -65,23 +65,6 @@ public class HmilyXaConnection implements Connection, XAConnection {
     }
 
     @Override
-    public Statement createStatement() throws SQLException {
-        Statement statement = connection.createStatement();
-        return new HmilyXaStatement(connection, xaConnection, statement);
-    }
-
-    @Override
-    public PreparedStatement prepareStatement(final String sql) throws SQLException {
-        PreparedStatement statement = connection.prepareStatement(sql);
-        return new HmilyXaPreparedStatement(connection, xaConnection, statement);
-    }
-
-    @Override
-    public CallableStatement prepareCall(final String sql) throws SQLException {
-        return connection.prepareCall(sql);
-    }
-
-    @Override
     public String nativeSQL(final String sql) throws SQLException {
         return connection.nativeSQL(sql);
     }
@@ -99,11 +82,6 @@ public class HmilyXaConnection implements Connection, XAConnection {
     @Override
     public void commit() throws SQLException {
         connection.commit();
-    }
-
-    @Override
-    public void rollback() throws SQLException {
-        connection.rollback();
     }
 
     @Override
@@ -187,23 +165,6 @@ public class HmilyXaConnection implements Connection, XAConnection {
     }
 
     @Override
-    public Statement createStatement(final int resultSetType, final int resultSetConcurrency) throws SQLException {
-        Statement statement = connection.createStatement(resultSetType, resultSetConcurrency);
-        return new HmilyXaStatement(connection, xaConnection, statement);
-    }
-
-    @Override
-    public PreparedStatement prepareStatement(final String sql, final int resultSetType, final int resultSetConcurrency) throws SQLException {
-        PreparedStatement statement = connection.prepareStatement(sql, resultSetType, resultSetConcurrency);
-        return new HmilyXaPreparedStatement(connection, xaConnection, statement);
-    }
-
-    @Override
-    public CallableStatement prepareCall(final String sql, final int resultSetType, final int resultSetConcurrency) throws SQLException {
-        return connection.prepareCall(sql, resultSetType, resultSetConcurrency);
-    }
-
-    @Override
     public Map<String, Class<?>> getTypeMap() throws SQLException {
         return connection.getTypeMap();
     }
@@ -234,6 +195,11 @@ public class HmilyXaConnection implements Connection, XAConnection {
     }
 
     @Override
+    public void rollback() throws SQLException {
+        connection.rollback();
+    }
+
+    @Override
     public void rollback(final Savepoint savepoint) throws SQLException {
         connection.rollback(savepoint);
     }
@@ -250,14 +216,33 @@ public class HmilyXaConnection implements Connection, XAConnection {
     }
 
     @Override
-    public PreparedStatement prepareStatement(final String sql, final int resultSetType, final int resultSetConcurrency, final int resultSetHoldability) throws SQLException {
-        PreparedStatement statement = connection.prepareStatement(sql, resultSetType, resultSetConcurrency, resultSetHoldability);
+    public Statement createStatement(final int resultSetType, final int resultSetConcurrency) throws SQLException {
+        Statement statement = connection.createStatement(resultSetType, resultSetConcurrency);
+        return new HmilyXaStatement(connection, xaConnection, statement);
+    }
+
+    @Override
+    public Statement createStatement() throws SQLException {
+        Statement statement = connection.createStatement();
+        return new HmilyXaStatement(connection, xaConnection, statement);
+    }
+
+    @Override
+    public PreparedStatement prepareStatement(final String sql) throws SQLException {
+        PreparedStatement statement = connection.prepareStatement(sql);
         return new HmilyXaPreparedStatement(connection, xaConnection, statement);
     }
 
     @Override
-    public CallableStatement prepareCall(final String sql, final int resultSetType, final int resultSetConcurrency, final int resultSetHoldability) throws SQLException {
-        return connection.prepareCall(sql, resultSetType, resultSetConcurrency, resultSetHoldability);
+    public PreparedStatement prepareStatement(final String sql, final int resultSetType, final int resultSetConcurrency) throws SQLException {
+        PreparedStatement statement = connection.prepareStatement(sql, resultSetType, resultSetConcurrency);
+        return new HmilyXaPreparedStatement(connection, xaConnection, statement);
+    }
+
+    @Override
+    public PreparedStatement prepareStatement(final String sql, final int resultSetType, final int resultSetConcurrency, final int resultSetHoldability) throws SQLException {
+        PreparedStatement statement = connection.prepareStatement(sql, resultSetType, resultSetConcurrency, resultSetHoldability);
+        return new HmilyXaPreparedStatement(connection, xaConnection, statement);
     }
 
     @Override
@@ -276,6 +261,21 @@ public class HmilyXaConnection implements Connection, XAConnection {
     public PreparedStatement prepareStatement(final String sql, final String[] columnNames) throws SQLException {
         PreparedStatement statement = connection.prepareStatement(sql, columnNames);
         return new HmilyXaPreparedStatement(connection, xaConnection, statement);
+    }
+
+    @Override
+    public CallableStatement prepareCall(final String sql) throws SQLException {
+        return connection.prepareCall(sql);
+    }
+
+    @Override
+    public CallableStatement prepareCall(final String sql, final int resultSetType, final int resultSetConcurrency, final int resultSetHoldability) throws SQLException {
+        return connection.prepareCall(sql, resultSetType, resultSetConcurrency, resultSetHoldability);
+    }
+
+    @Override
+    public CallableStatement prepareCall(final String sql, final int resultSetType, final int resultSetConcurrency) throws SQLException {
+        return connection.prepareCall(sql, resultSetType, resultSetConcurrency);
     }
 
     @Override

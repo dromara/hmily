@@ -31,7 +31,7 @@ import java.util.Map;
 public interface RpcXaProxy {
 
     /**
-     * 执行成功
+     * 执行成功.
      */
     int YES = 10000;
 
@@ -89,28 +89,28 @@ public interface RpcXaProxy {
         /**
          * The Commit.
          *
-         * @see RpcResource#commit(Xid, boolean) RpcResource#commit(Xid, boolean)RpcResource#commit(Xid, boolean)RpcResource#commit(Xid, boolean)RpcResource#commit(Xid, boolean)RpcResource#commit(Xid, boolean)RpcResource#commit(Xid, boolean)
+         * @see RpcResource#commit(Xid, boolean)
          */
         COMMIT,
 
         /**
          * The Prepare.
          *
-         * @see RpcResource#prepare(Xid) RpcResource#prepare(Xid)RpcResource#prepare(Xid)RpcResource#prepare(Xid)RpcResource#prepare(Xid)RpcResource#prepare(Xid)RpcResource#prepare(Xid)
+         * @see RpcResource#prepare(Xid)
          */
         PREPARE,
 
         /**
          * The Recover.
          *
-         * @see RpcResource#recover(int) RpcResource#recover(int)RpcResource#recover(int)RpcResource#recover(int)RpcResource#recover(int)RpcResource#recover(int)RpcResource#recover(int)
+         * @see RpcResource#recover(int)
          */
         RECOVER,
 
         /**
          * The Rollback.
          *
-         * @see RpcResource#rollback(Xid) RpcResource#rollback(Xid)RpcResource#rollback(Xid)RpcResource#rollback(Xid)RpcResource#rollback(Xid)RpcResource#rollback(Xid)RpcResource#rollback(Xid)
+         * @see RpcResource#rollback(Xid)
          */
         ROLLBACK,
     }

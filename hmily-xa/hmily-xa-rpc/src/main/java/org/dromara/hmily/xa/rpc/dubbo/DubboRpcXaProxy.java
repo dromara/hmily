@@ -31,8 +31,6 @@ import org.dromara.hmily.xa.rpc.RpcXaProxy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -45,21 +43,11 @@ import java.util.Optional;
  * @author sixh chenbin
  */
 public class DubboRpcXaProxy implements RpcXaProxy {
+    private final Logger logger = LoggerFactory.getLogger(DubboRpcXaProxy.class);
 
     private final Invoker<?> invoker;
 
     private final Invocation rpcInvocation;
-
-    private final Logger logger = LoggerFactory.getLogger(DubboRpcXaProxy.class);
-
-    /**
-     * Gets url.
-     *
-     * @return the url
-     */
-    public String getUrl() {
-        return invoker.getUrl().toString();
-    }
 
     /**
      * 初始化一个调用dubbo的rpc代理.
@@ -70,6 +58,15 @@ public class DubboRpcXaProxy implements RpcXaProxy {
     public DubboRpcXaProxy(final Invoker<?> invoker, final Invocation rpcInvocation) {
         this.invoker = invoker;
         this.rpcInvocation = rpcInvocation;
+    }
+
+    /**
+     * Gets url.
+     *
+     * @return the url
+     */
+    public String getUrl() {
+        return invoker.getUrl().toString();
     }
 
     @Override
@@ -102,7 +99,6 @@ public class DubboRpcXaProxy implements RpcXaProxy {
         return Optional.ofNullable(rpcInvocation.getAttachment("timeOut")).map(Integer::parseInt).orElse(0);
     }
 
-
     @Override
     public void init(final XaParticipant participant) {
         HmilyTransactionContext context = new HmilyTransactionContext();
@@ -118,4 +114,8 @@ public class DubboRpcXaProxy implements RpcXaProxy {
         return false;
     }
 
+    @Override
+    public boolean equals(final Object obj) {
+        return super.equals(obj);
+    }
 }

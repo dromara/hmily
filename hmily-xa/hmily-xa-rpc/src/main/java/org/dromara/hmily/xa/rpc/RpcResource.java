@@ -30,7 +30,6 @@ import java.util.Objects;
 /**
  * RpcResource .
  * Call remote service related resources.
- * <p>
  * 对于一些Rpc的调用事务。
  *
  * @author sixh chenbin
@@ -78,7 +77,7 @@ public abstract class RpcResource extends XaResourceWrapped {
         exception(cmd);
     }
 
-    private void exception(Integer cmd) throws XAException {
+    private void exception(final Integer cmd) throws XAException {
         if (cmd != null) {
             if (cmd > RpcXaProxy.YES) {
                 logger.warn("xa exception:cmd :{}", cmd);
