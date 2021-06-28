@@ -61,7 +61,8 @@ public class TransactionImpl implements Transaction, TimerRemovalListener<Resour
     /**
      * Instantiates a new Transaction.
      *
-     * @param xId the x id
+     * @param xId      the x id
+     * @param hasSuper the has super
      */
     TransactionImpl(final XidImpl xId, final boolean hasSuper) {
         this.xid = xId;
@@ -108,7 +109,7 @@ public class TransactionImpl implements Transaction, TimerRemovalListener<Resour
             try {
                 //第1阶段提交.
                 subCoordinator.onePhaseCommit();
-            } catch (TransactionRolledbackException e) {
+            } catch (Exception e) {
                 logger.error("onePhaseCommit()");
                 throw new RollbackException();
             }
@@ -228,12 +229,22 @@ public class TransactionImpl implements Transaction, TimerRemovalListener<Resour
             if (hasSuper) {
                 doDeList(XAResource.TMSUCCESS);
             } else {
-                oneFinally.rollback();
+                try {
+                    oneFinally.rollback();
+                } catch (RemoteException e) {
+                    logger.error("rollback error {}", e.getMessage(), e);
+                    throw new SystemException();
+                }
             }
             return;
         }
         if (subCoordinator != null) {
-            subCoordinator.rollback();
+            try {
+                subCoordinator.rollback();
+            } catch (RemoteException e) {
+                logger.error("rollback error {}", e.getMessage(), e);
+                throw new SystemException();
+            }
         }
     }
 

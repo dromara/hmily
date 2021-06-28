@@ -20,15 +20,19 @@ package org.dromara.hmily.xa.core;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.transaction.HeuristicCommitException;
 import javax.transaction.RollbackException;
 import javax.transaction.Synchronization;
 import javax.transaction.SystemException;
 import javax.transaction.TransactionRolledbackException;
 import javax.transaction.xa.XAException;
 import javax.transaction.xa.XAResource;
+import java.rmi.RemoteException;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Vector;
+
+import static org.dromara.hmily.xa.core.XaState.STATUS_MARKED_ROLLBACK;
 
 /**
  * SubCoordinator .
@@ -36,7 +40,7 @@ import java.util.Vector;
  *
  * @author sixh chenbin
  */
-public class SubCoordinator implements Resource, Synchronization {
+public class SubCoordinator implements Resource {
 
     private final Logger logger = LoggerFactory.getLogger(SubCoordinator.class);
 
@@ -60,6 +64,7 @@ public class SubCoordinator implements Resource, Synchronization {
      * Instantiates a new Sub coordinator.
      *
      * @param transaction the transaction
+     * @param hasSuper    the has super
      */
     public SubCoordinator(final TransactionImpl transaction, final boolean hasSuper) {
         this.transaction = transaction;
@@ -67,7 +72,7 @@ public class SubCoordinator implements Resource, Synchronization {
     }
 
     @Override
-    public Result prepare() {
+    public Result prepare() throws RemoteException {
         try {
             // xa end.
             transaction.doDeList(XAResource.TMSUCCESS);
@@ -76,14 +81,24 @@ public class SubCoordinator implements Resource, Synchronization {
         }
         switch (state) {
             case STATUS_MARKED_ROLLBACK:
-                state = XaState.STATUS_ROLLING_BACK;
+                beforeCompletion();
+                doRollback();
                 return Result.ROLLBACK;
             case STATUS_COMMITTED:
                 return Result.COMMIT;
             default:
+                beforeCompletion();
                 break;
         }
-        return doPrepare();
+        if (state == STATUS_MARKED_ROLLBACK) {
+            doRollback();
+            return Result.ROLLBACK;
+        }
+        Result result = doPrepare();
+        if (result == Result.READONLY) {
+            afterCompletion();
+        }
+        return result;
     }
 
     private synchronized Result doPrepare() {
@@ -141,7 +156,7 @@ public class SubCoordinator implements Resource, Synchronization {
     }
 
     @Override
-    public void rollback() {
+    public void rollback() throws RemoteException {
         //处理.
         try {
             this.transaction.doDeList(XAResource.TMSUCCESS);
@@ -160,14 +175,15 @@ public class SubCoordinator implements Resource, Synchronization {
                 return;
             default:
                 return;
-
         }
+        beforeCompletion();
         this.doRollback();
     }
 
-    private synchronized void doRollback() {
+    private synchronized void doRollback() throws RemoteException {
         state = XaState.STATUS_ROLLEDBACK;
         int rollbackError = 0;
+        boolean heurcom = false;
         for (int i = 0; i < resources.size(); i++) {
             HmilyXaResource xaResource = (HmilyXaResource) resources.elementAt(i);
             try {
@@ -178,10 +194,23 @@ public class SubCoordinator implements Resource, Synchronization {
             } catch (XAException e) {
                 logger.error("rollback  error {}:{}", xaResource.getXid(), HmilyXaException.getMessage(e));
                 rollbackError++;
+                if (e.errorCode == XAException.XA_HEURCOM) {
+                    heurcom = true;
+                } else {
+                    logger.error("rollback error {}", e.getMessage(), e);
+                    afterCompletion();
+                    throw new RuntimeException(HmilyXaException.getMessage(e));
+                }
             }
+        }
+        if (!heurcom) {
+            afterCompletion();
         }
         if (rollbackError > 0) {
             state = XaState.STATUS_UNKNOWN;
+        }
+        if (heurcom) {
+            throw new RemoteException();
         }
     }
 
@@ -209,6 +238,7 @@ public class SubCoordinator implements Resource, Synchronization {
         } else {
             state = XaState.STATUS_COMMITTED;
         }
+        afterCompletion();
     }
 
     @Override
@@ -222,7 +252,7 @@ public class SubCoordinator implements Resource, Synchronization {
     }
 
     @Override
-    public void onePhaseCommit() throws TransactionRolledbackException {
+    public void onePhaseCommit() throws TransactionRolledbackException, RemoteException {
         if (state == XaState.STATUS_ROLLEDBACK) {
             try {
                 transaction.doDeList(XAResource.TMSUCCESS);
@@ -231,9 +261,9 @@ public class SubCoordinator implements Resource, Synchronization {
                 throw new TransactionRolledbackException(e.getMessage());
             }
         }
-        if (state == XaState.STATUS_MARKED_ROLLBACK) {
+        if (state == STATUS_MARKED_ROLLBACK) {
             try {
-                //todo 完成事务前的处理.
+                beforeCompletion();
                 transaction.doDeList(XAResource.TMSUCCESS);
             } catch (SystemException e) {
                 logger.error("error doDeList error", e);
@@ -251,8 +281,13 @@ public class SubCoordinator implements Resource, Synchronization {
         }
         try {
             transaction.doDeList(XAResource.TMSUCCESS);
+            beforeCompletion();
         } catch (SystemException e) {
             logger.error("deList xaResource:", e);
+        }
+        if (state == STATUS_MARKED_ROLLBACK) {
+            doRollback();
+            throw new TransactionRolledbackException();
         }
         if (resources.size() == 1) {
             doOnePhaseCommit();
@@ -261,8 +296,8 @@ public class SubCoordinator implements Resource, Synchronization {
         Result result = doPrepare();
         if (result == Result.COMMIT) {
             doCommit();
-//        } else if (result == Result.READONLY) {
-            //todo:这里需要处理一下.
+        } else if (result == Result.READONLY) {
+            afterCompletion();
         } else if (result == Result.ROLLBACK) {
             this.doRollback();
             throw new TransactionRolledbackException();
@@ -285,6 +320,8 @@ public class SubCoordinator implements Resource, Synchronization {
                 throw new TransactionRolledbackException("XAException:" + ex.getMessage());
             }
             throw new RuntimeException("XAException" + ex.getMessage());
+        } finally {
+            afterCompletion();
         }
     }
 
@@ -339,7 +376,7 @@ public class SubCoordinator implements Resource, Synchronization {
             synchronizations.add(synchronization);
             return;
         }
-        if (state == XaState.STATUS_MARKED_ROLLBACK || state == XaState.STATUS_ROLLEDBACK) {
+        if (state == STATUS_MARKED_ROLLBACK || state == XaState.STATUS_ROLLEDBACK) {
             synchronizations.add(synchronization);
             throw new RollbackException();
         }
@@ -350,9 +387,10 @@ public class SubCoordinator implements Resource, Synchronization {
      */
     public void setRollbackOnly() {
         if (state == XaState.STATUS_PREPARING) {
-            state = XaState.STATUS_MARKED_ROLLBACK;
+            state = STATUS_MARKED_ROLLBACK;
         }
     }
+
 
     /**
      * Gets state.
@@ -363,13 +401,21 @@ public class SubCoordinator implements Resource, Synchronization {
         return state;
     }
 
-    @Override
-    public void beforeCompletion() {
-
+    /**
+     * Before completion.
+     */
+    private void beforeCompletion() {
+        for (final Synchronization synchronization : synchronizations) {
+            synchronization.beforeCompletion();
+        }
     }
 
-    @Override
-    public void afterCompletion(final int status) {
-
+    /**
+     * After completion.
+     */
+    private void afterCompletion() {
+        for (final Synchronization synchronization : synchronizations) {
+            synchronization.afterCompletion(this.state.getState());
+        }
     }
 }

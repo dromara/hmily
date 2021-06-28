@@ -18,6 +18,7 @@ package org.dromara.hmily.xa.p6spy;
 
 import com.p6spy.engine.spy.P6DataSource;
 import lombok.Getter;
+import org.dromara.hmily.common.exception.HmilyException;
 
 import javax.sql.DataSource;
 import javax.sql.XAConnection;
@@ -72,7 +73,7 @@ public class HmilyXaP6Datasource extends P6DataSource {
             throw new NullPointerException("targetDataSource is null");
         }
         if (!(delegate instanceof XADataSource)) {
-            throw new NullPointerException("datasource non implements XADataSource");
+            throw new HmilyException("datasource non implements XADataSource");
         }
         targetDataSource = delegate;
     }

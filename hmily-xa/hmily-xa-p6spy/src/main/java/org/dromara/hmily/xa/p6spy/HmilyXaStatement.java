@@ -22,6 +22,7 @@ import org.dromara.hmily.xa.core.TransactionManagerImpl;
 
 import javax.sql.XAConnection;
 import javax.transaction.RollbackException;
+import javax.transaction.Synchronization;
 import javax.transaction.SystemException;
 import javax.transaction.Transaction;
 import javax.transaction.xa.XAResource;
@@ -30,6 +31,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLWarning;
 import java.sql.Statement;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * HmilyXaStatement .
@@ -50,8 +53,9 @@ public class HmilyXaStatement implements Statement {
     /**
      * Instantiates a new Hmily xa statement.
      *
-     * @param connection the connection
-     * @param statement  the statement
+     * @param connection   the connection
+     * @param xaConnection the xa connection
+     * @param statement    the statement
      */
     public HmilyXaStatement(final Connection connection, final XAConnection xaConnection, final Statement statement) {
         this.statement = statement;
@@ -282,24 +286,26 @@ public class HmilyXaStatement implements Statement {
     /**
      * Associate xa tm.
      *
-     * @param <T>  the type parameter
-     * @param call the call
+     * @param <T>    the type parameter
+     * @param called the called
      * @return the t
      * @throws SQLException the sql exception
      */
-    public <T> T associateXa(final Call<T> call) throws SQLException {
+    public <T> T associateXa(final Called<T> called) throws SQLException {
         Transaction tx = TransactionManagerImpl.INST.getTransaction();
         if (tx != null) {
             XAConnection xaConnection = getXaConnection();
             try {
-                if (tx instanceof TransactionImpl) {
-                    ((TransactionImpl) tx).doEnList(xaConnection.getXAResource(), XAResource.TMJOIN);
+                if (!TransactionManagerImpl.INST.isExistDataSources(xaConnection)) {
+                    if (tx instanceof TransactionImpl) {
+                        ((TransactionImpl) tx).doEnList(xaConnection.getXAResource(), XAResource.TMJOIN);
+                    }
                 }
             } catch (RollbackException | SystemException | SQLException e) {
                 e.printStackTrace();
             }
         }
-        return call.call();
+        return called.call();
     }
 
     /**
@@ -307,8 +313,8 @@ public class HmilyXaStatement implements Statement {
      *
      * @return the xa connection
      */
-    public XAConnection getXaConnection() {
-        if (xaConnection == null) {
+    public synchronized XAConnection getXaConnection() {
+        if (this.xaConnection == null) {
             throw new IllegalArgumentException("connection not implements XAConnection");
         }
         return xaConnection;
@@ -320,7 +326,7 @@ public class HmilyXaStatement implements Statement {
      * @param <T> the type parameter
      */
     @FunctionalInterface
-    interface Call<T> {
+    interface Called<T> {
         /**
          * Call t.
          *

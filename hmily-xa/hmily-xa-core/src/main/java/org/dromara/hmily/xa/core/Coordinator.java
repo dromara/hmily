@@ -89,7 +89,7 @@ public class Coordinator implements Resource, Finally, TimerRemovalListener<Reso
     }
 
     @Override
-    public void rollback() {
+    public void rollback() throws RemoteException {
         switch (state) {
             case STATUS_ACTIVE:
             case STATUS_MARKED_ROLLBACK:
@@ -228,7 +228,7 @@ public class Coordinator implements Resource, Finally, TimerRemovalListener<Reso
         }
     }
 
-    private void doRollback() {
+    private void doRollback() throws RemoteException {
         state = XaState.STATUS_ROLLEDBACK;
         for (Resource resource : this.coordinators) {
             if (resource != null) {

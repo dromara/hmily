@@ -17,14 +17,19 @@
 
 package org.dromara.hmily.xa.core;
 
+import javax.sql.XAConnection;
 import javax.transaction.HeuristicMixedException;
 import javax.transaction.HeuristicRollbackException;
 import javax.transaction.InvalidTransactionException;
 import javax.transaction.NotSupportedException;
 import javax.transaction.RollbackException;
+import javax.transaction.Synchronization;
 import javax.transaction.SystemException;
 import javax.transaction.Transaction;
 import javax.transaction.TransactionManager;
+import java.sql.SQLException;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * TransactionManagerImpl .
@@ -37,6 +42,8 @@ public enum TransactionManagerImpl implements TransactionManager {
      * Singleton.
      */
     INST;
+
+    private final ThreadLocal<Set<XAConnection>> enlisted = ThreadLocal.withInitial(HashSet::new);
 
     private HmilyXaTransactionManager hmilyXaTransactionManager;
 
@@ -95,5 +102,30 @@ public enum TransactionManagerImpl implements TransactionManager {
     @Override
     public Transaction suspend() throws SystemException {
         return hmilyXaTransactionManager.suspend();
+    }
+
+    public boolean isExistDataSources(XAConnection connection) {
+        boolean contains = enlisted.get().contains(connection);
+        Transaction transaction = getTransaction();
+        if (!contains) {
+            try {
+                transaction.registerSynchronization(new Synchronization() {
+                    @Override
+                    public void beforeCompletion() {
+                        enlisted.get().remove(connection);
+                    }
+
+                    @Override
+                    public void afterCompletion(final int status) {
+                        enlisted.get().clear();
+                        enlisted.remove();
+                    }
+                });
+            } catch (RollbackException | SystemException e) {
+                return false;
+            }
+            enlisted.get().add(connection);
+        }
+        return contains;
     }
 }

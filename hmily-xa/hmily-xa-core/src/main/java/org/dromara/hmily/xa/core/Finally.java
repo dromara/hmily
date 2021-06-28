@@ -32,7 +32,7 @@ public interface Finally extends Resource {
      * rollback.
      */
     @Override
-    void rollback();
+    void rollback() throws RemoteException;
 
     /**
      * commit.

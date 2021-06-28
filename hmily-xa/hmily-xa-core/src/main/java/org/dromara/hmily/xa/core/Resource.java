@@ -32,12 +32,12 @@ public interface Resource {
      *
      * @return int int
      */
-    Result prepare();
+    Result prepare() throws RemoteException;
 
     /**
      * Rollback.
      */
-    void rollback();
+    void rollback() throws RemoteException;
 
     /**
      * Commit.

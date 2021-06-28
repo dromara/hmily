@@ -70,11 +70,7 @@ public class HmilyXaTransactionManager implements TransactionManager {
      */
     @Override
     public Transaction getTransaction() {
-        Transaction transaction = getThreadTransaction();
-        if (transaction == null) {
-            logger.warn("transaction is null");
-        }
-        return transaction;
+        return getThreadTransaction();
     }
 
     @Override
@@ -88,6 +84,7 @@ public class HmilyXaTransactionManager implements TransactionManager {
             if (thm1.equals(transaction)) {
                 return;
             }
+            logger.warn("The transaction of this thread is consistent with the one you passed in");
             throw new IllegalStateException("The transaction of this thread is consistent with the one you passed in");
         }
         boolean b = !(transaction instanceof TransactionImpl);

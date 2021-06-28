@@ -32,12 +32,7 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class XidImpl implements Xid {
 
-    private static final Integer DEF_ID = 8808;
-
-    /**
-     * Process branch Id.
-     */
-    private static final AtomicLong BXID = new AtomicLong(1);
+    private static final Integer DEF_ID = 88088;
 
     private final String globalId;
 
@@ -51,10 +46,10 @@ public class XidImpl implements Xid {
      * Instantiates a new X id.
      */
     public XidImpl() {
-        Long id = IdWorkerUtils.getInstance().createUUID();
-        String bid = "0";
+        long id = IdWorkerUtils.getInstance().createUUID();
+        long bid = IdWorkerUtils.getInstance().createUUID();
         String newId = id + "-" + bid + "-" + NetUtils.getLocalIp();
-        this.globalId = id.toString();
+        this.globalId = String.valueOf(id);
         this.branchId = newId;
         this.branchIdByte = newId.getBytes();
         this.globalIdByte = globalId.getBytes();
@@ -66,11 +61,10 @@ public class XidImpl implements Xid {
      * @param xId the x id
      */
     public XidImpl(final XidImpl xId) {
-        String bid;
         String gid;
         List<String> xxIdx = Splitter.on("-").splitToList(xId.getGlobalId());
         gid = xxIdx.get(0);
-        bid = String.valueOf(BXID.getAndIncrement());
+        long bid = IdWorkerUtils.getInstance().createUUID();
         String newId = gid + "-" + bid + "-" + NetUtils.getLocalIp();
         this.branchId = newId;
         this.branchIdByte = newId.getBytes();
@@ -99,11 +93,10 @@ public class XidImpl implements Xid {
      * @param index the index
      */
     public XidImpl(final XidImpl xId, final Integer index) {
-        String bid;
         String gid;
         List<String> xxIdx = Splitter.on("-").splitToList(xId.getGlobalId());
         gid = xxIdx.get(0);
-        bid = String.valueOf(BXID.getAndIncrement());
+        long bid = IdWorkerUtils.getInstance().createUUID();
         String newId = gid + "-" + bid + "-" + NetUtils.getLocalIp() + "-" + index;
         this.branchId = newId;
         this.branchIdByte = newId.getBytes();
