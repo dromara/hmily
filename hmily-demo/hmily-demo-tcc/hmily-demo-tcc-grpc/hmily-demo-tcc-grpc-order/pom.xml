@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>hmily-demo-grpc-tcc-order</artifactId>
+    <artifactId>hmily-demo-tcc-grpc-order</artifactId>
 
     <dependencies>
         <dependency>

@@ -7,12 +7,11 @@ CREATE TABLE IF NOT EXISTS `hmily_lock`
 (
     `trans_id`          bigint(20) not null comment '全局事务id',
     `participant_id`    bigint(20) not null comment 'hmily参与者id',
-    `resource_id`       varchar(256) not null comment '资源id',
+    `resource_id`       varchar(255) not null comment '资源id',
     `target_table_name` varchar(64)  not null comment '锁定目标表名',
     `target_table_pk`   varchar(64)  not null comment '锁定表主键',
     `create_time`       datetime     not null comment '创建时间',
-    `update_time`       datetime     not null DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP comment '更新时间',
-    PRIMARY KEY (`resource_id`, `target_table_name`, `target_table_pk`)
+    `update_time`       datetime     not null DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP comment '更新时间'
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci comment 'hmily全局lock表';
