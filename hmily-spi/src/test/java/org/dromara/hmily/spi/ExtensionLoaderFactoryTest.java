@@ -22,19 +22,17 @@ import org.dromara.hmily.spi.fixture.NoHelloTestSPI;
 import org.junit.Test;
 
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 
 public final class ExtensionLoaderFactoryTest {
     
     @Test
     public void testSPI() {
         HmilyTestSPI hmilyTestSPI = ExtensionLoaderFactory.load(HmilyTestSPI.class);
-        assertThat(hmilyTestSPI.getClass().getName(), is(NoHelloTestSPI.class.getName()));
+        assertThat(hmilyTestSPI.getClass().getName(), is(HelloWorldTestSPI.class.getName()));
         
         HmilyTestSPI test2 = ExtensionLoaderFactory.load(HmilyTestSPI.class);
-        assertThat(test2.getClass().getName(), is(NoHelloTestSPI.class.getName()));
+        assertThat(test2.getClass().getName(), is(HelloWorldTestSPI.class.getName()));
         
         HmilyTestSPI hello1 = ExtensionLoaderFactory.load(HmilyTestSPI.class, "hello");
         assertThat(hello1.getClass().getName(), is(HelloWorldTestSPI.class.getName()));
