@@ -41,7 +41,7 @@ public @interface HmilySPI {
     String value();
     
     /**
-     * Order int.
+     * Order int, higher values are interpreted as lower priority.
      *
      * @return the int
      */
