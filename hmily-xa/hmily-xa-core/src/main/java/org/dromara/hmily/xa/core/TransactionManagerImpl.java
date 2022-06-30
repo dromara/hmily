@@ -32,6 +32,7 @@ import java.util.Set;
 
 /**
  * TransactionManagerImpl .
+ * 借助HmilyXaTransactionManager
  *
  * @author sixh chenbin
  */

@@ -82,12 +82,14 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     @HmilyXA
     @Transactional
+    //rpc
     public void testMakePayment(Order order) {
 //        updateOrderStatus(order, OrderStatusEnum.PAYING);
         //扣除用户余额
         accountService.testPayment(buildAccountDTO(order));
         //进入扣减库存操作
-        inventoryService.testDecrease(buildInventoryDTO(order));
+        System.out.println (1);
+//        inventoryService.testDecrease(buildInventoryDTO(order));
     }
 
     /**

@@ -25,6 +25,9 @@ import org.dromara.hmily.core.service.HmilyTransactionHandler;
  * DefHmilyTransactionHandler .
  * 如果为null的时候，需要执行相关的业务逻辑。.
  *
+ * default
+ * 处理context为null的情况
+ *
  * @author sixh chenbin
  */
 public class DefHmilyTransactionHandler implements HmilyTransactionHandler {

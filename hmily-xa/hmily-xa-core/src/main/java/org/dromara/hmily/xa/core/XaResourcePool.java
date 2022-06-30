@@ -38,6 +38,7 @@ public final class XaResourcePool {
 
     /**
      * The constant INST.
+     * 存放所有产生的resource，这样就可以commit或者rollback
      */
     public static final XaResourcePool INST = new XaResourcePool();
 

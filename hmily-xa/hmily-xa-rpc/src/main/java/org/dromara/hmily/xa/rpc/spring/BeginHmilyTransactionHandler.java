@@ -24,7 +24,7 @@ import org.dromara.hmily.core.service.HmilyTransactionHandler;
 
 /**
  * CommitHmilyTransactionHandler .
- * 提交一个事务的相关处理.
+ * 提交一个事务的相关处理.处理context传递时，下游服务的加入
  *
  * @author sixh chenbin
  */

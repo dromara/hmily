@@ -50,13 +50,13 @@ public class DubboXaFilter implements Filter {
 
     @Override
     public Result invoke(final Invoker<?> invoker, final Invocation invocation) throws RpcException {
-        LOGGER.debug("create dubbo xa sources");
+        LOGGER.debug("create dubbo xa sources");//在发送rpc时调用
         Class<?> clazz = invoker.getInterface();
         Class<?>[] args = invocation.getParameterTypes();
         String methodName = invocation.getMethodName();
         try {
             Method method = clazz.getMethod(methodName, args);
-            Hmily hmily = method.getAnnotation(Hmily.class);
+            Hmily hmily = method.getAnnotation(Hmily.class);//rpc调用的方法需要手动加@Hmily注解
             if (Objects.isNull(hmily)) {
                 return invoker.invoke(invocation);
             }
@@ -69,7 +69,7 @@ public class DubboXaFilter implements Filter {
         if (transaction instanceof TransactionImpl) {
             XAResource resource = new DubboRpcResource(invoker, invocation);
             try {
-                ((TransactionImpl) transaction).doEnList(resource, XAResource.TMJOIN);
+                ((TransactionImpl) transaction).doEnList(resource, XAResource.TMJOIN);//加入XA事务
             } catch (SystemException | RollbackException e) {
                 LOGGER.error(":", e);
                 throw new RuntimeException("dubbo xa resource tm join err", e);

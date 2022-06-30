@@ -23,6 +23,7 @@ import java.lang.annotation.Target;
 
 /**
  * The annotation Hmily.
+ * 加了这个注解，表示远程调用的时候会传递context
  *
  * @author xiaoyu
  */

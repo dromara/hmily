@@ -23,6 +23,7 @@ import javax.transaction.xa.Xid;
 
 /**
  * HmilyXaResource .
+ * XAResource统一外观
  *
  * @author sixh chenbin
  */

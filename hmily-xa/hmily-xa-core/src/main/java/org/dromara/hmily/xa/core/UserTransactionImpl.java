@@ -29,6 +29,7 @@ import javax.transaction.UserTransaction;
 
 /**
  * UserTransactionImpl .
+ * 用于配置事务管理器
  *
  * @author sixh chenbin
  */

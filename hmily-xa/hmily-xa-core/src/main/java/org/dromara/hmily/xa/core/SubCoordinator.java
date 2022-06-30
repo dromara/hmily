@@ -355,7 +355,7 @@ public class SubCoordinator implements Resource {
                 return false;
             }
         }).findFirst();
-        if (!isSame.isPresent()) {
+        if (!isSame.isPresent()) {//如果没有，就添加一个resource
             this.resources.add(xaResource);
             return false;
         }

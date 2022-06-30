@@ -102,7 +102,7 @@ public class DubboRpcXaProxy implements RpcXaProxy {
     @Override
     public void init(final XaParticipant participant) {
         HmilyTransactionContext context = new HmilyTransactionContext();
-        context.setXaParticipant(participant);
+        context.setXaParticipant(participant);//XaParticipant算是事务参与者，是父节点给颁发的branchId等信息
         RpcMediator.getInstance().transmit(RpcContext.getContext()::setAttachment, context);
     }
 

@@ -48,11 +48,11 @@ public class TransactionImpl implements Transaction, TimerRemovalListener<Resour
 
     private final XidImpl xid;
 
-    private SubCoordinator subCoordinator;
+    private SubCoordinator subCoordinator;//子协调器
 
     private final List<XAResource> enlistResourceList = Collections.synchronizedList(new ArrayList<>());
 
-    private List<XAResource> delistResourceList;
+    private List<XAResource> delistResourceList;//用于保存挂起的？
 
     private final TransactionContext context;
 
@@ -128,7 +128,7 @@ public class TransactionImpl implements Transaction, TimerRemovalListener<Resour
         //xaResource;
         if (flag == XAResource.TMJOIN
                 || flag == XAResource.TMNOFLAGS) {
-            //这里需要处理不同的xa事务数据.
+            //这里需要处理不同的xa事务数据.加入XA事务
             enlistResource(xaResource);
         } else if (flag == XAResource.TMRESUME) {
             //进行事务的恢复.
