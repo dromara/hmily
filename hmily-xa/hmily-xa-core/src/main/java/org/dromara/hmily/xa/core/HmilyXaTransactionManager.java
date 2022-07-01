@@ -44,6 +44,7 @@ public class HmilyXaTransactionManager implements TransactionManager {
 
     /**
      * onveniently realize the processing of nested transactions.
+     * 可能一个线程内会嵌套事务，所以用stack
      */
     private final ThreadLocal<Stack<Transaction>> tms = new ThreadLocal<>();
 
@@ -157,10 +158,12 @@ public class HmilyXaTransactionManager implements TransactionManager {
         Transaction threadTransaction = getThreadTransaction();
         Transaction rct = threadTransaction;
         //xa;
+        //如果有事务了，就创建一个子事务
         if (threadTransaction != null) {
             TransactionImpl tx = (TransactionImpl) rct;
             rct = tx.createSubTransaction();
         } else {
+            //创建一个事务
             boolean hasSuper = false;
             HmilyTransactionContext context = HmilyContextHolder.get();
             XidImpl xId;
@@ -170,6 +173,8 @@ public class HmilyXaTransactionManager implements TransactionManager {
             } else {
                 xId = new XidImpl();
             }
+            //如果有context，那就设置当前分支的id
+            //getXaParticipant是由上游事务设置的
             //Main business coordinator
             rct = new TransactionImpl(xId, hasSuper);
         }

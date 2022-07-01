@@ -52,6 +52,7 @@ public class CommitHmilyTransactionHandler implements HmilyTransactionHandler {
         XidImpl xid = new XidImpl(branchId);
         List<XaResourceWrapped> allResource = XaResourcePool.INST.getAllResource(xid.getGlobalId());
         //如果是远程调用就只能是commit.
+        //获得所有resource，然后级联commit，resource可能是其他的rpc
         try {
             for (final XaResourceWrapped xaResourceWrapped : allResource) {
                 ((HmilyXaResource) xaResourceWrapped).commit(false);

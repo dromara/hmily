@@ -106,6 +106,7 @@ public class SubCoordinator implements Resource {
         }
         state = XaState.STATUS_PREPARING;
         boolean isError = false;
+        //对于每个resource进行prepare
         for (int i = 0; i < resources.size(); i++) {
             HmilyXaResource xaResource = (HmilyXaResource) resources.elementAt(i);
             //If there is an error.
@@ -400,6 +401,7 @@ public class SubCoordinator implements Resource {
 
     /**
      * Before completion.
+     * 触发JTA的回调
      */
     private void beforeCompletion() {
         for (final Synchronization synchronization : synchronizations) {
@@ -409,6 +411,7 @@ public class SubCoordinator implements Resource {
 
     /**
      * After completion.
+     * 触发JTA的回调
      */
     private void afterCompletion() {
         for (final Synchronization synchronization : synchronizations) {

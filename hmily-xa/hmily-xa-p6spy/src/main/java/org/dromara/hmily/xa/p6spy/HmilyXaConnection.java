@@ -42,6 +42,8 @@ import java.util.concurrent.Executor;
 
 /**
  * HmilyXaConnection .
+ * 封装一个特殊的Connection
+ * 这样假如发生了语句调用，就会把它假如resource中。
  *
  * @author sixh chenbin
  */

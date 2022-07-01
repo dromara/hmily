@@ -81,7 +81,7 @@ public class XidImpl implements Xid {
         this.branchId = branchId;
         this.branchIdByte = branchId.getBytes();
         String gid = strings.get(0);
-        this.globalId = gid;
+        this.globalId = gid;//直接计算出globalId
         this.globalIdByte = gid.getBytes();
     }
 

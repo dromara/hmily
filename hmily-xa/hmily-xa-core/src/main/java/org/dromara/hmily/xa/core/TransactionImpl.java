@@ -89,9 +89,9 @@ public class TransactionImpl implements Transaction, TimerRemovalListener<Resour
     @Override
     public void commit() throws RollbackException, HeuristicMixedException, HeuristicRollbackException, SecurityException, IllegalStateException, SystemException {
         Finally oneFinally = context.getOneFinally();
-        if (oneFinally != null) {
+        if (oneFinally != null) {//其实就是协调器
             try {
-                if (hasSuper) {
+                if (hasSuper) {//如果有父事务，那就结束这个resource，让父事务调用
                     doDeList(XAResource.TMSUCCESS);
                 } else {
                     oneFinally.commit();
@@ -163,7 +163,7 @@ public class TransactionImpl implements Transaction, TimerRemovalListener<Resour
         HmilyXaResource myResoure = (HmilyXaResource) xaResource;
         try {
             //flags - TMSUCCESS、TMFAIL 或 TMSUSPEND 之一。
-            myResoure.end(flag);
+            myResoure.end(flag);//end，代表提交前一个resource的结束
             enlistResourceList.remove(xaResource);
             return true;
         } catch (XAException e) {

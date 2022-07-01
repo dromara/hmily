@@ -23,7 +23,7 @@ import javax.transaction.xa.Xid;
 
 /**
  * HmilyXaResource .
- * XAResource统一外观
+ * XAResource统一外观，里面可能是rpc，也可能是其他XA resource
  *
  * @author sixh chenbin
  */

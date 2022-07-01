@@ -104,6 +104,7 @@ public class Coordinator implements Resource, Finally, TimerRemovalListener<Reso
         doRollback();
     }
 
+    //commit的时候会调用sub的prepare？
     @Override
     public void commit() throws RemoteException {
         switch (state) {
@@ -123,6 +124,7 @@ public class Coordinator implements Resource, Finally, TimerRemovalListener<Reso
                 throw new TransactionRequiredException("status error");
         }
         //哪果只有一个数据就表示只是自己本身，@Coordinator.
+        //没有子协调者
         if (this.coordinators.size() == 1) {
             state = XaState.STATUS_COMMITTING;
             Resource resource = coordinators.get(0);
@@ -155,15 +157,18 @@ public class Coordinator implements Resource, Finally, TimerRemovalListener<Reso
         doCommit();
     }
 
+    //
     private Result doPrepare() {
         // start 1pc.
         Result rs = Result.READONLY;
         if (coordinators.size() == 0) {
+            //只有我自己，那就提交
             state = XaState.STATUS_COMMITTED;
             return rs;
         }
         state = XaState.STATUS_PREPARING;
         int errors = 0;
+        //级联prepare
         for (final Resource coordinator : coordinators) {
             /*
              * 开始调用1pc阶段.
@@ -237,6 +242,9 @@ public class Coordinator implements Resource, Finally, TimerRemovalListener<Reso
         }
     }
 
+    /**
+     * 提交事务
+     */
     private void doCommit() throws TransactionRolledbackException {
         state = XaState.STATUS_COMMITTING;
         int commitErrors = 0;

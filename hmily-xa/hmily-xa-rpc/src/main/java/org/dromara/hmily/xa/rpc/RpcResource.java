@@ -56,6 +56,7 @@ public abstract class RpcResource extends XaResourceWrapped {
         exception(cmd);
     }
 
+    //prepare失败只有一种情况，就是read only
     @Override
     public int prepare(final Xid xid) throws XAException {
         Integer cmd = xaProxy.cmd(RpcXaProxy.XaCmd.PREPARE, Collections.emptyMap());

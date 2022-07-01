@@ -82,10 +82,11 @@ public class DubboRpcXaProxy implements RpcXaProxy {
         //重新设置值.
         if (StringUtils.isNoneBlank(attachment)) {
             HmilyTransactionContext context = GsonUtils.getInstance().fromJson(attachment, HmilyTransactionContext.class);
-            context.getXaParticipant().setCmd(cmd.name());
+            context.getXaParticipant().setCmd(cmd.name());//通知其他人可以提交了，或者回滚！
+            //getXaParticipant是远程
             RpcMediator.getInstance().transmit(RpcContext.getContext()::setAttachment, context);
         }
-        Result result = this.invoker.invoke(rpcInvocation);
+        Result result = this.invoker.invoke(rpcInvocation);//再执行一次，而那个方法被代理了！
         if (result.hasException()) {
             logger.warn("执行一个指令发送了异常，{}:{}", params, result.getException().getMessage());
             return EXC;
