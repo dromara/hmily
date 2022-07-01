@@ -45,6 +45,7 @@ public class HmilyXaTransactionManager implements TransactionManager {
     /**
      * onveniently realize the processing of nested transactions.
      * 可能一个线程内会嵌套事务，所以用stack
+     * stack和事务的调用过程很像
      */
     private final ThreadLocal<Stack<Transaction>> tms = new ThreadLocal<>();
 
@@ -162,6 +163,7 @@ public class HmilyXaTransactionManager implements TransactionManager {
         if (threadTransaction != null) {
             TransactionImpl tx = (TransactionImpl) rct;
             rct = tx.createSubTransaction();
+            //父coordinator的引用复制在这里，基于transaction的拷贝构造器
         } else {
             //创建一个事务
             boolean hasSuper = false;
@@ -169,13 +171,14 @@ public class HmilyXaTransactionManager implements TransactionManager {
             XidImpl xId;
             if (context != null && context.getXaParticipant() != null) {
                 xId = new XidImpl(context.getXaParticipant().getBranchId());
-                hasSuper = true;
+                hasSuper = true;//注意远程的时候，远程有父事务
             } else {
                 xId = new XidImpl();
             }
             //如果有context，那就设置当前分支的id
             //getXaParticipant是由上游事务设置的
             //Main business coordinator
+            //注意，跨rpc的事务调用也要关联父事务，这样只有最后一个起点才会调用主协调器
             rct = new TransactionImpl(xId, hasSuper);
         }
         setTxTotr(rct);

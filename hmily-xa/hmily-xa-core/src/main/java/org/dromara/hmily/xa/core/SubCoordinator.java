@@ -35,6 +35,7 @@ import java.util.Vector;
  * SubCoordinator .
  * 需要处理一下，等待总协调者的通知，如果没有通知，就表示回滚。
  *
+ * 处理的是子事务的结束，受主Coordinator的控制
  * @author sixh chenbin
  */
 public class SubCoordinator implements Resource {
@@ -101,6 +102,7 @@ public class SubCoordinator implements Resource {
     private synchronized Result doPrepare() {
         Result result = Result.READONLY;
         if (resources.size() == 0) {
+            //没有resource就直接提交成功了
             state = XaState.STATUS_COMMITTED;
             return result;
         }
@@ -178,6 +180,8 @@ public class SubCoordinator implements Resource {
         this.doRollback();
     }
 
+    //当前事务标记为回滚
+    //回滚当前事务的所有resource
     private synchronized void doRollback() throws RemoteException {
         state = XaState.STATUS_ROLLEDBACK;
         int rollbackError = 0;
@@ -249,8 +253,10 @@ public class SubCoordinator implements Resource {
         }
     }
 
+    //似乎是直接提交的意思？即1阶段提交
     @Override
     public void onePhaseCommit() throws TransactionRolledbackException, RemoteException {
+        //已经回滚了
         if (state == XaState.STATUS_ROLLEDBACK) {
             try {
                 transaction.doDeList(XAResource.TMSUCCESS);
@@ -259,6 +265,7 @@ public class SubCoordinator implements Resource {
                 throw new TransactionRolledbackException(e.getMessage());
             }
         }
+        //标记为回滚
         if (state == XaState.STATUS_MARKED_ROLLBACK) {
             try {
                 beforeCompletion();
@@ -267,8 +274,10 @@ public class SubCoordinator implements Resource {
                 logger.error("error doDeList error", e);
             }
             doRollback();
+            //抛出异常，这样上层事务会接收到这个异常，也会回滚
             throw new TransactionRolledbackException();
         }
+        //已经提交了
         if (state == XaState.STATUS_COMMITTED) {
             try {
                 transaction.doDeList(XAResource.TMSUCCESS);
@@ -277,6 +286,7 @@ public class SubCoordinator implements Resource {
             }
             return;
         }
+        //剩下的就是提交
         try {
             transaction.doDeList(XAResource.TMSUCCESS);
             beforeCompletion();
@@ -287,10 +297,13 @@ public class SubCoordinator implements Resource {
             doRollback();
             throw new TransactionRolledbackException();
         }
+        //如果只有一个resource，就直接提交？？
+        //那假如有rpc resource，但是远程的有多个呢？
         if (resources.size() == 1) {
             doOnePhaseCommit();
             return;
         }
+        //prepare并根据结果,这里更像是没有rpc的事务，直接本地就行
         Result result = doPrepare();
         if (result == Result.COMMIT) {
             doCommit();

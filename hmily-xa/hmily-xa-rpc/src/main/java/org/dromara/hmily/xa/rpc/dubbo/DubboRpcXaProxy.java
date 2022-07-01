@@ -87,6 +87,7 @@ public class DubboRpcXaProxy implements RpcXaProxy {
             RpcMediator.getInstance().transmit(RpcContext.getContext()::setAttachment, context);
         }
         Result result = this.invoker.invoke(rpcInvocation);//再执行一次，而那个方法被代理了！
+        //根据是否产生异常来判断是否prepare成功！
         if (result.hasException()) {
             logger.warn("执行一个指令发送了异常，{}:{}", params, result.getException().getMessage());
             return EXC;

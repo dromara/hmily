@@ -71,7 +71,7 @@ public class HmilyXaResource extends XaResourceWrapped {
     /**
      * Commit.
      *
-     * @param b the b
+     * @param b the b，false为2阶段提交，true为3阶段提交
      * @throws XAException the xa exception
      */
     public void commit(final boolean b) throws XAException {

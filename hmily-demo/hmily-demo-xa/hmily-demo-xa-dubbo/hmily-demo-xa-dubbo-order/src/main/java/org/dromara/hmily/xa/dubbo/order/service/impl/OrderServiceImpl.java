@@ -159,7 +159,7 @@ public class OrderServiceImpl implements OrderService {
 
     private Order saveOrder(Integer count, BigDecimal amount) {
         final Order order = buildOrder(count, amount);
-//        orderMapper.save(order);
+        orderMapper.save(order);
         return order;
     }
 

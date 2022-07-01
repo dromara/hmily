@@ -50,6 +50,7 @@ public class TransactionImpl implements Transaction, TimerRemovalListener<Resour
 
     private SubCoordinator subCoordinator;//子协调器
 
+    //所有的resource
     private final List<XAResource> enlistResourceList = Collections.synchronizedList(new ArrayList<>());
 
     private List<XAResource> delistResourceList;//用于保存挂起的？
@@ -86,6 +87,7 @@ public class TransactionImpl implements Transaction, TimerRemovalListener<Resour
         subCoordinator(true, true);
     }
 
+    //
     @Override
     public void commit() throws RollbackException, HeuristicMixedException, HeuristicRollbackException, SecurityException, IllegalStateException, SystemException {
         Finally oneFinally = context.getOneFinally();
@@ -94,7 +96,7 @@ public class TransactionImpl implements Transaction, TimerRemovalListener<Resour
                 if (hasSuper) {//如果有父事务，那就结束这个resource，让父事务调用
                     doDeList(XAResource.TMSUCCESS);
                 } else {
-                    oneFinally.commit();
+                    oneFinally.commit();//最顶层父事务会调用commit，对应协调器的commit
                 }
             } catch (TransactionRolledbackException e) {
                 logger.error("error rollback", e);
@@ -103,11 +105,12 @@ public class TransactionImpl implements Transaction, TimerRemovalListener<Resour
                 logger.error("error", e);
                 throw new SystemException(e.getMessage());
             }
-            return;
+            return;//return!!!!
         }
         if (subCoordinator != null) {
             try {
                 //第1阶段提交.
+                //如果没有主coordinator，那就直接提交了
                 subCoordinator.onePhaseCommit();
             } catch (Exception e) {
                 logger.error("onePhaseCommit()");
@@ -118,6 +121,8 @@ public class TransactionImpl implements Transaction, TimerRemovalListener<Resour
 
     /**
      * Do en list.
+     * rpc时会加入远程的RpcResource
+     * 本地数据源也会加入
      *
      * @param xaResource the xa resource
      * @param flag       the flag
@@ -132,6 +137,7 @@ public class TransactionImpl implements Transaction, TimerRemovalListener<Resour
             enlistResource(xaResource);
         } else if (flag == XAResource.TMRESUME) {
             //进行事务的恢复.
+            //是恢复的话，就回复所有的挂起事务
             if (delistResourceList != null) {
                 for (final XAResource resource : delistResourceList) {
                     this.enlistResource(resource);
@@ -143,6 +149,7 @@ public class TransactionImpl implements Transaction, TimerRemovalListener<Resour
 
     /**
      * Do de list.
+     * 先复制到de list，然后清除en list
      *
      * @param flag the flag
      * @throws SystemException the system exception
@@ -172,6 +179,7 @@ public class TransactionImpl implements Transaction, TimerRemovalListener<Resour
         return false;
     }
 
+    //一个事务关联一个coordinator，和一个子coordinator，子coordinator关联这个事务的所有resource
     @Override
     public boolean enlistResource(final XAResource xaResource) throws
             RollbackException, IllegalStateException, SystemException {
@@ -187,15 +195,17 @@ public class TransactionImpl implements Transaction, TimerRemovalListener<Resour
         boolean found = subCoordinator.addXaResource(hmilyXaResource);
         int flag = found ? XAResource.TMJOIN : XAResource.TMNOFLAGS;
         try {
+            //如果加入了一个在挂起队列中的resource
             if (delistResourceList != null && delistResourceList.contains(hmilyXaResource)) {
                 flag = XAResource.TMRESUME;
             }
             // TMNOFLAGS、TMJOIN 或 TMRESUME 之一。
-            hmilyXaResource.start(flag);
+            hmilyXaResource.start(flag);//resource生命周期启动callback
         } catch (XAException e) {
             logger.error("{}", HmilyXaException.getMessage(e), e);
             throw new IllegalStateException(e);
         }
+        //不会重复添加resource
         if (!enlistResourceList.contains(hmilyXaResource)) {
             enlistResourceList.add(hmilyXaResource);
         }
@@ -260,6 +270,11 @@ public class TransactionImpl implements Transaction, TimerRemovalListener<Resour
         subCoordinator.setRollbackOnly();
     }
 
+    /**
+     * 只有在构造器里创建才会创建父coordinator
+     * 父coordinator可能为null，假如使用了默认的无参构造器
+     * @param newCoordinator 是否允许创建协调器
+     */
     private void subCoordinator(final boolean newCoordinator, final boolean stateActive) {
         try {
             subCoordinator = new SubCoordinator(this, this.hasSuper);
@@ -268,11 +283,13 @@ public class TransactionImpl implements Transaction, TimerRemovalListener<Resour
             }
             Coordinator coordinator = context.getCoordinator();
             if (newCoordinator && coordinator == null) {
+                //懒加载
                 coordinator = new Coordinator(xid, this.hasSuper);
                 context.setCoordinator(coordinator);
                 if (context.getOneFinally() == null) {
                     context.setOneFinally(coordinator);
                 }
+                //事务超时时间30000s
                 coordinator.getTimer().put(coordinator, 30000, TimeUnit.SECONDS);
                 coordinator.getTimer().addRemovalListener(this);
             }

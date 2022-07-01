@@ -117,8 +117,8 @@ public class AccountServiceImpl implements AccountService {
     @Transactional
     public boolean testPayment(AccountDTO accountDTO) {
 //        accountMapper.testUpdate(accountDTO);
-//        throw new RuntimeException("111111111");
-        return Boolean.TRUE;
+        throw new RuntimeException("111111111");
+//        return Boolean.TRUE;
     }
 
     @Override
