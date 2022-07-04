@@ -78,6 +78,7 @@ public class DubboRpcResource extends RpcResource {
         return "dubbo";
     }
 
+    //enlist时会调用，因为绑定到事务中
     @Override
     public void start(final Xid xid, final int i) throws XAException {
         super.start(xid, i);
