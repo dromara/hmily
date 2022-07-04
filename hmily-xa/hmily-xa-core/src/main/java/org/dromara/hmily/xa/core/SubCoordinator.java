@@ -253,7 +253,7 @@ public class SubCoordinator implements Resource {
         }
     }
 
-    //似乎是直接提交的意思？即1阶段提交
+    //一个事务本身直接提交，需要查看一下是否是只有一个资源，否则还得2pc
     @Override
     public void onePhaseCommit() throws TransactionRolledbackException, RemoteException {
         //已经回滚了
@@ -297,8 +297,10 @@ public class SubCoordinator implements Resource {
             doRollback();
             throw new TransactionRolledbackException();
         }
-        //如果只有一个resource，就直接提交？？
+        //如果只有一个resource，就直接提交
+        //有0个resource的情况会在prepare失败
         //那假如有rpc resource，但是远程的有多个呢？
+        //可以在应用层避免，用户在仅仅调用一个事务rpc时，不应该在本地再开一个事务！
         if (resources.size() == 1) {
             doOnePhaseCommit();
             return;

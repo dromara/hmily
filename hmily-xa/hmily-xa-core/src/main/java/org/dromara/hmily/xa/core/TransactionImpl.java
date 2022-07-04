@@ -87,7 +87,7 @@ public class TransactionImpl implements Transaction, TimerRemovalListener<Resour
         subCoordinator(true, true);
     }
 
-    //
+    //需要支持不是XA的事务，比如本地直接提交了
     @Override
     public void commit() throws RollbackException, HeuristicMixedException, HeuristicRollbackException, SecurityException, IllegalStateException, SystemException {
         Finally oneFinally = context.getOneFinally();
@@ -107,6 +107,8 @@ public class TransactionImpl implements Transaction, TimerRemovalListener<Resour
             }
             return;//return!!!!
         }
+        //什么情况下会没有主coordinator？
+        //我认为是无法触发的，因为构造器中会保证一定有主coordinator
         if (subCoordinator != null) {
             try {
                 //第1阶段提交.

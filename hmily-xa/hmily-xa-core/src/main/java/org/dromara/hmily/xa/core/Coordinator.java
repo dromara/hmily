@@ -125,6 +125,7 @@ public class Coordinator implements Resource, Finally, TimerRemovalListener<Reso
         }
         //哪果只有一个数据就表示只是自己本身，@Coordinator.
         //只有一个子协调器，表示没有嵌套事务，所以直接提交
+        //不过自己可能有多个资源，所以在后面会判断一下
         if (this.coordinators.size() == 1) {
             state = XaState.STATUS_COMMITTING;
             Resource resource = coordinators.get(0);

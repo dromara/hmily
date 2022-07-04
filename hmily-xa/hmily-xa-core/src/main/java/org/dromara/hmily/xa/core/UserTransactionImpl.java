@@ -30,6 +30,7 @@ import javax.transaction.UserTransaction;
 /**
  * UserTransactionImpl .
  * 用于配置事务管理器
+ * UserTransaction是支持用户直接通过JTA编写分布式事务的api
  *
  * @author sixh chenbin
  */

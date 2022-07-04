@@ -106,6 +106,7 @@ public enum TransactionManagerImpl implements TransactionManager {
 
     /**
      * Is exist data sources boolean.
+     * 这个方法会防止重复添加
      *
      * @param connection the connection
      * @return the boolean
@@ -115,6 +116,8 @@ public enum TransactionManagerImpl implements TransactionManager {
         Transaction transaction = getTransaction();
         if (!contains) {
             try {
+                //设置回调，保证在完成前remove，注意这个不是transaction的list，这是校验重复的list
+                //用于给每个connection仅仅设定一个transaction的list
                 transaction.registerSynchronization(new Synchronization() {
                     @Override
                     public void beforeCompletion() {
