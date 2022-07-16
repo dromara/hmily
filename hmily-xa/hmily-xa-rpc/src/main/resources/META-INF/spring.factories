@@ -1,0 +1,2 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  org.dromara.hmily.xa.rpc.springcloud.SpringCloudXaAutoConfiguration

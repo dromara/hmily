@@ -52,8 +52,9 @@ public class PrepareHmilyTransactionHandler implements HmilyTransactionHandler {
         //完成prepare.
         XaParticipant xaParticipant = hmilyTransactionContext.getXaParticipant();
         String branchId = xaParticipant.getBranchId();
-        XidImpl xid = new XidImpl(branchId);
+        XidImpl xid = new XidImpl(xaParticipant.getGlobalId (),branchId);
         String globalId = xid.getGlobalId();
+        //会受到负载均衡器的影响
         List<XaResourceWrapped> allResource = XaResourcePool.INST.getAllResource(globalId);
         //如果是远程调用就只能是commit.
         int result;

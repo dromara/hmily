@@ -4,9 +4,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -27,7 +27,7 @@ import org.dromara.hmily.demo.common.account.entity.AccountDO;
  * @author xiaoyu
  */
 public interface AccountMapper {
-    
+
     /**
      * Update int.
      *
@@ -38,7 +38,7 @@ public interface AccountMapper {
             " freeze_amount= freeze_amount + #{amount} ,update_time = now()" +
             " where user_id =#{userId}  and  balance >= #{amount}  ")
     int update(AccountDTO accountDTO);
-    
+
     /**
      * Update tac int.
      *
@@ -48,7 +48,7 @@ public interface AccountMapper {
     @Update("update account set balance = balance - #{amount}, update_time = now()" +
             " where user_id =#{userId} and balance >= #{amount}  ")
     int updateTAC(AccountDTO accountDTO);
-    
+
     /**
      * Test update int.
      *
@@ -57,8 +57,9 @@ public interface AccountMapper {
      */
     @Update("update account set balance = balance - #{amount}, update_time = now() " +
             " where user_id =#{userId}  and  balance >= #{amount}  ")
+//    @Update("select 1")
     int testUpdate(AccountDTO accountDTO);
-    
+
     /**
      * Confirm int.
      *
@@ -69,7 +70,7 @@ public interface AccountMapper {
             " freeze_amount= freeze_amount - #{amount}" +
             " where user_id =#{userId}  and freeze_amount >= #{amount} ")
     int confirm(AccountDTO accountDTO);
-    
+
     /**
      * Cancel int.
      *
@@ -80,7 +81,7 @@ public interface AccountMapper {
             " freeze_amount= freeze_amount -  #{amount} " +
             " where user_id =#{userId}  and freeze_amount >= #{amount}")
     int cancel(AccountDTO accountDTO);
-    
+
     /**
      * 根据userId获取用户账户信息
      *

@@ -85,6 +85,13 @@ public class XidImpl implements Xid {
         this.globalIdByte = gid.getBytes();
     }
 
+    public XidImpl(final String transactionId,final String branchId) {
+        this.branchId = branchId;
+        this.branchIdByte = branchId.getBytes();
+        this.globalId = transactionId;
+        this.globalIdByte = transactionId.getBytes();
+    }
+
     /**
      * Instantiates a new X id.
      *

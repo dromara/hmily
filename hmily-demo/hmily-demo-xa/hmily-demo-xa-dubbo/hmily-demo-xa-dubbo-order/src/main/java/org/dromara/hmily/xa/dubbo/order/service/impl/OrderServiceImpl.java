@@ -67,9 +67,9 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public String testOrderPay(Integer count, BigDecimal amount) {
         Order order = saveOrder(count, amount);
-//        final long start = System.currentTimeMillis();
-//        paymentService.testMakePayment(order);
-//        System.out.println("方法耗时：" + (System.currentTimeMillis() - start));
+        final long start = System.currentTimeMillis();
+        paymentService.testMakePayment(order);
+        System.out.println("方法耗时：" + (System.currentTimeMillis() - start));
         return "success";
     }
 
