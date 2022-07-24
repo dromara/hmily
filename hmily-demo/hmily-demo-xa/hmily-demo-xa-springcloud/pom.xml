@@ -31,10 +31,10 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>hmily-demo-tcc-springcloud-order</module>
-        <module>hmily-demo-tcc-springcloud-inventory</module>
-        <module>hmily-demo-tcc-springcloud-account</module>
-        <module>hmily-demo-tcc-springcloud-eureka</module>
+        <module>hmily-demo-xa-springcloud-order</module>
+        <module>hmily-demo-xa-springcloud-inventory</module>
+        <module>hmily-demo-xa-springcloud-account</module>
+        <module>hmily-demo-xa-springcloud-eureka</module>
     </modules>
 
     <properties>

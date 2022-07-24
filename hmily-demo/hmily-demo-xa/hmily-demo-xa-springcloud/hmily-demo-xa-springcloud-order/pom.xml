@@ -27,7 +27,7 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>hmily-demo-tcc-springcloud-order</artifactId>
+    <artifactId>hmily-demo-xa-springcloud-order</artifactId>
 
     <dependencies>
         <dependency>
