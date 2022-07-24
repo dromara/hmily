@@ -22,14 +22,6 @@
             <artifactId>hmily-xa-rpc-common</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.dromara</groupId>
-            <artifactId>hmily-xa-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.dromara</groupId>
-            <artifactId>hmily-xa-p6spy</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.apache.dubbo</groupId>
             <artifactId>dubbo</artifactId>
             <scope>provided</scope>

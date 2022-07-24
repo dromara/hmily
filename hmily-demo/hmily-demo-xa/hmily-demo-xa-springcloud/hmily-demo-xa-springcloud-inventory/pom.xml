@@ -47,6 +47,10 @@
             <scope>compile</scope>
             <exclusions>
                 <exclusion>
+                    <groupId>org.dromara</groupId>
+                    <artifactId>hmily-config-apollo</artifactId>
+                </exclusion>
+                <exclusion>
                     <groupId>com.google.guava</groupId>
                     <artifactId>guava</artifactId>
                 </exclusion>
