@@ -2,7 +2,6 @@ package org.dromara.hmily.xa.rpc.springcloud;
 
 
 import org.dromara.hmily.core.context.XaParticipant;
-import org.dromara.hmily.xa.core.timer.HashedWheelTimer;
 import org.dromara.hmily.xa.rpc.RpcResource;
 import org.dromara.hmily.xa.rpc.RpcXaProxy;
 

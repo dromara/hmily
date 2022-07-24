@@ -47,7 +47,7 @@ public class RollbackHmilyTransactionHandler implements HmilyTransactionHandler 
     @Override
     public Object handleTransaction(final ProceedingJoinPoint point, final HmilyTransactionContext hmilyTransactionContext) throws Throwable {
         //完成Rollbqack.
-        logger.info ("Got rollback cmd {}", hmilyTransactionContext.getXaParticipant ());
+        logger.info ("Rollback branch {}", hmilyTransactionContext.getXaParticipant ());
         XaParticipant xaParticipant = hmilyTransactionContext.getXaParticipant();
         String branchId = xaParticipant.getBranchId();
         XidImpl xid = new XidImpl(xaParticipant.getGlobalId (),branchId);
