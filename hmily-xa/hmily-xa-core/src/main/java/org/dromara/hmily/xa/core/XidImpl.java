@@ -177,7 +177,9 @@ public class XidImpl implements Xid {
 
     @Override
     public int hashCode() {
-        return super.hashCode();
+        int result = globalId != null ? globalId.hashCode () : 0;
+        result = 31 * result + (branchId != null ? branchId.hashCode () : 0);
+        return result;
     }
 
     @Override

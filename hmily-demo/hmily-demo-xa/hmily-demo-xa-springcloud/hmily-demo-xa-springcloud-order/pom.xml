@@ -169,6 +169,11 @@
         </dependency>
         <dependency>
             <groupId>org.dromara</groupId>
+            <artifactId>hmily-xa-p6spy</artifactId>
+            <version>2.1.2-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.dromara</groupId>
             <artifactId>hmily-xa-rpc-springcloud</artifactId>
             <version>2.1.2-SNAPSHOT</version>
             <scope>compile</scope>

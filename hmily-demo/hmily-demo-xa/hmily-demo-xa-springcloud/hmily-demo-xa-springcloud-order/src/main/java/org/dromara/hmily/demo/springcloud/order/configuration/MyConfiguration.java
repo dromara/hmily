@@ -16,15 +16,30 @@
 
 package org.dromara.hmily.demo.springcloud.order.configuration;
 
+import com.netflix.client.config.DefaultClientConfigImpl;
+import com.netflix.client.config.IClientConfig;
+import com.netflix.loadbalancer.*;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.cloud.client.loadbalancer.LoadBalanced;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.client.RestTemplate;
 
 /**
  * MyConfiguration.
+ *
  * @author xiaoyu
  */
 @Configuration
 @SuppressWarnings("all")
 public class MyConfiguration {
+
+    @Bean
+    @LoadBalanced
+    public RestTemplate restTemplate() {
+        return new RestTemplate ();
+    }
+
 
    /* @Bean
     @Scope("prototype")

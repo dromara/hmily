@@ -1,2 +1,3 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  org.dromara.hmily.xa.rpc.springcloud.SpringCloudXaAutoConfiguration
+  org.dromara.hmily.xa.rpc.springcloud.SpringCloudXaAutoConfiguration,\
+  org.dromara.hmily.xa.rpc.springcloud.loadbalancer.XaLoadBalancerAutoConfiguration

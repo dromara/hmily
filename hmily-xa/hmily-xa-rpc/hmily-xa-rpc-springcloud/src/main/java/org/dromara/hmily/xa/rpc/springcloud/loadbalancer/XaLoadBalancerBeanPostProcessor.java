@@ -14,28 +14,37 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.xa.rpc.springcloud;
+package org.dromara.hmily.xa.rpc.springcloud.loadbalancer;
 
+import com.netflix.loadbalancer.ILoadBalancer;
+import com.netflix.loadbalancer.IRule;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
-import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.lang.NonNull;
 
-import java.lang.reflect.Proxy;
-
-
-public class FeignBeanPostProcessor implements BeanPostProcessor {
+/**
+ * 包装IRule,只能对注册为bean的生效，否则需要自己包装
+ * TODO @RibbonClient中配置的配置类，也要自动
+ */
+public class XaLoadBalancerBeanPostProcessor implements BeanPostProcessor {
     @Override
     public Object postProcessAfterInitialization(Object bean, @NonNull String beanName) throws BeansException {
-        //代理Feign
-        Class<?> beanClass = bean.getClass ();
-        //findAnnotation保证找到接口的注解
-        FeignClient feignClient = AnnotationUtils.findAnnotation (beanClass, FeignClient.class);
-        if (feignClient != null) {
-            return Proxy.newProxyInstance (beanClass.getClassLoader (), beanClass.getInterfaces (),
-                    new FeignRequestInvocationHandler (bean));
+        if (hasInterface (bean.getClass (), ILoadBalancer.class)) {
+            return new SpringCloudXaLoadBalancer ((ILoadBalancer) bean);
         }
+
         return bean;
+    }
+
+    private boolean hasInterface(Class<?> clazz, Class<?> theInterface) {
+        if (clazz == null || clazz.equals (Object.class)) {
+            return false;
+        }
+        for (Class<?> anInterface : clazz.getInterfaces ()) {
+            if (anInterface.equals (theInterface)) {
+                return true;
+            }
+        }
+        return hasInterface (clazz.getSuperclass (), theInterface);
     }
 }

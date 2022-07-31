@@ -9,7 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.math.BigDecimal;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
+@SpringBootTest
 public class OrderServiceImplTest {
 
     @Autowired
@@ -26,8 +26,10 @@ public class OrderServiceImplTest {
     @Test
     public void testTestOrderPay2() {
         Order order = new Order ();
-        order.setCount (1);
-        order.setProductId ("1");
+        order.setCount (100);
+        order.setTotalAmount (BigDecimal.valueOf (150.54));
+        order.setProductId ("100");
+        order.setUserId ("12345");
         orderMapper.save (order);
     }
 }
