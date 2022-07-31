@@ -45,10 +45,11 @@ public class XaLoadBalancerAutoConfiguration implements InitializingBean {
 
     /**
      * 给{@link SpringClientFactory}添加一个默认config，它会注册XaLoadBalancerBeanPostProcessor，
-     * 从而实现对{@link ILoadBalancer}的代理
+     * 从而实现对{@link ILoadBalancer}的包装
      */
     @Override
     public void afterPropertiesSet() {
+        //default. 开头的是每个app context公用的默认的配置类
         RibbonClientSpecification specification =
                 new RibbonClientSpecification ("default.SpringCloudXaBeanPostProcessor", new Class<?>[]{Config.class});
         springClientFactory.setConfigurations (Collections.singletonList (specification));

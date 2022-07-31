@@ -23,8 +23,7 @@ import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.lang.NonNull;
 
 /**
- * 包装IRule,只能对注册为bean的生效，否则需要自己包装
- * TODO @RibbonClient中配置的配置类，也要自动
+ * 包装ILoadBalancer
  */
 public class XaLoadBalancerBeanPostProcessor implements BeanPostProcessor {
     @Override
