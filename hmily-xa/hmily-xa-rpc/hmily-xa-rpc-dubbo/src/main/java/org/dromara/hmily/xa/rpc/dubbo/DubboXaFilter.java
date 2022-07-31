@@ -41,8 +41,6 @@ import java.util.Objects;
 /**
  * DubboXaFilter .
  *
- * 如何拦截本身的rpc，给enlist
- *
  * @author sixh chenbin
  */
 @Activate(group = {Constants.CONSUMER})

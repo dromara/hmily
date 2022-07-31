@@ -40,8 +40,6 @@ import java.util.Optional;
  * 1、包括dubbo服务的注册，dubbo事务的相关处理.
  * 2、当dubbo是一个事务数据源时候，接受相关的指令处理.
  *
- * 如何调用远程，给远程发送事务命令，如prepare等
- *
  * @author sixh chenbin
  */
 public class DubboRpcXaProxy implements RpcXaProxy {
