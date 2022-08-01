@@ -23,7 +23,11 @@ import org.dromara.hmily.common.utils.DefaultValueUtils;
 import org.dromara.hmily.core.context.HmilyTransactionContext;
 import org.dromara.hmily.core.context.XaParticipant;
 import org.dromara.hmily.core.service.HmilyTransactionHandler;
-import org.dromara.hmily.xa.core.*;
+import org.dromara.hmily.xa.core.HmilyXaException;
+import org.dromara.hmily.xa.core.HmilyXaResource;
+import org.dromara.hmily.xa.core.XaResourcePool;
+import org.dromara.hmily.xa.core.XaResourceWrapped;
+import org.dromara.hmily.xa.core.XidImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

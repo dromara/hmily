@@ -28,8 +28,11 @@ import javax.transaction.SystemException;
 import javax.transaction.Transaction;
 import javax.transaction.xa.XAResource;
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.SocketTimeoutException;
 import java.util.Objects;
+import java.util.Optional;
 
 public class FeignRequestInvocationHandler implements InvocationHandler {
 
@@ -63,7 +66,23 @@ public class FeignRequestInvocationHandler implements InvocationHandler {
                 throw new RuntimeException("hmily xa resource tm join err", e);
             }
         }
-        return method.invoke(target, args);
+
+        try {
+            return method.invoke(target, args);
+        } catch (InvocationTargetException exception) {
+            Throwable throwable = Optional
+                    .ofNullable(exception.getTargetException())
+                    .map(Throwable::getCause)
+                    .orElse(null);
+            if (throwable instanceof SocketTimeoutException) {
+                //说明Feign RPC发生了超时
+                if (transaction != null) {
+                    transaction.rollback();
+                }
+            }
+            //重新抛出异常，通知应用层
+            throw exception;
+        }
     }
 
 }
