@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.dromara.hmily.demo.springcloud.order.service.impl;
 
 import org.dromara.hmily.annotation.HmilyXA;
@@ -74,6 +73,28 @@ public class OrderServiceImpl implements OrderService {
     }
 
     /**
+     * 创建订单并且进行扣除账户余额支付，并进行库存扣减操作
+     * in this  Inventory nested in account.
+     *
+     * @param count  购买数量
+     * @param amount 支付金额
+     * @return string
+     */
+    @Override
+    public String orderPayWithNested(Integer count, BigDecimal amount) {
+        Order order = saveOrder(count, amount);
+        paymentService.makePaymentWithNested(order);
+        return "success";
+    }
+
+    @Override
+    public String orderPayWithNestedException(Integer count, BigDecimal amount) {
+        Order order = saveOrder(count, amount);
+        paymentService.makePaymentWithNestedException(order);
+        return "success";
+    }
+
+    /**
      * 模拟在订单支付操作中，库存在try阶段中的库存异常
      *
      * @param count  购买数量
@@ -100,6 +121,36 @@ public class OrderServiceImpl implements OrderService {
         paymentService.mockPaymentInventoryWithTryTimeout(order);
         return "success";
     }
+
+    @Override
+    public String mockAccountWithTryException(Integer count, BigDecimal amount) {
+        Order order = saveOrder(count, amount);
+        paymentService.mockPaymentAccountWithTryException(order);
+        return "success";
+    }
+
+    @Override
+    public String mockAccountWithTryTimeout(Integer count, BigDecimal amount) {
+        Order order = saveOrder(count, amount);
+        paymentService.mockPaymentAccountWithTryTimeout(order);
+        return "success";
+    }
+
+
+    /**
+     * 模拟在订单支付操作中，库存在Confirm阶段中的timeout
+     *
+     * @param count  购买数量
+     * @param amount 支付金额
+     * @return string
+     */
+    @Override
+    public String mockInventoryWithConfirmTimeout(Integer count, BigDecimal amount) {
+        Order order = saveOrder(count, amount);
+        paymentService.mockPaymentInventoryWithConfirmTimeout(order);
+        return "success";
+    }
+
     @Override
     public boolean updateOrderStatus(Order order) {
         return orderMapper.update(order) > 0;
@@ -107,7 +158,7 @@ public class OrderServiceImpl implements OrderService {
 
     private Order saveOrder(Integer count, BigDecimal amount) {
         final Order order = buildOrder(count, amount);
-        orderMapper.save(order);
+//        orderMapper.save(order);
         return order;
     }
 

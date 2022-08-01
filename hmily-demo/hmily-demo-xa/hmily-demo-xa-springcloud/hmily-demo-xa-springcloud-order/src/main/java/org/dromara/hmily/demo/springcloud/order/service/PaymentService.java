@@ -1,4 +1,3 @@
-package org.dromara.hmily.demo.springcloud.order.service;
 /*
  * Copyright 2017-2021 Dromara.org
 
@@ -15,6 +14,7 @@ package org.dromara.hmily.demo.springcloud.order.service;
  * limitations under the License.
  */
 
+package org.dromara.hmily.demo.springcloud.order.service;
 
 import org.dromara.hmily.annotation.Hmily;
 import org.dromara.hmily.demo.common.order.entity.Order;
@@ -42,6 +42,20 @@ public interface PaymentService {
     void testMakePayment(Order order);
 
     /**
+     * 订单支付
+     *
+     * @param order 订单实体
+     */
+    void makePaymentWithNested(Order order);
+
+    /**
+     * Make payment with nested exception.
+     *
+     * @param order the order
+     */
+    void makePaymentWithNestedException(Order order);
+
+    /**
      * mock订单支付的时候库存异常
      *
      * @param order 订单实体
@@ -56,5 +70,29 @@ public interface PaymentService {
      * @return String string
      */
     String mockPaymentInventoryWithTryTimeout(Order order);
+
+    /**
+     * Mock payment account with try exception string.
+     *
+     * @param order the order
+     * @return the string
+     */
+    String mockPaymentAccountWithTryException(Order order);
+
+    /**
+     * Mock payment account with try timeout string.
+     *
+     * @param order the order
+     * @return the string
+     */
+    String mockPaymentAccountWithTryTimeout(Order order);
+
+    /**
+     * mock订单支付的时候库存确认超时
+     *
+     * @param order 订单实体
+     * @return String string
+     */
+    String mockPaymentInventoryWithConfirmTimeout(Order order);
 
 }

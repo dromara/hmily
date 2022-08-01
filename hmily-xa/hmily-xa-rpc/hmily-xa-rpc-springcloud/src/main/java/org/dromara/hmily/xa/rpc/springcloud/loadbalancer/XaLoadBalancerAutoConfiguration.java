@@ -33,17 +33,18 @@ public class XaLoadBalancerAutoConfiguration implements InitializingBean {
     @Autowired
     private SpringClientFactory springClientFactory;
 
-    /**
-     * Register {@link XaLoadBalancerBeanPostProcessor} Bean.
-     * @return {@link XaLoadBalancerBeanPostProcessor} Bean
-     */
-    @Bean
-    public XaLoadBalancerBeanPostProcessor xaLoadBalancerBeanPostProcessor() {
-        return new XaLoadBalancerBeanPostProcessor();
-    }
+//    /**
+//     * Register {@link XaLoadBalancerBeanPostProcessor} Bean.
+//     * @return {@link XaLoadBalancerBeanPostProcessor} Bean
+//     */
+//    @Bean
+//    public XaLoadBalancerBeanPostProcessor xaLoadBalancerBeanPostProcessor() {
+//        return new XaLoadBalancerBeanPostProcessor();
+//    }
 
     /**
      * Register {@link SpringCloudXaLoadBalancer.TransactionEventListener} Bean.
+     *
      * @return {@link SpringCloudXaLoadBalancer.TransactionEventListener} Bean
      */
     @Bean
@@ -65,6 +66,11 @@ public class XaLoadBalancerAutoConfiguration implements InitializingBean {
 
     @Configuration
     static class Config {
+        /**
+         * 注册 {@link XaLoadBalancerBeanPostProcessor} Bean.
+         *
+         * @return {@link XaLoadBalancerBeanPostProcessor} Bean
+         */
         @Bean
         public XaLoadBalancerBeanPostProcessor xaLoadBalancerBeanPostProcessor() {
             return new XaLoadBalancerBeanPostProcessor();

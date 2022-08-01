@@ -8,10 +8,10 @@ spring:
     main:
         allow-bean-definition-overriding: true
     datasource:
-        driver-class-name:  com.mysql.jdbc.Driver
-        url: jdbc:mysql://127.0.0.1:3306/hmily_stock?useUnicode=true&characterEncoding=utf8
-        username: root
-        password:
+      driver-class-name:  com.mysql.jdbc.Driver
+      url: jdbc:mysql://127.0.0.1:3306/hmily_stock?useUnicode=true&characterEncoding=utf8&useSSL=false
+      username: root
+      password: fjz13685459286
     application:
       name: inventory-service
 
@@ -31,8 +31,8 @@ inventory-service :
 
 logging:
     level:
-        root: error
-        org.springframework.web: info
+        root: info
+        org.springframework.web: debug
         org.apache.ibatis: debug
         org.dromara.hmily.demo.bonuspoint: debug
         org.dromara.hmily.demo.lottery: debug

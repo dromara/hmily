@@ -1,4 +1,3 @@
-package org.dromara.hmily.demo.springcloud.order.service.impl;
 /*
  * Copyright 2017-2021 Dromara.org
  *
@@ -14,14 +13,12 @@ package org.dromara.hmily.demo.springcloud.order.service.impl;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.dromara.hmily.demo.springcloud.order.service.impl;
 
 import org.dromara.hmily.annotation.HmilyXA;
 import org.dromara.hmily.common.exception.HmilyRuntimeException;
-import org.dromara.hmily.demo.common.account.api.AccountService;
 import org.dromara.hmily.demo.common.account.dto.AccountDTO;
 import org.dromara.hmily.demo.common.account.dto.AccountNestedDTO;
-import org.dromara.hmily.demo.common.account.entity.AccountDO;
-import org.dromara.hmily.demo.common.inventory.api.InventoryService;
 import org.dromara.hmily.demo.common.inventory.dto.InventoryDTO;
 import org.dromara.hmily.demo.common.order.entity.Order;
 import org.dromara.hmily.demo.common.order.enums.OrderStatusEnum;
@@ -35,6 +32,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+
 /**
  * @author xiaoyu
  */
@@ -45,17 +44,17 @@ public class PaymentServiceImpl implements PaymentService {
 
     private final OrderMapper orderMapper;
 
-    private final AccountClient accountService;
+    private final AccountClient accountClient;
 
-    private final InventoryClient inventoryService;
+    private final InventoryClient inventoryClient;
 
     @Autowired(required = false)
     public PaymentServiceImpl(OrderMapper orderMapper,
                               AccountClient accountService,
                               InventoryClient inventoryService) {
         this.orderMapper = orderMapper;
-        this.accountService = accountService;
-        this.inventoryService = inventoryService;
+        this.accountClient = accountService;
+        this.inventoryClient = inventoryService;
     }
 
     @Override
@@ -73,32 +72,60 @@ public class PaymentServiceImpl implements PaymentService {
             throw new HmilyRuntimeException("库存不足！");
         }*/
         //扣除用户余额
-        accountService.payment(buildAccountDTO(order));
+        accountClient.payment(buildAccountDTO(order));
         //进入扣减库存操作
-        inventoryService.decrease(buildInventoryDTO(order));
+        inventoryClient.decrease(buildInventoryDTO(order));
     }
 
     @Override
     @HmilyXA
     @Transactional
-    //rpc
     public void testMakePayment(Order order) {
-//        updateOrderStatus(order, OrderStatusEnum.PAYING);
+        updateOrderStatus(order, OrderStatusEnum.PAYING);
         //扣除用户余额
-        accountService.testPayment(buildAccountDTO(order));
+        System.out.println("扣除用户余额");
+        accountClient.testPayment(buildAccountDTO(order));
         //进入扣减库存操作
-        System.out.println (1);
-//        inventoryService.testDecrease(buildInventoryDTO(order));
+//        System.out.println ("进入扣减库存操作");
+//        inventoryClient.decrease(buildInventoryDTO(order));
     }
 
+    /**
+     * 订单支付
+     *
+     * @param order 订单实体
+     */
+    @Override
+    @HmilyXA
+    public void makePaymentWithNested(Order order) {
+        updateOrderStatus(order, OrderStatusEnum.PAYING);
+        BigDecimal decimal = accountClient.findByUserId(order.getUserId());
+        if (decimal.compareTo(order.getTotalAmount()) <= 0) {
+            throw new HmilyRuntimeException("余额不足！");
+        }
+        //扣除用户余额
+        accountClient.paymentWithNested(buildAccountNestedDTO(order));
+    }
+
+    @Override
+    @HmilyXA
+    public void makePaymentWithNestedException(Order order) {
+        updateOrderStatus(order, OrderStatusEnum.PAYING);
+        BigDecimal decimal = accountClient.findByUserId(order.getUserId());
+        if (decimal.compareTo(order.getTotalAmount()) <= 0) {
+            throw new HmilyRuntimeException("余额不足！");
+        }
+        //扣除用户余额
+        accountClient.paymentWithNestedException(buildAccountNestedDTO(order));
+    }
 
     @Override
     @HmilyXA
     public String mockPaymentInventoryWithTryException(Order order) {
         updateOrderStatus(order, OrderStatusEnum.PAYING);
         //扣除用户余额
-        accountService.payment(buildAccountDTO(order));
-        inventoryService.mockWithTryException(buildInventoryDTO(order));
+        accountClient.payment(buildAccountDTO(order));
+        inventoryClient.mockWithTryException(buildInventoryDTO(order));
         return "success";
     }
 
@@ -107,8 +134,37 @@ public class PaymentServiceImpl implements PaymentService {
     public String mockPaymentInventoryWithTryTimeout(Order order) {
         updateOrderStatus(order, OrderStatusEnum.PAYING);
         //扣除用户余额
-        accountService.payment(buildAccountDTO(order));
-        inventoryService.mockWithTryTimeout(buildInventoryDTO(order));
+        accountClient.payment(buildAccountDTO(order));
+        inventoryClient.mockWithTryTimeout(buildInventoryDTO(order));
+        return "success";
+    }
+
+    @Override
+    @HmilyXA
+    public String mockPaymentAccountWithTryException(Order order) {
+        updateOrderStatus(order, OrderStatusEnum.PAYING);
+//        accountService.mockTryPaymentException(buildAccountDTO(order));
+        return "success";
+    }
+
+    @Override
+    @HmilyXA
+    public String mockPaymentAccountWithTryTimeout(Order order) {
+        updateOrderStatus(order, OrderStatusEnum.PAYING);
+//        accountService.mockTryPaymentTimeout(buildAccountDTO(order));
+        return "success";
+    }
+
+    @Override
+    @HmilyXA
+    public String mockPaymentInventoryWithConfirmTimeout(Order order) {
+        updateOrderStatus(order, OrderStatusEnum.PAYING);
+        //扣除用户余额
+        AccountDTO accountDTO = new AccountDTO();
+        accountDTO.setAmount(order.getTotalAmount());
+        accountDTO.setUserId(order.getUserId());
+        accountClient.payment(accountDTO);
+//        inventoryService.mockWithConfirmTimeout(buildInventoryDTO(order));
         return "success";
     }
 

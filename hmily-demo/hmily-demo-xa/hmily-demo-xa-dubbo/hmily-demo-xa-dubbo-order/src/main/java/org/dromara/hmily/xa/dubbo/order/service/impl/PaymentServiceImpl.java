@@ -17,7 +17,6 @@
 package org.dromara.hmily.xa.dubbo.order.service.impl;
 
 
-import org.dromara.hmily.annotation.HmilyTCC;
 import org.dromara.hmily.annotation.HmilyXA;
 import org.dromara.hmily.common.exception.HmilyRuntimeException;
 import org.dromara.hmily.demo.common.account.api.AccountService;
@@ -89,7 +88,7 @@ public class PaymentServiceImpl implements PaymentService {
         accountService.testPayment(buildAccountDTO(order));
         //进入扣减库存操作
         System.out.println (1);
-//        inventoryService.testDecrease(buildInventoryDTO(order));
+        inventoryService.testDecrease(buildInventoryDTO(order));
     }
 
     /**

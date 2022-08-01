@@ -46,6 +46,7 @@ public class CommitHmilyTransactionHandler implements HmilyTransactionHandler {
         XaParticipant xaParticipant = hmilyTransactionContext.getXaParticipant();
         String branchId = xaParticipant.getBranchId();
         XidImpl xid = new XidImpl(xaParticipant.getGlobalId(), branchId);
+        logger.info("Got commit cmd: {}", xid);
         List<XaResourceWrapped> allResource = XaResourcePool.INST.getAllResource(xid.getGlobalId());
         //如果是远程调用就只能是commit.
         try {

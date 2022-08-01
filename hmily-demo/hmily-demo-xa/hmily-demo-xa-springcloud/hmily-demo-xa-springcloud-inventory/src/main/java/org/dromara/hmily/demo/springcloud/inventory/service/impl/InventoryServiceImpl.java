@@ -4,9 +4,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,6 +17,7 @@
 package org.dromara.hmily.demo.springcloud.inventory.service.impl;
 
 import org.dromara.hmily.annotation.HmilyTCC;
+import org.dromara.hmily.annotation.HmilyXA;
 import org.dromara.hmily.common.exception.HmilyRuntimeException;
 import org.dromara.hmily.demo.common.inventory.dto.InventoryDTO;
 import org.dromara.hmily.demo.common.inventory.entity.InventoryDO;
@@ -35,7 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service("inventoryService")
 public class InventoryServiceImpl implements InventoryService {
-    
+
     private static final Logger LOGGER = LoggerFactory.getLogger(InventoryServiceImpl.class);
 
     private final InventoryMapper inventoryMapper;
@@ -53,19 +54,19 @@ public class InventoryServiceImpl implements InventoryService {
      * @return true
      */
     @Override
-    @HmilyTCC(confirmMethod = "confirmMethod", cancelMethod = "cancelMethod")
+    @HmilyXA
     public Boolean decrease(InventoryDTO inventoryDTO) {
-        LOGGER.info("==========try扣减库存decrease===========");
-        inventoryMapper.decrease(inventoryDTO);
-        return true;
+        LOGGER.info("==========扣减库存decrease===========");
+        throw new RuntimeException("mock ex");
+//        return inventoryMapper.decrease(inventoryDTO) > 0;
     }
-    
+
     @Override
     public Boolean testDecrease(InventoryDTO inventoryDTO) {
         inventoryMapper.testDecrease(inventoryDTO);
         return true;
     }
-    
+
     /**
      * 获取商品库存信息.
      *
@@ -126,7 +127,7 @@ public class InventoryServiceImpl implements InventoryService {
         return true;
         // throw new TccRuntimeException("库存扣减确认异常！");
     }
-    
+
     public Boolean confirmMethod(InventoryDTO inventoryDTO) {
         LOGGER.info("==========confirmMethod库存确认方法===========");
         return inventoryMapper.confirm(inventoryDTO) > 0;

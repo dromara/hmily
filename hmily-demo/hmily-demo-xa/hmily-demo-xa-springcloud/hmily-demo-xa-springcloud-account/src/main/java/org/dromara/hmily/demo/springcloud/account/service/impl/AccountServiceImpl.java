@@ -25,17 +25,14 @@ import org.dromara.hmily.demo.common.account.dto.AccountDTO;
 import org.dromara.hmily.demo.common.account.dto.AccountNestedDTO;
 import org.dromara.hmily.demo.common.account.entity.AccountDO;
 import org.dromara.hmily.demo.common.account.mapper.AccountMapper;
-import org.dromara.hmily.demo.common.inventory.api.InventoryService;
 import org.dromara.hmily.demo.common.inventory.dto.InventoryDTO;
 import org.dromara.hmily.demo.springcloud.account.client.InventoryClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -120,8 +117,13 @@ public class AccountServiceImpl implements AccountService {
     @Transactional
     public boolean testPayment(AccountDTO accountDTO) {
 //        accountMapper.testUpdate(accountDTO);
-        throw new RuntimeException("111111111");
-//        return Boolean.TRUE;
+//        throw new RuntimeException("111111111");
+        try {
+            Thread.sleep(10 * 1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return Boolean.TRUE;
     }
 
     @Override

@@ -50,6 +50,7 @@ public class PrepareHmilyTransactionHandler implements HmilyTransactionHandler {
         String branchId = xaParticipant.getBranchId();
         XidImpl xid = new XidImpl(xaParticipant.getGlobalId(), branchId);
         String globalId = xid.getGlobalId();
+        logger.info("Got prepare cmd: {}", xid);
         List<XaResourceWrapped> allResource = XaResourcePool.INST.getAllResource(globalId);
         //如果是远程调用就只能是commit.
         int result;

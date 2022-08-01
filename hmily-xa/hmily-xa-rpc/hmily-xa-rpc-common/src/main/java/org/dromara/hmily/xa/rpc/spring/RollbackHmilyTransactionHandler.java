@@ -43,10 +43,10 @@ public class RollbackHmilyTransactionHandler implements HmilyTransactionHandler 
     @Override
     public Object handleTransaction(final ProceedingJoinPoint point, final HmilyTransactionContext hmilyTransactionContext) throws Throwable {
         //完成Rollbqack.
-        logger.info("Rollback branch {}", hmilyTransactionContext.getXaParticipant());
         XaParticipant xaParticipant = hmilyTransactionContext.getXaParticipant();
         String branchId = xaParticipant.getBranchId();
         XidImpl xid = new XidImpl(xaParticipant.getGlobalId(), branchId);
+        logger.info("Got Rollback cmd: {}", xid);
         List<XaResourceWrapped> allResource = XaResourcePool.INST.getAllResource(xid.getGlobalId());
         //如果是远程调用就只能是commit.
         try {
