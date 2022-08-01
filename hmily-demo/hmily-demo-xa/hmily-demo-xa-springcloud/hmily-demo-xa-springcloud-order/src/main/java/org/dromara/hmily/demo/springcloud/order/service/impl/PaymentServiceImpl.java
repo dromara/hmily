@@ -86,8 +86,8 @@ public class PaymentServiceImpl implements PaymentService {
         System.out.println("扣除用户余额");
         accountClient.testPayment(buildAccountDTO(order));
         //进入扣减库存操作
-//        System.out.println ("进入扣减库存操作");
-//        inventoryClient.decrease(buildInventoryDTO(order));
+        System.out.println ("进入扣减库存操作");
+        inventoryClient.decrease(buildInventoryDTO(order));
     }
 
     /**

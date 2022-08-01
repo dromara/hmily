@@ -57,8 +57,13 @@ public class InventoryServiceImpl implements InventoryService {
     @HmilyXA
     public Boolean decrease(InventoryDTO inventoryDTO) {
         LOGGER.info("==========扣减库存decrease===========");
-        throw new RuntimeException("mock ex");
-//        return inventoryMapper.decrease(inventoryDTO) > 0;
+//        throw new RuntimeException("mock ex");
+//        try {
+//            Thread.sleep(1000 * 10);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+        return inventoryMapper.decrease(inventoryDTO) > 0;
     }
 
     @Override

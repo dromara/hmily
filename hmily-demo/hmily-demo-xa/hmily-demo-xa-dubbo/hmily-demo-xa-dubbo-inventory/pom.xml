@@ -41,7 +41,7 @@
         </dependency>
         <dependency>
             <groupId>org.dromara</groupId>
-            <artifactId>hmily-xa-rpc</artifactId>
+            <artifactId>hmily-xa-rpc-dubbo</artifactId>
             <version>2.1.2-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
