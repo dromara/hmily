@@ -82,12 +82,10 @@ public class DubboRpcXaProxy implements RpcXaProxy {
         //重新设置值.
         if (StringUtils.isNoneBlank(attachment)) {
             HmilyTransactionContext context = GsonUtils.getInstance().fromJson(attachment, HmilyTransactionContext.class);
-            context.getXaParticipant().setCmd(cmd.name());//通知其他人可以提交了，或者回滚！
-            //getXaParticipant是远程
+            context.getXaParticipant().setCmd(cmd.name());
             RpcMediator.getInstance().transmit(RpcContext.getContext()::setAttachment, context);
         }
-        Result result = this.invoker.invoke(rpcInvocation);//再执行一次，而那个方法被代理了！
-        //根据是否产生异常来判断是否prepare成功！
+        Result result = this.invoker.invoke(rpcInvocation);
         if (result.hasException()) {
             logger.warn("执行一个指令发送了异常，{}:{}", params, result.getException().getMessage());
             return EXC;
@@ -104,7 +102,7 @@ public class DubboRpcXaProxy implements RpcXaProxy {
     @Override
     public void init(final XaParticipant participant) {
         HmilyTransactionContext context = new HmilyTransactionContext();
-        context.setXaParticipant(participant);//XaParticipant算是事务参与者，是父节点给颁发的branchId等信息
+        context.setXaParticipant(participant);
         RpcMediator.getInstance().transmit(RpcContext.getContext()::setAttachment, context);
     }
 

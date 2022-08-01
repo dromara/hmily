@@ -28,7 +28,7 @@ public class TransactionContext {
 
     private final XidImpl xId;
 
-    private Finally oneFinally;//就等于coordinator
+    private Finally oneFinally;
 
     /**
      * Instantiates a new Transaction context.

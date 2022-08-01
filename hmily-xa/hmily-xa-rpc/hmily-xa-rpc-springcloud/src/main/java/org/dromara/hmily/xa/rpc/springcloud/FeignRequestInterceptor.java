@@ -16,31 +16,17 @@
 
 package org.dromara.hmily.xa.rpc.springcloud;
 
-
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
 import org.dromara.hmily.core.context.HmilyContextHolder;
-import org.dromara.hmily.core.context.HmilyTransactionContext;
-import org.dromara.hmily.core.context.XaParticipant;
 import org.dromara.hmily.core.mediator.RpcMediator;
-import org.dromara.hmily.xa.core.XidImpl;
-import org.dromara.hmily.xa.rpc.RpcXaProxy;
 import org.springframework.core.Ordered;
 
-import javax.transaction.xa.Xid;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-
-/**
- * 保证如果有context，就一定会设置
- * 保存的是远程rpc产生的，而有rpc则一定会commit或rollback
- */
 class FeignRequestInterceptor implements RequestInterceptor, Ordered {
 
     @Override
-    public void apply(RequestTemplate template) {
-        RpcMediator.getInstance ().transmit (template::header, HmilyContextHolder.get ());
+    public void apply(final RequestTemplate template) {
+        RpcMediator.getInstance().transmit(template::header, HmilyContextHolder.get());
     }
 
     @Override

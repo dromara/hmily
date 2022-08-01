@@ -23,7 +23,6 @@ import javax.transaction.xa.Xid;
 
 /**
  * HmilyXaResource .
- * XAResource统一外观，里面可能是rpc，也可能是其他XA resource
  *
  * @author sixh chenbin
  */
@@ -71,7 +70,7 @@ public class HmilyXaResource extends XaResourceWrapped {
     /**
      * Commit.
      *
-     * @param b the b，false为2阶段提交，true为3阶段提交
+     * @param b the b
      * @throws XAException the xa exception
      */
     public void commit(final boolean b) throws XAException {

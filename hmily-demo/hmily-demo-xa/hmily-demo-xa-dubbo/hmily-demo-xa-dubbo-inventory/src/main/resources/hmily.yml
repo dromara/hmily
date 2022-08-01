@@ -1,10 +1,10 @@
 hmily:
   server:
     configMode: local
-    appName: account-dubbo
+    appName: inventory-dubbo
   #  如果server.configMode eq local 的时候才会读取到这里的配置信息.
   config:
-    appName: account-dubbo
+    appName: inventory-dubbo
     serializer: kryo
     contextTransmittalMode: threadLocal
     scheduledThreadMax: 16
@@ -19,7 +19,7 @@ hmily:
     bufferSize: 8192
     consumerThreads: 16
     asyncRepository: true
-    autoSql: true
+    autoSql: false
     phyDeleted: true
     storeDays: 3
     repository: mysql
@@ -27,10 +27,9 @@ hmily:
 repository:
   database:
     driverClassName: com.mysql.jdbc.Driver
-    url : jdbc:mysql://127.0.0.1:3306/hmily?useUnicode=true&characterEncoding=utf8&useSSL=false
+    url : jdbc:mysql://localhost:3306/hmily?allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=GMT%2B8&useSSL=false&verifyServerCertificate=false
     username: root
-#    password: 123456
-    password: fjz13685459286
+    password: 123456
     maxActive: 20
     minIdle: 10
     connectionTimeout: 30000
@@ -75,7 +74,7 @@ repository:
 metrics:
   metricsName: prometheus
   host:
-  port: 9071
+  port: 9081
   async: true
   threadCount : 16
   jmxConfig:

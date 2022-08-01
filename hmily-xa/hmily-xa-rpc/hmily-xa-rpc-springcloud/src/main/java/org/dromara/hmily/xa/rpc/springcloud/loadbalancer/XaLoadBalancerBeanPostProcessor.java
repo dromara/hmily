@@ -17,33 +17,32 @@
 package org.dromara.hmily.xa.rpc.springcloud.loadbalancer;
 
 import com.netflix.loadbalancer.ILoadBalancer;
-import com.netflix.loadbalancer.IRule;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.lang.NonNull;
 
 /**
- * 包装ILoadBalancer
+ * 包装ILoadBalancer.
  */
 public class XaLoadBalancerBeanPostProcessor implements BeanPostProcessor {
     @Override
-    public Object postProcessAfterInitialization(Object bean, @NonNull String beanName) throws BeansException {
-        if (hasInterface (bean.getClass (), ILoadBalancer.class)) {
-            return new SpringCloudXaLoadBalancer ((ILoadBalancer) bean);
+    public Object postProcessAfterInitialization(final Object bean, @NonNull final String beanName) throws BeansException {
+        if (hasInterface(bean.getClass(), ILoadBalancer.class)) {
+            return new SpringCloudXaLoadBalancer((ILoadBalancer) bean);
         }
 
         return bean;
     }
 
-    private boolean hasInterface(Class<?> clazz, Class<?> theInterface) {
-        if (clazz == null || clazz.equals (Object.class)) {
+    private boolean hasInterface(final Class<?> clazz, final Class<?> theInterface) {
+        if (clazz == null || clazz.equals(Object.class)) {
             return false;
         }
-        for (Class<?> anInterface : clazz.getInterfaces ()) {
-            if (anInterface.equals (theInterface)) {
+        for (Class<?> anInterface : clazz.getInterfaces()) {
+            if (anInterface.equals(theInterface)) {
                 return true;
             }
         }
-        return hasInterface (clazz.getSuperclass (), theInterface);
+        return hasInterface(clazz.getSuperclass(), theInterface);
     }
 }

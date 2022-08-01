@@ -26,14 +26,22 @@ import org.springframework.context.annotation.Configuration;
 @ConditionalOnClass(FeignClient.class)
 public class SpringCloudXaAutoConfiguration {
 
+    /**
+     * Register {@link FeignRequestInterceptor} Bean.
+     * @return {@link FeignRequestInterceptor} Bean
+     */
     @Bean
     public RequestInterceptor hmilyXaInterceptor() {
-        return new FeignRequestInterceptor ();
+        return new FeignRequestInterceptor();
     }
 
+    /**
+     * Register {@link FeignBeanPostProcessor} Bean.
+     * @return {@link FeignBeanPostProcessor} Bean
+     */
     @Bean
     public FeignBeanPostProcessor hmilyXaPostProcessor() {
-        return new FeignBeanPostProcessor ();
+        return new FeignBeanPostProcessor();
     }
 
 }

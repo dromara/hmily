@@ -28,7 +28,6 @@ import java.sql.SQLException;
 
 /**
  * The type Hmily p 6 datasource xa.
- * 必配置项
  *
  * @author xiaoyu
  */

@@ -22,14 +22,7 @@ import org.dromara.hmily.core.context.HmilyTransactionContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.transaction.HeuristicMixedException;
-import javax.transaction.HeuristicRollbackException;
-import javax.transaction.InvalidTransactionException;
-import javax.transaction.RollbackException;
-import javax.transaction.Status;
-import javax.transaction.SystemException;
-import javax.transaction.Transaction;
-import javax.transaction.TransactionManager;
+import javax.transaction.*;
 import javax.transaction.xa.XAResource;
 import java.util.Stack;
 
@@ -44,8 +37,6 @@ public class HmilyXaTransactionManager implements TransactionManager {
 
     /**
      * onveniently realize the processing of nested transactions.
-     * 可能一个线程内会嵌套事务，所以用stack
-     * stack和事务的调用过程很像
      */
     private final ThreadLocal<Stack<Transaction>> tms = new ThreadLocal<>();
 
@@ -159,27 +150,21 @@ public class HmilyXaTransactionManager implements TransactionManager {
         Transaction threadTransaction = getThreadTransaction();
         Transaction rct = threadTransaction;
         //xa;
-        //如果有事务了，就创建一个子事务
         if (threadTransaction != null) {
             TransactionImpl tx = (TransactionImpl) rct;
             rct = tx.createSubTransaction();
-            //父coordinator的引用复制在这里，基于transaction的拷贝构造器
         } else {
-            //创建一个事务
             boolean hasSuper = false;
             HmilyTransactionContext context = HmilyContextHolder.get();
             XidImpl xId;
             if (context != null && context.getXaParticipant() != null) {
-                xId = new XidImpl(context.getXaParticipant ().getGlobalId (),
+                xId = new XidImpl(context.getXaParticipant().getGlobalId(),
                         context.getXaParticipant().getBranchId());
-                hasSuper = true;//注意远程的时候，远程有父事务
+                hasSuper = true;
             } else {
                 xId = new XidImpl();
             }
-            //如果有context，那就设置当前分支的id
-            //getXaParticipant是由上游事务设置的
             //Main business coordinator
-            //注意，跨rpc的事务调用也要关联父事务，这样只有最后一个起点才会调用主协调器
             rct = new TransactionImpl(xId, hasSuper);
         }
         setTxTotr(rct);

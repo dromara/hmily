@@ -24,17 +24,16 @@ import org.springframework.lang.NonNull;
 
 import java.lang.reflect.Proxy;
 
-
 public class FeignBeanPostProcessor implements BeanPostProcessor {
     @Override
-    public Object postProcessAfterInitialization(Object bean, @NonNull String beanName) throws BeansException {
+    public Object postProcessAfterInitialization(final Object bean, @NonNull final String beanName) throws BeansException {
         //代理Feign
-        Class<?> beanClass = bean.getClass ();
+        Class<?> beanClass = bean.getClass();
         //findAnnotation保证找到接口的注解
-        FeignClient feignClient = AnnotationUtils.findAnnotation (beanClass, FeignClient.class);
+        FeignClient feignClient = AnnotationUtils.findAnnotation(beanClass, FeignClient.class);
         if (feignClient != null) {
-            return Proxy.newProxyInstance (beanClass.getClassLoader (), beanClass.getInterfaces (),
-                    new FeignRequestInvocationHandler (bean));
+            return Proxy.newProxyInstance(beanClass.getClassLoader(), beanClass.getInterfaces(),
+                    new FeignRequestInvocationHandler(bean));
         }
         return bean;
     }

@@ -104,7 +104,6 @@ public class Coordinator implements Resource, Finally, TimerRemovalListener<Reso
         doRollback();
     }
 
-
     @Override
     public void commit() throws RemoteException {
         switch (state) {
@@ -124,8 +123,6 @@ public class Coordinator implements Resource, Finally, TimerRemovalListener<Reso
                 throw new TransactionRequiredException("status error");
         }
         //哪果只有一个数据就表示只是自己本身，@Coordinator.
-        //只有一个子协调器，表示没有嵌套事务，所以直接提交
-        //不过自己可能有多个资源，所以在后面会判断一下
         if (this.coordinators.size() == 1) {
             state = XaState.STATUS_COMMITTING;
             Resource resource = coordinators.get(0);
@@ -141,7 +138,7 @@ public class Coordinator implements Resource, Finally, TimerRemovalListener<Reso
             }
             return;
         }
-        //Start 1 pc.有嵌套子事务？
+        //Start 1 pc.
         Result result = doPrepare();
         if (result == Result.COMMIT) {
             doCommit();
@@ -158,7 +155,6 @@ public class Coordinator implements Resource, Finally, TimerRemovalListener<Reso
         doCommit();
     }
 
-    //
     private Result doPrepare() {
         // start 1pc.
         Result rs = Result.READONLY;
@@ -168,7 +164,6 @@ public class Coordinator implements Resource, Finally, TimerRemovalListener<Reso
         }
         state = XaState.STATUS_PREPARING;
         int errors = 0;
-        //级联prepare
         for (final Resource coordinator : coordinators) {
             /*
              * 开始调用1pc阶段.
@@ -242,9 +237,6 @@ public class Coordinator implements Resource, Finally, TimerRemovalListener<Reso
         }
     }
 
-    /**
-     * 提交事务
-     */
     private void doCommit() throws TransactionRolledbackException {
         state = XaState.STATUS_COMMITTING;
         int commitErrors = 0;

@@ -33,34 +33,41 @@ public class XaLoadBalancerAutoConfiguration implements InitializingBean {
     @Autowired
     private SpringClientFactory springClientFactory;
 
+    /**
+     * Register {@link XaLoadBalancerBeanPostProcessor} Bean.
+     * @return {@link XaLoadBalancerBeanPostProcessor} Bean
+     */
     @Bean
     public XaLoadBalancerBeanPostProcessor xaLoadBalancerBeanPostProcessor() {
-        return new XaLoadBalancerBeanPostProcessor ();
+        return new XaLoadBalancerBeanPostProcessor();
     }
 
+    /**
+     * Register {@link SpringCloudXaLoadBalancer.TransactionEventListener} Bean.
+     * @return {@link SpringCloudXaLoadBalancer.TransactionEventListener} Bean
+     */
     @Bean
     public SpringCloudXaLoadBalancer.TransactionEventListener xaTransactionEventListener() {
-        return new SpringCloudXaLoadBalancer.TransactionEventListener ();
+        return new SpringCloudXaLoadBalancer.TransactionEventListener();
     }
 
     /**
      * 给{@link SpringClientFactory}添加一个默认config，它会注册XaLoadBalancerBeanPostProcessor，
-     * 从而实现对{@link ILoadBalancer}的包装
+     * 从而实现对{@link ILoadBalancer}的包装.
      */
     @Override
     public void afterPropertiesSet() {
         //default. 开头的是每个app context公用的默认的配置类
         RibbonClientSpecification specification =
-                new RibbonClientSpecification ("default.SpringCloudXaBeanPostProcessor", new Class<?>[]{Config.class});
-        springClientFactory.setConfigurations (Collections.singletonList (specification));
+                new RibbonClientSpecification("default.SpringCloudXaBeanPostProcessor", new Class<?>[]{Config.class});
+        springClientFactory.setConfigurations(Collections.singletonList(specification));
     }
-
 
     @Configuration
     static class Config {
         @Bean
         public XaLoadBalancerBeanPostProcessor xaLoadBalancerBeanPostProcessor() {
-            return new XaLoadBalancerBeanPostProcessor ();
+            return new XaLoadBalancerBeanPostProcessor();
         }
     }
 }

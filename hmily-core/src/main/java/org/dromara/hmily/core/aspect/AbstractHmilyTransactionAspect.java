@@ -43,7 +43,6 @@ public abstract class AbstractHmilyTransactionAspect {
 
     /**
      * this is around in {@linkplain HmilyTCC }.
-     * TODO interceptTccMethod -> interceptTransactionMethod
      *
      * @param proceedingJoinPoint proceedingJoinPoint
      * @return Object object

@@ -27,8 +27,8 @@ import java.lang.reflect.Method;
 
 public class SpringCloudXaResource extends RpcResource {
 
-    public SpringCloudXaResource(Method method, Object target, Object[] args) {
-        super (new SpringCloudXaProxy (method, target, args));
+    public SpringCloudXaResource(final Method method, final Object target, final Object[] args) {
+        super(new SpringCloudXaProxy(method, target, args));
     }
 
     @Override
@@ -37,12 +37,12 @@ public class SpringCloudXaResource extends RpcResource {
     }
 
     @Override
-    public void end(Xid xid, int i) throws XAException {
+    public void end(final Xid xid, final int i) throws XAException {
 
     }
 
     @Override
-    public void forget(Xid xid) throws XAException {
+    public void forget(final Xid xid) throws XAException {
 
     }
 
@@ -52,7 +52,7 @@ public class SpringCloudXaResource extends RpcResource {
     }
 
     @Override
-    public boolean isSameRM(XAResource xaResource) throws XAException {
+    public boolean isSameRM(final XAResource xaResource) throws XAException {
         if (xaResource instanceof SpringCloudXaResource) {
             return ((SpringCloudXaResource) xaResource).getXaProxy().equals(this.getXaProxy());
         }
@@ -60,7 +60,7 @@ public class SpringCloudXaResource extends RpcResource {
     }
 
     @Override
-    public boolean setTransactionTimeout(int i) throws XAException {
+    public boolean setTransactionTimeout(final int i) throws XAException {
         return true;
     }
 

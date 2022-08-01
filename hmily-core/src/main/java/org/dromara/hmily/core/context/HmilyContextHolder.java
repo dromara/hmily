@@ -16,11 +16,12 @@
 
 package org.dromara.hmily.core.context;
 
-import java.util.Objects;
-import java.util.Optional;
 import org.dromara.hmily.config.api.ConfigEnv;
 import org.dromara.hmily.config.api.entity.HmilyConfig;
 import org.dromara.hmily.spi.ExtensionLoaderFactory;
+
+import java.util.Objects;
+import java.util.Optional;
 
 /**
  * The type Hmily context holder.
@@ -32,7 +33,7 @@ public class HmilyContextHolder {
     static {
         HmilyConfig hmilyConfig = ConfigEnv.getInstance().getConfig(HmilyConfig.class);
         if (Objects.isNull(hmilyConfig)) {
-            hmilyContext = new ThreadLocalHmilyContext();//thread local
+            hmilyContext = new ThreadLocalHmilyContext();
         } else {
             hmilyContext = Optional.ofNullable(ExtensionLoaderFactory.load(HmilyContext.class, hmilyConfig.getContextTransmittalMode())).orElse(new ThreadLocalHmilyContext());
         }

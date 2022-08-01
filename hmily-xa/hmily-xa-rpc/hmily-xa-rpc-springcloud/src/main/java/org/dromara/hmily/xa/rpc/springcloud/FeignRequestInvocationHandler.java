@@ -31,40 +31,39 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.Objects;
 
-
 public class FeignRequestInvocationHandler implements InvocationHandler {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger (FeignRequestInvocationHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FeignRequestInvocationHandler.class);
+
     private final Object target;
 
-    public FeignRequestInvocationHandler(Object target) {
+    public FeignRequestInvocationHandler(final Object target) {
         this.target = target;
     }
 
     @Override
-    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+    public Object invoke(final Object proxy, final Method method, final Object[] args) throws Throwable {
         try {
-            Hmily hmily = method.getAnnotation (Hmily.class);
-            if (Objects.isNull (hmily)) {
-                return method.invoke (target, args);
+            Hmily hmily = method.getAnnotation(Hmily.class);
+            if (Objects.isNull(hmily)) {
+                return method.invoke(target, args);
             }
         } catch (Exception ex) {
-            LogUtil.error (LOGGER, "hmily find method error {} ", ex::getMessage);
-            return method.invoke (target, args);
+            LogUtil.error(LOGGER, "hmily find method error {} ", ex::getMessage);
+            return method.invoke(target, args);
         }
 
-        Transaction transaction = TransactionManagerImpl.INST.getTransaction ();
+        Transaction transaction = TransactionManagerImpl.INST.getTransaction();
         if (transaction instanceof TransactionImpl) {
-            XAResource resource = new SpringCloudXaResource (method, target, args);
+            XAResource resource = new SpringCloudXaResource(method, target, args);
             try {
-                ((TransactionImpl) transaction).doEnList (resource, XAResource.TMJOIN);
+                ((TransactionImpl) transaction).doEnList(resource, XAResource.TMJOIN);
             } catch (SystemException | RollbackException e) {
-                LOGGER.error (":", e);
-                throw new RuntimeException ("hmily xa resource tm join err", e);
+                LOGGER.error(":", e);
+                throw new RuntimeException("hmily xa resource tm join err", e);
             }
         }
-        return method.invoke (target, args);
+        return method.invoke(target, args);
     }
-
 
 }

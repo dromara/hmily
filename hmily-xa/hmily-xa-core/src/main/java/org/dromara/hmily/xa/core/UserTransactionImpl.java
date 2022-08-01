@@ -17,20 +17,10 @@
 
 package org.dromara.hmily.xa.core;
 
-import javax.transaction.HeuristicMixedException;
-import javax.transaction.HeuristicRollbackException;
-import javax.transaction.InvalidTransactionException;
-import javax.transaction.NotSupportedException;
-import javax.transaction.RollbackException;
-import javax.transaction.SystemException;
-import javax.transaction.Transaction;
-import javax.transaction.TransactionManager;
-import javax.transaction.UserTransaction;
+import javax.transaction.*;
 
 /**
  * UserTransactionImpl .
- * 用于配置事务管理器
- * UserTransaction是支持用户直接通过JTA编写分布式事务的api
  *
  * @author sixh chenbin
  */

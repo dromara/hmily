@@ -87,6 +87,6 @@ public class DubboRpcResource extends RpcResource {
         xaParticipant.setBranchId(new String(xid.getBranchQualifier()));
         xaParticipant.setGlobalId(new String(xid.getGlobalTransactionId()));
         xaParticipant.setCmd(RpcXaProxy.XaCmd.START.name());
-        this.getXaProxy().init(xaParticipant);//标记调用的远程方法为事务参与者
+        this.getXaProxy().init(xaParticipant);
     }
 }

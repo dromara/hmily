@@ -18,21 +18,12 @@
 package org.dromara.hmily.xa.core;
 
 import javax.sql.XAConnection;
-import javax.transaction.HeuristicMixedException;
-import javax.transaction.HeuristicRollbackException;
-import javax.transaction.InvalidTransactionException;
-import javax.transaction.NotSupportedException;
-import javax.transaction.RollbackException;
-import javax.transaction.Synchronization;
-import javax.transaction.SystemException;
-import javax.transaction.Transaction;
-import javax.transaction.TransactionManager;
+import javax.transaction.*;
 import java.util.HashSet;
 import java.util.Set;
 
 /**
  * TransactionManagerImpl .
- * 借助HmilyXaTransactionManager
  *
  * @author sixh chenbin
  */
@@ -106,7 +97,6 @@ public enum TransactionManagerImpl implements TransactionManager {
 
     /**
      * Is exist data sources boolean.
-     * 这个方法会防止重复添加
      *
      * @param connection the connection
      * @return the boolean
@@ -116,8 +106,6 @@ public enum TransactionManagerImpl implements TransactionManager {
         Transaction transaction = getTransaction();
         if (!contains) {
             try {
-                //设置回调，保证在完成前remove，注意这个不是transaction的list，这是校验重复的list
-                //用于给每个connection仅仅设定一个transaction的list
                 transaction.registerSynchronization(new Synchronization() {
                     @Override
                     public void beforeCompletion() {

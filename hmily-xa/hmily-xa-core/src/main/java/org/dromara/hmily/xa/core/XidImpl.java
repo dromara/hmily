@@ -81,11 +81,11 @@ public class XidImpl implements Xid {
         this.branchId = branchId;
         this.branchIdByte = branchId.getBytes();
         String gid = strings.get(0);
-        this.globalId = gid;//直接计算出globalId
+        this.globalId = gid;
         this.globalIdByte = gid.getBytes();
     }
 
-    public XidImpl(final String transactionId,final String branchId) {
+    public XidImpl(final String transactionId, final String branchId) {
         this.branchId = branchId;
         this.branchIdByte = branchId.getBytes();
         this.globalId = transactionId;
@@ -177,8 +177,8 @@ public class XidImpl implements Xid {
 
     @Override
     public int hashCode() {
-        int result = globalId != null ? globalId.hashCode () : 0;
-        result = 31 * result + (branchId != null ? branchId.hashCode () : 0);
+        int result = globalId != null ? globalId.hashCode() : 0;
+        result = 31 * result + (branchId != null ? branchId.hashCode() : 0);
         return result;
     }
 

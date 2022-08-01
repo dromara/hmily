@@ -33,36 +33,42 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * 要保证XA事务的prepare、commit、rollback等请求路由到同一个server
+ * 要保证XA事务的prepare、commit、rollback等路由到同一个server.
  */
 public class SpringCloudXaLoadBalancer implements ILoadBalancer {
-    private static final Map<Xid, Server> ROUTER_MAP = new ConcurrentHashMap<> ();
+    /**
+     * Store server routing.
+     */
+    private static final Map<Xid, Server> ROUTER_MAP = new ConcurrentHashMap<>();
+
     private final ILoadBalancer delegate;
 
-    public SpringCloudXaLoadBalancer(ILoadBalancer delegate) {
+    public SpringCloudXaLoadBalancer(final ILoadBalancer delegate) {
         this.delegate = delegate;
     }
 
     @Override
-    public void addServers(List<Server> newServers) {
-        delegate.addServers (newServers);
+    public void addServers(final List<Server> newServers) {
+        delegate.addServers(newServers);
     }
 
     @Override
-    public Server chooseServer(Object key) {
-        HmilyTransactionContext context = HmilyContextHolder.get ();
-        Server server = delegate.chooseServer (key);
+    public Server chooseServer(final Object key) {
+        HmilyTransactionContext context = HmilyContextHolder.get();
+        Server server = delegate.chooseServer(key);
         if (context != null) {
-            XaParticipant participant = context.getXaParticipant ();
+            XaParticipant participant = context.getXaParticipant();
             if (participant != null) {
-                String cmd = participant.getCmd ();
-                Xid xid = new XidImpl (participant.getGlobalId (), participant.getBranchId ());
-                if (RpcXaProxy.XaCmd.START.name ().equalsIgnoreCase (cmd)) {
+                String cmd = participant.getCmd();
+                Xid xid = new XidImpl(participant.getGlobalId(), participant.getBranchId());
+                if (RpcXaProxy.XaCmd.START.name().equalsIgnoreCase(cmd)) {
                     //保证同一个事务分支的rpc路由到同一个server
-                    ROUTER_MAP.put (xid, server);
+                    ROUTER_MAP.put(xid, server);
                 } else {
-                    Server oldServer = ROUTER_MAP.get (xid);
-                    if (oldServer != null) server = oldServer;
+                    Server oldServer = ROUTER_MAP.get(xid);
+                    if (oldServer != null) {
+                        server = oldServer;
+                    }
                 }
             }
         }
@@ -71,37 +77,37 @@ public class SpringCloudXaLoadBalancer implements ILoadBalancer {
     }
 
     @Override
-    public void markServerDown(Server server) {
-        delegate.markServerDown (server);
+    public void markServerDown(final Server server) {
+        delegate.markServerDown(server);
     }
 
     @Override
-    public List<Server> getServerList(boolean availableOnly) {
-        return delegate.getServerList (availableOnly);
+    public List<Server> getServerList(final boolean availableOnly) {
+        return delegate.getServerList(availableOnly);
     }
 
     @Override
     public List<Server> getReachableServers() {
-        return delegate.getReachableServers ();
+        return delegate.getReachableServers();
     }
 
     @Override
     public List<Server> getAllServers() {
-        return delegate.getAllServers ();
+        return delegate.getAllServers();
     }
 
 
     /**
-     * 事务结束时才remove，这样外部就可以多次commit重试
+     * 事务结束时才remove，这样外部就可以多次commit重试.
      */
     static class TransactionEventListener {
         @TransactionalEventListener(phase = TransactionPhase.AFTER_COMPLETION)
-        public void onTransactionFinished(@SuppressWarnings ("unused") ApplicationEvent event) {
-            HmilyTransactionContext context = HmilyContextHolder.get ();
+        public void onTransactionFinished(@SuppressWarnings("unused") final ApplicationEvent event) {
+            HmilyTransactionContext context = HmilyContextHolder.get();
             if (context != null) {
-                Xid xid = new XidImpl (context.getXaParticipant ().getGlobalId (),
-                        context.getXaParticipant ().getBranchId ());
-                ROUTER_MAP.remove (xid);
+                Xid xid = new XidImpl(context.getXaParticipant().getGlobalId(),
+                        context.getXaParticipant().getBranchId());
+                ROUTER_MAP.remove(xid);
             }
         }
     }

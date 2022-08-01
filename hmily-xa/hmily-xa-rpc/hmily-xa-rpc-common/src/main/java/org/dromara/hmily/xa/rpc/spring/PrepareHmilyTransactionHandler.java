@@ -23,11 +23,7 @@ import org.dromara.hmily.common.utils.DefaultValueUtils;
 import org.dromara.hmily.core.context.HmilyTransactionContext;
 import org.dromara.hmily.core.context.XaParticipant;
 import org.dromara.hmily.core.service.HmilyTransactionHandler;
-import org.dromara.hmily.xa.core.HmilyXaResource;
-import org.dromara.hmily.xa.core.HmilyXaException;
-import org.dromara.hmily.xa.core.XaResourcePool;
-import org.dromara.hmily.xa.core.XaResourceWrapped;
-import org.dromara.hmily.xa.core.XidImpl;
+import org.dromara.hmily.xa.core.*;
 import org.dromara.hmily.xa.rpc.RpcXaProxy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,9 +48,8 @@ public class PrepareHmilyTransactionHandler implements HmilyTransactionHandler {
         //完成prepare.
         XaParticipant xaParticipant = hmilyTransactionContext.getXaParticipant();
         String branchId = xaParticipant.getBranchId();
-        XidImpl xid = new XidImpl(xaParticipant.getGlobalId (),branchId);
+        XidImpl xid = new XidImpl(xaParticipant.getGlobalId(), branchId);
         String globalId = xid.getGlobalId();
-        //会受到负载均衡器的影响
         List<XaResourceWrapped> allResource = XaResourcePool.INST.getAllResource(globalId);
         //如果是远程调用就只能是commit.
         int result;

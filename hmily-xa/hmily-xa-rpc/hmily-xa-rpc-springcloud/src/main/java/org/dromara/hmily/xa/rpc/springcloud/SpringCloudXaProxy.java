@@ -16,7 +16,6 @@
 
 package org.dromara.hmily.xa.rpc.springcloud;
 
-
 import org.dromara.hmily.core.context.HmilyContextHolder;
 import org.dromara.hmily.core.context.HmilyTransactionContext;
 import org.dromara.hmily.core.context.XaParticipant;
@@ -29,70 +28,92 @@ import java.util.Arrays;
 import java.util.Map;
 
 public class SpringCloudXaProxy implements RpcXaProxy {
-    private final Logger logger = LoggerFactory.getLogger (SpringCloudXaProxy.class);
+    private final Logger logger = LoggerFactory.getLogger(SpringCloudXaProxy.class);
 
     private final Method method;
+
     private final Object target;
+
     private final Object[] args;
+
     private HmilyTransactionContext context;
 
-    public SpringCloudXaProxy(Method method, Object target, Object[] args) {
+    public SpringCloudXaProxy(final Method method, final Object target, final Object[] args) {
         this.method = method;
         this.target = target;
         this.args = args;
     }
 
+    /**
+     * Get Feign method.
+     *
+     * @return method
+     */
     public Method getMethod() {
         return method;
     }
 
+    /**
+     * Get Feign client object.
+     *
+     * @return Feign client object
+     */
     public Object getTarget() {
         return target;
     }
 
+    /**
+     * Get Feign method arguments.
+     *
+     * @return method arguments
+     */
     public Object[] getArgs() {
         return args;
     }
 
     @Override
-    public Integer cmd(XaCmd cmd, Map<String, Object> params) {
+    public Integer cmd(final XaCmd cmd, final Map<String, Object> params) {
         if (cmd == null) {
-            logger.warn ("cmd is null");
+            logger.warn("cmd is null");
             return NO;
         }
 
-        context.getXaParticipant ().setCmd (cmd.name ());
-        HmilyContextHolder.set (context);
+        context.getXaParticipant().setCmd(cmd.name());
+        HmilyContextHolder.set(context);
         try {
-            method.invoke (target, args);
+            method.invoke(target, args);
             return YES;
         } catch (Throwable e) {
-            logger.error ("cmd {} err", cmd.name (), e);
+            logger.error("cmd {} err", cmd.name(), e);
             return EXC;
         }
     }
 
     @Override
     public int getTimeout() {
-        return 0;//TODO
+        return 0;
     }
 
     @Override
-    public void init(XaParticipant participant) {
-        context = new HmilyTransactionContext ();
-        context.setXaParticipant (participant);
-        HmilyContextHolder.set (context);
+    public void init(final XaParticipant participant) {
+        context = new HmilyTransactionContext();
+        context.setXaParticipant(participant);
+        HmilyContextHolder.set(context);
     }
 
     @Override
-    public boolean equals(RpcXaProxy xaProxy) {
+    public boolean equals(final RpcXaProxy xaProxy) {
         if (xaProxy instanceof SpringCloudXaProxy) {
             SpringCloudXaProxy proxy = (SpringCloudXaProxy) xaProxy;
-            return proxy.getMethod ().equals (getMethod ()) &&
-                    proxy.getTarget ().equals (getTarget ()) &&
-                    Arrays.equals (proxy.getArgs (), getArgs ());
+            return proxy.getMethod().equals(getMethod())
+                    && proxy.getTarget().equals(getTarget())
+                    && Arrays.equals(proxy.getArgs(), getArgs());
         }
         return false;
     }
 
+    @Override
+    public boolean equals(final Object obj) {
+        return super.equals(obj);
+    }
 }

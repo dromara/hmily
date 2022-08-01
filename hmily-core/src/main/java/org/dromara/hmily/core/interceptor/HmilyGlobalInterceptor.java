@@ -56,7 +56,7 @@ public class HmilyGlobalInterceptor implements HmilyTransactionInterceptor {
 
     @Override
     public Object invoke(final ProceedingJoinPoint pjp) throws Throwable {
-        HmilyTransactionContext context = parameterLoader.load();//加载上下文
+        HmilyTransactionContext context = parameterLoader.load();
         return invokeWithinTransaction(context, pjp);
     }
 

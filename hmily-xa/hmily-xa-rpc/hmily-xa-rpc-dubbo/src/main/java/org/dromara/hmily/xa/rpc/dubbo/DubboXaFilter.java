@@ -19,11 +19,7 @@ package org.dromara.hmily.xa.rpc.dubbo;
 
 import org.apache.dubbo.common.Constants;
 import org.apache.dubbo.common.extension.Activate;
-import org.apache.dubbo.rpc.Filter;
-import org.apache.dubbo.rpc.Invocation;
-import org.apache.dubbo.rpc.Invoker;
-import org.apache.dubbo.rpc.Result;
-import org.apache.dubbo.rpc.RpcException;
+import org.apache.dubbo.rpc.*;
 import org.dromara.hmily.annotation.Hmily;
 import org.dromara.hmily.common.utils.LogUtil;
 import org.dromara.hmily.xa.core.TransactionImpl;
@@ -50,13 +46,13 @@ public class DubboXaFilter implements Filter {
 
     @Override
     public Result invoke(final Invoker<?> invoker, final Invocation invocation) throws RpcException {
-        LOGGER.debug("create dubbo xa sources");//在发送rpc时调用
+        LOGGER.debug("create dubbo xa sources");
         Class<?> clazz = invoker.getInterface();
         Class<?>[] args = invocation.getParameterTypes();
         String methodName = invocation.getMethodName();
         try {
             Method method = clazz.getMethod(methodName, args);
-            Hmily hmily = method.getAnnotation(Hmily.class);//rpc调用的方法需要手动加@Hmily注解
+            Hmily hmily = method.getAnnotation(Hmily.class);
             if (Objects.isNull(hmily)) {
                 return invoker.invoke(invocation);
             }
@@ -69,7 +65,7 @@ public class DubboXaFilter implements Filter {
         if (transaction instanceof TransactionImpl) {
             XAResource resource = new DubboRpcResource(invoker, invocation);
             try {
-                ((TransactionImpl) transaction).doEnList(resource, XAResource.TMJOIN);//加入XA事务
+                ((TransactionImpl) transaction).doEnList(resource, XAResource.TMJOIN);
             } catch (SystemException | RollbackException e) {
                 LOGGER.error(":", e);
                 throw new RuntimeException("dubbo xa resource tm join err", e);

@@ -23,11 +23,7 @@ import org.dromara.hmily.common.utils.DefaultValueUtils;
 import org.dromara.hmily.core.context.HmilyTransactionContext;
 import org.dromara.hmily.core.context.XaParticipant;
 import org.dromara.hmily.core.service.HmilyTransactionHandler;
-import org.dromara.hmily.xa.core.HmilyXaException;
-import org.dromara.hmily.xa.core.HmilyXaResource;
-import org.dromara.hmily.xa.core.XaResourcePool;
-import org.dromara.hmily.xa.core.XaResourceWrapped;
-import org.dromara.hmily.xa.core.XidImpl;
+import org.dromara.hmily.xa.core.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,10 +45,9 @@ public class CommitHmilyTransactionHandler implements HmilyTransactionHandler {
         //完成commit.
         XaParticipant xaParticipant = hmilyTransactionContext.getXaParticipant();
         String branchId = xaParticipant.getBranchId();
-        XidImpl xid = new XidImpl(xaParticipant.getGlobalId (),branchId);
+        XidImpl xid = new XidImpl(xaParticipant.getGlobalId(), branchId);
         List<XaResourceWrapped> allResource = XaResourcePool.INST.getAllResource(xid.getGlobalId());
         //如果是远程调用就只能是commit.
-        //获得所有resource，然后级联commit，resource可能是其他的rpc
         try {
             for (final XaResourceWrapped xaResourceWrapped : allResource) {
                 ((HmilyXaResource) xaResourceWrapped).commit(false);

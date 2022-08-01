@@ -18,11 +18,7 @@
 package org.dromara.hmily.xa.core;
 
 import javax.transaction.xa.Xid;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -38,7 +34,6 @@ public final class XaResourcePool {
 
     /**
      * The constant INST.
-     * 存放所有产生的resource，这样就可以commit或者rollback
      */
     public static final XaResourcePool INST = new XaResourcePool();
 

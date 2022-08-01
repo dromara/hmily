@@ -24,7 +24,7 @@ import javax.transaction.xa.Xid;
 /**
  * XaResourceExtends .
  * 扩展 XaResources扩展.
- * XAResource，即RM，比如JDBC RM
+ *
  * @author sixh chenbin
  */
 public abstract class XaResourceWrapped implements XAResource {
