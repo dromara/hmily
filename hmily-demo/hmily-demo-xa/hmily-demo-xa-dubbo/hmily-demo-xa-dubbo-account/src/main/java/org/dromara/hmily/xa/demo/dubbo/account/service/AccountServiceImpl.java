@@ -116,7 +116,7 @@ public class AccountServiceImpl implements AccountService {
     @HmilyXA
     @Transactional
     public boolean testPayment(AccountDTO accountDTO) {
-//        accountMapper.testUpdate(accountDTO);
+        accountMapper.testUpdate(accountDTO);
 //        throw new RuntimeException("111111111");
         return Boolean.TRUE;
     }

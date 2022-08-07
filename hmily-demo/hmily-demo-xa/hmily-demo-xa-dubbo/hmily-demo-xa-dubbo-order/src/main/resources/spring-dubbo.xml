@@ -9,7 +9,7 @@
         <dubbo:parameter key="qos.enable" value="false"/>
     </dubbo:application>
 
-    <dubbo:registry address="zookeeper://localhost:2181" transport="netty4" client="curator">
+    <dubbo:registry address="zookeeper://192.168.3.21:2181" transport="netty4" client="curator">
         <dubbo:parameter key="client" value="curator"/>
     </dubbo:registry>
 

@@ -27,7 +27,7 @@ hmily:
 repository:
   database:
     driverClassName: com.mysql.jdbc.Driver
-    url : jdbc:mysql://localhost:3306/hmily?allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=GMT%2B8&useSSL=false&verifyServerCertificate=false
+    url : jdbc:mysql://192.168.3.18:3306/hmily?allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=GMT%2B8&useSSL=true&verifyServerCertificate=false
     username: root
     password: 123456
     maxActive: 20

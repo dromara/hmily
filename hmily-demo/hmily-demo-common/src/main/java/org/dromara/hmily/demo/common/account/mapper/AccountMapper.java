@@ -57,7 +57,6 @@ public interface AccountMapper {
      */
     @Update("update account set balance = balance - #{amount}, update_time = now() " +
             " where user_id =#{userId}  and  balance >= #{amount}  ")
-//    @Update("select 1")
     int testUpdate(AccountDTO accountDTO);
 
     /**

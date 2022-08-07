@@ -39,7 +39,7 @@ public class SpringCloudXaLoadBalancer implements ILoadBalancer {
     /**
      * Store server routing.
      */
-    private static final Map<Xid, Server> ROUTER_MAP = new ConcurrentHashMap<>();
+    private static final Map<Xid, Server> ROUTING_MAP = new ConcurrentHashMap<>();
 
     private final ILoadBalancer delegate;
 
@@ -63,9 +63,9 @@ public class SpringCloudXaLoadBalancer implements ILoadBalancer {
                 Xid xid = new XidImpl(participant.getGlobalId(), participant.getBranchId());
                 if (RpcXaProxy.XaCmd.START.name().equalsIgnoreCase(cmd)) {
                     //保证同一个事务分支的rpc路由到同一个server
-                    ROUTER_MAP.put(xid, server);
+                    ROUTING_MAP.put(xid, server);
                 } else {
-                    Server oldServer = ROUTER_MAP.get(xid);
+                    Server oldServer = ROUTING_MAP.get(xid);
                     if (oldServer != null) {
                         server = oldServer;
                     }
@@ -107,7 +107,7 @@ public class SpringCloudXaLoadBalancer implements ILoadBalancer {
             if (context != null) {
                 Xid xid = new XidImpl(context.getXaParticipant().getGlobalId(),
                         context.getXaParticipant().getBranchId());
-                ROUTER_MAP.remove(xid);
+                ROUTING_MAP.remove(xid);
             }
         }
     }

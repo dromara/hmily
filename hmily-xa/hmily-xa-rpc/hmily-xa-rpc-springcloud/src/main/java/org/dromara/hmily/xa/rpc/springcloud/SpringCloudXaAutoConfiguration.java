@@ -40,7 +40,7 @@ public class SpringCloudXaAutoConfiguration {
      * @return {@link FeignBeanPostProcessor} Bean
      */
     @Bean
-    public FeignBeanPostProcessor hmilyXaPostProcessor() {
+    public static FeignBeanPostProcessor hmilyXaPostProcessor() {
         return new FeignBeanPostProcessor();
     }
 
