@@ -66,8 +66,6 @@ public class SpringCloudXaResource extends RpcResource {
 
     @Override
     public void start(final Xid xid, final int i) throws XAException {
-        super.start(xid, i);
-
         XaParticipant xaParticipant = new XaParticipant();
         xaParticipant.setFlag(i);
         xaParticipant.setBranchId(new String(xid.getBranchQualifier()));

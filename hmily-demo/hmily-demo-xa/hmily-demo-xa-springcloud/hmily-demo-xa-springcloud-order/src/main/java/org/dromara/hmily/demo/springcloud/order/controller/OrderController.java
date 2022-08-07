@@ -16,7 +16,6 @@
 
 package org.dromara.hmily.demo.springcloud.order.controller;
 
-import io.swagger.annotations.ApiOperation;
 import org.dromara.hmily.demo.springcloud.order.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -40,15 +39,7 @@ public class OrderController {
         this.orderService = orderService;
     }
 
-    @PostMapping(value = "/orderPay")
-    @ApiOperation(value = "订单支付接口（注意这里模拟的是创建订单并进行支付扣减库存等操作）")
-    public String orderPay(@RequestParam(value = "count") Integer count,
-                           @RequestParam(value = "amount") BigDecimal amount) {
-        return orderService.orderPay(count, amount);
-    }
-
     @PostMapping(value = "/testOrderPay")
-    @ApiOperation(value = "测试订单支付接口(这里是压测接口不添加分布式事务)")
     public String testOrderPay(@RequestParam(value = "count") Integer count,
                                @RequestParam(value = "amount") BigDecimal amount) {
         final long start = System.currentTimeMillis();
@@ -57,18 +48,38 @@ public class OrderController {
         return result;
     }
 
-    @PostMapping(value = "/mockInventoryWithTryException")
-    @ApiOperation(value = "模拟下单付款操作在try阶段时候，库存异常，此时账户系统和订单状态会回滚，达到数据的一致性（注意:这里模拟的是系统异常，或者rpc异常）")
-    public String mockInventoryWithTryException(@RequestParam(value = "count") Integer count,
-                                                @RequestParam(value = "amount") BigDecimal amount) {
+    //测试其中一个事务异常
+    @PostMapping(value = "/mockException")
+    public String mockException(@RequestParam(value = "count") Integer count,
+                                @RequestParam(value = "amount") BigDecimal amount) {
         return orderService.mockInventoryWithTryException(count, amount);
     }
 
-    @PostMapping(value = "/mockInventoryWithTryTimeout")
-    @ApiOperation(value = "模拟下单付款操作在try阶段时候，库存超时异常（但是自身最后又成功了），此时账户系统和订单状态会回滚，（库存依赖事务日志进行恢复），达到数据的一致性（异常指的是超时异常）")
-    public String mockInventoryWithTryTimeout(@RequestParam(value = "count") Integer count,
-                                              @RequestParam(value = "amount") BigDecimal amount) {
+    //测试其中一个事务超时
+    @PostMapping(value = "/mockTimeout")
+    public String mockTimeout(@RequestParam(value = "count") Integer count,
+                              @RequestParam(value = "amount") BigDecimal amount) {
         return orderService.mockInventoryWithTryTimeout(count, amount);
     }
 
+    //模拟rpc的嵌套调用 order--> account--> inventory,成功提交
+    @PostMapping(value = "/orderPayWithNested")
+    public String orderPayWithNested(@RequestParam(value = "count") Integer count,
+                                     @RequestParam(value = "amount") BigDecimal amount) {
+        return orderService.orderPayWithNested(count, amount);
+    }
+
+    //模拟rpc的嵌套调用 order--> account--> inventory,发生异常
+    @PostMapping(value = "/orderPayWithNestedException")
+    public String orderPayWithNestedException(@RequestParam(value = "count") Integer count,
+                                              @RequestParam(value = "amount") BigDecimal amount) {
+        return orderService.orderPayWithNestedException(count, amount);
+    }
+
+    //模拟rpc的嵌套调用 order--> account--> inventory,发生超时
+//    @PostMapping(value = "/orderPayWithNestedTimeout")
+//    public String orderPayWithNestedTimeout(@RequestParam(value = "count") Integer count,
+//                                              @RequestParam(value = "amount") BigDecimal amount) {
+//        return orderService.orderPayWithNestedTimeout(count, amount);
+//    }
 }

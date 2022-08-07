@@ -96,7 +96,6 @@ public class PaymentServiceImpl implements PaymentService {
      * @param order 订单实体
      */
     @Override
-    @HmilyXA
     public void makePaymentWithNested(Order order) {
         updateOrderStatus(order, OrderStatusEnum.PAYING);
         BigDecimal decimal = accountClient.findByUserId(order.getUserId());
@@ -108,7 +107,6 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    @HmilyXA
     public void makePaymentWithNestedException(Order order) {
         updateOrderStatus(order, OrderStatusEnum.PAYING);
         BigDecimal decimal = accountClient.findByUserId(order.getUserId());
@@ -120,7 +118,19 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
+    public void makePaymentWithNestedTimeout(Order order) {
+        updateOrderStatus(order, OrderStatusEnum.PAYING);
+        BigDecimal decimal = accountClient.findByUserId(order.getUserId());
+        if (decimal.compareTo(order.getTotalAmount()) <= 0) {
+            throw new HmilyRuntimeException("余额不足！");
+        }
+        //扣除用户余额
+        accountClient.paymentWithNestedTimeout(buildAccountNestedDTO(order));
+    }
+
+    @Override
     @HmilyXA
+    @Transactional
     public String mockPaymentInventoryWithTryException(Order order) {
         updateOrderStatus(order, OrderStatusEnum.PAYING);
         //扣除用户余额
@@ -131,6 +141,7 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     @HmilyXA
+    @Transactional
     public String mockPaymentInventoryWithTryTimeout(Order order) {
         updateOrderStatus(order, OrderStatusEnum.PAYING);
         //扣除用户余额
@@ -141,6 +152,7 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     @HmilyXA
+    @Transactional
     public String mockPaymentAccountWithTryException(Order order) {
         updateOrderStatus(order, OrderStatusEnum.PAYING);
 //        accountService.mockTryPaymentException(buildAccountDTO(order));
@@ -153,29 +165,6 @@ public class PaymentServiceImpl implements PaymentService {
         updateOrderStatus(order, OrderStatusEnum.PAYING);
 //        accountService.mockTryPaymentTimeout(buildAccountDTO(order));
         return "success";
-    }
-
-    @Override
-    @HmilyXA
-    public String mockPaymentInventoryWithConfirmTimeout(Order order) {
-        updateOrderStatus(order, OrderStatusEnum.PAYING);
-        //扣除用户余额
-        AccountDTO accountDTO = new AccountDTO();
-        accountDTO.setAmount(order.getTotalAmount());
-        accountDTO.setUserId(order.getUserId());
-        accountClient.payment(accountDTO);
-//        inventoryService.mockWithConfirmTimeout(buildInventoryDTO(order));
-        return "success";
-    }
-
-    public void confirmOrderStatus(Order order) {
-        updateOrderStatus(order, OrderStatusEnum.PAY_SUCCESS);
-        LOGGER.info("=========进行订单confirm操作完成================");
-    }
-
-    public void cancelOrderStatus(Order order) {
-        updateOrderStatus(order, OrderStatusEnum.PAY_FAIL);
-        LOGGER.info("=========进行订单cancel操作完成================");
     }
 
     private void updateOrderStatus(Order order, OrderStatusEnum orderStatus) {

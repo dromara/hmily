@@ -63,7 +63,7 @@ public class XaLoadBalancerAutoConfiguration implements InitializingBean {
          * @return {@link XaLoadBalancerBeanPostProcessor} Bean
          */
         @Bean
-        public XaLoadBalancerBeanPostProcessor xaLoadBalancerBeanPostProcessor() {
+        public static XaLoadBalancerBeanPostProcessor xaLoadBalancerBeanPostProcessor() {
             return new XaLoadBalancerBeanPostProcessor();
         }
     }

@@ -29,18 +29,6 @@
     <artifactId>hmily-demo-xa-springcloud-account</artifactId>
 
     <dependencies>
-<!--        <dependency>-->
-<!--            <groupId>org.dromara</groupId>-->
-<!--            <artifactId>hmily-springcloud</artifactId>-->
-<!--            <version>2.1.2-SNAPSHOT</version>-->
-<!--            <exclusions>-->
-<!--                <exclusion>-->
-<!--                    <groupId>org.dromara</groupId>-->
-<!--                    <artifactId>hmily-tcc</artifactId>-->
-<!--                </exclusion>-->
-<!--            </exclusions>-->
-<!--        </dependency>-->
-
         <dependency>
             <groupId>org.dromara</groupId>
             <artifactId>hmily-demo-common</artifactId>
@@ -182,12 +170,6 @@
             <groupId>org.dromara</groupId>
             <artifactId>hmily-xa-rpc-springcloud</artifactId>
             <version>2.1.2-SNAPSHOT</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.dromara</groupId>
-                    <artifactId>hmily-config-apollo</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
         <!--

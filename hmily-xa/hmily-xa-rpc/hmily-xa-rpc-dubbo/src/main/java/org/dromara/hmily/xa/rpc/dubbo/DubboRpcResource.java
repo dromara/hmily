@@ -80,7 +80,6 @@ public class DubboRpcResource extends RpcResource {
 
     @Override
     public void start(final Xid xid, final int i) throws XAException {
-        super.start(xid, i);
         //需要初始化一下错误调用的相关数据.
         XaParticipant xaParticipant = new XaParticipant();
         xaParticipant.setFlag(i);

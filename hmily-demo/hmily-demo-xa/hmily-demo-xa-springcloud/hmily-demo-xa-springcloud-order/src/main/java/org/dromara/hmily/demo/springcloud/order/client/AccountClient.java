@@ -102,4 +102,15 @@ public interface AccountClient {
     @Hmily
     @RequestMapping("/account-service/account/paymentWithNestedException")
     Boolean paymentWithNestedException(@RequestBody AccountNestedDTO nestedDTO);
+
+    /**
+     * paymentWithNestedTimeout
+     *
+     * @param nestedDTO the nested dto
+     * @return the boolean
+     */
+    @Hmily
+    @RequestMapping("/account-service/account/paymentWithNestedTimeout")
+    Boolean paymentWithNestedTimeout(@RequestBody AccountNestedDTO nestedDTO);
+
 }

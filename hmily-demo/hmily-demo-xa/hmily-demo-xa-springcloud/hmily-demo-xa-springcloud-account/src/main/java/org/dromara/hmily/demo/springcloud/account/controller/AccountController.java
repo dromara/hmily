@@ -64,6 +64,11 @@ public class AccountController {
         return accountService.paymentWithNestedException(nestedDTO);
     }
 
+//    @RequestMapping("/paymentWithNestedTimeout")
+//    public Boolean paymentWithNestedTimeout(@RequestBody AccountNestedDTO nestedDTO) {
+//        return accountService.paymentWithNestedTimeout(nestedDTO);
+//    }
+
     @RequestMapping("/findByUserId")
     public BigDecimal findByUserId(@RequestParam("userId") String userId) {
         return accountService.findByUserId(userId).getBalance();

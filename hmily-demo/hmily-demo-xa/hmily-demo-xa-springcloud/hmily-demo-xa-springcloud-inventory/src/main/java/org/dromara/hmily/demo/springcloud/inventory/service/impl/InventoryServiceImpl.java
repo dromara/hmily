@@ -48,7 +48,6 @@ public class InventoryServiceImpl implements InventoryService {
 
     /**
      * 扣减库存操作.
-     * 这一个tcc接口
      *
      * @param inventoryDTO 库存DTO对象
      * @return true
@@ -84,7 +83,7 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     @Override
-    @HmilyTCC(confirmMethod = "confirmMethod", cancelMethod = "cancelMethod")
+    @HmilyXA
     @Transactional
     public Boolean mockWithTryException(InventoryDTO inventoryDTO) {
         //这里是模拟异常所以就直接抛出异常了
@@ -92,7 +91,7 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     @Override
-    @HmilyTCC(confirmMethod = "confirmMethod", cancelMethod = "cancelMethod")
+    @HmilyXA
     @Transactional(rollbackFor = Exception.class)
     public Boolean mockWithTryTimeout(InventoryDTO inventoryDTO) {
         try {
@@ -109,37 +108,4 @@ public class InventoryServiceImpl implements InventoryService {
         return true;
     }
 
-    @Transactional(rollbackFor = Exception.class)
-    public Boolean confirmMethodTimeout(InventoryDTO inventoryDTO) {
-        try {
-            //模拟延迟 当前线程暂停11秒
-            Thread.sleep(11000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        LOGGER.info("==========Springcloud调用扣减库存确认方法===========");
-        inventoryMapper.decrease(inventoryDTO);
-        return true;
-    }
-
-    @Transactional(rollbackFor = Exception.class)
-    public Boolean confirmMethodException(InventoryDTO inventoryDTO) {
-        LOGGER.info("==========Springcloud调用扣减库存确认方法===========");
-        final int decrease = inventoryMapper.decrease(inventoryDTO);
-        if (decrease != 1) {
-            throw new HmilyRuntimeException("库存不足");
-        }
-        return true;
-        // throw new TccRuntimeException("库存扣减确认异常！");
-    }
-
-    public Boolean confirmMethod(InventoryDTO inventoryDTO) {
-        LOGGER.info("==========confirmMethod库存确认方法===========");
-        return inventoryMapper.confirm(inventoryDTO) > 0;
-    }
-
-    public Boolean cancelMethod(InventoryDTO inventoryDTO) {
-        LOGGER.info("==========cancelMethod库存取消方法===========");
-        return inventoryMapper.cancel(inventoryDTO) > 0;
-    }
 }

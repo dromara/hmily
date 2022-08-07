@@ -56,7 +56,7 @@ public class SpringCloudXaLoadBalancer implements ILoadBalancer {
     public Server chooseServer(final Object key) {
         HmilyTransactionContext context = HmilyContextHolder.get();
         Server server = delegate.chooseServer(key);
-        if (context != null) {
+        if (server != null && context != null) {
             XaParticipant participant = context.getXaParticipant();
             if (participant != null) {
                 String cmd = participant.getCmd();

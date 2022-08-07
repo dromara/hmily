@@ -16,7 +16,6 @@
 
 package org.dromara.hmily.demo.springcloud.order.service;
 
-import org.dromara.hmily.annotation.Hmily;
 import org.dromara.hmily.demo.common.order.entity.Order;
 
 /**
@@ -38,7 +37,6 @@ public interface PaymentService {
      *
      * @param order the order
      */
-    @Hmily
     void testMakePayment(Order order);
 
     /**
@@ -54,6 +52,8 @@ public interface PaymentService {
      * @param order the order
      */
     void makePaymentWithNestedException(Order order);
+
+    void makePaymentWithNestedTimeout(Order order);
 
     /**
      * mock订单支付的时候库存异常
@@ -86,13 +86,5 @@ public interface PaymentService {
      * @return the string
      */
     String mockPaymentAccountWithTryTimeout(Order order);
-
-    /**
-     * mock订单支付的时候库存确认超时
-     *
-     * @param order 订单实体
-     * @return String string
-     */
-    String mockPaymentInventoryWithConfirmTimeout(Order order);
 
 }
