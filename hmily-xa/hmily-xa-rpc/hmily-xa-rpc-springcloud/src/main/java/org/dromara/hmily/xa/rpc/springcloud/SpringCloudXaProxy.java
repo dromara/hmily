@@ -27,6 +27,11 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Map;
 
+/**
+ * SpringCloud的RpcXaProxy实现.<br/>
+ * 保存Feign rpc对应的接口方法、参数，从而在执行{@link #cmd}时可以通过反射再复现一次Feign rpc调用，
+ * 这样就可以把XA事务的命令发送到对应的rpc下游服务器.
+ */
 public class SpringCloudXaProxy implements RpcXaProxy {
     private final Logger logger = LoggerFactory.getLogger(SpringCloudXaProxy.class);
 
@@ -38,6 +43,12 @@ public class SpringCloudXaProxy implements RpcXaProxy {
 
     private HmilyTransactionContext context;
 
+    /**
+     * 初始化一个调用spring cloud的rpc代理.
+     * @param method Feign rpc的方法
+     * @param target Feign的目标对象
+     * @param args Feign rpc的参数
+     */
     public SpringCloudXaProxy(final Method method, final Object target, final Object[] args) {
         this.method = method;
         this.target = target;

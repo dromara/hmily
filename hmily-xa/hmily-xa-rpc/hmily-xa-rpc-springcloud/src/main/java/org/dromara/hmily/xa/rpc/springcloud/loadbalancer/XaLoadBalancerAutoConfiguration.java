@@ -27,9 +27,17 @@ import org.springframework.context.annotation.Configuration;
 
 import java.util.Collections;
 
+/**
+ * 自动配置.
+ */
 @ConditionalOnClass(ILoadBalancer.class)
 @Configuration
 public class XaLoadBalancerAutoConfiguration implements InitializingBean {
+
+    /**
+     * Ribbon基于{@link SpringClientFactory}来实现配置隔离，
+     * 要保证每种配置情况的{@link ILoadBalancer}都会被包装.
+     */
     @Autowired
     private SpringClientFactory springClientFactory;
 
@@ -44,8 +52,10 @@ public class XaLoadBalancerAutoConfiguration implements InitializingBean {
     }
 
     /**
-     * 给{@link SpringClientFactory}添加一个默认config，它会注册XaLoadBalancerBeanPostProcessor，
-     * 从而实现对{@link ILoadBalancer}的包装.
+     * Ribbon基于{@link SpringClientFactory}来实现配置隔离，
+     * 要保证每种配置情况的{@link ILoadBalancer}都会被包装.
+     * <br/>
+     * 所以给{@link SpringClientFactory}添加一个默认config，它会注册{@link XaLoadBalancerBeanPostProcessor}.
      */
     @Override
     public void afterPropertiesSet() {

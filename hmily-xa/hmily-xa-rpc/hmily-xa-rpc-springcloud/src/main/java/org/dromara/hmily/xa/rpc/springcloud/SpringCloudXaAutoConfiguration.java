@@ -22,6 +22,9 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * 自动配置.
+ */
 @Configuration
 @ConditionalOnClass(FeignClient.class)
 public class SpringCloudXaAutoConfiguration {

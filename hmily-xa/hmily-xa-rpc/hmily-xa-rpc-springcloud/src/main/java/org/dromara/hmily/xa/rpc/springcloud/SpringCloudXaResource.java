@@ -25,6 +25,9 @@ import javax.transaction.xa.XAResource;
 import javax.transaction.xa.Xid;
 import java.lang.reflect.Method;
 
+/**
+ * SpringCloudXaResource.
+ */
 public class SpringCloudXaResource extends RpcResource {
 
     public SpringCloudXaResource(final Method method, final Object target, final Object[] args) {

@@ -34,6 +34,9 @@ import java.net.SocketTimeoutException;
 import java.util.Objects;
 import java.util.Optional;
 
+/**
+ * 拦截Feign rpc，如果有事务，则为其创建一个{@link XAResource}.
+ */
 public class FeignRequestInvocationHandler implements InvocationHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FeignRequestInvocationHandler.class);

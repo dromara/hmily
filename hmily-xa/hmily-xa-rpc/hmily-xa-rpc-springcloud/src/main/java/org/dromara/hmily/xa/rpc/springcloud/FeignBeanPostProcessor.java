@@ -16,6 +16,7 @@
 
 package org.dromara.hmily.xa.rpc.springcloud;
 
+import org.dromara.hmily.xa.rpc.RpcXaProxy;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -24,6 +25,10 @@ import org.springframework.lang.NonNull;
 
 import java.lang.reflect.Proxy;
 
+/**
+ * 通过{@link BeanPostProcessor}来包装被@{@link FeignClient}注解注释的接口的实现类.
+ * 包装Feign rpc从而可以给下游rpc服务器发送{@link RpcXaProxy.XaCmd}.
+ */
 public class FeignBeanPostProcessor implements BeanPostProcessor {
     @Override
     public Object postProcessAfterInitialization(final Object bean, @NonNull final String beanName) throws BeansException {

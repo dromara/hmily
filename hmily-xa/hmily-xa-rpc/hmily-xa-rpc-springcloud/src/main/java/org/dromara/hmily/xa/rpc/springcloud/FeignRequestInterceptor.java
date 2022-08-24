@@ -18,11 +18,15 @@ package org.dromara.hmily.xa.rpc.springcloud;
 
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
+import org.dromara.hmily.core.context.HmilyContext;
 import org.dromara.hmily.core.context.HmilyContextHolder;
 import org.dromara.hmily.core.mediator.RpcMediator;
 import org.springframework.core.Ordered;
 
-class FeignRequestInterceptor implements RequestInterceptor, Ordered {
+/**
+ * 拦截Feign Rpc，使其传递{@link HmilyContext}.
+ */
+public class FeignRequestInterceptor implements RequestInterceptor, Ordered {
 
     @Override
     public void apply(final RequestTemplate template) {
