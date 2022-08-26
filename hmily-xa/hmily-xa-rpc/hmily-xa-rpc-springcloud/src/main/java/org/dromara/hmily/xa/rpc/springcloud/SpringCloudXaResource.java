@@ -30,6 +30,12 @@ import java.lang.reflect.Method;
  */
 public class SpringCloudXaResource extends RpcResource {
 
+    /**
+     * 实例化一个SpringCloudXaResource.
+     * @param target Feign rpc的目标对象.
+     * @param method Feign rpc的方法.
+     * @param args Feign rpc的方法参数.
+     */
     public SpringCloudXaResource(final Method method, final Object target, final Object[] args) {
         super(new SpringCloudXaProxy(method, target, args));
     }

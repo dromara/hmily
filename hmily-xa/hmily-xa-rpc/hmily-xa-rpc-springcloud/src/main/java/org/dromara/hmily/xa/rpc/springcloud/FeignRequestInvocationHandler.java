@@ -43,6 +43,10 @@ public class FeignRequestInvocationHandler implements InvocationHandler {
 
     private final Object target;
 
+    /**
+     * 实例化一个FeignRequestInvocationHandler.
+     * @param target 被FeignRequestInvocationHandler代理的目标对象.
+     */
     public FeignRequestInvocationHandler(final Object target) {
         this.target = target;
     }

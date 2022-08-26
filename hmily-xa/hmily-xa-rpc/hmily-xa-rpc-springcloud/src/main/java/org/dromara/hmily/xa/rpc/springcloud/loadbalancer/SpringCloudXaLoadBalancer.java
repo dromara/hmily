@@ -43,6 +43,10 @@ public class SpringCloudXaLoadBalancer implements ILoadBalancer {
 
     private final ILoadBalancer delegate;
 
+    /**
+     * 实例化一个SpringCloudXaLoadBalancer.
+     * @param delegate 被SpringCloudXaLoadBalancer包装的ILoadBalancer.
+     */
     public SpringCloudXaLoadBalancer(final ILoadBalancer delegate) {
         this.delegate = delegate;
     }
