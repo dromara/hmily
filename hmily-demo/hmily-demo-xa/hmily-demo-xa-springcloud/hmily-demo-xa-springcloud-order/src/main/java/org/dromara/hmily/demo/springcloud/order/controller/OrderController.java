@@ -75,11 +75,4 @@ public class OrderController {
                                               @RequestParam(value = "amount") BigDecimal amount) {
         return orderService.orderPayWithNestedException(count, amount);
     }
-
-    //模拟rpc的嵌套调用 order--> account--> inventory,发生超时
-//    @PostMapping(value = "/orderPayWithNestedTimeout")
-//    public String orderPayWithNestedTimeout(@RequestParam(value = "count") Integer count,
-//                                              @RequestParam(value = "amount") BigDecimal amount) {
-//        return orderService.orderPayWithNestedTimeout(count, amount);
-//    }
 }

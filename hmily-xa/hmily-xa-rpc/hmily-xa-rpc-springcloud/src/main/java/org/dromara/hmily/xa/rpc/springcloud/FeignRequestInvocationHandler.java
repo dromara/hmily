@@ -28,11 +28,8 @@ import javax.transaction.SystemException;
 import javax.transaction.Transaction;
 import javax.transaction.xa.XAResource;
 import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.net.SocketTimeoutException;
 import java.util.Objects;
-import java.util.Optional;
 
 /**
  * 拦截Feign rpc，如果有事务，则为其创建一个{@link XAResource}.
@@ -74,22 +71,7 @@ public class FeignRequestInvocationHandler implements InvocationHandler {
             }
         }
 
-        try {
-            return method.invoke(target, args);
-        } catch (InvocationTargetException exception) {
-            Throwable throwable = Optional
-                    .ofNullable(exception.getTargetException())
-                    .map(Throwable::getCause)
-                    .orElse(null);
-            if (throwable instanceof SocketTimeoutException) {
-                //说明Feign RPC发生了超时
-                if (transaction != null) {
-                    transaction.rollback();
-                }
-            }
-            //重新抛出异常，通知应用层
-            throw exception;
-        }
+        return method.invoke(target, args);
     }
 
 }

@@ -11,7 +11,7 @@ spring:
       driver-class-name:  com.mysql.jdbc.Driver
       url: jdbc:mysql://127.0.0.1:3306/hmily_stock?useUnicode=true&characterEncoding=utf8&useSSL=false
       username: root
-      password: fjz13685459286
+      password: 123456
     application:
       name: inventory-service
 
