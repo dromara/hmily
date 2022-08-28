@@ -17,6 +17,19 @@
     </properties>
 
     <dependencies>
+        <!--for ParameterLoader etc.-->
+        <dependency>
+            <groupId>org.dromara</groupId>
+            <artifactId>hmily-springcloud</artifactId>
+            <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.dromara</groupId>
+                    <artifactId>hmily-tcc</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
         <dependency>
             <groupId>org.dromara</groupId>
             <artifactId>hmily-xa-rpc-common</artifactId>
@@ -59,16 +72,16 @@
             <version>4.0.1</version>
             <scope>provided</scope>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>com.netflix.ribbon</groupId>-->
-<!--            <artifactId>ribbon-loadbalancer</artifactId>-->
-<!--            <scope>provided</scope>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>com.netflix.hystrix</groupId>-->
-<!--            <artifactId>hystrix-core</artifactId>-->
-<!--            <scope>provided</scope>-->
-<!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>com.netflix.ribbon</groupId>-->
+        <!--            <artifactId>ribbon-loadbalancer</artifactId>-->
+        <!--            <scope>provided</scope>-->
+        <!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>com.netflix.hystrix</groupId>-->
+        <!--            <artifactId>hystrix-core</artifactId>-->
+        <!--            <scope>provided</scope>-->
+        <!--        </dependency>-->
 
         <dependency>
             <groupId>io.github.openfeign</groupId>
