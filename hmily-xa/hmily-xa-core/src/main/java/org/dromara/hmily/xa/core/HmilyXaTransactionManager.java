@@ -165,7 +165,8 @@ public class HmilyXaTransactionManager implements TransactionManager {
             HmilyTransactionContext context = HmilyContextHolder.get();
             XidImpl xId;
             if (context != null && context.getXaParticipant() != null) {
-                xId = new XidImpl(context.getXaParticipant().getBranchId());
+                xId = new XidImpl(context.getXaParticipant().getGlobalId(),
+                        context.getXaParticipant().getBranchId());
                 hasSuper = true;
             } else {
                 xId = new XidImpl();

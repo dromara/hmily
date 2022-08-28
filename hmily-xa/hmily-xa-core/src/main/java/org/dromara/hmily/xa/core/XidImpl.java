@@ -85,6 +85,13 @@ public class XidImpl implements Xid {
         this.globalIdByte = gid.getBytes();
     }
 
+    public XidImpl(final String transactionId, final String branchId) {
+        this.branchId = branchId;
+        this.branchIdByte = branchId.getBytes();
+        this.globalId = transactionId;
+        this.globalIdByte = transactionId.getBytes();
+    }
+
     /**
      * Instantiates a new X id.
      *
@@ -170,7 +177,9 @@ public class XidImpl implements Xid {
 
     @Override
     public int hashCode() {
-        return super.hashCode();
+        int result = globalId != null ? globalId.hashCode() : 0;
+        result = 31 * result + (branchId != null ? branchId.hashCode() : 0);
+        return result;
     }
 
     @Override

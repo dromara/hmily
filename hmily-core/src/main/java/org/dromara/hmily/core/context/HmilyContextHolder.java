@@ -26,9 +26,9 @@ import org.dromara.hmily.spi.ExtensionLoaderFactory;
  * The type Hmily context holder.
  */
 public class HmilyContextHolder {
-    
+
     private static HmilyContext hmilyContext;
-    
+
     static {
         HmilyConfig hmilyConfig = ConfigEnv.getInstance().getConfig(HmilyConfig.class);
         if (Objects.isNull(hmilyConfig)) {
@@ -37,7 +37,7 @@ public class HmilyContextHolder {
             hmilyContext = Optional.ofNullable(ExtensionLoaderFactory.load(HmilyContext.class, hmilyConfig.getContextTransmittalMode())).orElse(new ThreadLocalHmilyContext());
         }
     }
-    
+
     /**
      * Set.
      *
@@ -46,7 +46,7 @@ public class HmilyContextHolder {
     public static void set(final HmilyTransactionContext context) {
         hmilyContext.set(context);
     }
-    
+
     /**
      * Get hmily transaction context.
      *
@@ -55,7 +55,7 @@ public class HmilyContextHolder {
     public static HmilyTransactionContext get() {
         return hmilyContext.get();
     }
-    
+
     /**
      * Remove.
      */
