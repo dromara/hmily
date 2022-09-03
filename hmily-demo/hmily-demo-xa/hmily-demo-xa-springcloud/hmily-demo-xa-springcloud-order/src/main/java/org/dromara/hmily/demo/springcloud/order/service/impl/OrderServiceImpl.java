@@ -15,6 +15,7 @@
  */
 package org.dromara.hmily.demo.springcloud.order.service.impl;
 
+import org.dromara.hmily.annotation.HmilyXA;
 import org.dromara.hmily.common.utils.IdWorkerUtils;
 import org.dromara.hmily.demo.common.order.entity.Order;
 import org.dromara.hmily.demo.common.order.enums.OrderStatusEnum;
@@ -62,6 +63,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
+    @HmilyXA
     public String testOrderPay(Integer count, BigDecimal amount) {
         Order order = saveOrder(count, amount);
         final long start = System.currentTimeMillis();
@@ -80,6 +82,7 @@ public class OrderServiceImpl implements OrderService {
      */
     @Override
     @Transactional
+    @HmilyXA
     public String orderPayWithNested(Integer count, BigDecimal amount) {
         Order order = saveOrder(count, amount);
         paymentService.makePaymentWithNested(order);
@@ -88,6 +91,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
+    @HmilyXA
     public String orderPayWithNestedException(Integer count, BigDecimal amount) {
         Order order = saveOrder(count, amount);
         paymentService.makePaymentWithNestedException(order);
@@ -96,6 +100,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
+    @HmilyXA
     public String orderPayWithNestedTimeout(Integer count, BigDecimal amount) {
         Order order = saveOrder(count, amount);
         paymentService.makePaymentWithNestedTimeout(order);
@@ -111,6 +116,7 @@ public class OrderServiceImpl implements OrderService {
      */
     @Override
     @Transactional
+    @HmilyXA
     public String mockInventoryWithTryException(Integer count, BigDecimal amount) {
         Order order = saveOrder(count, amount);
         return paymentService.mockPaymentInventoryWithTryException(order);
@@ -125,6 +131,7 @@ public class OrderServiceImpl implements OrderService {
      */
     @Override
     @Transactional
+    @HmilyXA
     public String mockInventoryWithTryTimeout(Integer count, BigDecimal amount) {
         Order order = saveOrder(count, amount);
         paymentService.mockPaymentInventoryWithTryTimeout(order);
@@ -133,6 +140,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
+    @HmilyXA
     public String mockAccountWithTryException(Integer count, BigDecimal amount) {
         Order order = saveOrder(count, amount);
         paymentService.mockPaymentAccountWithTryException(order);
@@ -141,6 +149,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
+    @HmilyXA
     public String mockAccountWithTryTimeout(Integer count, BigDecimal amount) {
         Order order = saveOrder(count, amount);
         paymentService.mockPaymentAccountWithTryTimeout(order);
@@ -149,7 +158,7 @@ public class OrderServiceImpl implements OrderService {
 
     private Order saveOrder(Integer count, BigDecimal amount) {
         final Order order = buildOrder(count, amount);
-//        orderMapper.save(order);
+        orderMapper.save(order);
         return order;
     }
 

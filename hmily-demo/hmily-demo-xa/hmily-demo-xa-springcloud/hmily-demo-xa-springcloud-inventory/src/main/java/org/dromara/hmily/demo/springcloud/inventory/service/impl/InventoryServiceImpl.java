@@ -16,7 +16,6 @@
 
 package org.dromara.hmily.demo.springcloud.inventory.service.impl;
 
-import org.dromara.hmily.annotation.HmilyTCC;
 import org.dromara.hmily.annotation.HmilyXA;
 import org.dromara.hmily.common.exception.HmilyRuntimeException;
 import org.dromara.hmily.demo.common.inventory.dto.InventoryDTO;
@@ -54,14 +53,9 @@ public class InventoryServiceImpl implements InventoryService {
      */
     @Override
     @HmilyXA
+    @Transactional
     public Boolean decrease(InventoryDTO inventoryDTO) {
         LOGGER.info("==========扣减库存decrease===========");
-//        throw new RuntimeException("mock ex");
-//        try {
-//            Thread.sleep(1000 * 10);
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
         return inventoryMapper.decrease(inventoryDTO) > 0;
     }
 
@@ -96,12 +90,13 @@ public class InventoryServiceImpl implements InventoryService {
     public Boolean mockWithTryTimeout(InventoryDTO inventoryDTO) {
         try {
             //模拟延迟 当前线程暂停10秒
-            Thread.sleep(10000);
+            Thread.sleep(20000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
         LOGGER.info("==========springcloud调用扣减库存mockWithTryTimeout===========");
         final int decrease = inventoryMapper.decrease(inventoryDTO);
+        LOGGER.info("==========springcloud调用扣减库存成功===========");
         if (decrease != 1) {
             throw new HmilyRuntimeException("库存不足");
         }

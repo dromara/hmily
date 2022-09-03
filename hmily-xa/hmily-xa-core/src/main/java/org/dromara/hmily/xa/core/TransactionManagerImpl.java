@@ -133,4 +133,13 @@ public enum TransactionManagerImpl implements TransactionManager {
         }
         return contains;
     }
+
+    /**
+     * 把事务标记为回滚状态.
+     *
+     * @param transId 事务id.
+     */
+    public void markTransactionRollback(final String transId) {
+        hmilyXaTransactionManager.markTransactionRollback(transId);
+    }
 }
