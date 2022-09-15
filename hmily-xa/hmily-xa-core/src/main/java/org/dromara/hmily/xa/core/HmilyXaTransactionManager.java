@@ -31,7 +31,9 @@ import javax.transaction.SystemException;
 import javax.transaction.Transaction;
 import javax.transaction.TransactionManager;
 import javax.transaction.xa.XAResource;
+import java.util.Map;
 import java.util.Stack;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * HmilyXaTransactionManager .
@@ -46,6 +48,13 @@ public class HmilyXaTransactionManager implements TransactionManager {
      * onveniently realize the processing of nested transactions.
      */
     private final ThreadLocal<Stack<Transaction>> tms = new ThreadLocal<>();
+
+    /**
+     * Store transId->Transaction.
+     * Note that this map only stores the first Transaction instance if there has many thread local Transaction,
+     * as calling that Transaction's rollback() or commit() will propagate cmd to other thread local Transaction.
+     */
+    private final Map<String, Transaction> transactionMap = new ConcurrentHashMap<>();
 
     /**
      * Instantiates a new Hmily xa transaction manager.
@@ -173,6 +182,7 @@ public class HmilyXaTransactionManager implements TransactionManager {
             }
             //Main business coordinator
             rct = new TransactionImpl(xId, hasSuper);
+            transactionMap.put(xId.getGlobalId(), rct);
         }
         setTxTotr(rct);
     }
@@ -241,6 +251,11 @@ public class HmilyXaTransactionManager implements TransactionManager {
             Transaction pop = stack.pop();
             if (stack.empty()) {
                 tms.remove();
+                transactionMap.forEach((k, v) -> {
+                    if (v == pop) {
+                        transactionMap.remove(k);
+                    }
+                });
             }
         }
     }
@@ -256,6 +271,23 @@ public class HmilyXaTransactionManager implements TransactionManager {
                 tms.set(stack);
             }
             stack.push(transaction);
+        }
+    }
+
+    /**
+     * 把事务标记为回滚状态.
+     *
+     * @param transId 事务id.
+     */
+    public void markTransactionRollback(final String transId) {
+        if (transactionMap.containsKey(transId)) {
+            logger.warn("When rollback cmd is received, the business logic of transaction {} isn't stopped, "
+                    + "maybe there is a RPC timout.", transId);
+            try {
+                transactionMap.get(transId).setRollbackOnly();
+            } catch (SystemException e) {
+                logger.error("err setRollbackOnly", e);
+            }
         }
     }
 }

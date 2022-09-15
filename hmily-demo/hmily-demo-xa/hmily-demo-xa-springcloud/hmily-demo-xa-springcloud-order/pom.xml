@@ -49,6 +49,12 @@
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+            <exclusions>
+                <exclusion>
+                    <artifactId>guava</artifactId>
+                    <groupId>com.google.guava</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
@@ -162,16 +168,11 @@
             </exclusions>
         </dependency>
 
-        <dependency>
-            <groupId>org.dromara</groupId>
-            <artifactId>hmily-spring</artifactId>
-            <version>2.1.2-SNAPSHOT</version>
-        </dependency>
+
         <dependency>
             <groupId>org.dromara</groupId>
             <artifactId>hmily-xa-rpc-springcloud</artifactId>
             <version>2.1.2-SNAPSHOT</version>
-            <scope>compile</scope>
         </dependency>
 
         <!--

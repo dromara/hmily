@@ -28,6 +28,7 @@ import org.dromara.hmily.xa.core.HmilyXaResource;
 import org.dromara.hmily.xa.core.XaResourcePool;
 import org.dromara.hmily.xa.core.XaResourceWrapped;
 import org.dromara.hmily.xa.core.XidImpl;
+import org.dromara.hmily.xa.core.TransactionManagerImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,7 +53,8 @@ public class RollbackHmilyTransactionHandler implements HmilyTransactionHandler 
         XidImpl xid = new XidImpl(xaParticipant.getGlobalId(), branchId);
         logger.info("Got Rollback cmd: {}", xid);
         List<XaResourceWrapped> allResource = XaResourcePool.INST.getAllResource(xid.getGlobalId());
-        //如果是远程调用就只能是commit.
+        //标记为回滚
+        TransactionManagerImpl.INST.markTransactionRollback(xid.getGlobalId());
         try {
             for (final XaResourceWrapped xaResourceWrapped : allResource) {
                 ((HmilyXaResource) xaResourceWrapped).rollback();

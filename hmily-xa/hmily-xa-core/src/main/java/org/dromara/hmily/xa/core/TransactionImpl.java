@@ -91,7 +91,9 @@ public class TransactionImpl implements Transaction, TimerRemovalListener<Resour
         Finally oneFinally = context.getOneFinally();
         if (oneFinally != null) {
             try {
-                if (hasSuper) {
+                if (getStatus() == XaState.STATUS_MARKED_ROLLBACK.getState()) {
+                    oneFinally.rollback();
+                } else if (hasSuper) {
                     doDeList(XAResource.TMSUCCESS);
                 } else {
                     oneFinally.commit();
@@ -226,15 +228,15 @@ public class TransactionImpl implements Transaction, TimerRemovalListener<Resour
     public void rollback() throws IllegalStateException, SystemException {
         Finally oneFinally = context.getOneFinally();
         if (oneFinally != null) {
-            if (hasSuper) {
-                doDeList(XAResource.TMSUCCESS);
-            } else {
+            if (!hasSuper || getStatus() == XaState.STATUS_MARKED_ROLLBACK.getState()) {
                 try {
                     oneFinally.rollback();
                 } catch (RemoteException e) {
                     logger.error("rollback error {}", e.getMessage(), e);
                     throw new SystemException();
                 }
+            } else {
+                doDeList(XAResource.TMSUCCESS);
             }
             return;
         }

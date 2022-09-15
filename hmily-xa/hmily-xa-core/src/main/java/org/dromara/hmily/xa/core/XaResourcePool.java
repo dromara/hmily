@@ -77,6 +77,10 @@ public final class XaResourcePool {
      * @return the xa resource wrapped
      */
     public XaResourceWrapped removeResource(final Xid xid) {
+        String gid = new String(xid.getGlobalTransactionId());
+        if (xids.containsKey(gid)) {
+            xids.get(gid).remove(xid);
+        }
         return pool.remove(xid);
     }
 
