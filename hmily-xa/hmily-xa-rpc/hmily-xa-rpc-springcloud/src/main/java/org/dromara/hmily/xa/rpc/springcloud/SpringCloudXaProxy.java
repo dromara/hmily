@@ -28,7 +28,7 @@ import java.util.Arrays;
 import java.util.Map;
 
 /**
- * SpringCloud的RpcXaProxy实现.<br/>
+ * SpringCloud的RpcXaProxy实现.
  * 保存Feign rpc对应的接口方法、参数，从而在执行{@link #cmd}时可以通过反射再复现一次Feign rpc调用，
  * 这样就可以把XA事务的命令发送到对应的rpc下游服务器.
  */
