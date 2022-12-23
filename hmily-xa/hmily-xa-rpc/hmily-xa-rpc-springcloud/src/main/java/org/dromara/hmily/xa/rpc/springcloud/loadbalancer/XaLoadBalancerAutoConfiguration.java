@@ -54,7 +54,6 @@ public class XaLoadBalancerAutoConfiguration implements InitializingBean {
     /**
      * Ribbon基于{@link SpringClientFactory}来实现配置隔离，
      * 要保证每种配置情况的{@link ILoadBalancer}都会被包装.
-     * <br/>
      * 所以给{@link SpringClientFactory}添加一个默认config，它会注册{@link XaLoadBalancerBeanPostProcessor}.
      */
     @Override
