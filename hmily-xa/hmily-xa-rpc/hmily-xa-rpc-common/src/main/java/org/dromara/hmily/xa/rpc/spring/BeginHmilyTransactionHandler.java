@@ -38,7 +38,7 @@ public class BeginHmilyTransactionHandler implements HmilyTransactionHandler {
     
     static {
         MetricsReporter.registerCounter(LabelNames.TRANSACTION_TOTAL, new String[]{"type"}, "hmily transaction total count");
-        MetricsReporter.registerHistogram(LabelNames.TRANSACTION_LATENCY,  new String[]{"type"}, "hmily transaction Latency Histogram Millis (ms)");
+        MetricsReporter.registerHistogram(LabelNames.TRANSACTION_LATENCY, new String[]{"type"}, "hmily transaction Latency Histogram Millis (ms)");
         MetricsReporter.registerCounter(LabelNames.TRANSACTION_STATUS, new String[]{"type", "role", "status"}, "collect hmily transaction count");
     }
 
