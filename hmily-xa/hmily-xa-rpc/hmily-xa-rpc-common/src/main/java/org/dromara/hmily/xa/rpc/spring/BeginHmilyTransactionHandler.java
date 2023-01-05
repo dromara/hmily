@@ -18,9 +18,15 @@
 package org.dromara.hmily.xa.rpc.spring;
 
 import org.aspectj.lang.ProceedingJoinPoint;
+import org.dromara.hmily.annotation.TransTypeEnum;
 import org.dromara.hmily.core.context.HmilyContextHolder;
 import org.dromara.hmily.core.context.HmilyTransactionContext;
 import org.dromara.hmily.core.service.HmilyTransactionHandler;
+import org.dromara.hmily.metrics.constant.LabelNames;
+import org.dromara.hmily.metrics.reporter.MetricsReporter;
+
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 /**
  * CommitHmilyTransactionHandler .
@@ -29,10 +35,22 @@ import org.dromara.hmily.core.service.HmilyTransactionHandler;
  * @author sixh chenbin
  */
 public class BeginHmilyTransactionHandler implements HmilyTransactionHandler {
+    
+    static {
+        MetricsReporter.registerCounter(LabelNames.TRANSACTION_TOTAL, new String[]{"type"}, "hmily transaction total count");
+        MetricsReporter.registerHistogram(LabelNames.TRANSACTION_LATENCY,  new String[]{"type"}, "hmily transaction Latency Histogram Millis (ms)");
+        MetricsReporter.registerCounter(LabelNames.TRANSACTION_STATUS, new String[]{"type", "role", "status"}, "collect hmily transaction count");
+    }
 
     @Override
     public Object handleTransaction(final ProceedingJoinPoint point, final HmilyTransactionContext hmilyTransactionContext) throws Throwable {
         HmilyContextHolder.set(hmilyTransactionContext);
-        return point.proceed();
+        MetricsReporter.counterIncrement(LabelNames.TRANSACTION_TOTAL, new String[]{TransTypeEnum.XA.name()});
+        LocalDateTime starterTime = LocalDateTime.now();
+        try {
+            return point.proceed();  
+        } finally {
+            MetricsReporter.recordTime(LabelNames.TRANSACTION_LATENCY, new String[]{TransTypeEnum.XA.name()}, starterTime.until(LocalDateTime.now(), ChronoUnit.MILLIS));
+        }
     }
 }

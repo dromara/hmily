@@ -49,7 +49,7 @@ public class StarterHmilyTccTransactionHandler implements HmilyTransactionHandle
     
     static {
         MetricsReporter.registerCounter(LabelNames.TRANSACTION_TOTAL, new String[]{"type"}, "hmily transaction total count");
-        MetricsReporter.registerHistogram(LabelNames.TRANSACTION_LATENCY, "hmily transaction Latency Histogram Millis (ms)");
+        MetricsReporter.registerHistogram(LabelNames.TRANSACTION_LATENCY, new String[]{"type"}, "hmily transaction Latency Histogram Millis (ms)");
     }
     
     public StarterHmilyTccTransactionHandler() {
@@ -89,7 +89,7 @@ public class StarterHmilyTccTransactionHandler implements HmilyTransactionHandle
         } finally {
             HmilyContextHolder.remove();
             executor.remove();
-            MetricsReporter.recordTime(LabelNames.TRANSACTION_LATENCY, starterTime.until(LocalDateTime.now(), ChronoUnit.MILLIS));
+            MetricsReporter.recordTime(LabelNames.TRANSACTION_LATENCY, new String[]{TransTypeEnum.TCC.name()}, starterTime.until(LocalDateTime.now(), ChronoUnit.MILLIS));
         }
         return returnValue;
     }

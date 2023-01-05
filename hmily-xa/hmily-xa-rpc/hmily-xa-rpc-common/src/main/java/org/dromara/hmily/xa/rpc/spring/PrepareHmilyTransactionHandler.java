@@ -19,16 +19,21 @@ package org.dromara.hmily.xa.rpc.spring;
 
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.dromara.hmily.annotation.TransTypeEnum;
+import org.dromara.hmily.common.enums.HmilyRoleEnum;
 import org.dromara.hmily.common.utils.DefaultValueUtils;
 import org.dromara.hmily.core.context.HmilyTransactionContext;
 import org.dromara.hmily.core.context.XaParticipant;
 import org.dromara.hmily.core.service.HmilyTransactionHandler;
-import org.dromara.hmily.xa.core.HmilyXaResource;
+import org.dromara.hmily.metrics.constant.LabelNames;
+import org.dromara.hmily.metrics.reporter.MetricsReporter;
 import org.dromara.hmily.xa.core.HmilyXaException;
+import org.dromara.hmily.xa.core.HmilyXaResource;
 import org.dromara.hmily.xa.core.XaResourcePool;
 import org.dromara.hmily.xa.core.XaResourceWrapped;
 import org.dromara.hmily.xa.core.XidImpl;
 import org.dromara.hmily.xa.rpc.RpcXaProxy;
+import org.dromara.hmily.xa.rpc.RpcXaProxy.XaCmd;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -79,6 +84,7 @@ public class PrepareHmilyTransactionHandler implements HmilyTransactionHandler {
             logger.info("Prepare:执行一个事务异常", ex);
             throw new HmilyXaException(HmilyXaException.UNKNOWN);
         }
+        MetricsReporter.counterIncrement(LabelNames.TRANSACTION_STATUS, new String[]{TransTypeEnum.XA.name(), HmilyRoleEnum.PARTICIPANT.name(), XaCmd.PREPARE.name()});
         Method method = ((MethodSignature) (point.getSignature())).getMethod();
         return DefaultValueUtils.getDefaultValue(method.getReturnType());
     }
