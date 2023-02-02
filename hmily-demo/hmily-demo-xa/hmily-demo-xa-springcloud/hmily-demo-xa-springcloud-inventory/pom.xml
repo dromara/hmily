@@ -171,7 +171,7 @@
         <dependency>
             <groupId>org.dromara</groupId>
             <artifactId>hmily-xa-rpc-springcloud</artifactId>
-            <version>2.1.2-SNAPSHOT</version>
+            <version>${hmily.version}</version>
         </dependency>
 
         <!--

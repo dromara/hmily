@@ -22,7 +22,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <jdk.version>1.8</jdk.version>
-        <hmily.version>2.1.2-SNAPSHOT</hmily.version>
+        <hmily.version>2.1.3-SNAPSHOT</hmily.version>
         <spring-cloud.version>Dalston.SR1</spring-cloud.version>
         <springfox.version>2.6.1</springfox.version>
         <spring.data.mongodb.version>2.1.3.RELEASE</spring.data.mongodb.version>

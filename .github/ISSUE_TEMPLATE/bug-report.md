@@ -11,7 +11,7 @@ A clear and concise description of what the bug is.
 
 ## Environment
 
-- hmily version(s): [e.g. 2.1.2-SNAPSHOT]
+- hmily version(s): [e.g. 2.1.3-SNAPSHOT]
 
 ## Steps to reproduce
 
