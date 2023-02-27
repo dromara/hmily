@@ -16,12 +16,15 @@
 
 package org.dromara.hmily.repository.spi.entity;
 
+import lombok.Data;
+
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
-import lombok.Data;
 
 /**
  * The HmilyTransaction.
@@ -79,12 +82,18 @@ public class HmilyTransaction implements Serializable {
     private List<HmilyParticipant> hmilyParticipants;
     
     /**
+     * ext map.
+     */
+    private Map<String, Object> paramMap = new ConcurrentHashMap<>();
+    
+    /**
      * Instantiates a new Hmily transaction.
      */
     public HmilyTransaction() {
         this.createTime = new Date();
         this.updateTime = new Date();
         hmilyParticipants = new CopyOnWriteArrayList<>();
+        
     }
     
     /**
