@@ -38,8 +38,10 @@
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <scope>compile</scope>
+            <version>5.1.48</version>
+            <scope>test</scope>
         </dependency>
+
         <dependency>
             <groupId>org.dromara</groupId>
             <artifactId>hmily-common</artifactId>
