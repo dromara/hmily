@@ -19,7 +19,7 @@ eureka:
     registerWithEureka: false
     fetchRegistry: false
     serviceUrl:
-      defaultZone: http://localhost:8761/eureka/
+      defaultZone: http://localhost:8768/eureka/
     healthcheck:
       enabled: true
     eurekaServiceUrlPollIntervalSeconds: 60
