@@ -17,9 +17,12 @@
 package org.dromara.hmily.tac.sqlrevert.core.image.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.dromara.hmily.tac.sqlrevert.core.image.CreateSQLUtil;
 import org.dromara.hmily.tac.sqlrevert.core.image.RevertSQLUnit;
 import org.dromara.hmily.tac.sqlrevert.core.image.SQLImageMapper;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -36,6 +39,9 @@ public final class InsertSQLImageMapper implements SQLImageMapper {
     
     @Override
     public RevertSQLUnit cast() {
-        return null;
+        String sql = String.format("DELETE FROM `%s` WHERE %s",
+                tableName, CreateSQLUtil.getKeyValueClause(afterImages.keySet(), " AND "));
+        List<Object> parameters = new LinkedList<>(afterImages.values());
+        return new RevertSQLUnit(sql, parameters);
     }
 }
