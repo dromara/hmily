@@ -73,7 +73,9 @@ public class RedisRepository implements HmilyRepository {
     private static final String HMILY_TRANSACTION_PARTICIPANT = "hmily_transaction_participant";
     
     private static final String HMILY_PARTICIPANT_UNDO = "hmily_participant_undo";
-    
+
+    private static final String HMILY_LOCK_GLOBAL = "hmily_lock_global";
+
     private String rootPathPrefix = "hmily";
     
     private String keyPrefix = "-";
@@ -430,19 +432,50 @@ public class RedisRepository implements HmilyRepository {
     
     @Override
     public int writeHmilyLocks(final Collection<HmilyLock> locks) {
-        // TODO
-        return 0;
+        int cnt = 0;
+        try {
+            for (HmilyLock lock : locks) {
+                final boolean exist = jedisClient.hexists(HMILY_LOCK_GLOBAL.getBytes(), lock.getLockId().getBytes());
+                if (!exist) {
+                    cnt++;
+                    jedisClient.hset(HMILY_LOCK_GLOBAL.getBytes(), lock.getLockId().getBytes(), hmilySerializer.serialize(lock));
+                }
+            }
+            return cnt;
+        } catch (JedisException e) {
+            LOGGER.error("writeHmilyLocks occur a exception", e);
+        }
+        return HmilyRepository.FAIL_ROWS;
     }
     
     @Override
     public int releaseHmilyLocks(final Collection<HmilyLock> locks) {
-        // TODO
-        return 0;
+        try {
+            for (HmilyLock lock : locks) {
+                jedisClient.hdel(HMILY_LOCK_GLOBAL, lock.getLockId());
+            }
+            return HmilyRepository.ROWS;
+        } catch (JedisException e) {
+            LOGGER.error("releaseHmilyLocks occur a exception", e);
+        }
+        return HmilyRepository.FAIL_ROWS;
     }
     
     @Override
     public Optional<HmilyLock> findHmilyLockById(final String lockId) {
-        // TODO
+        try {
+            final boolean exist = jedisClient.hexists(HMILY_LOCK_GLOBAL.getBytes(), lockId.getBytes());
+            if (!exist) {
+                return Optional.empty();
+            }
+            byte[] data = jedisClient.hget(HMILY_LOCK_GLOBAL.getBytes(), lockId.getBytes());
+            if (data == null) {
+                return Optional.empty();
+            }
+            return Optional.of(hmilySerializer.deSerialize(data, HmilyLock.class));
+        } catch (JedisException e) {
+            LOGGER.error("lockId occur a exception", e);
+        }
         return Optional.empty();
     }
     
