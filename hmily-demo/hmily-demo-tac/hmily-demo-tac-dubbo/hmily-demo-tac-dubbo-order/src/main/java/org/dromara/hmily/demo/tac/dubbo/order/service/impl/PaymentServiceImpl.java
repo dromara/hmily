@@ -148,7 +148,20 @@ public class PaymentServiceImpl implements PaymentService {
         inventoryService.mockWithConfirmTimeout(buildInventoryDTO(order));
         return "success";
     }
-    
+
+    @Override
+    @HmilyTAC
+    public String makePaymentWithReadCommitted(Order order) {
+        updateOrderStatus(order, OrderStatusEnum.PAY_SUCCESS);
+        //扣除用户余额
+        accountService.payment(buildAccountDTO(order));
+        //查询账户信息, 读已提交, 此时该事务未结束, 获取全局锁失败, 将会回滚
+        accountService.findByUserId(order.getUserId());
+        //进入扣减库存操作
+        inventoryService.decrease(buildInventoryDTO(order));
+        return "success";
+    }
+
     private void updateOrderStatus(final Order order, final OrderStatusEnum orderStatus) {
         order.setStatus(orderStatus.getCode());
         orderMapper.update(order);

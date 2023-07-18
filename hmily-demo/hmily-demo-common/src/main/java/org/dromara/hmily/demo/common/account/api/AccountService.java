@@ -85,5 +85,6 @@ public interface AccountService {
      * @param userId 用户id
      * @return AccountDO account do
      */
+    @Hmily
     AccountDO findByUserId(String userId);
 }

@@ -17,6 +17,7 @@
 package org.dromara.hmily.demo.tac.dubbo.order.service.impl;
 
 import org.dromara.hmily.common.utils.IdWorkerUtils;
+import org.dromara.hmily.demo.common.account.api.AccountService;
 import org.dromara.hmily.demo.common.order.entity.Order;
 import org.dromara.hmily.demo.common.order.enums.OrderStatusEnum;
 import org.dromara.hmily.demo.common.order.mapper.OrderMapper;
@@ -46,8 +47,8 @@ public class OrderServiceImpl implements OrderService {
     private final PaymentService paymentService;
 
     @Autowired(required = false)
-    public OrderServiceImpl(OrderMapper orderMapper,
-                            PaymentService paymentService) {
+    public OrderServiceImpl(final OrderMapper orderMapper,
+                            final PaymentService paymentService) {
         this.orderMapper = orderMapper;
         this.paymentService = paymentService;
     }
@@ -153,11 +154,20 @@ public class OrderServiceImpl implements OrderService {
     public boolean updateOrderStatus(Order order) {
         return orderMapper.update(order) > 0;
     }
-    
+
     private Order saveOrder(Integer count, BigDecimal amount) {
         final Order order = buildOrder(count, amount);
         orderMapper.save(order);
         return order;
+    }
+
+    @Override
+    public String orderPayWithReadCommitted(Integer count, BigDecimal amount) {
+        Order order = saveOrder(count, amount);
+        long start = System.currentTimeMillis();
+        paymentService.makePaymentWithReadCommitted(order);
+        System.out.println("切面耗时：" + (System.currentTimeMillis() - start));
+        return "success";
     }
     
     private Order buildOrder(Integer count, BigDecimal amount) {

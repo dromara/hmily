@@ -109,4 +109,14 @@ public class OrderController {
                                               final @RequestParam(value = "amount") BigDecimal amount) {
         return orderService.mockInventoryWithConfirmTimeout(count, amount);
     }
+
+    @PostMapping(value = "/mockReadCommitted")
+    @ApiOperation(value = "订单支付接口（模拟读已提交的隔离级别）")
+    public String mockOrderPayWithReadCommitted(final @RequestParam(value = "count") Integer count,
+                           final @RequestParam(value = "amount") BigDecimal amount) {
+        final long start = System.currentTimeMillis();
+        orderService.orderPayWithReadCommitted(count, amount);
+        System.out.println("消耗时间为:" + (System.currentTimeMillis() - start));
+        return "";
+    }
 }

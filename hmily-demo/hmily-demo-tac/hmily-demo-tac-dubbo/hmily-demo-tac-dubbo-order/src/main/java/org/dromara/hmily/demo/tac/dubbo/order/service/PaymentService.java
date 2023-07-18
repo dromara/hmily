@@ -93,4 +93,11 @@ public interface PaymentService {
      * @return String string
      */
     String mockPaymentInventoryWithConfirmTimeout(Order order);
+
+    /**
+     * 订单支付.
+     *
+     * @param order 订单实体
+     */
+    String makePaymentWithReadCommitted(Order order);
 }
