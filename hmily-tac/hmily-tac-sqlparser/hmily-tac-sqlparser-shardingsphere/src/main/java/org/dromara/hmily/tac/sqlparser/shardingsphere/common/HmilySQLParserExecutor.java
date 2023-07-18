@@ -18,6 +18,7 @@ package org.dromara.hmily.tac.sqlparser.shardingsphere.common;
 
 import org.apache.shardingsphere.sql.parser.sql.common.statement.dml.DeleteStatement;
 import org.apache.shardingsphere.sql.parser.sql.common.statement.dml.InsertStatement;
+import org.apache.shardingsphere.sql.parser.sql.common.statement.dml.SelectStatement;
 import org.apache.shardingsphere.sql.parser.sql.common.statement.dml.UpdateStatement;
 import org.dromara.hmily.tac.sqlparser.model.common.statement.HmilyStatement;
 
@@ -49,4 +50,12 @@ public interface HmilySQLParserExecutor {
      * @return hmily statement
      */
     HmilyStatement executeDeleteStatement(DeleteStatement deleteStatement);
+
+    /**
+     * Execute select statement.
+     *
+     * @param selectStatement select statement
+     * @return hmily statement
+     */
+    HmilyStatement executeSelectStatement(SelectStatement selectStatement);
 }

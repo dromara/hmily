@@ -23,5 +23,5 @@ package org.dromara.hmily.repository.spi.entity.tuple;
  */
 public enum HmilySQLManipulation {
     
-    INSERT, DELETE, UPDATE
+    INSERT, DELETE, UPDATE, SELECT
 }

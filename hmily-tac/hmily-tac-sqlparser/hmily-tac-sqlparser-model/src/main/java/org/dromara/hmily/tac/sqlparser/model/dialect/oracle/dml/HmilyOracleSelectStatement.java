@@ -14,28 +14,18 @@
  * limitations under the License.
  */
 
-package org.dromara.hmily.tac.sqlparser.model.common.segment.dml.order.item;
+package org.dromara.hmily.tac.sqlparser.model.dialect.oracle.dml;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import org.dromara.hmily.tac.sqlparser.model.common.constant.HmilyOrderDirection;
-import org.dromara.hmily.tac.sqlparser.model.common.segment.HmilySegment;
+import lombok.ToString;
+import org.dromara.hmily.tac.sqlparser.model.common.statement.dml.HmilySelectStatement;
+import org.dromara.hmily.tac.sqlparser.model.dialect.oracle.HmilyOracleStatement;
 
 /**
- * Order by item segment.
+ * Oracle select statement.
  */
-@RequiredArgsConstructor
-@Getter
 @Setter
-public abstract class HmilyOrderByItemSegment implements HmilySegment {
+@ToString
+public final class HmilyOracleSelectStatement extends HmilySelectStatement implements HmilyOracleStatement {
     
-    private final int startIndex;
-    
-    private final int stopIndex;
-    
-    private final HmilyOrderDirection hmilyOrderDirection;
-    
-    private final HmilyOrderDirection nullHmilyOrderDirection;
-
 }

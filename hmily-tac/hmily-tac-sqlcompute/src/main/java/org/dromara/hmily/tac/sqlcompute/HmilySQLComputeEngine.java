@@ -28,11 +28,11 @@ import java.util.List;
  * @author zhaojun
  */
 public interface HmilySQLComputeEngine {
-    
+
     /**
      * Generate snapshot images.
      *
-     * @param sql the sql
+     * @param sql        the sql
      * @param parameters parameters
      * @param connection connection
      * @param resourceId resource id

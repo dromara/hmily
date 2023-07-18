@@ -16,14 +16,21 @@
 
 package org.dromara.hmily.tac.sqlparser.shardingsphere.dialect;
 
+import org.apache.shardingsphere.sql.parser.sql.common.segment.dml.pagination.limit.LimitSegment;
 import org.apache.shardingsphere.sql.parser.sql.common.statement.dml.DeleteStatement;
 import org.apache.shardingsphere.sql.parser.sql.common.statement.dml.InsertStatement;
+import org.apache.shardingsphere.sql.parser.sql.common.statement.dml.SelectStatement;
 import org.apache.shardingsphere.sql.parser.sql.common.statement.dml.UpdateStatement;
+import org.apache.shardingsphere.sql.parser.sql.dialect.statement.sqlserver.dml.SQLServerSelectStatement;
+import org.dromara.hmily.tac.sqlparser.model.common.segment.dml.pagination.HmilyPaginationValueSegment;
+import org.dromara.hmily.tac.sqlparser.model.common.segment.dml.pagination.limit.HmilyLimitSegment;
 import org.dromara.hmily.tac.sqlparser.model.common.statement.HmilyStatement;
 import org.dromara.hmily.tac.sqlparser.model.dialect.sqlserver.dml.HmilySQLServerDeleteStatement;
 import org.dromara.hmily.tac.sqlparser.model.dialect.sqlserver.dml.HmilySQLServerInsertStatement;
+import org.dromara.hmily.tac.sqlparser.model.dialect.sqlserver.dml.HmilySQLServerSelectStatement;
 import org.dromara.hmily.tac.sqlparser.model.dialect.sqlserver.dml.HmilySQLServerUpdateStatement;
 import org.dromara.hmily.tac.sqlparser.shardingsphere.common.AbstractHmilySQLParserExecutor;
+import org.dromara.hmily.tac.sqlparser.shardingsphere.common.handler.CommonAssembler;
 
 /**
  * Hmily SQLServer parser executor.
@@ -46,5 +53,26 @@ public final class HmilySQLServerParserExecutor extends AbstractHmilySQLParserEx
     public HmilyStatement executeDeleteStatement(final DeleteStatement deleteStatement) {
         HmilySQLServerDeleteStatement hmilySQLServerDeleteStatement = new HmilySQLServerDeleteStatement();
         return generateHmilyDeleteStatement(deleteStatement, hmilySQLServerDeleteStatement);
+    }
+
+    @Override
+    public HmilyStatement executeSelectStatement(final SelectStatement selectStatement) {
+        HmilySQLServerSelectStatement hmilySQLServerSelectStatement = new HmilySQLServerSelectStatement();
+        generateHmilySelectStatement(selectStatement, hmilySQLServerSelectStatement);
+        SQLServerSelectStatement sqlServerSelectStatement = (SQLServerSelectStatement) selectStatement;
+        if (sqlServerSelectStatement.getLimit().isPresent()) {
+            LimitSegment limitSegment = sqlServerSelectStatement.getLimit().get();
+            HmilyPaginationValueSegment offset = null;
+            HmilyPaginationValueSegment rowCount = null;
+            if (limitSegment.getOffset().isPresent()) {
+                offset = CommonAssembler.assembleHmilyPaginationValueSegment(limitSegment.getOffset().get());
+            }
+            if (limitSegment.getRowCount().isPresent()) {
+                rowCount = CommonAssembler.assembleHmilyPaginationValueSegment(limitSegment.getRowCount().get());
+            }
+            HmilyLimitSegment hmilyLimitSegment = new HmilyLimitSegment(limitSegment.getStartIndex(), limitSegment.getStopIndex(), offset, rowCount);
+            hmilySQLServerSelectStatement.setLimit(hmilyLimitSegment);
+        }
+        return hmilySQLServerSelectStatement;
     }
 }
