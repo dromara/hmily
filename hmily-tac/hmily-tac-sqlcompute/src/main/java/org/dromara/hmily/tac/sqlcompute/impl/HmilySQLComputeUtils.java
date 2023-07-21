@@ -40,7 +40,7 @@ public class HmilySQLComputeUtils {
      * Execute query.
      *
      * @param connection connection
-     * @param sql        sql
+     * @param sql sql
      * @param parameters parameters
      * @return records
      * @throws SQLException SQL exception
