@@ -131,7 +131,8 @@ public class AccountServiceImpl implements AccountService {
         inventoryService.mockWithTryException(inventoryDTO);
         return Boolean.TRUE;
     }
-    
+
+    @HmilyTAC
     @Override
     public AccountDO findByUserId(final String userId) {
         return accountMapper.findByUserId(userId);

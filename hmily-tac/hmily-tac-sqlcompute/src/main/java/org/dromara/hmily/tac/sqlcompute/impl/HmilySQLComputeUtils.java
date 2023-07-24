@@ -35,7 +35,7 @@ import java.util.Map;
  * @author zhaojun
  */
 public class HmilySQLComputeUtils {
-    
+
     /**
      * Execute query.
      *
@@ -65,11 +65,11 @@ public class HmilySQLComputeUtils {
         }
         return result;
     }
-    
+
     /**
      * Get all columns.
      *
-     * @param segment hmily simple table segment
+     * @param segment   hmily simple table segment
      * @param tableName table name
      * @return all table columns in asterisk way
      */
@@ -83,5 +83,32 @@ public class HmilySQLComputeUtils {
             result = String.format("%s.*", tableName);
         }
         return result;
+    }
+
+    /**
+     * Get all pk columns.
+     *
+     * @param segment           hmily simple table segment
+     * @param tableName         table name
+     * @param primaryKeyColumns primary key columns
+     * @return all table primary key columns in asterisk way
+     */
+    public static String getAllPKColumns(final HmilySimpleTableSegment segment, final String tableName, final List<String> primaryKeyColumns) {
+        StringBuilder pkNamesStr = new StringBuilder();
+        for (int i = 0; i < primaryKeyColumns.size(); i++) {
+            if (i > 0) {
+                pkNamesStr.append(" , ");
+            }
+            String pkName = null;
+            if (segment.getAlias().isPresent()) {
+                pkName = String.format("%s.%s", segment.getAlias().get(), primaryKeyColumns.get(i));
+            } else if (segment.getOwner().isPresent()) {
+                pkName = String.format("%s.%s.%s", segment.getOwner(), tableName, primaryKeyColumns.get(i));
+            } else {
+                pkName = String.format("%s.%s", tableName, primaryKeyColumns.get(i));
+            }
+            pkNamesStr.append(pkName);
+        }
+        return pkNamesStr.toString();
     }
 }

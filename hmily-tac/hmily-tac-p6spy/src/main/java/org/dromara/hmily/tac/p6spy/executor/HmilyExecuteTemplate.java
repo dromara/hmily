@@ -38,6 +38,7 @@ import org.dromara.hmily.tac.p6spy.threadlocal.AutoCommitThreadLocal;
 import org.dromara.hmily.tac.sqlcompute.HmilySQLComputeEngine;
 import org.dromara.hmily.tac.sqlcompute.HmilySQLComputeEngineFactory;
 import org.dromara.hmily.tac.sqlparser.model.common.statement.HmilyStatement;
+import org.dromara.hmily.tac.sqlparser.model.common.statement.dml.HmilySelectStatement;
 import org.dromara.hmily.tac.sqlparser.spi.HmilySqlParserEngineFactory;
 
 import java.sql.Connection;
@@ -104,7 +105,9 @@ public enum HmilyExecuteTemplate {
         HmilyUndoContext undoContext = buildUndoContext(HmilyContextHolder.get(), snapshot, resourceId);
         HmilyLockManager.INSTANCE.tryAcquireLocks(undoContext.getHmilyLocks());
         log.debug("TAC-try-lock ::: {}", undoContext.getHmilyLocks());
-        HmilyUndoContextCacheManager.INSTANCE.set(undoContext);
+        if (!(statement instanceof HmilySelectStatement)) {
+            HmilyUndoContextCacheManager.INSTANCE.set(undoContext);
+        }
     }
     
     private HmilyUndoContext buildUndoContext(final HmilyTransactionContext transactionContext, final HmilyDataSnapshot dataSnapshot, final String resourceId) {

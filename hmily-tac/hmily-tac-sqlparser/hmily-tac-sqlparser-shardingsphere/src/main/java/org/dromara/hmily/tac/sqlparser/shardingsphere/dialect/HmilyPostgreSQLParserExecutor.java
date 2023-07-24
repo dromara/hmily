@@ -16,14 +16,21 @@
 
 package org.dromara.hmily.tac.sqlparser.shardingsphere.dialect;
 
+import org.apache.shardingsphere.sql.parser.sql.common.segment.dml.pagination.limit.LimitSegment;
 import org.apache.shardingsphere.sql.parser.sql.common.statement.dml.DeleteStatement;
 import org.apache.shardingsphere.sql.parser.sql.common.statement.dml.InsertStatement;
+import org.apache.shardingsphere.sql.parser.sql.common.statement.dml.SelectStatement;
 import org.apache.shardingsphere.sql.parser.sql.common.statement.dml.UpdateStatement;
+import org.apache.shardingsphere.sql.parser.sql.dialect.statement.postgresql.dml.PostgreSQLSelectStatement;
+import org.dromara.hmily.tac.sqlparser.model.common.segment.dml.pagination.HmilyPaginationValueSegment;
+import org.dromara.hmily.tac.sqlparser.model.common.segment.dml.pagination.limit.HmilyLimitSegment;
 import org.dromara.hmily.tac.sqlparser.model.common.statement.HmilyStatement;
 import org.dromara.hmily.tac.sqlparser.model.dialect.postgresql.dml.HmilyPostgreSQLDeleteStatement;
 import org.dromara.hmily.tac.sqlparser.model.dialect.postgresql.dml.HmilyPostgreSQLInsertStatement;
 import org.dromara.hmily.tac.sqlparser.model.dialect.postgresql.dml.HmilyPostgreSQLUpdateStatement;
+import org.dromara.hmily.tac.sqlparser.model.dialect.postgresql.dml.HmilyPostgresqlSelectStatement;
 import org.dromara.hmily.tac.sqlparser.shardingsphere.common.AbstractHmilySQLParserExecutor;
+import org.dromara.hmily.tac.sqlparser.shardingsphere.common.handler.CommonAssembler;
 
 /**
  * Hmily PostgreSQL parser executor.
@@ -46,5 +53,26 @@ public final class HmilyPostgreSQLParserExecutor extends AbstractHmilySQLParserE
     public HmilyStatement executeDeleteStatement(final DeleteStatement deleteStatement) {
         HmilyPostgreSQLDeleteStatement hmilyPostgreSQLDeleteStatement = new HmilyPostgreSQLDeleteStatement();
         return generateHmilyDeleteStatement(deleteStatement, hmilyPostgreSQLDeleteStatement);
+    }
+
+    @Override
+    public HmilyStatement executeSelectStatement(final SelectStatement selectStatement) {
+        HmilyPostgresqlSelectStatement hmilyPostgresqlSelectStatement = new HmilyPostgresqlSelectStatement();
+        generateHmilySelectStatement(selectStatement, hmilyPostgresqlSelectStatement);
+        PostgreSQLSelectStatement postgreSQLSelectStatement = (PostgreSQLSelectStatement) selectStatement;
+        if (postgreSQLSelectStatement.getLimit().isPresent()) {
+            LimitSegment limitSegment = postgreSQLSelectStatement.getLimit().get();
+            HmilyPaginationValueSegment offset = null;
+            HmilyPaginationValueSegment rowCount = null;
+            if (limitSegment.getOffset().isPresent()) {
+                offset = CommonAssembler.assembleHmilyPaginationValueSegment(limitSegment.getOffset().get());
+            }
+            if (limitSegment.getRowCount().isPresent()) {
+                rowCount = CommonAssembler.assembleHmilyPaginationValueSegment(limitSegment.getRowCount().get());
+            }
+            HmilyLimitSegment hmilyLimitSegment = new HmilyLimitSegment(limitSegment.getStartIndex(), limitSegment.getStopIndex(), offset, rowCount);
+            hmilyPostgresqlSelectStatement.setLimit(hmilyLimitSegment);
+        }
+        return hmilyPostgresqlSelectStatement;
     }
 }
