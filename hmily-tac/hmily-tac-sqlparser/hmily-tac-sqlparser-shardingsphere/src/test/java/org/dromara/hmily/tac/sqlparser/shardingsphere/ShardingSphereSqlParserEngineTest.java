@@ -54,4 +54,12 @@ public class ShardingSphereSqlParserEngineTest {
         HmilyStatement hmilyStatement = shardingSphereSqlParserEngine.parser(sql, new MySQLDatabaseType());
         System.out.println(hmilyStatement);
     }
+
+    @Test
+    public void assertHmilySelectWhere() {
+        String sql = "select * from t_order where id =? and retry=? order by update_time ASC limit 1";
+        ShardingSphereSqlParserEngine shardingSphereSqlParserEngine = new ShardingSphereSqlParserEngine();
+        HmilyStatement hmilyStatement = shardingSphereSqlParserEngine.parser(sql, new MySQLDatabaseType());
+        System.out.println(hmilyStatement);
+    }
 }

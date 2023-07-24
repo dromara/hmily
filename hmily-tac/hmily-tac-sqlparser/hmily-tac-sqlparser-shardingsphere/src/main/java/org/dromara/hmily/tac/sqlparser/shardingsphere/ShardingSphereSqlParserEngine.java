@@ -21,18 +21,23 @@ import org.apache.shardingsphere.infra.parser.sql.SQLStatementParserEngineFactor
 import org.apache.shardingsphere.sql.parser.sql.common.statement.SQLStatement;
 import org.apache.shardingsphere.sql.parser.sql.common.statement.dml.DeleteStatement;
 import org.apache.shardingsphere.sql.parser.sql.common.statement.dml.InsertStatement;
+import org.apache.shardingsphere.sql.parser.sql.common.statement.dml.SelectStatement;
 import org.apache.shardingsphere.sql.parser.sql.common.statement.dml.UpdateStatement;
 import org.apache.shardingsphere.sql.parser.sql.dialect.statement.mysql.dml.MySQLDeleteStatement;
 import org.apache.shardingsphere.sql.parser.sql.dialect.statement.mysql.dml.MySQLInsertStatement;
+import org.apache.shardingsphere.sql.parser.sql.dialect.statement.mysql.dml.MySQLSelectStatement;
 import org.apache.shardingsphere.sql.parser.sql.dialect.statement.mysql.dml.MySQLUpdateStatement;
 import org.apache.shardingsphere.sql.parser.sql.dialect.statement.oracle.dml.OracleDeleteStatement;
 import org.apache.shardingsphere.sql.parser.sql.dialect.statement.oracle.dml.OracleInsertStatement;
+import org.apache.shardingsphere.sql.parser.sql.dialect.statement.oracle.dml.OracleSelectStatement;
 import org.apache.shardingsphere.sql.parser.sql.dialect.statement.oracle.dml.OracleUpdateStatement;
 import org.apache.shardingsphere.sql.parser.sql.dialect.statement.postgresql.dml.PostgreSQLDeleteStatement;
 import org.apache.shardingsphere.sql.parser.sql.dialect.statement.postgresql.dml.PostgreSQLInsertStatement;
+import org.apache.shardingsphere.sql.parser.sql.dialect.statement.postgresql.dml.PostgreSQLSelectStatement;
 import org.apache.shardingsphere.sql.parser.sql.dialect.statement.postgresql.dml.PostgreSQLUpdateStatement;
 import org.apache.shardingsphere.sql.parser.sql.dialect.statement.sqlserver.dml.SQLServerDeleteStatement;
 import org.apache.shardingsphere.sql.parser.sql.dialect.statement.sqlserver.dml.SQLServerInsertStatement;
+import org.apache.shardingsphere.sql.parser.sql.dialect.statement.sqlserver.dml.SQLServerSelectStatement;
 import org.apache.shardingsphere.sql.parser.sql.dialect.statement.sqlserver.dml.SQLServerUpdateStatement;
 import org.dromara.hmily.spi.HmilySPI;
 import org.dromara.hmily.tac.common.database.type.DatabaseType;
@@ -62,11 +67,13 @@ public final class ShardingSphereSqlParserEngine implements HmilySqlParserEngine
             return executeInsertStatementParser((InsertStatement) sqlStatement);
         } else if (sqlStatement instanceof DeleteStatement) {
             return executeDeleteStatementParser((DeleteStatement) sqlStatement);
+        } else if (sqlStatement instanceof SelectStatement) {
+            return executeSelectStatementParser((SelectStatement) sqlStatement);
         } else {
             throw new SqlParserException("Unsupported SQL Statement.");
         }
     }
-    
+
     private HmilyStatement executeUpdateStatementParser(final UpdateStatement updateStatement) {
         if (updateStatement instanceof MySQLUpdateStatement) {
             HmilyMySQLParserExecutor hmilyMySQLParserExecutor = new HmilyMySQLParserExecutor();
@@ -118,6 +125,24 @@ public final class ShardingSphereSqlParserEngine implements HmilySqlParserEngine
             return hmilySQLServerParserExecutor.executeDeleteStatement(deleteStatement);
         } else {
             throw new SqlParserException("Unsupported Dialect of Delete Statement.");
+        }
+    }
+
+    private HmilyStatement executeSelectStatementParser(final SelectStatement selectStatement) {
+        if (selectStatement instanceof MySQLSelectStatement) {
+            HmilyMySQLParserExecutor hmilyMySQLParserExecutor = new HmilyMySQLParserExecutor();
+            return hmilyMySQLParserExecutor.executeSelectStatement(selectStatement);
+        } else if (selectStatement instanceof PostgreSQLSelectStatement) {
+            HmilyPostgreSQLParserExecutor hmilyPostgreSQLParserExecutor = new HmilyPostgreSQLParserExecutor();
+            return hmilyPostgreSQLParserExecutor.executeSelectStatement(selectStatement);
+        } else if (selectStatement instanceof OracleSelectStatement) {
+            HmilyOracleParserExecutor hmilyOracleParserExecutor = new HmilyOracleParserExecutor();
+            return hmilyOracleParserExecutor.executeSelectStatement(selectStatement);
+        } else if (selectStatement instanceof SQLServerSelectStatement) {
+            HmilySQLServerParserExecutor hmilySQLServerParserExecutor = new HmilySQLServerParserExecutor();
+            return hmilySQLServerParserExecutor.executeSelectStatement(selectStatement);
+        } else {
+            throw new SqlParserException("Unsupported Dialect of Select Statement.");
         }
     }
 }

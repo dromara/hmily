@@ -28,7 +28,7 @@ import java.util.List;
  * @author zhaojun
  */
 public interface HmilySQLComputeEngine {
-    
+
     /**
      * Generate snapshot images.
      *

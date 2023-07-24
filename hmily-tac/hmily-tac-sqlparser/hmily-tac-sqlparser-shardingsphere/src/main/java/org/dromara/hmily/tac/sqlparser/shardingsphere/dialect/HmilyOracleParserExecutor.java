@@ -18,10 +18,12 @@ package org.dromara.hmily.tac.sqlparser.shardingsphere.dialect;
 
 import org.apache.shardingsphere.sql.parser.sql.common.statement.dml.DeleteStatement;
 import org.apache.shardingsphere.sql.parser.sql.common.statement.dml.InsertStatement;
+import org.apache.shardingsphere.sql.parser.sql.common.statement.dml.SelectStatement;
 import org.apache.shardingsphere.sql.parser.sql.common.statement.dml.UpdateStatement;
 import org.dromara.hmily.tac.sqlparser.model.common.statement.HmilyStatement;
 import org.dromara.hmily.tac.sqlparser.model.dialect.oracle.dml.HmilyOracleDeleteStatement;
 import org.dromara.hmily.tac.sqlparser.model.dialect.oracle.dml.HmilyOracleInsertStatement;
+import org.dromara.hmily.tac.sqlparser.model.dialect.oracle.dml.HmilyOracleSelectStatement;
 import org.dromara.hmily.tac.sqlparser.model.dialect.oracle.dml.HmilyOracleUpdateStatement;
 import org.dromara.hmily.tac.sqlparser.shardingsphere.common.AbstractHmilySQLParserExecutor;
 
@@ -46,5 +48,11 @@ public final class HmilyOracleParserExecutor extends AbstractHmilySQLParserExecu
     public HmilyStatement executeDeleteStatement(final DeleteStatement deleteStatement) {
         HmilyOracleDeleteStatement hmilyOracleDeleteStatement = new HmilyOracleDeleteStatement();
         return generateHmilyDeleteStatement(deleteStatement, hmilyOracleDeleteStatement);
+    }
+
+    @Override
+    public HmilyStatement executeSelectStatement(final SelectStatement selectStatement) {
+        HmilyOracleSelectStatement hmilyOracleSelectStatement = new HmilyOracleSelectStatement();
+        return generateHmilySelectStatement(selectStatement, hmilyOracleSelectStatement);
     }
 }

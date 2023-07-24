@@ -19,10 +19,12 @@ package org.dromara.hmily.tac.sqlcompute;
 import org.dromara.hmily.tac.sqlcompute.exception.SQLComputeException;
 import org.dromara.hmily.tac.sqlcompute.impl.HmilyDeleteSQLComputeEngine;
 import org.dromara.hmily.tac.sqlcompute.impl.HmilyInsertSQLComputeEngine;
+import org.dromara.hmily.tac.sqlcompute.impl.HmilySelectSQLComputeEngine;
 import org.dromara.hmily.tac.sqlcompute.impl.HmilyUpdateSQLComputeEngine;
 import org.dromara.hmily.tac.sqlparser.model.common.statement.HmilyStatement;
 import org.dromara.hmily.tac.sqlparser.model.dialect.mysql.dml.HmilyMySQLDeleteStatement;
 import org.dromara.hmily.tac.sqlparser.model.dialect.mysql.dml.HmilyMySQLInsertStatement;
+import org.dromara.hmily.tac.sqlparser.model.dialect.mysql.dml.HmilyMySQLSelectStatement;
 import org.dromara.hmily.tac.sqlparser.model.dialect.mysql.dml.HmilyMySQLUpdateStatement;
 
 /**
@@ -31,7 +33,7 @@ import org.dromara.hmily.tac.sqlparser.model.dialect.mysql.dml.HmilyMySQLUpdateS
  * @author zhaojun
  */
 public final class HmilySQLComputeEngineFactory {
-    
+
     /**
      * Create new instance of hmily SQL compute engine.
      *
@@ -46,6 +48,8 @@ public final class HmilySQLComputeEngineFactory {
             return new HmilyUpdateSQLComputeEngine((HmilyMySQLUpdateStatement) hmilyStatement);
         } else if (hmilyStatement instanceof HmilyMySQLDeleteStatement) {
             return new HmilyDeleteSQLComputeEngine((HmilyMySQLDeleteStatement) hmilyStatement);
+        } else if (hmilyStatement instanceof HmilyMySQLSelectStatement) {
+            return new HmilySelectSQLComputeEngine((HmilyMySQLSelectStatement) hmilyStatement);
         } else {
             throw new SQLComputeException(String.format("do not support hmily SQL compute yet, SQLStatement:{%s}.", hmilyStatement));
         }

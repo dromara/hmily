@@ -117,4 +117,12 @@ public interface OrderService {
      * @return true or false
      */
     boolean updateOrderStatus(Order order);
+
+    /**
+     * 订单支付接口（模拟读已提交的隔离级别）
+     * @param count  购买数量
+     * @param amount 支付金额
+     * @return string string
+     */
+    String orderPayWithReadCommitted(Integer count, BigDecimal amount);
 }

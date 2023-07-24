@@ -19,12 +19,15 @@ package org.dromara.hmily.tac.sqlparser.shardingsphere.common;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shardingsphere.sql.parser.sql.common.statement.dml.DeleteStatement;
 import org.apache.shardingsphere.sql.parser.sql.common.statement.dml.InsertStatement;
+import org.apache.shardingsphere.sql.parser.sql.common.statement.dml.SelectStatement;
 import org.apache.shardingsphere.sql.parser.sql.common.statement.dml.UpdateStatement;
 import org.dromara.hmily.tac.sqlparser.model.common.statement.dml.HmilyDeleteStatement;
 import org.dromara.hmily.tac.sqlparser.model.common.statement.dml.HmilyInsertStatement;
+import org.dromara.hmily.tac.sqlparser.model.common.statement.dml.HmilySelectStatement;
 import org.dromara.hmily.tac.sqlparser.model.common.statement.dml.HmilyUpdateStatement;
 import org.dromara.hmily.tac.sqlparser.shardingsphere.common.handler.DeleteStatementAssembler;
 import org.dromara.hmily.tac.sqlparser.shardingsphere.common.handler.InsertStatementAssembler;
+import org.dromara.hmily.tac.sqlparser.shardingsphere.common.handler.SelectStatementAssembler;
 import org.dromara.hmily.tac.sqlparser.shardingsphere.common.handler.UpdateStatementAssembler;
 
 /**
@@ -64,5 +67,16 @@ public abstract class AbstractHmilySQLParserExecutor implements HmilySQLParserEx
      */
     public HmilyDeleteStatement generateHmilyDeleteStatement(final DeleteStatement deleteStatement, final HmilyDeleteStatement hmilyDeleteStatement) {
         return DeleteStatementAssembler.assembleHmilyDeleteStatement(deleteStatement, hmilyDeleteStatement);
+    }
+
+    /**
+     * Generate Hmily select statement.
+     *
+     * @param selectStatement select statement
+     * @param hmilySelectStatement hmily select statement
+     * @return hmily select statement
+     */
+    public HmilySelectStatement generateHmilySelectStatement(final SelectStatement selectStatement, final HmilySelectStatement hmilySelectStatement) {
+        return SelectStatementAssembler.assembleHmilySelectStatement(selectStatement, hmilySelectStatement);
     }
 }

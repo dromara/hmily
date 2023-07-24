@@ -25,6 +25,11 @@ import org.apache.shardingsphere.sql.parser.sql.common.segment.dml.expr.complex.
 import org.apache.shardingsphere.sql.parser.sql.common.segment.dml.expr.simple.LiteralExpressionSegment;
 import org.apache.shardingsphere.sql.parser.sql.common.segment.dml.expr.simple.ParameterMarkerExpressionSegment;
 import org.apache.shardingsphere.sql.parser.sql.common.segment.dml.item.ExpressionProjectionSegment;
+import org.apache.shardingsphere.sql.parser.sql.common.segment.dml.pagination.PaginationValueSegment;
+import org.apache.shardingsphere.sql.parser.sql.common.segment.dml.pagination.limit.NumberLiteralLimitValueSegment;
+import org.apache.shardingsphere.sql.parser.sql.common.segment.dml.pagination.limit.ParameterMarkerLimitValueSegment;
+import org.apache.shardingsphere.sql.parser.sql.common.segment.dml.pagination.rownum.NumberLiteralRowNumberValueSegment;
+import org.apache.shardingsphere.sql.parser.sql.common.segment.dml.pagination.rownum.ParameterMarkerRowNumberValueSegment;
 import org.apache.shardingsphere.sql.parser.sql.common.segment.generic.OwnerSegment;
 import org.apache.shardingsphere.sql.parser.sql.common.segment.generic.table.SimpleTableSegment;
 import org.apache.shardingsphere.sql.parser.sql.common.segment.generic.table.TableNameSegment;
@@ -35,6 +40,11 @@ import org.dromara.hmily.tac.sqlparser.model.common.segment.dml.expr.complex.Hmi
 import org.dromara.hmily.tac.sqlparser.model.common.segment.dml.expr.simple.HmilyLiteralExpressionSegment;
 import org.dromara.hmily.tac.sqlparser.model.common.segment.dml.expr.simple.HmilyParameterMarkerExpressionSegment;
 import org.dromara.hmily.tac.sqlparser.model.common.segment.dml.item.HmilyExpressionProjectionSegment;
+import org.dromara.hmily.tac.sqlparser.model.common.segment.dml.pagination.HmilyPaginationValueSegment;
+import org.dromara.hmily.tac.sqlparser.model.common.segment.dml.pagination.limit.HmilyNumberLiteralLimitValueSegment;
+import org.dromara.hmily.tac.sqlparser.model.common.segment.dml.pagination.limit.HmilyParameterMarkerLimitValueSegment;
+import org.dromara.hmily.tac.sqlparser.model.common.segment.dml.pagination.rownum.HmilyNumberLiteralRowNumberValueSegment;
+import org.dromara.hmily.tac.sqlparser.model.common.segment.dml.pagination.rownum.HmilyParameterMarkerRowNumberValueSegment;
 import org.dromara.hmily.tac.sqlparser.model.common.segment.generic.HmilyAliasSegment;
 import org.dromara.hmily.tac.sqlparser.model.common.segment.generic.HmilyOwnerSegment;
 import org.dromara.hmily.tac.sqlparser.model.common.segment.generic.table.HmilySimpleTableSegment;
@@ -123,5 +133,28 @@ public final class CommonAssembler {
             ColumnSegment column = (ColumnSegment) ((BetweenExpression) expression).getLeft();
         }
         return result;
+    }
+
+    /**
+     *  Assemble hmily PaginationValue segment.
+     * @param paginationValue pagination value segment
+     * @return Hmily pagination value segment
+     */
+    public static HmilyPaginationValueSegment assembleHmilyPaginationValueSegment(final PaginationValueSegment paginationValue) {
+        HmilyPaginationValueSegment hmilyPaginationValueSegment = null;
+        int startIndex = paginationValue.getStartIndex();
+        int stopIndex = paginationValue.getStopIndex();
+        if (paginationValue instanceof NumberLiteralLimitValueSegment) {
+            hmilyPaginationValueSegment = new HmilyNumberLiteralLimitValueSegment(startIndex, stopIndex, ((NumberLiteralLimitValueSegment) paginationValue).getValue());
+        } else if (paginationValue instanceof ParameterMarkerLimitValueSegment) {
+            hmilyPaginationValueSegment = new HmilyParameterMarkerLimitValueSegment(startIndex, stopIndex, ((ParameterMarkerLimitValueSegment) paginationValue).getParameterIndex());
+        } else if (paginationValue instanceof NumberLiteralRowNumberValueSegment) {
+            NumberLiteralRowNumberValueSegment nrnvs = (NumberLiteralRowNumberValueSegment) paginationValue;
+            hmilyPaginationValueSegment = new HmilyNumberLiteralRowNumberValueSegment(startIndex, stopIndex, nrnvs.getValue(), nrnvs.isBoundOpened());
+        } else if (paginationValue instanceof ParameterMarkerRowNumberValueSegment) {
+            ParameterMarkerRowNumberValueSegment pmrnvs = (ParameterMarkerRowNumberValueSegment) paginationValue;
+            hmilyPaginationValueSegment = new HmilyParameterMarkerRowNumberValueSegment(startIndex, stopIndex, pmrnvs.getParameterIndex(), pmrnvs.isBoundOpened());
+        }
+        return hmilyPaginationValueSegment;
     }
 }
