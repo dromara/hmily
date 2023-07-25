@@ -152,6 +152,19 @@ public class PaymentServiceImpl implements PaymentService {
         return "success";
     }
 
+    @Override
+    @HmilyTAC
+    public String makePaymentWithReadCommitted(Order order) {
+        updateOrderStatus(order, OrderStatusEnum.PAY_SUCCESS);
+        //扣除用户余额
+        accountClient.payment(buildAccountDTO(order));
+        //查询账户信息, 读已提交, 此时该事务未结束, 获取全局锁失败, 将会回滚
+        accountClient.findByUserId(order.getUserId());
+        //进入扣减库存操作
+        inventoryClient.decrease(buildInventoryDTO(order));
+        return "success";
+    }
+
     private void updateOrderStatus(Order order, OrderStatusEnum orderStatus) {
         order.setStatus(orderStatus.getCode());
         orderMapper.update(order);

@@ -32,7 +32,6 @@ public interface PaymentService {
      */
     void makePayment(Order order);
     
-    
     /**
      * Test make payment.
      *

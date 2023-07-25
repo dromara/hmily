@@ -128,7 +128,16 @@ public class OrderServiceImpl implements OrderService {
     public void updateOrderStatus(Order order) {
         orderMapper.update(order);
     }
-    
+
+    @Override
+    public String orderPayWithReadCommitted(Integer count, BigDecimal amount) {
+        Order order = saveOrder(count, amount);
+        long start = System.currentTimeMillis();
+        paymentService.makePaymentWithReadCommitted(order);
+        System.out.println("切面耗时：" + (System.currentTimeMillis() - start));
+        return "success";
+    }
+
     private Order saveOrder(Integer count, BigDecimal amount) {
         final Order order = buildOrder(count, amount);
         orderMapper.save(order);
