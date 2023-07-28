@@ -20,15 +20,33 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <groupId>org.dromara</groupId>
-        <artifactId>hmily-demo</artifactId>
+        <artifactId>hmily-demo-tac</artifactId>
         <version>1.0.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    
-    <artifactId>hmily-demo-tac</artifactId>
+    <artifactId>hmily-demo-tac-springcloud</artifactId>
     <packaging>pom</packaging>
+
     <modules>
-        <module>hmily-demo-tac-dubbo</module>
-        <module>hmily-demo-tac-springcloud</module>
+        <module>hmily-demo-tac-springcloud-order</module>
+        <module>hmily-demo-tac-springcloud-inventory</module>
+        <module>hmily-demo-tac-springcloud-account</module>
+        <module>hmily-demo-tac-springcloud-eureka</module>
     </modules>
+
+    <properties>
+        <spring-cloud.version>Finchley.RELEASE</spring-cloud.version>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 </project>
