@@ -18,7 +18,6 @@ package org.dromara.hmily.repository.spi.entity;
 
 import com.google.common.base.Joiner;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
 import java.io.Serializable;
@@ -29,7 +28,6 @@ import java.io.Serializable;
  * @author xiaoyu
  */
 @Getter
-@RequiredArgsConstructor
 @ToString
 public class HmilyLock implements Serializable {
     
@@ -38,28 +36,39 @@ public class HmilyLock implements Serializable {
     /**
      * transaction id.
      */
-    private final Long transId;
+    private Long transId;
     
     /**
      * participant id.
      */
-    private final Long participantId;
+    private Long participantId;
     
     /**
      * resource id.
      */
-    private final String resourceId;
+    private String resourceId;
     
     /**
      * target table name.
      */
-    private final String targetTableName;
+    private String targetTableName;
     
     /**
      * target table pk.
      */
-    private final String targetTablePk;
-    
+    private String targetTablePk;
+
+    public HmilyLock(final Long transId, final Long participantId, final String resourceId, final String targetTableName, final String targetTablePk) {
+        this.transId = transId;
+        this.participantId = participantId;
+        this.resourceId = resourceId;
+        this.targetTableName = targetTableName;
+        this.targetTablePk = targetTablePk;
+    }
+
+    public HmilyLock() {
+    }
+
     /**
      * Get lock id.
      *

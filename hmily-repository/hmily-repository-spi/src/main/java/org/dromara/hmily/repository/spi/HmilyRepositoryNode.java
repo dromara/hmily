@@ -18,6 +18,8 @@ public final class HmilyRepositoryNode {
     private static final String HMILY_PARTICIPANT_UNDO = "hmily_participant_undo";
     
     private static final String ROOT_PATH_PREFIX = "hmily-repository";
+
+    private static final String HMILY_LOCK_GLOBAL = "hmily_lock_global";
     
     private final String appName;
     
@@ -36,7 +38,7 @@ public final class HmilyRepositoryNode {
      * @return hmily transaction root path
      */
     public String getHmilyTransactionRootPath() {
-        return Joiner.on("/").join("", ROOT_PATH_PREFIX, HMILY_TRANSACTION_GLOBAL);
+        return Joiner.on("/").join("", ROOT_PATH_PREFIX, appName, HMILY_TRANSACTION_GLOBAL);
     }
 
     /**
@@ -85,5 +87,24 @@ public final class HmilyRepositoryNode {
      */
     public String getHmilyParticipantUndoRealPath(final Long undoId) {
         return Joiner.on("/").join(getHmilyParticipantUndoRootPath(), undoId);
+    }
+
+    /**
+     * Get hmily lock root path.
+     *
+     * @return hmily lock root path
+     */
+    public String getHmilyLockRootPath() {
+        return Joiner.on("/").join("", ROOT_PATH_PREFIX, appName, HMILY_LOCK_GLOBAL);
+    }
+
+    /**
+     * Get hmily lock real path.
+     *
+     * @param lockId lock id
+     * @return hmily lock real path
+     */
+    public String getHmilyLockRealPath(final String lockId) {
+        return Joiner.on("/").join(getHmilyLockRootPath(), lockId);
     }
 }
