@@ -17,12 +17,14 @@
 package org.dromara.hmily.tac.core.lock;
 
 import lombok.extern.slf4j.Slf4j;
+import org.dromara.hmily.common.utils.CollectionUtils;
 import org.dromara.hmily.core.repository.HmilyRepositoryStorage;
 import org.dromara.hmily.repository.spi.entity.HmilyLock;
 import org.dromara.hmily.repository.spi.exception.HmilyLockConflictException;
 import org.dromara.hmily.tac.core.cache.HmilyLockCacheManager;
 
 import java.util.Collection;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -66,5 +68,24 @@ public enum HmilyLockManager {
         HmilyRepositoryStorage.releaseHmilyLocks(hmilyLocks);
         hmilyLocks.forEach(lock -> HmilyLockCacheManager.getInstance().removeByKey(lock.getLockId()));
         log.debug("TAC-release-lock ::: {}", hmilyLocks);
+    }
+
+    /**
+     * Check locks.
+     *
+     * @param hmilyLocks hmily locks
+     */
+    public void checkLocks(final Collection<HmilyLock> hmilyLocks) {
+        if (CollectionUtils.isEmpty(hmilyLocks)) {
+            return;
+        }
+        for (HmilyLock lock : hmilyLocks) {
+            Optional<HmilyLock> hmilyLock = HmilyLockCacheManager.getInstance().get(lock.getLockId());
+            if (hmilyLock.isPresent() && !Objects.equals(hmilyLock.get().getTransId(), lock.getTransId())) {
+                String message = String.format("current record [%s] has locked by transaction:[%s]", lock.getLockId(), hmilyLock.get().getTransId());
+                log.error(message);
+                throw new HmilyLockConflictException(message);
+            }
+        }
     }
 }

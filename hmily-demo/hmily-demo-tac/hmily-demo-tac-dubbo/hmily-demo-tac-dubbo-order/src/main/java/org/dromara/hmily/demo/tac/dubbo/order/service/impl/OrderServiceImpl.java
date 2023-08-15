@@ -165,7 +165,23 @@ public class OrderServiceImpl implements OrderService {
     public String orderPayWithReadCommitted(Integer count, BigDecimal amount) {
         Order order = saveOrder(count, amount);
         long start = System.currentTimeMillis();
-        paymentService.makePaymentWithReadCommitted(order);
+        // 开启一个事务
+        new Thread(() -> {
+            try {
+                paymentService.makePaymentWithReadCommitted(order, 1);
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
+        }, "globl trans2").start();
+        try {
+            // 确保第一个事务先执行
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        // 开启另一个事务
+        paymentService.makePaymentWithReadCommitted(order, 2);
+
         System.out.println("切面耗时：" + (System.currentTimeMillis() - start));
         return "success";
     }

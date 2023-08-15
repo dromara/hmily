@@ -97,6 +97,7 @@ public interface PaymentService {
      * 订单支付.
      *
      * @param order 订单实体
+     * @param type 类型
      */
-    String makePaymentWithReadCommitted(Order order);
+    String makePaymentWithReadCommitted(Order order, int type);
 }
