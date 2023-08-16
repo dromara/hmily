@@ -23,6 +23,7 @@ import com.mongodb.ServerAddress;
 import org.apache.commons.lang3.tuple.Pair;
 import org.dromara.hmily.config.api.ConfigEnv;
 import org.dromara.hmily.config.api.entity.HmilyMongoConfig;
+import org.dromara.hmily.repository.mongodb.entity.LockMongoEntity;
 import org.dromara.hmily.repository.mongodb.entity.ParticipantMongoEntity;
 import org.dromara.hmily.repository.mongodb.entity.TransactionMongoEntity;
 import org.dromara.hmily.repository.mongodb.entity.UndoMongoEntity;
@@ -38,6 +39,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.MongoClientFactoryBean;
 import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
@@ -210,20 +212,34 @@ public class MongodbRepository implements HmilyRepository {
     
     @Override
     public int writeHmilyLocks(final Collection<HmilyLock> locks) {
-        // TODO
-        return 0;
+        int cnt = 0;
+        for (HmilyLock lock : locks) {
+            Query query = new Query();
+            query.addCriteria(Criteria.where("lock_id").is(lock.getLockId()));
+            boolean exists = service.exists(query, LockMongoEntity.class);
+            if (!exists) {
+                cnt++;
+                if (FAIL_ROWS == service.insertc(converter.create(lock))) {
+                    return FAIL_ROWS;
+                }
+            }
+        }
+        return cnt;
     }
     
     @Override
     public int releaseHmilyLocks(final Collection<HmilyLock> locks) {
-        // TODO
-        return 0;
+        int cnt = 0;
+        for (HmilyLock lock : locks) {
+            cnt += service.delete(LockMongoEntity.class, Criteria.where("lock_id").is(lock.getLockId()));
+        }
+        return cnt;
     }
     
     @Override
     public Optional<HmilyLock> findHmilyLockById(final String lockId) {
-        // TODO
-        return Optional.empty();
+        return service.find(LockMongoEntity.class, Criteria.where("lock_id").is(lockId))
+                .stream().map(converter::convert).findFirst();
     }
     
     @Override

@@ -450,11 +450,13 @@ public class RedisRepository implements HmilyRepository {
     
     @Override
     public int releaseHmilyLocks(final Collection<HmilyLock> locks) {
+        int cnt = 0;
         try {
             for (HmilyLock lock : locks) {
                 jedisClient.hdel(HMILY_LOCK_GLOBAL, lock.getLockId());
+                cnt++;
             }
-            return HmilyRepository.ROWS;
+            return cnt;
         } catch (JedisException e) {
             LOGGER.error("releaseHmilyLocks occur a exception", e);
         }
