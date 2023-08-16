@@ -1,10 +1,12 @@
 package org.dromara.hmily.repository.mongodb;
 
+import org.dromara.hmily.repository.mongodb.entity.LockMongoEntity;
 import org.dromara.hmily.repository.mongodb.entity.ParticipantMongoEntity;
 import org.dromara.hmily.repository.mongodb.entity.TransactionMongoEntity;
 import org.dromara.hmily.repository.mongodb.entity.UndoMongoEntity;
 import org.dromara.hmily.repository.spi.entity.HmilyDataSnapshot;
 import org.dromara.hmily.repository.spi.entity.HmilyInvocation;
+import org.dromara.hmily.repository.spi.entity.HmilyLock;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipant;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipantUndo;
 import org.dromara.hmily.repository.spi.entity.HmilyTransaction;
@@ -109,6 +111,16 @@ public class MongoEntityConvert {
 
     /**
      * 转换mongo对象.
+     * @param entity mongo entity.
+     * @return hmily entity.
+     */
+    public HmilyLock convert(final LockMongoEntity entity) {
+        return new HmilyLock(entity.getTransId(), entity.getParticipantId(), entity.getResourceId(),
+                entity.getTargetTableName(), entity.getTargetTablePk());
+    }
+
+    /**
+     * 转换mongo对象.
      * @param hmilyParticipant hmilyParticipant entity.
      * @param appName app name.
      * @return entity.
@@ -177,6 +189,22 @@ public class MongoEntityConvert {
         entity.setUndoId(undo.getUndoId());
         entity.setDataSnapshot(hmilySerializer.serialize(undo.getDataSnapshot()));
         entity.setUpdateTime(undo.getUpdateTime());
+        return entity;
+    }
+
+    /**
+     * 转换mongo对象.
+     * @param lock hmily entity.
+     * @return mongo entity.
+     */
+    public LockMongoEntity create(final HmilyLock lock) {
+        LockMongoEntity entity = new LockMongoEntity();
+        entity.setLockId(lock.getLockId());
+        entity.setTargetTableName(lock.getTargetTableName());
+        entity.setTargetTablePk(lock.getTargetTablePk());
+        entity.setResourceId(lock.getResourceId());
+        entity.setParticipantId(lock.getParticipantId());
+        entity.setTransId(lock.getTransId());
         return entity;
     }
 }
