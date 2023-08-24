@@ -168,7 +168,7 @@ public class OrderServiceImpl implements OrderService {
         // 开启一个事务
         new Thread(() -> {
             try {
-                paymentService.makePaymentWithReadCommitted(order, ReadCommittedTransactionEnum.READ_COMMITTED_TRANSACTION_ALL);
+                paymentService.makePaymentWithReadCommitted(order, ReadCommittedTransactionEnum.TRANSACTION_READ_WRITE);
             } catch (Exception e) {
                 System.out.println(e.getMessage());
             }
@@ -180,7 +180,7 @@ public class OrderServiceImpl implements OrderService {
             e.printStackTrace();
         }
         // 开启另一个事务
-        paymentService.makePaymentWithReadCommitted(order, ReadCommittedTransactionEnum.READ_COMMITTED_TRANSACTION_JUST_SELECT);
+        paymentService.makePaymentWithReadCommitted(order, ReadCommittedTransactionEnum.TRANSACTION_READ_ONLY);
 
         System.out.println("切面耗时：" + (System.currentTimeMillis() - start));
         return "success";

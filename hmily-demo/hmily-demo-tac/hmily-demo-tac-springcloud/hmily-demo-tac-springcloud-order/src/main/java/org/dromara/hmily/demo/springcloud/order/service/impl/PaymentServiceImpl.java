@@ -156,7 +156,7 @@ public class PaymentServiceImpl implements PaymentService {
     @HmilyTAC
     public String makePaymentWithReadCommitted(Order order, ReadCommittedTransactionEnum transactionEnum) {
         //第二个事务查询相同账户信息, 获取不到全局锁, 会进行回滚
-        if (ReadCommittedTransactionEnum.READ_COMMITTED_TRANSACTION_JUST_SELECT.equals(transactionEnum)) {
+        if (ReadCommittedTransactionEnum.TRANSACTION_READ_ONLY.equals(transactionEnum)) {
             accountClient.findByUserId(order.getUserId());
             return "success";
         }
