@@ -17,10 +17,10 @@
 package org.dromara.hmily.demo.tac.dubbo.order.service.impl;
 
 import org.dromara.hmily.common.utils.IdWorkerUtils;
-import org.dromara.hmily.demo.common.account.api.AccountService;
 import org.dromara.hmily.demo.common.order.entity.Order;
 import org.dromara.hmily.demo.common.order.enums.OrderStatusEnum;
 import org.dromara.hmily.demo.common.order.mapper.OrderMapper;
+import org.dromara.hmily.demo.tac.dubbo.order.enums.ReadCommittedTransactionEnum;
 import org.dromara.hmily.demo.tac.dubbo.order.service.OrderService;
 import org.dromara.hmily.demo.tac.dubbo.order.service.PaymentService;
 import org.slf4j.Logger;
@@ -168,11 +168,11 @@ public class OrderServiceImpl implements OrderService {
         // 开启一个事务
         new Thread(() -> {
             try {
-                paymentService.makePaymentWithReadCommitted(order, 1);
+                paymentService.makePaymentWithReadCommitted(order, ReadCommittedTransactionEnum.READ_COMMITTED_TRANSACTION_ALL);
             } catch (Exception e) {
                 System.out.println(e.getMessage());
             }
-        }, "globl trans2").start();
+        }, "global trans2").start();
         try {
             // 确保第一个事务先执行
             Thread.sleep(1000);
@@ -180,7 +180,7 @@ public class OrderServiceImpl implements OrderService {
             e.printStackTrace();
         }
         // 开启另一个事务
-        paymentService.makePaymentWithReadCommitted(order, 2);
+        paymentService.makePaymentWithReadCommitted(order, ReadCommittedTransactionEnum.READ_COMMITTED_TRANSACTION_JUST_SELECT);
 
         System.out.println("切面耗时：" + (System.currentTimeMillis() - start));
         return "success";

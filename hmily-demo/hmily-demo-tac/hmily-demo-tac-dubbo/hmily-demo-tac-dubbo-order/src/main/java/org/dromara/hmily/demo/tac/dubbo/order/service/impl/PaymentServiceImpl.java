@@ -4,9 +4,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -27,13 +27,13 @@ import org.dromara.hmily.demo.common.inventory.dto.InventoryDTO;
 import org.dromara.hmily.demo.common.order.entity.Order;
 import org.dromara.hmily.demo.common.order.enums.OrderStatusEnum;
 import org.dromara.hmily.demo.common.order.mapper.OrderMapper;
+import org.dromara.hmily.demo.tac.dubbo.order.enums.ReadCommittedTransactionEnum;
 import org.dromara.hmily.demo.tac.dubbo.order.service.PaymentService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.concurrent.TimeUnit;
 
 /**
  * PaymentServiceImpl.
@@ -41,7 +41,7 @@ import java.util.concurrent.TimeUnit;
  */
 @Service
 public class PaymentServiceImpl implements PaymentService {
-    
+
     private static final Logger LOGGER = LoggerFactory.getLogger(PaymentServiceImpl.class);
 
     private final OrderMapper orderMapper;
@@ -58,7 +58,7 @@ public class PaymentServiceImpl implements PaymentService {
         this.accountService = accountService;
         this.inventoryService = inventoryService;
     }
-    
+
     @Override
     @HmilyTAC
     public void makePayment(final Order order) {
@@ -68,7 +68,7 @@ public class PaymentServiceImpl implements PaymentService {
         //进入扣减库存操作
         inventoryService.decrease(buildInventoryDTO(order));
     }
-    
+
     @Override
     public void testMakePayment(final Order order) {
         updateOrderStatus(order, OrderStatusEnum.PAYING);
@@ -89,7 +89,7 @@ public class PaymentServiceImpl implements PaymentService {
         //扣除用户余额
         accountService.paymentWithNested(buildAccountNestedDTO(order));
     }
-    
+
     @Override
     @HmilyTAC
     public void makePaymentWithNestedException(final Order order) {
@@ -101,7 +101,7 @@ public class PaymentServiceImpl implements PaymentService {
         //扣除用户余额
         accountService.paymentWithNestedException(buildAccountNestedDTO(order));
     }
-    
+
     @Override
     @HmilyTAC
     public String mockPaymentInventoryWithTryException(final Order order) {
@@ -111,7 +111,7 @@ public class PaymentServiceImpl implements PaymentService {
         inventoryService.mockWithTryException(buildInventoryDTO(order));
         return "success";
     }
-    
+
     @Override
     @HmilyTAC
     public String mockPaymentInventoryWithTryTimeout(final Order order) {
@@ -121,7 +121,7 @@ public class PaymentServiceImpl implements PaymentService {
         inventoryService.mockWithTryTimeout(buildInventoryDTO(order));
         return "success";
     }
-    
+
     @Override
     @HmilyTAC
     public String mockPaymentAccountWithTryException(final Order order) {
@@ -129,7 +129,7 @@ public class PaymentServiceImpl implements PaymentService {
         accountService.mockTryPaymentException(buildAccountDTO(order));
         return "success";
     }
-    
+
     @Override
     @HmilyTAC
     public String mockPaymentAccountWithTryTimeout(final Order order) {
@@ -137,7 +137,7 @@ public class PaymentServiceImpl implements PaymentService {
         accountService.mockTryPaymentTimeout(buildAccountDTO(order));
         return "success";
     }
-    
+
     @Override
     @HmilyTAC
     public String mockPaymentInventoryWithConfirmTimeout(final Order order) {
@@ -153,9 +153,9 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     @HmilyTAC
-    public String makePaymentWithReadCommitted(Order order, int type) {
+    public String makePaymentWithReadCommitted(Order order, ReadCommittedTransactionEnum transactionEnum) {
         //第二个事务查询相同账户信息, 获取不到全局锁, 会进行回滚
-        if (type == 2) {
+        if (ReadCommittedTransactionEnum.READ_COMMITTED_TRANSACTION_JUST_SELECT.equals(transactionEnum)) {
             accountService.findByUserId(order.getUserId());
             return "success";
         }
@@ -179,14 +179,14 @@ public class PaymentServiceImpl implements PaymentService {
         order.setStatus(orderStatus.getCode());
         orderMapper.update(order);
     }
-    
+
     private AccountDTO buildAccountDTO(final Order order) {
         AccountDTO accountDTO = new AccountDTO();
         accountDTO.setAmount(order.getTotalAmount());
         accountDTO.setUserId(order.getUserId());
         return accountDTO;
     }
-    
+
     private AccountNestedDTO buildAccountNestedDTO(final Order order) {
         AccountNestedDTO nestedDTO = new AccountNestedDTO();
         nestedDTO.setAmount(order.getTotalAmount());
@@ -195,7 +195,7 @@ public class PaymentServiceImpl implements PaymentService {
         nestedDTO.setCount(order.getCount());
         return nestedDTO;
     }
-    
+
     private InventoryDTO buildInventoryDTO(final Order order) {
         InventoryDTO inventoryDTO = new InventoryDTO();
         inventoryDTO.setCount(order.getCount());

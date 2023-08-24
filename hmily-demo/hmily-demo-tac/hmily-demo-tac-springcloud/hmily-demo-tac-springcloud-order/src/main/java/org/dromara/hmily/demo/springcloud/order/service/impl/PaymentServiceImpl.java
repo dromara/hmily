@@ -17,7 +17,6 @@
 package org.dromara.hmily.demo.springcloud.order.service.impl;
 
 import org.dromara.hmily.annotation.HmilyTAC;
-import org.dromara.hmily.annotation.HmilyTCC;
 import org.dromara.hmily.common.exception.HmilyRuntimeException;
 import org.dromara.hmily.demo.common.account.dto.AccountDTO;
 import org.dromara.hmily.demo.common.account.dto.AccountNestedDTO;
@@ -27,6 +26,7 @@ import org.dromara.hmily.demo.common.order.enums.OrderStatusEnum;
 import org.dromara.hmily.demo.common.order.mapper.OrderMapper;
 import org.dromara.hmily.demo.springcloud.order.client.AccountClient;
 import org.dromara.hmily.demo.springcloud.order.client.InventoryClient;
+import org.dromara.hmily.demo.springcloud.order.enums.ReadCommittedTransactionEnum;
 import org.dromara.hmily.demo.springcloud.order.service.PaymentService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -154,9 +154,9 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     @HmilyTAC
-    public String makePaymentWithReadCommitted(Order order, int type) {
+    public String makePaymentWithReadCommitted(Order order, ReadCommittedTransactionEnum transactionEnum) {
         //第二个事务查询相同账户信息, 获取不到全局锁, 会进行回滚
-        if (type == 2) {
+        if (ReadCommittedTransactionEnum.READ_COMMITTED_TRANSACTION_JUST_SELECT.equals(transactionEnum)) {
             accountClient.findByUserId(order.getUserId());
             return "success";
         }
@@ -203,4 +203,5 @@ public class PaymentServiceImpl implements PaymentService {
         nestedDTO.setCount(order.getCount());
         return nestedDTO;
     }
+
 }

@@ -18,6 +18,7 @@ package org.dromara.hmily.demo.springcloud.order.service;
 
 
 import org.dromara.hmily.demo.common.order.entity.Order;
+import org.dromara.hmily.demo.springcloud.order.enums.ReadCommittedTransactionEnum;
 
 /**
  * PaymentService.
@@ -100,7 +101,7 @@ public interface PaymentService {
      * 订单支付.
      *
      * @param order 订单实体
-     * @param type 类型
+     * @param readCommittedTransactionEnum 读已提交事务类型
      */
-    String makePaymentWithReadCommitted(Order order, int type);
+    String makePaymentWithReadCommitted(Order order, ReadCommittedTransactionEnum readCommittedTransactionEnum);
 }
