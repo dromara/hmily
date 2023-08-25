@@ -62,11 +62,11 @@ import java.util.concurrent.CountDownLatch;
 public class ZookeeperRepository implements HmilyRepository {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ZookeeperRepository.class);
-    
+
     private static final CountDownLatch LATCH = new CountDownLatch(1);
-    
+
     private static volatile ZooKeeper zooKeeper;
-    
+
     private HmilySerializer hmilySerializer;
 
     private HmilyRepositoryNode node;
@@ -223,7 +223,7 @@ public class ZookeeperRepository implements HmilyRepository {
             return dateParam.after(hmilyTransaction.getUpdateTime()) && hmilyTransaction.getStatus() == HmilyActionEnum.DELETE.getCode();
         }, date);
     }
-    
+
     @Override
     public int createHmilyParticipant(final HmilyParticipant hmilyParticipant) throws HmilyRepositoryException {
         try {
@@ -288,7 +288,7 @@ public class ZookeeperRepository implements HmilyRepository {
             return transIdParam.compareTo(hmilyParticipant.getTransId()) == 0;
         }, transId);
     }
-    
+
     @Override
     public int updateHmilyParticipantStatus(final Long participantId, final Integer status) throws HmilyRepositoryException {
         String path = node.getHmilyParticipantRealPath(participantId);
@@ -440,25 +440,61 @@ public class ZookeeperRepository implements HmilyRepository {
         }
         return HmilyRepository.FAIL_ROWS;
     }
-    
+
     @Override
     public int writeHmilyLocks(final Collection<HmilyLock> locks) {
-        // TODO
-        return 0;
+        for (HmilyLock lock : locks) {
+            String path = node.getHmilyLockRealPath(lock.getLockId().replace("/", "-"));
+            try {
+                create(node.getHmilyLockRootPath());
+                Stat stat = zooKeeper.exists(path, false);
+                if (stat == null) {
+                    zooKeeper.create(path, hmilySerializer.serialize(lock), ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
+                } else {
+                    zooKeeper.setData(path, hmilySerializer.serialize(lock), stat.getVersion());
+                }
+            } catch (KeeperException | InterruptedException e) {
+                throw new HmilyException(e);
+            }
+        }
+        return locks.size();
     }
-    
+
     @Override
     public int releaseHmilyLocks(final Collection<HmilyLock> locks) {
-        // TODO
-        return 0;
+        for (HmilyLock lock : locks) {
+            String path = node.getHmilyLockRealPath(lock.getLockId().replace("/", "-"));
+            try {
+                if (checkPath(path, false)) {
+                    return FAIL_ROWS;
+                }
+                zooKeeper.delete(path, -1);
+            } catch (InterruptedException | KeeperException e) {
+                LOGGER.error("removeHmilyLock occur a exception", e);
+                return HmilyRepository.FAIL_ROWS;
+            }
+        }
+        return locks.size();
     }
-    
+
     @Override
     public Optional<HmilyLock> findHmilyLockById(final String lockId) {
-        // TODO
+        String path = node.getHmilyLockRealPath(lockId.replace("/", "-"));
+        try {
+            if (checkPath(path, false)) {
+                return Optional.empty();
+            }
+            byte[] data = zooKeeper.getData(path, false, null);
+            if (data == null || data.length == 0) {
+                return Optional.empty();
+            }
+            return Optional.of(hmilySerializer.deSerialize(data, HmilyLock.class));
+        } catch (KeeperException | InterruptedException e) {
+            LOGGER.error("findHmilyLockById occur a exception", e);
+        }
         return Optional.empty();
     }
-    
+
     private void connect(final HmilyZookeeperConfig config) {
         try {
             zooKeeper = new ZooKeeper(config.getHost(), config.getSessionTimeOut(), watchedEvent -> {
@@ -467,9 +503,9 @@ public class ZookeeperRepository implements HmilyRepository {
                 }
             });
             LATCH.await();
-            Stat stat = zooKeeper.exists(node.getRootPathPrefix(), false);
+            Stat stat = zooKeeper.exists("/" + node.getRootPathPrefix(), false);
             if (stat == null) {
-                zooKeeper.create(node.getRootPathPrefix(), node.getRootPathPrefix().getBytes(), ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
+                zooKeeper.create("/" + node.getRootPathPrefix(), node.getRootPathPrefix().getBytes(), ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
             }
         } catch (Exception e) {
             throw new HmilyRuntimeException(e);
@@ -581,18 +617,18 @@ public class ZookeeperRepository implements HmilyRepository {
         }
         return HmilyRepository.FAIL_ROWS;
     }
-    
+
     /**
      * The type Path tokenizer.
      */
     static class PathTokenizer {
-        
+
         private String path = "";
-        
+
         private String[] nodes;
-        
+
         private int index;
-    
+
         /**
          * Instantiates a new Path tokenizer.
          *
@@ -607,7 +643,7 @@ public class ZookeeperRepository implements HmilyRepository {
                 index = 1;
             }
         }
-    
+
         /**
          * Next path string.
          *
@@ -618,7 +654,7 @@ public class ZookeeperRepository implements HmilyRepository {
             index++;
             return path;
         }
-    
+
         /**
          * Has next boolean.
          *
@@ -628,14 +664,14 @@ public class ZookeeperRepository implements HmilyRepository {
             return index < nodes.length;
         }
     }
-    
+
     /**
      * The interface Filter.
      *
      * @param <T> the type parameter
      */
     interface Filter<T> {
-    
+
         /**
          * Filter boolean.
          *
