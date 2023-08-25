@@ -17,8 +17,10 @@
 package org.dromara.hmily.repository.zookeeper;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 
@@ -27,11 +29,14 @@ import org.apache.zookeeper.data.Stat;
 import org.dromara.hmily.annotation.TransTypeEnum;
 import org.dromara.hmily.config.api.ConfigEnv;
 import org.dromara.hmily.config.api.entity.HmilyZookeeperConfig;
+import org.dromara.hmily.repository.spi.HmilyRepository;
+import org.dromara.hmily.repository.spi.entity.HmilyLock;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipant;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipantUndo;
 import org.dromara.hmily.repository.spi.entity.HmilyTransaction;
 import org.dromara.hmily.repository.zookeeper.mock.ZookeeperMock;
 import org.dromara.hmily.serializer.kryo.KryoSerializer;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -50,9 +55,9 @@ import static org.junit.Assert.assertTrue;
  * Author:   lilang
  * Description: zookeeper repository test crud
  */
-@RunWith(PowerMockRunner.class)
-@PrepareForTest({ZookeeperRepository.class})
-@PowerMockIgnore({"javax.management.*", "com.intellij.*", "com.codahale.metrics.*"})
+//@RunWith(PowerMockRunner.class)
+//@PrepareForTest({ZookeeperRepository.class})
+//@PowerMockIgnore({"javax.management.*", "com.intellij.*", "com.codahale.metrics.*"})
 public class ZookeeperRepositoryTest {
 
     private static final String HMILY_TRANSACTION_GLOBAL = "hmily_transaction_global";
@@ -61,8 +66,10 @@ public class ZookeeperRepositoryTest {
 
     private static final String HMILY_PARTICIPANT_UNDO = "hmily_participant_undo";
 
+    private static final String HMILY_LOCK_GLOBAL = "hmily_lock_global";
+
     // when it is false. please delete the annotation (@RunWith, @PrepareForTest, @PowerMockIgnore) of this class
-    private boolean mockSwitch = true;
+    private boolean mockSwitch = false;
     
     private ZookeeperRepository zookeeperRepository = new ZookeeperRepository();
     
@@ -104,7 +111,7 @@ public class ZookeeperRepositoryTest {
 
         zookeeperRepository.init(appName);
         zookeeperRepository.setSerializer(new KryoSerializer());
-        
+
         
         Field zooKeeperFiled = ZookeeperRepository.class.getDeclaredField("zooKeeper");
         zooKeeperFiled.setAccessible(true);
@@ -123,6 +130,11 @@ public class ZookeeperRepositoryTest {
         if (stat != null) {
             zooKeeper.delete("/hmily/" + appName + "/" + HMILY_PARTICIPANT_UNDO, stat.getVersion());
         }
+
+        stat = zooKeeper.exists("/hmily/" + appName + "/" + HMILY_LOCK_GLOBAL, false);
+        if (stat != null) {
+            zooKeeper.delete("/hmily/" + appName + "/" + HMILY_LOCK_GLOBAL, stat.getVersion());
+        }
     }
     
     /**
@@ -132,14 +144,42 @@ public class ZookeeperRepositoryTest {
     public void testCURD() {
         Long transactionId = (long) random.nextInt(1000);
         testTransaction(transactionId);
-        
+
         Long participantId = (long) random.nextInt(1000);
         testParticipant(transactionId, participantId);
-        
+
         Long undoId = (long) random.nextInt(1000);
         testParticipantUndo(transactionId, participantId, undoId);
     }
-    
+
+    /**
+     * Test curd.
+     */
+    @Test
+    public void testLock() {
+        List<HmilyLock> locks = new ArrayList<>();
+        Long transId = (long) random.nextInt(1000);
+        Long participantId = (long) random.nextInt(1000);
+        String resourceId = "jdbc:mysql://localhost:3306/test";
+        for (int i = 1; i <= 5; i++) {
+            HmilyLock lock = new HmilyLock(transId, participantId, resourceId, "tableName" + i, i + "");
+            locks.add(lock);
+        }
+        int rows = zookeeperRepository.writeHmilyLocks(locks);
+        Assert.assertEquals(locks.size(), rows);
+        // 锁不存在
+        rows = zookeeperRepository.releaseHmilyLocks(locks);
+        Assert.assertEquals(locks.size(), rows);
+        String lockId = locks.get(0).getLockId();
+        Optional<HmilyLock> lockOptional = zookeeperRepository.findHmilyLockById(lockId);
+        Assert.assertEquals(Optional.empty(), lockOptional);
+        // 锁存在
+        zookeeperRepository.writeHmilyLocks(locks);
+        lockId = locks.get(0).getLockId();
+        lockOptional = zookeeperRepository.findHmilyLockById(lockId);
+        Assert.assertEquals(lockId, lockOptional.get().getLockId());
+    }
+
     private void testTransaction(Long transactionId) {
         HmilyTransaction hmilyTransaction = buildHmilyTransaction(transactionId);
         int result = zookeeperRepository.createHmilyTransaction(hmilyTransaction);
@@ -275,7 +315,7 @@ public class ZookeeperRepositoryTest {
         int removeByDateResult = zookeeperRepository.removeHmilyParticipantByDate(calendar.getTime());
         assertEquals(3L, removeByDateResult);
     }
-    
+
     private HmilyParticipantUndo buildHmilyParticipantUndo(Long transactionId, Long particaipantId, Long undoId) {
         HmilyParticipantUndo hmilyParticipantUndo = new HmilyParticipantUndo();
         hmilyParticipantUndo.setStatus(4);
