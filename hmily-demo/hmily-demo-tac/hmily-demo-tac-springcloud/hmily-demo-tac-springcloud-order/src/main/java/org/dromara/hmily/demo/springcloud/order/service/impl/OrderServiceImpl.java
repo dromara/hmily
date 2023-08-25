@@ -20,6 +20,7 @@ import org.dromara.hmily.common.utils.IdWorkerUtils;
 import org.dromara.hmily.demo.common.order.entity.Order;
 import org.dromara.hmily.demo.common.order.enums.OrderStatusEnum;
 import org.dromara.hmily.demo.common.order.mapper.OrderMapper;
+import org.dromara.hmily.demo.springcloud.order.enums.ReadCommittedTransactionEnum;
 import org.dromara.hmily.demo.springcloud.order.service.OrderService;
 import org.dromara.hmily.demo.springcloud.order.service.PaymentService;
 import org.slf4j.Logger;
@@ -133,7 +134,23 @@ public class OrderServiceImpl implements OrderService {
     public String orderPayWithReadCommitted(Integer count, BigDecimal amount) {
         Order order = saveOrder(count, amount);
         long start = System.currentTimeMillis();
-        paymentService.makePaymentWithReadCommitted(order);
+        // 开启一个事务
+        new Thread(() -> {
+            try {
+                paymentService.makePaymentWithReadCommitted(order, ReadCommittedTransactionEnum.TRANSACTION_READ_WRITE);
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
+        }, "global trans2").start();
+        try {
+            // 确保第一个事务先执行
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        // 开启另一个事务
+        paymentService.makePaymentWithReadCommitted(order, ReadCommittedTransactionEnum.TRANSACTION_READ_ONLY);
+
         System.out.println("切面耗时：" + (System.currentTimeMillis() - start));
         return "success";
     }

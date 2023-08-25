@@ -17,6 +17,7 @@
 package org.dromara.hmily.demo.tac.dubbo.order.service;
 
 import org.dromara.hmily.demo.common.order.entity.Order;
+import org.dromara.hmily.demo.tac.dubbo.order.enums.ReadCommittedTransactionEnum;
 
 /**
  * The interface Payment service.
@@ -97,6 +98,7 @@ public interface PaymentService {
      * 订单支付.
      *
      * @param order 订单实体
+     * @param readCommittedTransactionEnum 事务类型
      */
-    String makePaymentWithReadCommitted(Order order);
+    String makePaymentWithReadCommitted(Order order, ReadCommittedTransactionEnum readCommittedTransactionEnum);
 }
