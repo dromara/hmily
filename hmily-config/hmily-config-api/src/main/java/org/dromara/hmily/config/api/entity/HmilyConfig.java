@@ -138,6 +138,16 @@ public class HmilyConfig extends AbstractConfig {
      * tac sqlRevert.
      */
     private String sqlRevert = "default";
+
+    /**
+     * global lock retry interval(unit: ms).
+     */
+    private int lockRetryInterval = 10;
+
+    /**
+     * global lock retry times.
+     */
+    private int lockRetryTimes = 30;
     
     @Override
     public String prefix() {

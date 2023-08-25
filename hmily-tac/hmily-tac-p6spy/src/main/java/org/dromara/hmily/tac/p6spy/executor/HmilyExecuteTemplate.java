@@ -4,9 +4,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,12 +28,14 @@ import org.dromara.hmily.core.repository.HmilyRepositoryStorage;
 import org.dromara.hmily.repository.spi.entity.HmilyDataSnapshot;
 import org.dromara.hmily.repository.spi.entity.HmilyLock;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipantUndo;
+import org.dromara.hmily.repository.spi.exception.HmilyLockConflictException;
 import org.dromara.hmily.tac.common.utils.DatabaseTypes;
 import org.dromara.hmily.tac.common.utils.ResourceIdUtils;
 import org.dromara.hmily.tac.core.cache.HmilyParticipantUndoCacheManager;
 import org.dromara.hmily.tac.core.cache.HmilyUndoContextCacheManager;
 import org.dromara.hmily.tac.core.context.HmilyUndoContext;
 import org.dromara.hmily.tac.core.lock.HmilyLockManager;
+import org.dromara.hmily.tac.core.lock.LockRetryController;
 import org.dromara.hmily.tac.p6spy.threadlocal.AutoCommitThreadLocal;
 import org.dromara.hmily.tac.sqlcompute.HmilySQLComputeEngine;
 import org.dromara.hmily.tac.sqlcompute.HmilySQLComputeEngineFactory;
@@ -53,12 +55,12 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 public enum HmilyExecuteTemplate {
-    
+
     /**
      * Instance hmily execute template.
      */
     INSTANCE;
-    
+
     /**
      * Sets auto commit.
      *
@@ -78,13 +80,12 @@ public enum HmilyExecuteTemplate {
             e.printStackTrace();
         }
     }
-    
-    
+
     /**
      * Execute.
      *
-     * @param sql SQL
-     * @param parameters parameters
+     * @param sql                   SQL
+     * @param parameters            parameters
      * @param connectionInformation connection information
      */
     public void execute(final String sql, final List<Object> parameters, final ConnectionInformation connectionInformation) {
@@ -100,16 +101,38 @@ public enum HmilyExecuteTemplate {
         }
         String resourceId = ResourceIdUtils.INSTANCE.getResourceId(connectionInformation.getUrl());
         HmilySQLComputeEngine sqlComputeEngine = HmilySQLComputeEngineFactory.newInstance(statement);
+        // select SQL
+        if (statement instanceof HmilySelectStatement) {
+            executeSelect(sql, parameters, connectionInformation, sqlComputeEngine, resourceId);
+            return;
+        }
         HmilyDataSnapshot snapshot = sqlComputeEngine.execute(sql, parameters, connectionInformation.getConnection(), resourceId);
         log.debug("TAC-compute-sql ::: {}", snapshot);
         HmilyUndoContext undoContext = buildUndoContext(HmilyContextHolder.get(), snapshot, resourceId);
         HmilyLockManager.INSTANCE.tryAcquireLocks(undoContext.getHmilyLocks());
         log.debug("TAC-try-lock ::: {}", undoContext.getHmilyLocks());
-        if (!(statement instanceof HmilySelectStatement)) {
-            HmilyUndoContextCacheManager.INSTANCE.set(undoContext);
+        HmilyUndoContextCacheManager.INSTANCE.set(undoContext);
+    }
+
+    private void executeSelect(final String sql, final List<Object> parameters, final ConnectionInformation connectionInformation,
+                               final HmilySQLComputeEngine sqlComputeEngine, final String resourceId) {
+        LockRetryController lockRetryController = new LockRetryController();
+        while (true) {
+            try {
+                HmilyDataSnapshot snapshot = sqlComputeEngine.execute(sql, parameters, connectionInformation.getConnection(), resourceId);
+                log.debug("TAC-compute-sql ::: {}", snapshot);
+                HmilyUndoContext undoContext = buildUndoContext(HmilyContextHolder.get(), snapshot, resourceId);
+                // check the global lock
+                HmilyLockManager.INSTANCE.checkLocks(undoContext.getHmilyLocks());
+                log.debug("TAC-check-lock ::: {}", undoContext.getHmilyLocks());
+                break;
+            } catch (HmilyLockConflictException hlce) {
+                // trigger retry
+                lockRetryController.sleep(hlce);
+            }
         }
     }
-    
+
     private HmilyUndoContext buildUndoContext(final HmilyTransactionContext transactionContext, final HmilyDataSnapshot dataSnapshot, final String resourceId) {
         HmilyUndoContext result = new HmilyUndoContext();
         result.setDataSnapshot(dataSnapshot);
@@ -118,7 +141,7 @@ public enum HmilyExecuteTemplate {
         result.setParticipantId(transactionContext.getParticipantId());
         return result;
     }
-    
+
     /**
      * Commit.
      *
@@ -136,8 +159,7 @@ public enum HmilyExecuteTemplate {
         log.debug("TAC-persist-undo ::: {}", undoList);
         clean(connection);
     }
-    
-    
+
     /**
      * Rollback.
      *
@@ -155,14 +177,14 @@ public enum HmilyExecuteTemplate {
         HmilyLockManager.INSTANCE.releaseLocks(locks);
         clean(connection);
     }
-    
+
     @SneakyThrows
     private void clean(final Connection connection) {
         connection.setAutoCommit(AutoCommitThreadLocal.INSTANCE.get());
         HmilyUndoContextCacheManager.INSTANCE.remove();
         AutoCommitThreadLocal.INSTANCE.remove();
     }
-    
+
     private List<HmilyParticipantUndo> buildUndoList() {
         List<HmilyUndoContext> contexts = HmilyUndoContextCacheManager.INSTANCE.get();
         return contexts.stream().map(context -> {
@@ -175,9 +197,8 @@ public enum HmilyExecuteTemplate {
             undo.setStatus(HmilyActionEnum.TRYING.getCode());
             return undo;
         }).collect(Collectors.toList());
-        
     }
-    
+
     private boolean check() {
         HmilyTransactionContext transactionContext = HmilyContextHolder.get();
         return Objects.isNull(transactionContext) || !TransTypeEnum.TAC.name().equalsIgnoreCase(transactionContext.getTransType());

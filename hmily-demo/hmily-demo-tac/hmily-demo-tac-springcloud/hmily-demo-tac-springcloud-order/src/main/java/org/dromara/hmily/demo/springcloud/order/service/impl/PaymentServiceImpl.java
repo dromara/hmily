@@ -17,7 +17,6 @@
 package org.dromara.hmily.demo.springcloud.order.service.impl;
 
 import org.dromara.hmily.annotation.HmilyTAC;
-import org.dromara.hmily.annotation.HmilyTCC;
 import org.dromara.hmily.common.exception.HmilyRuntimeException;
 import org.dromara.hmily.demo.common.account.dto.AccountDTO;
 import org.dromara.hmily.demo.common.account.dto.AccountNestedDTO;
@@ -27,6 +26,7 @@ import org.dromara.hmily.demo.common.order.enums.OrderStatusEnum;
 import org.dromara.hmily.demo.common.order.mapper.OrderMapper;
 import org.dromara.hmily.demo.springcloud.order.client.AccountClient;
 import org.dromara.hmily.demo.springcloud.order.client.InventoryClient;
+import org.dromara.hmily.demo.springcloud.order.enums.ReadCommittedTransactionEnum;
 import org.dromara.hmily.demo.springcloud.order.service.PaymentService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -154,13 +154,24 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     @HmilyTAC
-    public String makePaymentWithReadCommitted(Order order) {
+    public String makePaymentWithReadCommitted(Order order, ReadCommittedTransactionEnum transactionEnum) {
+        //第二个事务查询相同账户信息, 获取不到全局锁, 会进行回滚
+        if (ReadCommittedTransactionEnum.TRANSACTION_READ_ONLY.equals(transactionEnum)) {
+            accountClient.findByUserId(order.getUserId());
+            return "success";
+        }
         updateOrderStatus(order, OrderStatusEnum.PAY_SUCCESS);
         //扣除用户余额
         accountClient.payment(buildAccountDTO(order));
-        //查询账户信息, 读已提交, 此时该事务未结束, 获取全局锁失败, 将会回滚
+        //查询账户信息, 读已提交隔离级别, 但是在统一全局事务中, 所以可见
         accountClient.findByUserId(order.getUserId());
         //进入扣减库存操作
+        try {
+            // 延时第一个事务, 确保第一个事务还没结束, 第二个事务执行查询
+            Thread.sleep(1200);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         inventoryClient.decrease(buildInventoryDTO(order));
         return "success";
     }
@@ -192,4 +203,5 @@ public class PaymentServiceImpl implements PaymentService {
         nestedDTO.setCount(order.getCount());
         return nestedDTO;
     }
+
 }
