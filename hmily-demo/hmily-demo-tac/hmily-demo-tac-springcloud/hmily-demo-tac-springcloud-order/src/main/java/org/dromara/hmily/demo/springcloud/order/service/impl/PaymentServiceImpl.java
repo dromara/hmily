@@ -17,6 +17,7 @@
 package org.dromara.hmily.demo.springcloud.order.service.impl;
 
 import org.dromara.hmily.annotation.HmilyTAC;
+import org.dromara.hmily.annotation.IsolationLevelEnum;
 import org.dromara.hmily.common.exception.HmilyRuntimeException;
 import org.dromara.hmily.demo.common.account.dto.AccountDTO;
 import org.dromara.hmily.demo.common.account.dto.AccountNestedDTO;
@@ -153,9 +154,9 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    @HmilyTAC
+    @HmilyTAC(isolationLevel = IsolationLevelEnum.READ_COMMITTED) // 开启读已提交隔离级别, 不开启事务会正常结束
     public String makePaymentWithReadCommitted(Order order, ReadCommittedTransactionEnum transactionEnum) {
-        //第二个事务查询相同账户信息, 获取不到全局锁, 会进行回滚
+        //第二个事务查询相同账户信息, 获取不到全局锁, 会先进行重试, 重试完后会进行回滚
         if (ReadCommittedTransactionEnum.TRANSACTION_READ_ONLY.equals(transactionEnum)) {
             accountClient.findByUserId(order.getUserId());
             return "success";

@@ -19,6 +19,7 @@ package org.dromara.hmily.tac.p6spy.executor;
 import com.p6spy.engine.common.ConnectionInformation;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.dromara.hmily.annotation.IsolationLevelEnum;
 import org.dromara.hmily.annotation.TransTypeEnum;
 import org.dromara.hmily.common.enums.HmilyActionEnum;
 import org.dromara.hmily.common.utils.IdWorkerUtils;
@@ -102,8 +103,12 @@ public enum HmilyExecuteTemplate {
         String resourceId = ResourceIdUtils.INSTANCE.getResourceId(connectionInformation.getUrl());
         HmilySQLComputeEngine sqlComputeEngine = HmilySQLComputeEngineFactory.newInstance(statement);
         // select SQL
+        HmilyTransactionContext transactionContext = HmilyContextHolder.get();
         if (statement instanceof HmilySelectStatement) {
-            executeSelect(sql, parameters, connectionInformation, sqlComputeEngine, resourceId);
+            if (IsolationLevelEnum.READ_COMMITTED.getValue() == transactionContext.getIsolationLevel()) {
+                // read committed level need check locks
+                executeSelect(sql, parameters, connectionInformation, sqlComputeEngine, resourceId);
+            }
             return;
         }
         HmilyDataSnapshot snapshot = sqlComputeEngine.execute(sql, parameters, connectionInformation.getConnection(), resourceId);
