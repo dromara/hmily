@@ -18,6 +18,9 @@ package org.dromara.hmily.tac.core.transaction;
 
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.reflect.MethodSignature;
+import org.dromara.hmily.annotation.HmilyTAC;
 import org.dromara.hmily.annotation.TransTypeEnum;
 import org.dromara.hmily.common.enums.ExecutorTypeEnum;
 import org.dromara.hmily.common.enums.HmilyActionEnum;
@@ -32,6 +35,7 @@ import org.dromara.hmily.core.repository.HmilyRepositoryStorage;
 import org.dromara.hmily.repository.spi.entity.HmilyParticipant;
 import org.dromara.hmily.repository.spi.entity.HmilyTransaction;
 
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Objects;
 
@@ -57,9 +61,10 @@ public class HmilyTacTransactionManager {
     /**
      * Begin hmily transaction.
      *
+     * @param point proceeding join point
      * @return the hmily transaction
      */
-    public HmilyTransaction begin() {
+    public HmilyTransaction begin(final ProceedingJoinPoint point) {
         //创建全局的事务，创建一个参与者
         HmilyTransaction globalHmilyTransaction = createHmilyTransaction();
         HmilyRepositoryStorage.createHmilyTransaction(globalHmilyTransaction);
@@ -75,6 +80,11 @@ public class HmilyTacTransactionManager {
         context.setTransId(globalHmilyTransaction.getTransId());
         context.setRole(HmilyRoleEnum.START.getCode());
         context.setTransType(TransTypeEnum.TAC.name());
+        // set transaction isolation level
+        MethodSignature signature = (MethodSignature) point.getSignature();
+        Method method = signature.getMethod();
+        final HmilyTAC hmilyTAC = method.getAnnotation(HmilyTAC.class);
+        context.setIsolationLevel(hmilyTAC.isolationLevel().getValue());
         context.setParticipantId(hmilyParticipant.getParticipantId());
         HmilyContextHolder.set(context);
         log.debug("TAC-tm-begin ::: {}", globalHmilyTransaction);

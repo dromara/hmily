@@ -17,6 +17,7 @@
 package org.dromara.hmily.core.context;
 
 import lombok.Data;
+import org.dromara.hmily.annotation.IsolationLevelEnum;
 import org.dromara.hmily.common.enums.HmilyActionEnum;
 import org.dromara.hmily.common.enums.HmilyRoleEnum;
 
@@ -57,6 +58,11 @@ public class HmilyTransactionContext {
      * transType.
      */
     private String transType;
+
+    /**
+     * isolation level enum. {@linkplain IsolationLevelEnum}
+     */
+    private int isolationLevel;
 
     //以下为xa相关的参数.
     /**
