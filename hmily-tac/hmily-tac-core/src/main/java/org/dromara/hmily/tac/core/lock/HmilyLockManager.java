@@ -24,8 +24,11 @@ import org.dromara.hmily.repository.spi.exception.HmilyLockConflictException;
 import org.dromara.hmily.tac.core.cache.HmilyLockCacheManager;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Hmily lock manager.
@@ -47,16 +50,28 @@ public enum HmilyLockManager {
      */
     //TODO add timeout mechanism in future
     public void tryAcquireLocks(final Collection<HmilyLock> hmilyLocks) {
+        Set<String> existedHmilyLockIds = new HashSet<>();
         for (HmilyLock each : hmilyLocks) {
             Optional<HmilyLock> hmilyLock = HmilyLockCacheManager.getInstance().get(each.getLockId());
             if (hmilyLock.isPresent()) {
-                String message = String.format("current record [%s] has locked by transaction:[%s]", each.getLockId(), hmilyLock.get().getTransId());
-                log.error(message);
-                throw new HmilyLockConflictException(message);
+                if (!hmilyLock.get().getTransId().equals(each.getTransId())) {
+                    String message = String.format("current record [%s] has locked by transaction:[%s]", each.getLockId(), hmilyLock.get().getTransId());
+                    log.error(message);
+                    throw new HmilyLockConflictException(message);
+                }
+                existedHmilyLockIds.add(hmilyLock.get().getLockId());
             }
         }
-        HmilyRepositoryStorage.writeHmilyLocks(hmilyLocks);
-        hmilyLocks.forEach(lock -> HmilyLockCacheManager.getInstance().cacheHmilyLock(lock.getLockId(), lock));
+        Collection<HmilyLock> unrepeatedHmilyLocks = hmilyLocks;
+        // If the lock already exists in the database, remove it from the hmilyLocks
+        if (CollectionUtils.isNotEmpty(existedHmilyLockIds)) {
+            unrepeatedHmilyLocks = hmilyLocks.stream().filter(lock -> !existedHmilyLockIds.contains(lock.getLockId())).collect(Collectors.toList());
+        }
+        if (CollectionUtils.isEmpty(unrepeatedHmilyLocks)) {
+            return;
+        }
+        HmilyRepositoryStorage.writeHmilyLocks(unrepeatedHmilyLocks);
+        unrepeatedHmilyLocks.forEach(lock -> HmilyLockCacheManager.getInstance().cacheHmilyLock(lock.getLockId(), lock));
     }
     
     /**
