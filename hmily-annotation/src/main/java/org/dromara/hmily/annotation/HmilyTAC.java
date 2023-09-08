@@ -30,4 +30,10 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 public @interface HmilyTAC {
 
+    /**
+     * Transaction isolation level enum.
+     *
+     * @return the transaction isolation level enum
+     */
+    IsolationLevelEnum isolationLevel() default IsolationLevelEnum.READ_UNCOMMITTED;
 }
