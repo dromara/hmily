@@ -23,6 +23,8 @@ import org.dromara.hmily.annotation.IsolationLevelEnum;
 import org.dromara.hmily.annotation.TransTypeEnum;
 import org.dromara.hmily.common.enums.HmilyActionEnum;
 import org.dromara.hmily.common.utils.IdWorkerUtils;
+import org.dromara.hmily.config.api.ConfigEnv;
+import org.dromara.hmily.config.api.entity.HmilyConfig;
 import org.dromara.hmily.core.context.HmilyContextHolder;
 import org.dromara.hmily.core.context.HmilyTransactionContext;
 import org.dromara.hmily.core.repository.HmilyRepositoryStorage;
@@ -36,7 +38,7 @@ import org.dromara.hmily.tac.core.cache.HmilyParticipantUndoCacheManager;
 import org.dromara.hmily.tac.core.cache.HmilyUndoContextCacheManager;
 import org.dromara.hmily.tac.core.context.HmilyUndoContext;
 import org.dromara.hmily.tac.core.lock.HmilyLockManager;
-import org.dromara.hmily.tac.core.lock.LockRetryController;
+import org.dromara.hmily.tac.core.lock.HmilyLockRetryHandler;
 import org.dromara.hmily.tac.p6spy.threadlocal.AutoCommitThreadLocal;
 import org.dromara.hmily.tac.sqlcompute.HmilySQLComputeEngine;
 import org.dromara.hmily.tac.sqlcompute.HmilySQLComputeEngineFactory;
@@ -102,40 +104,38 @@ public enum HmilyExecuteTemplate {
         }
         String resourceId = ResourceIdUtils.INSTANCE.getResourceId(connectionInformation.getUrl());
         HmilySQLComputeEngine sqlComputeEngine = HmilySQLComputeEngineFactory.newInstance(statement);
-        // select SQL
         HmilyTransactionContext transactionContext = HmilyContextHolder.get();
+        int lockRetryInterval = transactionContext.getLockRetryInterval();
+        int lockRetryTimes = transactionContext.getLockRetryTimes();
+        // select SQL
         if (statement instanceof HmilySelectStatement) {
             if (IsolationLevelEnum.READ_COMMITTED.getValue() == transactionContext.getIsolationLevel()) {
                 // read committed level need check locks
-                executeSelect(sql, parameters, connectionInformation, sqlComputeEngine, resourceId);
+                executeSelect(sql, parameters, connectionInformation, sqlComputeEngine, resourceId, lockRetryInterval, lockRetryTimes);
             }
             return;
         }
-        HmilyDataSnapshot snapshot = sqlComputeEngine.execute(sql, parameters, connectionInformation.getConnection(), resourceId);
-        log.debug("TAC-compute-sql ::: {}", snapshot);
-        HmilyUndoContext undoContext = buildUndoContext(HmilyContextHolder.get(), snapshot, resourceId);
-        HmilyLockManager.INSTANCE.tryAcquireLocks(undoContext.getHmilyLocks());
-        log.debug("TAC-try-lock ::: {}", undoContext.getHmilyLocks());
-        HmilyUndoContextCacheManager.INSTANCE.set(undoContext);
+        // update delete insert SQL
+        new HmilyLockRetryPolicy(lockRetryInterval, lockRetryTimes).execute(() -> {
+            HmilyDataSnapshot snapshot = sqlComputeEngine.execute(sql, parameters, connectionInformation.getConnection(), resourceId);
+            log.debug("TAC-compute-sql ::: {}", snapshot);
+            HmilyUndoContext undoContext = buildUndoContext(HmilyContextHolder.get(), snapshot, resourceId);
+            HmilyLockManager.INSTANCE.tryAcquireLocks(undoContext.getHmilyLocks());
+            log.debug("TAC-try-lock ::: {}", undoContext.getHmilyLocks());
+            HmilyUndoContextCacheManager.INSTANCE.set(undoContext);
+        });
     }
 
     private void executeSelect(final String sql, final List<Object> parameters, final ConnectionInformation connectionInformation,
-                               final HmilySQLComputeEngine sqlComputeEngine, final String resourceId) {
-        LockRetryController lockRetryController = new LockRetryController();
-        while (true) {
-            try {
-                HmilyDataSnapshot snapshot = sqlComputeEngine.execute(sql, parameters, connectionInformation.getConnection(), resourceId);
-                log.debug("TAC-compute-sql ::: {}", snapshot);
-                HmilyUndoContext undoContext = buildUndoContext(HmilyContextHolder.get(), snapshot, resourceId);
-                // check the global lock
-                HmilyLockManager.INSTANCE.checkLocks(undoContext.getHmilyLocks());
-                log.debug("TAC-check-lock ::: {}", undoContext.getHmilyLocks());
-                break;
-            } catch (HmilyLockConflictException hlce) {
-                // trigger retry
-                lockRetryController.sleep(hlce);
-            }
-        }
+                               final HmilySQLComputeEngine sqlComputeEngine, final String resourceId, final int lockRetryInterval, final int lockRetryTimes) {
+        new HmilyLockRetryPolicy(lockRetryInterval, lockRetryTimes).execute(() -> {
+            HmilyDataSnapshot snapshot = sqlComputeEngine.execute(sql, parameters, connectionInformation.getConnection(), resourceId);
+            log.debug("TAC-compute-sql ::: {}", snapshot);
+            HmilyUndoContext undoContext = buildUndoContext(HmilyContextHolder.get(), snapshot, resourceId);
+            // check the global lock
+            HmilyLockManager.INSTANCE.checkLocks(undoContext.getHmilyLocks());
+            log.debug("TAC-check-lock ::: {}", undoContext.getHmilyLocks());
+        });
     }
 
     private HmilyUndoContext buildUndoContext(final HmilyTransactionContext transactionContext, final HmilyDataSnapshot dataSnapshot, final String resourceId) {
@@ -207,5 +207,36 @@ public enum HmilyExecuteTemplate {
     private boolean check() {
         HmilyTransactionContext transactionContext = HmilyContextHolder.get();
         return Objects.isNull(transactionContext) || !TransTypeEnum.TAC.name().equalsIgnoreCase(transactionContext.getTransType());
+    }
+
+    private static class HmilyLockRetryPolicy {
+        protected static final boolean LOCK_RETRY_POLICY = ConfigEnv.getInstance().getConfig(HmilyConfig.class).isLockRetryPolicy();
+
+        private final HmilyLockRetryHandler hmilyLockRetryHandler;
+
+        HmilyLockRetryPolicy(final int lockRetryInterval, final int lockRetryTimes) {
+            this.hmilyLockRetryHandler = new HmilyLockRetryHandler(lockRetryInterval, lockRetryTimes);
+        }
+
+        private void execute(final Runnable task) {
+            if (!LOCK_RETRY_POLICY) {
+                task.run();
+            } else {
+                doRetryOnLockConflict(task);
+            }
+        }
+
+        private void doRetryOnLockConflict(final Runnable task) {
+            while (true) {
+                try {
+                    // execute the task that need to be retried
+                    task.run();
+                    break;
+                } catch (HmilyLockConflictException hlce) {
+                    // trigger retry
+                    hmilyLockRetryHandler.sleep(hlce);
+                }
+            }
+        }
     }
 }

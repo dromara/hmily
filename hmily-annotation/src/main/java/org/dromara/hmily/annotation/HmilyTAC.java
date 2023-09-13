@@ -36,4 +36,18 @@ public @interface HmilyTAC {
      * @return the transaction isolation level enum
      */
     IsolationLevelEnum isolationLevel() default IsolationLevelEnum.READ_UNCOMMITTED;
+
+    /**
+     * customized global lock retry interval(unit: ms).
+     *
+     * @return lock retry interval
+     */
+    int lockRetryInterval() default 0;
+
+    /**
+     * customized global lock retry times.
+     *
+     * @return lock retry times
+     */
+    int lockRetryTimes() default -1;
 }

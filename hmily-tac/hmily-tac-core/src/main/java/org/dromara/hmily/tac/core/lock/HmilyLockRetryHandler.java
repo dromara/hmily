@@ -11,7 +11,7 @@ import org.dromara.hmily.tac.core.exception.LockWaitTimeoutException;
  * @author zhangzhi
  */
 @Slf4j
-public class LockRetryController {
+public class HmilyLockRetryHandler {
 
     private int lockRetryInterval;
 
@@ -20,10 +20,10 @@ public class LockRetryController {
     /**
      * Instantiates a new Lock retry controller.
      */
-    public LockRetryController() {
+    public HmilyLockRetryHandler(final int lockRetryInterval, final int lockRetryTimes) {
         HmilyConfig hmilyConfig = ConfigEnv.getInstance().getConfig(HmilyConfig.class);
-        this.lockRetryInterval = hmilyConfig.getLockRetryInterval();
-        this.lockRetryTimes = hmilyConfig.getLockRetryTimes();
+        this.lockRetryInterval = lockRetryInterval <= 0 ? hmilyConfig.getLockRetryInterval() : lockRetryInterval;
+        this.lockRetryTimes = lockRetryTimes < 0 ? hmilyConfig.getLockRetryTimes() : lockRetryTimes;
     }
 
     /**
@@ -32,7 +32,6 @@ public class LockRetryController {
      * @throws LockWaitTimeoutException the lock wait timeout exception
      */
     public void sleep(final Exception e) {
-        // prioritize the rollback of other transactions
         if (--lockRetryTimes < 0) {
             log.error("Global lock wait timeout");
             throw new LockWaitTimeoutException("Global lock wait timeout", e);

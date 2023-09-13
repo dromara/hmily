@@ -85,6 +85,8 @@ public class HmilyTacTransactionManager {
         Method method = signature.getMethod();
         final HmilyTAC hmilyTAC = method.getAnnotation(HmilyTAC.class);
         context.setIsolationLevel(hmilyTAC.isolationLevel().getValue());
+        context.setLockRetryInterval(hmilyTAC.lockRetryInterval());
+        context.setLockRetryTimes(hmilyTAC.lockRetryTimes());
         context.setParticipantId(hmilyParticipant.getParticipantId());
         HmilyContextHolder.set(context);
         log.debug("TAC-tm-begin ::: {}", globalHmilyTransaction);
