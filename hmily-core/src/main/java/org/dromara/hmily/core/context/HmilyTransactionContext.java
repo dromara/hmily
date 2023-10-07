@@ -64,6 +64,16 @@ public class HmilyTransactionContext {
      */
     private int isolationLevel;
 
+    /**
+     * lock retry interval.
+     */
+    private int lockRetryInterval;
+
+    /**
+     * lock retry times.
+     */
+    private int lockRetryTimes;
+
     //以下为xa相关的参数.
     /**
      * xa相关的参数定义.

@@ -148,6 +148,11 @@ public class HmilyConfig extends AbstractConfig {
      * global lock retry times.
      */
     private int lockRetryTimes = 30;
+
+    /**
+     * whether the lock retry policy is enabled.
+     */
+    private boolean lockRetryPolicy = true;
     
     @Override
     public String prefix() {
