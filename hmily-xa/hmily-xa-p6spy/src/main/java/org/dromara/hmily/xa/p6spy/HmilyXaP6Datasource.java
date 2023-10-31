@@ -17,12 +17,11 @@
 package org.dromara.hmily.xa.p6spy;
 
 import com.p6spy.engine.spy.P6DataSource;
+import com.p6spy.engine.wrapper.ConnectionWrapper;
 import lombok.Getter;
-import org.dromara.hmily.common.exception.HmilyException;
 
 import javax.sql.DataSource;
 import javax.sql.XAConnection;
-import javax.sql.XADataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 
@@ -32,10 +31,10 @@ import java.sql.SQLException;
  * @author xiaoyu
  */
 public class HmilyXaP6Datasource extends P6DataSource {
-
+    
     @Getter
     private DataSource targetDataSource;
-
+    
     /**
      * Instantiates a new Hmily p 6 datasource.
      *
@@ -45,35 +44,39 @@ public class HmilyXaP6Datasource extends P6DataSource {
         super(delegate);
         init(delegate);
     }
-
+    
     @Override
     public Connection getConnection() throws SQLException {
-        XAConnection xaConnection = super.getXAConnection();
-        return getHmilyConnection(xaConnection);
+        ConnectionWrapper connection = (ConnectionWrapper)super.getConnection();
+        return getHmilyConnection(connection.getDelegate());
     }
-
+    
     @Override
     public Connection getConnection(final String username, final String password) throws SQLException {
-        XAConnection connection = super.getXAConnection(username, password);
-        return getHmilyConnection(connection);
+        ConnectionWrapper connection = (ConnectionWrapper)super.getConnection(username, password);
+        return getHmilyConnection(connection.getDelegate());
     }
-
+    
     /**
      * Gets hmily connection.
      *
-     * @param xaConnection the connection
+     * @param connection the connection
      * @return the hmily connection
      */
-    private Connection getHmilyConnection(final XAConnection xaConnection) throws SQLException {
+    private Connection getHmilyConnection(final Connection connection) throws SQLException {
+        XAConnection xaConnection;
+        try {
+            Connection unwrap = connection.unwrap(Connection.class);
+            xaConnection = XaConnectionFactory.warp(unwrap);
+        } catch (Exception e) {
+            throw new SQLException(e);
+        }
         return new HmilyXaConnection(xaConnection);
     }
-
+    
     private void init(final DataSource delegate) {
         if (delegate == null) {
             throw new NullPointerException("targetDataSource is null");
-        }
-        if (!(delegate instanceof XADataSource)) {
-            throw new HmilyException("datasource non implements XADataSource");
         }
         targetDataSource = delegate;
     }

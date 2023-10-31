@@ -17,7 +17,7 @@
 
 package org.dromara.hmily.xa.p6spy.test;
 
-import com.alibaba.druid.pool.xa.DruidXADataSource;
+import com.alibaba.druid.pool.DruidDataSource;
 import org.dromara.hmily.xa.core.UserTransactionImpl;
 import org.dromara.hmily.xa.p6spy.HmilyXaP6Datasource;
 import org.junit.Test;
@@ -114,18 +114,19 @@ public class HmilyXaTest {
         }
     }
 
-    private DataSource getDataSource2() {
-        DruidXADataSource druidDataSource = new DruidXADataSource();
-        druidDataSource.setUrl("jdbc:mysql://192.168.3.18:3306/xa_test");
+    private DataSource getDataSource() {
+        DruidDataSource druidDataSource = new DruidDataSource();
+        druidDataSource.setUrl("jdbc:mysql://127.0.0.1:3306/hmily?useSSL=false");
         druidDataSource.setUsername("root");
         druidDataSource.setPassword("123456");
+//        druidDataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
         druidDataSource.setDriverClassName("com.mysql.jdbc.Driver");
         return new HmilyXaP6Datasource(druidDataSource);
     }
 
-    private DataSource getDataSource() {
-        DruidXADataSource druidDataSource = new DruidXADataSource();
-        druidDataSource.setUrl("jdbc:mysql://192.168.3.26:3306/xa_test");
+    private DataSource getDataSource2() {
+        DruidDataSource druidDataSource = new DruidDataSource();
+        druidDataSource.setUrl("jdbc:mysql://127.0.0.1:3306/hmily");
         druidDataSource.setUsername("root");
         druidDataSource.setPassword("123456");
         druidDataSource.setDriverClassName("com.mysql.jdbc.Driver");
